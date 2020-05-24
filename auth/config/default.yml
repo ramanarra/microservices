@@ -1,0 +1,16 @@
+server :
+  URL : 'redis://localhost:6379'
+
+database :
+  type : 'postgres'
+  username : 'postgres'
+  password : 'root'
+  host: 'localhost'
+  database : 'auth'
+  port : 5432
+  synchronize : false
+  
+JWT :
+  expiresIn : 3600
+  secret : 'topSecret51'
+  defaultStrategy : 'jwt'

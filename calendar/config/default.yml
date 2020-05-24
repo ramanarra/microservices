@@ -1,0 +1,11 @@
+server :
+  URL : 'redis://localhost:6379'
+
+database :
+  type : 'postgres'
+  username : 'postgres'
+  password : 'root'
+  host: 'localhost'
+  database : 'calendar'
+  port : 5432
+  synchronize : false
