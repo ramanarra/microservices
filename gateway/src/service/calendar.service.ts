@@ -2,8 +2,7 @@ import { Injectable, Inject, UseFilters } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
 import { Observable } from 'rxjs';
-import { UserDto } from 'src/dto/user.dto';
-import { AppointmentDto } from 'src/dto/appointment.dto';
+import { UserDto, AppointmentDto } from 'common-dto';
 
 @Injectable()
 export class CalendarService {

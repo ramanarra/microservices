@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { AppointmentDto } from 'src/dto/appointment.dto';
+import { AppointmentDto } from 'common-dto';
 
 @Controller('appointment')
 export class AppointmentController {

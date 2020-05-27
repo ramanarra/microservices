@@ -1,7 +1,7 @@
 import { Injectable, Inject, UseFilters } from '@nestjs/common';
 import { ClientProxy } from "@nestjs/microservices";
 import { Observable } from 'rxjs';
-import { UserDto, LoginDto } from 'src/dto/user.dto';
+import { UserDto } from 'common-dto';
 import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class UserService {
         return this.redisClient.send({ cmd: 'auth_user_signUp' }, userDto);
     }
 
-    public validateEmailPassword(loginDto : LoginDto): Observable<any> {
+    public validateEmailPassword(loginDto : UserDto): Observable<any> {
         return this.redisClient.send({cmd : "auth_user_validate_email_password"}, loginDto);
     }
 
