@@ -1,6 +1,6 @@
 import { Repository, EntityRepository } from "typeorm";
 import { Users } from "./users.entity";
-import { UserDto } from "src/dto/user.dto";
+import { UserDto } from "common-dto";
 import * as bcrypt from "bcrypt";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 

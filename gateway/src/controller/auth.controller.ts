@@ -1,6 +1,6 @@
 import { Controller, Body, Post, Get, UseFilters, Logger } from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
-import { UserDto, LoginDto } from 'src/dto/user.dto';
+import { UserDto } from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 import {
   ApiCreatedResponse,
@@ -30,7 +30,7 @@ export class AuthController {
     @ApiOkResponse({ description: 'User Login' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
-    login(@Body() loginDto : LoginDto) {
+    login(@Body() loginDto : UserDto) {
       this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
       return this.userService.validateEmailPassword(loginDto);
     }

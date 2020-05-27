@@ -1,8 +1,7 @@
 import { Controller, UseFilters, Body, Logger } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UserService } from './user.service';
-import { UserDto } from 'src/dto/user.dto';
-import { RpcExceptionFilter } from 'src/common/filter/rpc-exception.filter';
+import { UserDto } from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 
 @Controller('user')

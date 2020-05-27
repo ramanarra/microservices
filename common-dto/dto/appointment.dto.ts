@@ -1,5 +1,3 @@
-import { isString } from "util";
-
 export class AppointmentDto {
   id : number;
   doctorId : number;
@@ -7,4 +5,4 @@ export class AppointmentDto {
   appointmentDate : Date;
   startTime : string;
   endTime : string;    
-  }
+}

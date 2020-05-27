@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/typeorm": "^7.0.0",
     "bcrypt": "^4.0.1",
+    "common-dto": "file:../common-dto",
     "config": "^3.3.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

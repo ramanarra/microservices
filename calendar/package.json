@@ -26,6 +26,7 @@
     "@nestjs/microservices": "^7.0.13",
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/typeorm": "^7.0.0",
+    "common-dto": "file:../common-dto",
     "config": "^3.3.1",
     "pg": "^8.2.1",
     "redis": "^3.0.2",
