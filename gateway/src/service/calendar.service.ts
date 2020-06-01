@@ -20,7 +20,7 @@ export class CalendarService {
 
     @UseFilters(AllClientServiceException)
     public createAppointment(userDto : UserDto, appointmentList : AppointmentDto): Observable<any> {
-        return this.redisClient.send({ cmd: 'calendar_appointment_create' }, {appointmentList, userDto});
+        return this.redisClient.send({ cmd: 'calendar_appointment_create' }, appointmentList);
     }
 
 }

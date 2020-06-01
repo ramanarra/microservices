@@ -5,7 +5,3 @@ export declare class UserDto {
     password: string;
     role: string;
 }
-declare const LoginDto_base: any;
-export declare class LoginDto extends LoginDto_base {
-}
-export {};

@@ -1,5 +1,4 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'typeorm';
-import { Timestamp } from 'rxjs';
 
 @Entity()
 export class Appointment extends BaseEntity{
