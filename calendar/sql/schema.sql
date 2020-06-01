@@ -11,7 +11,7 @@ ALTER SEQUENCE public.appointment_seq
 
 CREATE TABLE public.appointment
 (
-    id bigint NOT NULL,
+     id bigint NOT NULL DEFAULT nextval('appointment_seq'::regclass),
     doctor_id bigint NOT NULL,
     patient_id bigint NOT NULL,
     appointment_date date NOT NULL,

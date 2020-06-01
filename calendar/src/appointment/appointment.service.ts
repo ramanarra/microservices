@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AppointmentRepository } from './appointment.repository';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AppointmentDto, UserDto } from 'common-dto';
+import { Appointment } from './appointment.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -10,8 +12,12 @@ export class AppointmentService {
     ) {
     }
 
-    async getAppointmentList(userDto : any){
-        await this.appointmentRepository.find({});
+    async getAppointmentList(userDto : UserDto): Promise<Appointment[]>{
+       return await this.appointmentRepository.find({});
+    }
+
+    async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
+        return await this.appointmentRepository.createAppointment(appointmentDto);
     }
 
 }

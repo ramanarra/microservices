@@ -33,4 +33,9 @@ export class UserController {
     return await this.userService.findByEmail(email);
   }
 
+  @MessagePattern({ cmd: 'auth_user_list' })
+  async findUsers():Promise<any>{
+    return await this.userService.findUsers();
+  }
+
 }
