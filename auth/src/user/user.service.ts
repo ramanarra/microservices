@@ -34,9 +34,9 @@ export class UserService {
         return await this.userRepository.findOne({email});
     }
 
-    findUsers(): Promise<Users[]> {
-        return this.userRepository.find();
-      }
+    // findUsers(): Promise<Users[]> {
+    //     return this.userRepository.find();
+    //   }
 
 
 }

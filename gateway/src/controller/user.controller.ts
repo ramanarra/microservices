@@ -13,14 +13,14 @@ export class UserController {
 
     constructor( private readonly userService : UserService){}
 
-    @ApiOkResponse({ description: 'Update current user' })
-    @ApiUnauthorizedResponse()
-    @Get('list')
-    @ApiBearerAuth('JWT')
-    @UseGuards(AuthGuard())
-    @Roles('admin')
-    @RolesPolicy('user_list_allow')
-    getUsersList() {
-        return this.userService.usersList();
-    }
+    // @ApiOkResponse({ description: 'Update current user' })
+    // @ApiUnauthorizedResponse()
+    // @Get('list')
+    // @ApiBearerAuth('JWT')
+    // @UseGuards(AuthGuard())
+    // @Roles('admin')
+    // @RolesPolicy('user_list_allow')
+    // getUsersList() {
+    //     return this.userService.usersList();
+    // }
 }
