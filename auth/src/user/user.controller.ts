@@ -13,7 +13,7 @@ export class UserController {
   private logger = new Logger('UserController');
   
 
-  constructor(private readonly userService: UserService,@Inject('REDIS_SERVICE') private readonly redisClient: ClientProxy ) {
+  constructor(private readonly userService: UserService ) {
 
   }
 
@@ -48,7 +48,9 @@ export class UserController {
       const doctor = await this.userService.doctor_Login(email,password);
       var doctorKey = doctor.doctor_key;
       //async doctorDetails(doctorKey: doctorKey): Observable<any> {
-      return this.redisClient.send( { cmd: 'auth_doctor_details' }, doctorKey);
+      //return this.redisClient.send( { cmd: 'auth_doctor_details' }, doctorKey);
+      return doctorKey;
+      
   }
 
 

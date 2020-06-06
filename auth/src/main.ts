@@ -11,11 +11,11 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice(AppModule, OPTIONS );
   await app.listen(() => logger.log('Auth microservice is listening'));
   
-  const app1 = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    transport: Transport.REDIS,
-    options: {
-      url: 'redis://localhost:6379',
-    },
-  });
+  // const app1 = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  //   transport: Transport.REDIS,
+  //   options: {
+  //     url: 'redis://localhost:6379',
+  //   },
+  // });
 }
 bootstrap();

@@ -32,7 +32,12 @@ export class AppointmentController {
     @MessagePattern({ cmd: 'auth_doctor_details' })
     async doctor_Login(doctorKey) : Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(doctorKey);
-        return doctor;
+        var doc=[];
+        doc[0]=doctor;
+        var accountKey = doctor.accountKey;
+        const account = await this.appointmentService.accountDetails(accountKey);
+        doc[1]=account;
+        return doc;
        
     }
 

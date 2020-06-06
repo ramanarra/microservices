@@ -8,6 +8,8 @@ import { PassportModule } from '@nestjs/passport';
 import * as config from 'config';
 import { AppModule } from 'src/app.module';
 import { ClientProxyFactory } from '@nestjs/microservices';
+import { NestFactory } from '@nestjs/core';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 const jwtConfig = config.get('JWT'); 
 
@@ -24,15 +26,20 @@ const jwtConfig = config.get('JWT');
     ],
     controllers: [UserController],
     providers: [UserService,
-      {
-        provide: 'REDIS_SERVICE',
-        useFactory: (appModule: AppModule) => {
-          return ClientProxyFactory.create(appModule.get('redisService'));
-        },
-        inject: [
-          AppModule
-        ]
-      },
+      // {
+      //   provide: 'REDIS_SERVICE',
+      //   useFactory: (appModule: AppModule) => {
+      //     return ClientProxyFactory.create({
+      //       transport: Transport.REDIS,
+      //       options: {
+      //         url: 'redis://localhost:6379',
+      //       }
+      //     });
+      //   },
+      //   inject: [
+      //     AppModule
+      //   ]
+      // },
     ]
 })
 export class UserModule { }
