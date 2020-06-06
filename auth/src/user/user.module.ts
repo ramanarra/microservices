@@ -6,6 +6,8 @@ import { UserRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import * as config from 'config';
+import { AppModule } from 'src/app.module';
+import { ClientProxyFactory } from '@nestjs/microservices';
 
 const jwtConfig = config.get('JWT'); 
 
@@ -21,6 +23,16 @@ const jwtConfig = config.get('JWT');
           PassportModule.register({defaultStrategy : jwtConfig.defaultStrategy})
     ],
     controllers: [UserController],
-    providers: [UserService]
+    providers: [UserService,
+      {
+        provide: 'REDIS_SERVICE',
+        useFactory: (appModule: AppModule) => {
+          return ClientProxyFactory.create(appModule.get('redisService'));
+        },
+        inject: [
+          AppModule
+        ]
+      },
+    ]
 })
 export class UserModule { }

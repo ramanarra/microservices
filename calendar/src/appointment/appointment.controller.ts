@@ -28,6 +28,13 @@ export class AppointmentController {
         return appointment;
     }
 
+    
+    @MessagePattern({ cmd: 'auth_doctor_details' })
+    async doctor_Login(doctorKey) : Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(doctorKey);
+        return doctor;
+       
+    }
 
 
 

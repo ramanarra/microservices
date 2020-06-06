@@ -34,9 +34,21 @@ export class UserService {
         return await this.userRepository.findOne({email});
     }
 
-    // findUsers(): Promise<Users[]> {
-    //     return this.userRepository.find();
-    //   }
+    findUsers(): Promise<Users[]> {
+        return this.userRepository.find();
+      }
+
+
+    async doctor_Login(email,password) : Promise<any> {
+        const doctor = await this.userRepository.findOne({email : email, password : password});
+        if(doctor){
+            return doctor;
+        }
+        else{
+            return 'Invalid Credentials';
+        }
+       
+    }
 
 
 }

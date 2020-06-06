@@ -28,7 +28,7 @@ TABLESPACE pg_default;
 ALTER TABLE public.users
     OWNER to postgres;
 
-CREATE TABLE public.doctor_login
+CREATE TABLE public.doctor
 (
     doctor_id serial NOT NULL,
     email character varying(100) NOT NULL,
@@ -40,10 +40,10 @@ WITH (
     OIDS = FALSE
 );
 
-ALTER TABLE public.doctor_login
+ALTER TABLE public.doctor
     OWNER to postgres;
 
-CREATE TABLE public.patient_login
+CREATE TABLE public.patient
 (
     patient_id serial NOT NULL,
     email character varying(100) NOT NULL,
@@ -54,7 +54,7 @@ WITH (
     OIDS = FALSE
 );
 
-ALTER TABLE public.patient_login
+ALTER TABLE public.patient
     OWNER to postgres;
 
 
@@ -92,7 +92,7 @@ ALTER TABLE public.account
 
 ALTER TABLE public.roles
     ADD CONSTRAINT roles_to_doctor_id FOREIGN KEY (doctor_id)
-    REFERENCES public.doctor_login (doctor_id) MATCH SIMPLE
+    REFERENCES public.doctor (doctor_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;

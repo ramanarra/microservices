@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique, Timestamp } from 'typeorm';
 import * as bcrypt from "bcrypt";
 
 @Entity()
@@ -21,7 +21,16 @@ export class Users extends BaseEntity{
     salt : string;
 
     @Column()
-    role : string;
+    account_id : number;
+
+    @Column()
+    doctor_key : string;
+
+    @Column()
+    is_active : boolean;
+
+    @Column()
+    updated_time : Date;
 
 
     async validatePassword(password : string) : Promise<boolean> {

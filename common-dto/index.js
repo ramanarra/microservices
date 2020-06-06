@@ -5,3 +5,5 @@ function __export(m) {
 exports.__esModule = true;
 __export(require("./dto/user.dto"));
 __export(require("./dto/appointment.dto"));
+__export(require("./dto/doctor.dto"));
+__export(require("./dto/account.dto"));

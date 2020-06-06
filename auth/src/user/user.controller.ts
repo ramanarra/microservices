@@ -1,18 +1,22 @@
-import { Controller, UseFilters, Body, Logger } from '@nestjs/common';
+import { Controller, UseFilters, Body, Logger, Inject } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { UserDto } from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
+import { ClientProxy } from "@nestjs/microservices";
+import { async } from 'rxjs/internal/scheduler/async';
 
 @Controller('user')
 @UseFilters(AllExceptionsFilter)
 export class UserController {
 
   private logger = new Logger('UserController');
+  
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly userService: UserService,@Inject('REDIS_SERVICE') private readonly redisClient: ClientProxy ) {
 
   }
+
 
   @MessagePattern({ cmd: 'auth_user_validate_email_password' })
   async login(userDto: UserDto): Promise<any> {
@@ -33,9 +37,19 @@ export class UserController {
     return await this.userService.findByEmail(email);
   }
 
-  // @MessagePattern({ cmd: 'auth_user_list' })
-  // async findUsers():Promise<any>{
-  //   return await this.userService.findUsers();
-  // }
+  @MessagePattern({ cmd: 'auth_user_list' })
+  async findUsers():Promise<any>{
+    return await this.userService.findUsers();
+  }
+
+  @MessagePattern({ cmd: 'auth_doctor__login' })
+  async doctor_Login(doctorDto: any): Promise<any> {
+      const { email, password } = doctorDto;
+      const doctor = await this.userService.doctor_Login(email,password);
+      var doctorKey = doctor.doctor_key;
+      //async doctorDetails(doctorKey: doctorKey): Observable<any> {
+      return this.redisClient.send( { cmd: 'auth_doctor_details' }, doctorKey);
+  }
+
 
 }

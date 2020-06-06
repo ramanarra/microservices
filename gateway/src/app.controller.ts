@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './common/decorator/get-user.decorator';
-import { UserDto,AppointmentDto } from 'common-dto';
+import { UserDto,AppointmentDto, DoctorDto } from 'common-dto';
 
 @Controller('')
 export class AppController {
