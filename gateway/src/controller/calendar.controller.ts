@@ -1,12 +1,14 @@
-import { Controller, Logger, Get, UseGuards, Post, Body } from '@nestjs/common';
+import { Controller, Logger, Get, UseGuards, Post, Body, UseFilters } from '@nestjs/common';
 import { CalendarService } from 'src/service/calendar.service';
 import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UserDto, AppointmentDto } from 'common-dto';
+import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 
 @Controller('calendar')
+@UseFilters(AllExceptionsFilter)
 export class CalendarController {
 
     private logger = new Logger('CalendarController');

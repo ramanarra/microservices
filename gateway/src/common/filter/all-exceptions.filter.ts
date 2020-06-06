@@ -1,18 +1,48 @@
-import { Catch, ArgumentsHost } from '@nestjs/common';
-import { BaseRpcExceptionFilter } from '@nestjs/microservices';
-import { throwError } from 'rxjs';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  ConflictException,
+} from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core/exceptions/base-exception-filter';
 
 @Catch()
-export class AllExceptionsFilter extends BaseRpcExceptionFilter {
-  catch(  exceptionError :  any, host: ArgumentsHost) {
-    //  const exceptionError = exception.getError() as any
-    const { response = {}, ...error } = {
-      ...exceptionError,
-      error:exceptionError.response.error ? exceptionError.response.error : exceptionError.error,
-      message: exceptionError.response.message,
-      status: exceptionError.response.statusCode,
+export class AllExceptionsFilter extends BaseExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+
+
+    if(exception instanceof ConflictException){
+
+      const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message : exception
+    });
+    }else {
+      
+    const status =
+    exception instanceof HttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
+
+  response.status(status).json({
+    statusCode: status,
+    timestamp: new Date().toISOString(),
+    path: request.url,
+    message : exception
+  });
     }
-    return throwError(error);
-    // return super.catch(exception, host);
+
   }
 }

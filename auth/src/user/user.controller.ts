@@ -25,7 +25,7 @@ export class UserController {
   @MessagePattern({ cmd: 'auth_user_signUp' })
   async signUp(userDto: UserDto): Promise<any> {
     this.logger.log(" authh service >> " + userDto);
-    return await this.userService.signUp(userDto);
+      return await this.userService.signUp(userDto);
   }
 
   @MessagePattern({ cmd: 'auth_user_find_by_email' })

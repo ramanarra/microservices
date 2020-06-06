@@ -1,12 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { MessagePattern } from '@nestjs/microservices';
+import { HealthCheckMicroServiceInterface } from 'common-dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  @MessagePattern({ cmd: 'calendar_service_healthCheck' })
+  getAuth(): HealthCheckMicroServiceInterface {
+    console.log("Hit to auth to check");
+   return { success : true};
+ }
+
 }

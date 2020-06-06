@@ -10,7 +10,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
 };
 exports.__esModule = true;
-__exportStar(require("./dto/user.dto"), exports);
-__exportStar(require("./dto/appointment.dto"), exports);
-__exportStar(require("./interface/index"), exports);
-__exportStar(require("./config/index"), exports);
+__exportStar(require("./constant"), exports);
