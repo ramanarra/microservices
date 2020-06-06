@@ -25,9 +25,4 @@ export class UserService {
         return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email);
     }
 
-    public usersList() : Observable <any> {
-        return this.redisClient.send( {cmd : 'auth_user_list'},'');
-    }
-
-
 }
