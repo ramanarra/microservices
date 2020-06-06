@@ -4,7 +4,6 @@ import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth, ApiCrea
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
-import { GetAppointment } from 'src/common/decorator/get-appointment.decorator';
 import { UserDto, AppointmentDto } from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 
