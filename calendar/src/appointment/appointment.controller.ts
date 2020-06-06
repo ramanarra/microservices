@@ -23,7 +23,7 @@ export class AppointmentController {
     @MessagePattern({ cmd: 'calendar_appointment_create' })
     async createAppointment(appointmentDetails: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDetails);
-        const appointment = await this.appointmentService.createAppointment(appointmentDetails);
+        const appointment = await this.appointmentService.getAppointmentList(appointmentDetails);
         
         return appointment;
     }
