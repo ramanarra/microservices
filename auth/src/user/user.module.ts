@@ -6,6 +6,10 @@ import { UserRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import * as config from 'config';
+import { AppModule } from 'src/app.module';
+import { ClientProxyFactory } from '@nestjs/microservices';
+import { NestFactory } from '@nestjs/core';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 const jwtConfig = config.get('JWT'); 
 

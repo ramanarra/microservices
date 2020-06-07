@@ -1,8 +1,7 @@
 import { Injectable, Inject, UseFilters, RequestTimeoutException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ClientProxy } from "@nestjs/microservices";
+import { UserDto ,DoctorDto, HealthCheckMicroServiceInterface} from 'common-dto';
 import { Observable, throwError, TimeoutError, of } from 'rxjs';
-import { UserDto, HealthCheckMicroServiceInterface } from 'common-dto';
-import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
 import { timeout, catchError } from 'rxjs/operators';
 import { HealthCheckService } from './health-check.service';
 
@@ -41,8 +40,30 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd: "auth_user_validate_email_password" }, loginDto);
     }
 
-    public findUserByEmail(email: string): Observable<any> {
-        return this.redisClient.send({ cmd: 'auth_user_find_by_email' }, email);
+    public findUserByEmail(email : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email);
     }
+
+    public usersList() : Observable <any> {
+        return this.redisClient.send( {cmd : 'auth_user_list'},'');
+    }
+
+    public doctorLogin(doctorDto: DoctorDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_login' }, doctorDto);
+    }
+
+    public doctorList(id): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_list' }, id);
+    }
+
+    public doctorView(doctorDto: DoctorDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_view' }, doctorDto);
+    }
+
+    
+    public doctor_Login(doctorDto: DoctorDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_doctor__login' }, doctorDto);
+    }
+
 
 }

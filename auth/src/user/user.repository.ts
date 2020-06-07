@@ -11,7 +11,7 @@ export class UserRepository extends Repository<Users> {
 
     async signUP(userDto: UserDto): Promise<any> {
 
-        const { name, email, password, role } = userDto;
+        const { name, email, password} = userDto;
 
         const user = new Users();
         const salt = await bcrypt.genSalt();
@@ -19,7 +19,7 @@ export class UserRepository extends Repository<Users> {
         user.password = await this.hashPassword(password, salt);
         user.salt = salt
         user.email = email;
-        user.role = role;
+        // user.role = role;
 
         try {
             return await user.save();

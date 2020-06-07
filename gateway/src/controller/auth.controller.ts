@@ -1,6 +1,6 @@
-import { Controller, Body, Post, Get, UseFilters, Logger } from '@nestjs/common';
+import { Controller, Body, Param, Query, Post, Get, Put, UseFilters, Logger } from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
-import { UserDto } from 'common-dto';
+import { UserDto, DoctorDto } from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 import {
   ApiCreatedResponse,
@@ -38,6 +38,51 @@ export class AuthController {
     this.logger.log(`Login  Api -> Response data ${JSON.stringify(res)}`);
     return res;
   }
+
+
+
+    @Post('doctorLogin')
+    @ApiOkResponse({ description: 'Doctor Login' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: DoctorDto })
+    doctorLogin(@Body() doctorDto : DoctorDto) {
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
+      return this.userService.doctorLogin(doctorDto);
+    }
+
+    // @Get('doctor_List')
+    // @ApiOkResponse({ description: 'Doctor List' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // doctorList(@Query('id') id: number) {
+    //   this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(id)}`);
+    //   return this.userService.doctorList(id);
+    // }
+
+    // @Post('doctorView')
+    // @ApiOkResponse({ description: 'Doctor View' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: DoctorDto })
+    // doctorView(@Body() doctorDto : DoctorDto) {
+    //   this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
+    //   return this.userService.doctorView(doctorDto);
+    // }
+
+    
+    // @Put('fee&consultaion')
+    // @ApiOkResponse({ description: 'Doctor fee and consultation update' })
+    // updateFee(@Param('id') id: string, @Body() feeDto: FeeDto) {
+    // return `This action updates a #${id} cat`;
+    // }
+
+
+    // @Post('doctor_Login')
+    // @ApiOkResponse({ description: 'Doctor Login' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: DoctorDto })
+    // doctor_Login(@Body() doctorDto : DoctorDto) {
+    //   this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
+    //   return this.userService.doctor_Login(doctorDto);
+    // }
 
 
 }

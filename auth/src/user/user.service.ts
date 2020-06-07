@@ -34,4 +34,16 @@ export class UserService {
     }
 
 
+    async doctor_Login(email,password) : Promise<any> {
+        const doctor = await this.userRepository.findOne({email : email, password : password});
+        if(doctor){
+            return doctor;
+        }
+        else{
+            return 'Invalid Credentials';
+        }
+       
+    }
+
+
 }

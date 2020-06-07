@@ -12,5 +12,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 exports.__esModule = true;
 __exportStar(require("./dto/user.dto"), exports);
 __exportStar(require("./dto/appointment.dto"), exports);
+__exportStar(require("./dto/doctor.dto"), exports);
+__exportStar(require("./dto/account.dto"), exports);
+__exportStar(require("./dto/doctor_config_preconsultation.dto"), exports);
 __exportStar(require("./interface/index"), exports);
 __exportStar(require("./config/index"), exports);
