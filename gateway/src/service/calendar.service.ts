@@ -2,6 +2,8 @@ import { Injectable, Inject, UseFilters, OnModuleDestroy, OnModuleInit } from '@
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { UserDto, AppointmentDto } from 'common-dto';
+import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
+
 
 @Injectable()
 export class CalendarService implements OnModuleInit, OnModuleDestroy{
@@ -14,18 +16,43 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     onModuleInit() {
         this.redisClient.connect();
      }
- 
+
      onModuleDestroy() {
          this.redisClient.close();
      }
 
-    
+
     public appointmentList(userDto : UserDto): Observable<any> {
         return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, userDto);
     }
+    // @UseFilters(AllClientServiceException)
+    // public appointmentList(userDto : UserDto): Observable<any> {
+    //     return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, userDto);
+    // }
 
+    @UseFilters(AllClientServiceException)
     public createAppointment(userDto : UserDto, appointmentList : AppointmentDto): Observable<any> {
         return this.redisClient.send({ cmd: 'calendar_appointment_create' }, {appointmentList, userDto});
     }
+
+    @UseFilters(AllClientServiceException)
+    public doctorList(role,key): Observable<any> {
+        var arr=[];
+         arr[0]=role;
+         arr[1]=key;
+        return this.redisClient.send( { cmd: 'app_doctor_list' }, arr);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorView(key): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_doctor_view' }, key);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorPreconsultation(doctorConfigPreConsultationDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_doctor_preconsultation' }, doctorConfigPreConsultationDto);
+    }
+
+
 
 }

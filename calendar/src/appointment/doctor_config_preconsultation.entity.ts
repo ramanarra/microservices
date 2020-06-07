@@ -21,7 +21,7 @@ export class DoctorConfigPreConsultation extends BaseEntity{
     @Column({
         name : 'is_preconsultation_allowed'
     })
-    isPreconsultationAllowed : string;
+    isPreconsultationAllowed : boolean;
 
     @Column({
         name : 'preconsultation_hours'
@@ -31,21 +31,21 @@ export class DoctorConfigPreConsultation extends BaseEntity{
     @Column({
         name : 'preconsultation_minutes'
     })
-    preconsultationMinutes : string;
+    preconsultationMinutes : number;
 
     @Column({
         name : 'is_active'
     })
-    isActive : string;
+    isActive : boolean;
 
     @Column({
         name : 'created_on'
     })
-    createdOn : string;
+    createdOn : Date;
 
     @Column({
         name : 'modified_on'
     })
-    modifiedOn : string;
+    modifiedOn : Date;
 
 }

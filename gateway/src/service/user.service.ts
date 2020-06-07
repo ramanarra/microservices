@@ -40,6 +40,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd: "auth_user_validate_email_password" }, loginDto);
     }
 
+    public findUserByEmail(email : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email);
+    }
+
+    public usersList() : Observable <any> {
+        return this.redisClient.send( {cmd : 'auth_user_list'},'');
+    }
+
     public doctorLogin(doctorDto: DoctorDto): Observable<any> {
         return this.redisClient.send( { cmd: 'auth_doctor_login' }, doctorDto);
     }
@@ -55,11 +63,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     
     public doctor_Login(doctorDto: DoctorDto): Observable<any> {
         return this.redisClient.send( { cmd: 'auth_doctor__login' }, doctorDto);
-    }
-
-
-    public findUserByEmail(email: string): Observable<any> {
-        return this.redisClient.send({ cmd: 'auth_user_find_by_email' }, email);
     }
 
 

@@ -17,17 +17,9 @@ CREATE TABLE public.users
     email character varying(250) COLLATE pg_catalog."default" NOT NULL,
     password character varying(250) COLLATE pg_catalog."default" NOT NULL,
     salt character varying(250) COLLATE pg_catalog."default",
-    account_id bigint,
-    doctor_key character varying(200) COLLATE pg_catalog."default",
-    is_active boolean,
-    updated_time time without time zone,
+    role character varying(250) COLLATE pg_catalog."default",
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_email_key UNIQUE (email),
-    CONSTRAINT user_to_account FOREIGN KEY (account_id)
-        REFERENCES public.account (account_id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+    CONSTRAINT users_email_key UNIQUE (email)
 )
 
 TABLESPACE pg_default;
