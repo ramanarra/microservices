@@ -9,7 +9,7 @@ export class AppController {
 
   @MessagePattern({ cmd: 'calendar_service_healthCheck' })
   getAuth(): HealthCheckMicroServiceInterface {
-    console.log("Hit to auth to check");
+    console.log("Hit to auth to check !!");
    return { success : true};
  }
 
