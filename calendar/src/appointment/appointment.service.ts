@@ -22,7 +22,6 @@ export class AppointmentService {
     }
 
     async doctorDetails(doctorKey): Promise<any> {
-        return await this.appointmentRepository.findOne( doctorKey);
         return await this.doctorRepository.findOne({doctorKey : doctorKey});
     }
 
