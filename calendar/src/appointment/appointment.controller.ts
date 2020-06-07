@@ -51,8 +51,6 @@ export class AppointmentController {
             return {
                 doctorList:account
             }
-
-           
         }else if(arr[0]=='Admin'){
             var accountKey = arr[1];
             const account = await this.appointmentService.accountDetails(accountKey);
@@ -82,8 +80,8 @@ export class AppointmentController {
         
     @MessagePattern({ cmd: 'app_doctor_preconsultation' })
     async doctorPreconsultation(doctorConfigPreConsultationDto:any) : Promise<any> {
-            const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
-            return preconsultation;
+        //    const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
+          //  return preconsultation;
         }
 
     

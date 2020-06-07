@@ -18,13 +18,13 @@ export class UserController {
   }
 
 
-  // @MessagePattern({ cmd: 'auth_user_validate_email_password' })
-  // async login(userDto: UserDto): Promise<any> {
-  //   this.logger.log(" login  service >> " + userDto);
-  //   const user = await this.userService.validateEmailPassword(userDto);
-  //   this.logger.log("asfn >>> " + user);
-  //            return user;
-  // }
+  @MessagePattern({ cmd: 'auth_user_validate_email_password' })
+  async login(userDto: UserDto): Promise<any> {
+    this.logger.log(" login  service >> " + userDto);
+    const user = await this.userService.validateEmailPassword(userDto);
+    this.logger.log("asfn >>> " + user);
+             return user;
+  }
 
   // @MessagePattern({ cmd: 'auth_user_signUp' })
   // async signUp(userDto: UserDto): Promise<any> {

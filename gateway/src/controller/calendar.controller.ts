@@ -18,7 +18,7 @@ export class CalendarController {
 
     // @Get('appointment')
     // @ApiOkResponse({ description: 'Appointment List' })
-    // @ApiBearerAuth('JWT')
+    //@ApiBearerAuth('JWT')
     // @UseGuards(AuthGuard())
     // @Roles('doctor', 'patient')
     // getAppointmentList(@GetUser() userInfo : UserDto) {
@@ -39,13 +39,12 @@ export class CalendarController {
     //   return this.calendarService.createAppointment(userInfo, appointmentDto);
     // }
 
-
     @Get('doctor_List')
     @ApiOkResponse({ description: 'Doctor List' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     //@UseInterceptors(ClassSerializerInterceptor)
     doctorList(@Query('Role') role: string,@Query('Key') key: string) {
-      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(role),JSON.stringify(key)}`);
+      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(role)}`);
       return this.calendarService.doctorList(role,key);
     }
 

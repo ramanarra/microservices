@@ -26,14 +26,14 @@ export class AuthController {
     //   return this.userService.signUp(userDto);
     // }
 
-    // @Post('login')
-    // @ApiOkResponse({ description: 'User Login' })
-    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    // @ApiBody({ type: UserDto })
-    // login(@Body() loginDto : UserDto) {
-    //   this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
-    //   return this.userService.validateEmailPassword(loginDto);
-    // }
+    @Post('login')
+    @ApiOkResponse({ description: 'User Login' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    login(@Body() loginDto : UserDto) {
+      this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
+      return this.userService.validateEmailPassword(loginDto);
+    }
 
     @Post('doctorLogin')
     @ApiOkResponse({ description: 'Doctor Login' })
