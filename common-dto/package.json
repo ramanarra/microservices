@@ -10,8 +10,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "class-validator": "^0.12.2"
-  }
+  "license": "ISC"
 }

@@ -12,7 +12,8 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
       message: exceptionError.response.message,
       status: exceptionError.response.statusCode,
     }
-    return throwError(error)
+    console.log('Exx >>>>>>-----------------------' +error);
+    return throwError(exceptionError)
     // return super.catch(exception, host);
   }
 }

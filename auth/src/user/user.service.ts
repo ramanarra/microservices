@@ -2,9 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
 import { UserDto } from 'common-dto';
-import { JwtPayLoad } from 'src/common/jwt/jwt-payLoad.interface';
+import { JwtPayLoad } from 'src/common/jwt/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
-import { Users } from './users.entity';
 
 @Injectable()
 export class UserService {
@@ -33,10 +32,6 @@ export class UserService {
     async findByEmail(email : string) : Promise<any> {
         return await this.userRepository.findOne({email});
     }
-
-    findUsers(): Promise<Users[]> {
-        return this.userRepository.find();
-      }
 
 
     async doctor_Login(email,password) : Promise<any> {

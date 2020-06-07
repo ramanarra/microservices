@@ -29,7 +29,7 @@ export class UserController {
   @MessagePattern({ cmd: 'auth_user_signUp' })
   async signUp(userDto: UserDto): Promise<any> {
     this.logger.log(" authh service >> " + userDto);
-    return await this.userService.signUp(userDto);
+      return await this.userService.signUp(userDto);
   }
 
   @MessagePattern({ cmd: 'auth_user_find_by_email' })
@@ -37,10 +37,11 @@ export class UserController {
     return await this.userService.findByEmail(email);
   }
 
-  @MessagePattern({ cmd: 'auth_user_list' })
-  async findUsers():Promise<any>{
-    return await this.userService.findUsers();
-  }
+
+  // @MessagePattern({ cmd: 'auth_user_list' })
+  // async findUsers():Promise<any>{
+  //   return await this.userService.findUsers();
+  // }
 
   @MessagePattern({ cmd: 'auth_doctor__login' })
   async doctor_Login(doctorDto: any): Promise<any> {
@@ -51,6 +52,5 @@ export class UserController {
      // return this.redisClient.send( { cmd: 'auth_doctor_details' }, doctorKey);
     return  doctorKey;
   }
-
 
 }

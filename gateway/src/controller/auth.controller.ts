@@ -14,26 +14,32 @@ import {
 @UseFilters(AllExceptionsFilter)
 export class AuthController {
 
-    private logger = new Logger('AuthController');
+  private logger = new Logger('AuthController');
 
-    constructor( private readonly userService : UserService){}
+  constructor(private readonly userService: UserService) { }
 
-    @Post('signUp')
-    @ApiResponse({ status: 201, description: 'User record has been successfully created', type: UserDto })
-    @ApiResponse({ status: 403, description: 'Email already exists'})
-    signUp(@Body() userDto : UserDto) {
-      this.logger.log(`Sign Up Api -> Request data ${JSON.stringify(userDto)}`);
-      return this.userService.signUp(userDto);
-    }
+  @Post('signUp')
+  @ApiResponse({ status: 201, description: 'User record has been successfully created', type: UserDto })
+  @ApiResponse({ status: 403, description: 'Email already exists' })
+  async signUp(@Body() userDto: UserDto) {
+    this.logger.log(`Sign Up Api -> Request data ${JSON.stringify(userDto)}`);
+    const res = await this.userService.signUp(userDto);
+    this.logger.log(`Sign Up Api -> Rews data ${JSON.stringify(res)}`);
+    return res;
+  }
 
-    @Post('login')
-    @ApiOkResponse({ description: 'User Login' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: UserDto })
-    login(@Body() loginDto : UserDto) {
-      this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
-      return this.userService.validateEmailPassword(loginDto);
-    }
+  @Post('login')
+  @ApiOkResponse({ description: 'User Login' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+  @ApiBody({ type: UserDto })
+  login(@Body() loginDto: UserDto) {
+    this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
+    const res = this.userService.validateEmailPassword(loginDto);
+    this.logger.log(`Login  Api -> Response data ${JSON.stringify(res)}`);
+    return res;
+  }
+
+
 
     @Post('doctorLogin')
     @ApiOkResponse({ description: 'Doctor Login' })
@@ -77,7 +83,5 @@ export class AuthController {
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
       return this.userService.doctor_Login(doctorDto);
     }
-
-    
     
 }

@@ -9,10 +9,6 @@ ALTER SEQUENCE public.appointment_seq
     OWNER TO postgres;
 
 
--- Table: public.appointment
-
--- DROP TABLE public.appointment;
-
 CREATE TABLE public.appointment
 (
     id bigint NOT NULL DEFAULT nextval('appointment_seq'::regclass),
