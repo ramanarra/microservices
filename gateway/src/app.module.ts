@@ -13,6 +13,7 @@ import { RolesGuard } from './common/guard/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { CalendarController } from './controller/calendar.controller';
 import { CalendarService } from './service/calendar.service';
+import { HealthCheckService } from './service/health-check.service';
 
 @Module({
   imports: [PassportModule.register({ defaultStrategy: "jwt" })],
@@ -32,7 +33,8 @@ import { CalendarService } from './service/calendar.service';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    }
+    },
+    HealthCheckService
   ],
 })
 export class AppModule { }
