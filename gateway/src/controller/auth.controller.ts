@@ -18,22 +18,22 @@ export class AuthController {
 
     constructor( private readonly userService : UserService){}
 
-    @Post('signUp')
-    @ApiResponse({ status: 201, description: 'User record has been successfully created', type: UserDto })
-    @ApiResponse({ status: 403, description: 'Email already exists'})
-    signUp(@Body() userDto : UserDto) {
-      this.logger.log(`Sign Up Api -> Request data ${JSON.stringify(userDto)}`);
-      return this.userService.signUp(userDto);
-    }
+    // @Post('signUp')
+    // @ApiResponse({ status: 201, description: 'User record has been successfully created', type: UserDto })
+    // @ApiResponse({ status: 403, description: 'Email already exists'})
+    // signUp(@Body() userDto : UserDto) {
+    //   this.logger.log(`Sign Up Api -> Request data ${JSON.stringify(userDto)}`);
+    //   return this.userService.signUp(userDto);
+    // }
 
-    @Post('login')
-    @ApiOkResponse({ description: 'User Login' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: UserDto })
-    login(@Body() loginDto : UserDto) {
-      this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
-      return this.userService.validateEmailPassword(loginDto);
-    }
+    // @Post('login')
+    // @ApiOkResponse({ description: 'User Login' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: UserDto })
+    // login(@Body() loginDto : UserDto) {
+    //   this.logger.log(`Login  Api -> Request data ${JSON.stringify(loginDto)}`);
+    //   return this.userService.validateEmailPassword(loginDto);
+    // }
 
     @Post('doctorLogin')
     @ApiOkResponse({ description: 'Doctor Login' })
@@ -44,22 +44,22 @@ export class AuthController {
       return this.userService.doctorLogin(doctorDto);
     }
 
-    @Get('doctorList')
-    @ApiOkResponse({ description: 'Doctor List' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    doctorList(@Query('id') id: number) {
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(id)}`);
-      return this.userService.doctorList(id);
-    }
+    // @Get('doctor_List')
+    // @ApiOkResponse({ description: 'Doctor List' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // doctorList(@Query('id') id: number) {
+    //   this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(id)}`);
+    //   return this.userService.doctorList(id);
+    // }
 
-    @Post('doctorView')
-    @ApiOkResponse({ description: 'Doctor View' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: DoctorDto })
-    doctorView(@Body() doctorDto : DoctorDto) {
-      this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
-      return this.userService.doctorView(doctorDto);
-    }
+    // @Post('doctorView')
+    // @ApiOkResponse({ description: 'Doctor View' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: DoctorDto })
+    // doctorView(@Body() doctorDto : DoctorDto) {
+    //   this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
+    //   return this.userService.doctorView(doctorDto);
+    // }
 
     
     // @Put('fee&consultaion')
@@ -69,14 +69,14 @@ export class AuthController {
     // }
 
 
-    @Post('doctor_Login')
-    @ApiOkResponse({ description: 'Doctor Login' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: DoctorDto })
-    doctor_Login(@Body() doctorDto : DoctorDto) {
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
-      return this.userService.doctor_Login(doctorDto);
-    }
+    // @Post('doctor_Login')
+    // @ApiOkResponse({ description: 'Doctor Login' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: DoctorDto })
+    // doctor_Login(@Body() doctorDto : DoctorDto) {
+    //   this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
+    //   return this.userService.doctor_Login(doctorDto);
+    // }
 
     
     

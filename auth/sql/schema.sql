@@ -8,6 +8,9 @@ CREATE SEQUENCE public.player_id_seq
 ALTER SEQUENCE public.player_id_seq
     OWNER TO postgres;
 
+-- Table: public.users
+
+-- DROP TABLE public.users;
 
 CREATE TABLE public.users
 (
@@ -16,9 +19,17 @@ CREATE TABLE public.users
     email character varying(250) COLLATE pg_catalog."default" NOT NULL,
     password character varying(250) COLLATE pg_catalog."default" NOT NULL,
     salt character varying(250) COLLATE pg_catalog."default",
-    role character varying(250) COLLATE pg_catalog."default",
+    account_id bigint,
+    doctor_key character varying(200) COLLATE pg_catalog."default",
+    is_active boolean,
+    updated_time time without time zone,
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_email_key UNIQUE (email)
+    CONSTRAINT users_email_key UNIQUE (email),
+    CONSTRAINT user_to_account FOREIGN KEY (account_id)
+        REFERENCES public.account (account_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
 )
 WITH (
     OIDS = FALSE
@@ -27,21 +38,14 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.users
     OWNER to postgres;
+-- Index: fki_user_to_account
 
-CREATE TABLE public.doctor
-(
-    doctor_id serial NOT NULL,
-    email character varying(100) NOT NULL,
-    password character varying(100) NOT NULL,
-    account_key character varying(200) NOT NULL,
-    CONSTRAINT doctor_id PRIMARY KEY (doctor_id)
-)
-WITH (
-    OIDS = FALSE
-);
+-- DROP INDEX public.fki_user_to_account;
 
-ALTER TABLE public.doctor
-    OWNER to postgres;
+CREATE INDEX fki_user_to_account
+    ON public.users USING btree
+    (account_id ASC NULLS LAST)
+    TABLESPACE pg_default;
 
 CREATE TABLE public.patient
 (
@@ -61,7 +65,6 @@ ALTER TABLE public.patient
 CREATE TABLE public.roles
 (
     roles_id serial NOT NULL,
-    doctor_id bigint NOT NULL,
     roles character varying(100) NOT NULL,
     account_key character varying(200) NOT NULL,
     CONSTRAINT roles_id PRIMARY KEY (roles_id)
@@ -81,6 +84,10 @@ CREATE TABLE public.account
     sub_start_date date NOT NULL,
     sub_end_date date NOT NULL,
     account_key character varying(200) NOT NULL,
+    account_name character varying(100) COLLATE pg_catalog."default",
+    updated_time timestamp without time zone,
+    updated_user bigint,
+    is_active boolean,
     CONSTRAINT account_id PRIMARY KEY (account_id)
 )
 WITH (

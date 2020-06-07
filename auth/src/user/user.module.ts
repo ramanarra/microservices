@@ -25,7 +25,7 @@ const jwtConfig = config.get('JWT');
           PassportModule.register({defaultStrategy : jwtConfig.defaultStrategy})
     ],
     controllers: [UserController],
-    providers: [UserService,
+    providers: [UserService]
       // {
       //   provide: 'REDIS_SERVICE',
       //   useFactory: (appModule: AppModule) => {
@@ -40,6 +40,15 @@ const jwtConfig = config.get('JWT');
       //     AppModule
       //   ]
       // },
-    ]
+
 })
 export class UserModule { }
+// {
+//     provide: 'REDIS_SERVICE',
+//         useFactory: (appModule: AppModule) => {
+//     return ClientProxyFactory.create(appModule.get('redisService'));
+// },
+//     inject: [
+//     AppModule
+// ]
+// },

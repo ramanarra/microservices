@@ -4,7 +4,7 @@ import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'type
 export class AccountDetails extends BaseEntity{
 
     @PrimaryGeneratedColumn({
-        name : 'id'
+        name : 'account_details_id'
     })
     id : number;
 

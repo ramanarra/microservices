@@ -41,6 +41,53 @@ export class AppointmentController {
        
     }
 
+    @MessagePattern({ cmd: 'app_doctor_list' })
+    async doctorList(arr) : Promise<any> {
+        if(arr[0]=="Doctor"){
+            var doctorKey = arr[1];
+            const doctor = await this.appointmentService.doctorDetails(doctorKey);
+            var accountKey = doctor.accountKey;
+            const account = await this.appointmentService.doctor_List(accountKey);
+            return {
+                doctorList:account
+            }
+
+           
+        }else if(arr[0]=='Admin'){
+            var accountKey = arr[1];
+            const account = await this.appointmentService.accountDetails(accountKey);
+            const doctor = await this.appointmentService.doctor_List(accountKey);
+            return {
+                accountDetails:account,
+                doctorList:doctor
+            }
+
+
+        }
+       
+    }
+
+
+    @MessagePattern({ cmd: 'app_doctor_view' })
+    async doctorView(key) : Promise<any> {
+            const doctor = await this.appointmentService.doctorDetails(key);
+            var accountKey = doctor.accountKey;
+            const account = await this.appointmentService.accountDetails(accountKey);
+            return {
+                doctorDetails: doctor,
+                accountDetails:account
+            }
+        }
+
+        
+    @MessagePattern({ cmd: 'app_doctor_preconsultation' })
+    async doctorPreconsultation(doctorConfigPreConsultationDto:any) : Promise<any> {
+            const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
+            return preconsultation;
+        }
+
+    
+
 
 
 }

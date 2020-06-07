@@ -1,4 +1,5 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Doctor extends BaseEntity{
@@ -13,6 +14,7 @@ export class Doctor extends BaseEntity{
     })
     doctorName : string;
 
+  //  @Exclude()
     @Column({
         name : 'account_key'
     })
