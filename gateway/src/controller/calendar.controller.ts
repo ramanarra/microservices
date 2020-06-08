@@ -4,7 +4,7 @@ import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth, ApiCrea
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
-import { UserDto, AppointmentDto , DoctorConfigPreConsultationDto} from 'common-dto';
+import { UserDto, AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDto} from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 
 @Controller('calendar')
@@ -66,6 +66,35 @@ export class CalendarController {
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorConfigPreConsultationDto)}`);
       return this.calendarService.doctorPreconsultation(doctorConfigPreConsultationDto);
     }
+
+    @Get('HospitalDetails')
+    @ApiOkResponse({ description: 'Hospital Details' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    //@UseInterceptors(ClassSerializerInterceptor)
+    hospitalDetails(@Query('AccountKey') accountKey: string) {
+      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(accountKey)}`);
+      return this.calendarService.hospitalDetails(accountKey);
+    }
+
+    @Post('doctorConfigCancelRescheduleEdit')
+    @ApiOkResponse({ description: 'Cancel &  Reschedule Update' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: DoctorConfigCanReschDto })
+    doctorCanReschEdit(@Body() doctorConfigCanReschDto : DoctorConfigCanReschDto) {
+      this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(doctorConfigCanReschDto)}`);
+      return this.calendarService.doctorCanReschEdit(doctorConfigCanReschDto);
+    }
+
+
+    @Get('doctorConfigCancelRescheduleView')
+    @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    //@UseInterceptors(ClassSerializerInterceptor)
+    doctorCanReschView(@Query('doctorKey') doctorKey: string) {
+      this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(doctorKey)}`);
+      return this.calendarService.doctorCanReschView(doctorKey);
+    }
+
 
 
 

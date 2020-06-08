@@ -3,8 +3,8 @@ export class DoctorConfigPreConsultationDto {
     doctorKey: string;
     consultationCost: string;
     isPreconsultationAllowed: boolean;
-    preConsultationHours: number;
-    preConsultationMinutes: number;
+    preconsultationHours: number;
+    preconsultationMinutes: number;
     isActive: boolean;
     createdOn: Date; 
     modifiedOn:Date; 

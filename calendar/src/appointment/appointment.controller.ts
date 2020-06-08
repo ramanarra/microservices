@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { AppointmentDto } from 'common-dto';
+import { AppointmentDto,DoctorConfigPreConsultationDto ,DoctorConfigCanReschDto} from 'common-dto';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -80,10 +80,29 @@ export class AppointmentController {
         
     @MessagePattern({ cmd: 'app_doctor_preconsultation' })
     async doctorPreconsultation(doctorConfigPreConsultationDto:any) : Promise<any> {
-        //    const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
-          //  return preconsultation;
+           const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
+           return preconsultation;
         }
 
+    
+        @MessagePattern({ cmd: 'app_hospital_details' })
+        async hospitalDetails(accountKey:any) : Promise<any> {
+               const preconsultation = await this.appointmentService.accountDetails(accountKey);
+               return preconsultation;
+        }  
+        
+        @MessagePattern({ cmd: 'app_canresch_edit' })
+        async doctorCanReschEdit(doctorConfigCanReschDto:any) : Promise<any> {
+               const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
+               return preconsultation;
+        }  
+
+        @MessagePattern({ cmd: 'app_canresch_view' })
+        async doctorCanReschView(doctorKey:any) : Promise<any> {
+               const preconsultation = await this.appointmentService.doctorCanReschView(doctorKey);
+               return preconsultation;
+        }  
+           
     
 
 
