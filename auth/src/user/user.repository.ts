@@ -51,4 +51,14 @@ export class UserRepository extends Repository<Users> {
         return bcrypt.hash(password, salt);
     }
 
+    async validateEmailPassword1(email,password) : Promise<any> {
+        const user = await this.findOne({email : email});
+        if(user && await user.validatePassword(password)){
+            return user;
+        }else {
+            return null;
+        }
+
+    }
+
 }

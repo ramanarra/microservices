@@ -13,18 +13,19 @@ export class AppointmentController {
     }
 
     @MessagePattern({ cmd: 'calendar_appointment_get_list' })
-    async getList(userDto : any): Promise<any> {
+    //async appointmentList(appointmentDto : any): Promise<any> {
+        async appointmentList(): Promise<any> {
         console.log("asdasd");
-        const appointment = await this.appointmentService.getAppointmentList(userDto);
+       // const appointment = await this.appointmentService.getAppointmentList(appointmentDto);
+       const appointment = await this.appointmentService.getAppointmentList();
         this.logger.log("asfn >>> " + appointment);
         return appointment;
     }
 
     @MessagePattern({ cmd: 'calendar_appointment_create' })
-    async createAppointment(appointmentDetails: any): Promise<any> {
-        this.logger.log("appointmentDetails >>> " + appointmentDetails);
-        const appointment = await this.appointmentService.getAppointmentList(appointmentDetails);
-        
+    async createAppointment(appointmentDto: any): Promise<any> {
+        this.logger.log("appointmentDetails >>> " + appointmentDto);
+        const appointment = await this.appointmentService.createAppointment(appointmentDto);       
         return appointment;
     }
 

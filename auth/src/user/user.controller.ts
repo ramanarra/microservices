@@ -51,7 +51,8 @@ export class UserController {
       var accountId = doctor.account_id;
       return {
         "doctorKey":doctorKey,
-        "accountId":accountId
+        "accountId":accountId,
+        "accessToken":doctor.accessToken
       };
       }
       else{
@@ -72,7 +73,8 @@ export class UserController {
       var doctorKey = doctor.doctor_key;
       return {
         "accountId":accountId,
-        "doctorKey":doctorKey
+        "doctorKey":doctorKey,
+        "accessToken":doctor.accessToken
       }
 
   };

@@ -9,17 +9,17 @@ import { UserService } from 'src/service/user.service';
 @UseGuards(AuthGuard())
 export class UserController {
 
-    @ApiOkResponse({ description: 'Update current user' })
-    @ApiUnauthorizedResponse()
-    @Get('list')
-    @ApiBearerAuth('JWT')
-    @UseGuards(AuthGuard())
-    @Roles('admin')
-    @RolesPolicy('user_list_allow')
-    getList() {
-        return [];
-    }
-    private logger = new Logger('UserController');
+    // @ApiOkResponse({ description: 'Update current user' })
+    // @ApiUnauthorizedResponse()
+    // @Get('list')
+    // @ApiBearerAuth('JWT')
+    // @UseGuards(AuthGuard())
+    // @Roles('admin')
+    // @RolesPolicy('user_list_allow')
+    // getList() {
+    //     return [];
+    // }
+    // private logger = new Logger('UserController');
 
     constructor( private readonly userService : UserService){}
 
