@@ -19,23 +19,23 @@ export class CalendarController {
 
     constructor( private readonly calendarService : CalendarService){}
 
-    @Get('appointmentsView')
-    @ApiOkResponse({ description: 'Appointment List' })
-     @ApiBearerAuth('JWT')
-    getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
-      this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(appInfo)}`);
+    // @Get('appointmentsView')
+    // @ApiOkResponse({ description: 'Appointment List' })
+    //  @ApiBearerAuth('JWT')
+    // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
+    //   this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(appInfo)}`);
 
-      var opts = {
-        jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey : 'secret'
-    }
-    var JwtStrategy = require('passport-jwt').Strategy,
-        ExtractJwt = require('passport-jwt').ExtractJwt;
-    const decodedJwt =  new JwtStrategy(opts);
-    this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(decodedJwt)}`);
-      return this.calendarService.appointmentList();
+    //   var opts = {
+    //     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
+    //     secretOrKey : 'secret'
+    // }
+    // var JwtStrategy = require('passport-jwt').Strategy,
+    //     ExtractJwt = require('passport-jwt').ExtractJwt;
+    // const decodedJwt =  new JwtStrategy(opts);
+    // this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(decodedJwt)}`);
+    //   return this.calendarService.appointmentList();
   
-    }
+    // }
 
 
     @Post('createAppointment')

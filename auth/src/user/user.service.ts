@@ -35,7 +35,7 @@ export class UserService {
 
 
     async doctor_Login(email,password) : Promise<any> {
-        const user = await this.userRepository.validateEmailPassword1(email,password);
+        const user = await this.userRepository.validateEmailAndPassword(email,password);
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
         
