@@ -32,4 +32,30 @@ export class Appointment extends BaseEntity{
     })
     endTime : string;
 
+    @Column({
+        name : 'payment_status'
+    })
+    paymentStatus : boolean;
+
+    @Column({
+        name : 'is_active'
+    })
+    isActive : boolean;
+
+    @Column({
+        name : 'is_cancel'
+    })
+    isCancel : boolean;
+
+    @Column({
+        name : 'created_by'
+    })
+    createdBy : string;
+
+    @Column({
+        name : 'created_id'
+    })
+    createdId : number;  
+
+
 }

@@ -4,6 +4,7 @@ import { Appointment } from 'src/appointment/appointment.entity';
 import { AccountDetails } from 'src/appointment/account_details.entity';
 import { DoctorConfigPreConsultation } from 'src/appointment/doctor_config_preconsultation.entity';
 import { Doctor } from 'src/appointment/doctor.entity';
+import { DoctorConfigCanResch } from 'src/appointment/doc_config_can_resch.entity';
 
 const dbConfig = config.get('database');
 
@@ -15,7 +16,7 @@ export const databaseConfig : TypeOrmModuleOptions = {
     username : dbConfig.username,
     password : dbConfig.password,
     database : dbConfig.database,
-    entities : [Appointment,AccountDetails,DoctorConfigPreConsultation, Doctor],
+    entities : [Appointment,AccountDetails,DoctorConfigPreConsultation, Doctor, DoctorConfigCanResch],
     synchronize : dbConfig.synchronize
 
 } 

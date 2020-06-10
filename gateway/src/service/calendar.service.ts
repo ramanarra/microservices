@@ -1,7 +1,7 @@
 import { Injectable, Inject, UseFilters, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { UserDto, AppointmentDto } from 'common-dto';
+import { UserDto, AppointmentDto,DoctorConfigCanReschDto } from 'common-dto';
 import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
 
 
@@ -22,17 +22,19 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
      }
 
 
-    public appointmentList(userDto : UserDto): Observable<any> {
-        return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, userDto);
-    }
-    // @UseFilters(AllClientServiceException)
     // public appointmentList(userDto : UserDto): Observable<any> {
     //     return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, userDto);
     // }
+    @UseFilters(AllClientServiceException)
+    //public appointmentList(appointmentDto : AppointmentDto): Observable<any> {
+        public appointmentList(): Observable<any> {
+        return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, '');
+       // return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, appointmentDto);
+    }
 
     @UseFilters(AllClientServiceException)
-    public createAppointment(userDto : UserDto, appointmentList : AppointmentDto): Observable<any> {
-        return this.redisClient.send({ cmd: 'calendar_appointment_create' }, {appointmentList, userDto});
+    public createAppointment(appointmentDto : AppointmentDto): Observable<any> {
+        return this.redisClient.send({ cmd: 'calendar_appointment_create' },appointmentDto);
     }
 
     @UseFilters(AllClientServiceException)
@@ -52,6 +54,24 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     public doctorPreconsultation(doctorConfigPreConsultationDto): Observable<any> {
         return this.redisClient.send( { cmd: 'app_doctor_preconsultation' }, doctorConfigPreConsultationDto);
     }
+
+    @UseFilters(AllClientServiceException)
+    public hospitalDetails(accountKey): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_hospital_details' }, accountKey);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorCanReschEdit(doctorConfigCanReschDto : DoctorConfigCanReschDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_canresch_edit' }, doctorConfigCanReschDto);
+    }
+
+    
+    @UseFilters(AllClientServiceException)
+    public doctorCanReschView(doctorKey): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_canresch_view' }, doctorKey);
+    }
+
+
 
 
 

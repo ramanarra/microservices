@@ -23,7 +23,7 @@ export class UserService {
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
         
-        const jwtUserInfo : JwtPayLoad  = { name : user.name, email : user.email, userId: user.id };
+        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id };
         const accessToken =  this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
         return user;
@@ -35,13 +35,14 @@ export class UserService {
 
 
     async doctor_Login(email,password) : Promise<any> {
-        const doctor = await this.userRepository.findOne({email : email, password : password});
-        if(doctor){
-            return doctor;
-        }
-        else{
-            return 'Invalid Credentials';
-        }
+        const user = await this.userRepository.validateEmailAndPassword(email,password);
+        if (!user)
+            throw new UnauthorizedException("Invalid Credentials");
+        
+        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id };
+        const accessToken =  this.jwtService.sign(jwtUserInfo);
+        user.accessToken = accessToken;
+        return user;
        
     }
 
