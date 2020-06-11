@@ -98,27 +98,27 @@ export class CalendarController {
     }
 
 
-    // @Get('doctorConfigCancelRescheduleView')
-    // @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
-    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    // //@UseInterceptors(ClassSerializerInterceptor)
-    // doctorCanReschView(@Query('doctorKey') doctorKey: string) {
-    //   this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(doctorKey)}`);
-    //   return this.calendarService.doctorCanReschView(doctorKey);
-    // }
+    @Get('doctorConfigCancelRescheduleView')
+    @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    //@UseInterceptors(ClassSerializerInterceptor)
+    doctorCanReschView(@Query('doctorKey') doctorKey: string) {
+      this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(doctorKey)}`);
+      return this.calendarService.doctorCanReschView(doctorKey);
+    }
 
-  //   @Get('appointmentsinView')
-  //   @ApiOkResponse({ description: 'Appointment List' })
-  //    @ApiBearerAuth('JWT')
-  //  // @UseGuards(AuthGuard())
-  //  // @Roles('doctor', 'patient')
-  //  getAppointmentList(@GetUser() userInfo : UserDto) {
-  //  // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
-  //     this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(userInfo)}`);
-  //     return this.calendarService.appointmentList();
-  //     //return this.calendarService.appointmentList();
+    @Get('appointmentsinView')
+    @ApiOkResponse({ description: 'Appointment List' })
+     @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @Roles('doctor', 'patient')
+   getAppointmentList1(@GetUser() userInfo : UserDto) {
+   // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
+      this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(userInfo)}`);
+      return this.calendarService.appointmentList1(userInfo);
+      //return this.calendarService.appointmentList();
   
-  //   }
+    }
 
 
 

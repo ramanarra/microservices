@@ -4,12 +4,14 @@ import { UserRepository } from './user.repository';
 import { UserDto } from 'common-dto';
 import { JwtPayLoad } from 'src/common/jwt/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
+import { AccountRepository } from './account.repository';
+import { RolesRepository } from './roles.repository';
 
 @Injectable()
 export class UserService {
 
     constructor(
-        @InjectRepository(UserRepository) private userRepository: UserRepository,
+        @InjectRepository(UserRepository) private userRepository: UserRepository, private accountRepository : AccountRepository, private rolesRepository : RolesRepository,
         private readonly jwtService : JwtService
     ) {
     }
@@ -17,6 +19,7 @@ export class UserService {
     async signUp(userDto: UserDto): Promise<any> {
         return await this.userRepository.signUP(userDto);
     }
+
 
     async validateEmailPassword(userDto: UserDto): Promise<any> {
         const user = await this.userRepository.validateEmailPassword(userDto);
@@ -46,5 +49,13 @@ export class UserService {
        
     }
 
+
+    async accountKey(accountId : number) : Promise<any> {
+        return await this.accountRepository.findOne({account_id : accountId});
+    }
+
+    async role(userId : number) : Promise<any> {
+        return await this.rolesRepository.findOne({user_id : userId});
+    }
 
 }
