@@ -26,7 +26,7 @@ export class UserService {
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
         
-        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id };
+        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id,account_key: '' , doctor_key : '', role: '' };
         const accessToken =  this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
         return user;
@@ -41,12 +41,15 @@ export class UserService {
         const user = await this.userRepository.validateEmailAndPassword(email,password);
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
-        
-        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id };
+        var accountId = user.account_id;
+        var accountData = await this.accountKey(accountId);
+        user.account_key = accountData.account_key;
+         var roles = await  this.role(user.id);
+        const jwtUserInfo : JwtPayLoad  = { email : user.email, userId: user.id, account_key: accountData.account_key, doctor_key: user.doctor_key, role: roles.roles };
+       console.log("=======jwtUserInfo",jwtUserInfo )
         const accessToken =  this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
         return user;
-       
     }
 
 

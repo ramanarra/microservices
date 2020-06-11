@@ -1,4 +1,4 @@
-import { Controller, Logger, Get, UseGuards, Post,Query,Put,Param, UseFilters, Body, UsePipes, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Logger, Get, UseGuards, Post,Query,Put,Param, UseFilters, Body, UsePipes, ValidationPipe,Request, ClassSerializerInterceptor } from '@nestjs/common';
 import { CalendarService } from 'src/service/calendar.service';
 import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth, ApiCreatedResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -52,12 +52,13 @@ export class CalendarController {
     }
 
     @Get('doctor_List')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor List' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     //@UseInterceptors(ClassSerializerInterceptor)
-    doctorList(@Query('Role') role: string,@Query('Key') key: string) {
-      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(role)}`);
-      return this.calendarService.doctorList(role,key);
+    doctorList(@Request() req) {
+      return this.calendarService.doctorList(req.user.role,req.user.doctor_key);
     }
 
 

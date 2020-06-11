@@ -18,15 +18,15 @@ export class AuthController {
 
   constructor(private readonly userService: UserService) { }
 
-
-    @Post('doctorLogin')
-    @ApiOkResponse({ description: 'Doctor Login' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: DoctorDto })
-    doctorLogin(@Body() doctorDto : DoctorDto) {
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
-      return this.userService.doctorLogin(doctorDto);
-    }
+    //
+    // @Post('doctorLogin')
+    // @ApiOkResponse({ description: 'Doctor Login' })
+    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    // @ApiBody({ type: DoctorDto })
+    // doctorLogin(@Body() doctorDto : DoctorDto) {
+    //   this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorDto)}`);
+    //   return this.userService.doctorLogin(doctorDto);
+    // }
 
     @Post('doctorsLogin')
     @ApiOkResponse({ description: 'Doctor Login' })
