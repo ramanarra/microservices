@@ -22,16 +22,6 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
      }
 
 
-    // public appointmentList(userDto : UserDto): Observable<any> {
-    //     return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, userDto);
-    // // }
-    // @UseFilters(AllClientServiceException)
-    // //public appointmentList(appointmentDto : AppointmentDto): Observable<any> {
-    //     public appointmentList(): Observable<any> {
-    //     return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, '');
-    //    // return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, appointmentDto);
-    // }
-
     @UseFilters(AllClientServiceException)
     public createAppointment(appointmentDto : AppointmentDto): Observable<any> {
         return this.redisClient.send({ cmd: 'calendar_appointment_create' },appointmentDto);
@@ -72,9 +62,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentList1(doctorKey): Observable<any> {
-    //    public appointmentList1(): Observable<any> {
-       // return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, '');
+    public appointmentList(doctorKey): Observable<any> {
         return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, doctorKey);
     }
 

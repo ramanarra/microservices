@@ -21,8 +21,7 @@ export class AppointmentService {
     ) {
     }
 
-    //async getAppointmentList(appointmentDto : AppointmentDto): Promise<Appointment[]>{
-        async getAppointmentList(doctorId): Promise<Appointment[]>{
+    async getAppointmentList(doctorId): Promise<Appointment[]>{
        return await this.appointmentRepository.find({doctorId : doctorId});
     }
 
@@ -56,11 +55,6 @@ export class AppointmentService {
     }
 
     async doctorCanReschView(doctorKey): Promise<any> {
-        //return await this.doctorConfigCanReschRepository.doctorCanReschView(doctorKey);
-        //return await this.doctorConfigCanReschRepository.query('select * from doctor_config_can_resch where doc_key = ? order by doc_config_can_resch_id limit 1;', ['Doc_1']);
-      //  return await this.doctorConfigCanReschRepository.find({doctorKey : doctorKey}).sort({_id:-1}).limit(1);
-        //find({}).sort({_id:-1}).limit(1)
-       // return await this.doctorConfigCanReschRepository.find({}).sort({'doctorKey': -1}).limit(1)
         return await this.doctorConfigCanReschRepository.findOne({doctorKey:doctorKey});
     }
 

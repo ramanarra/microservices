@@ -24,7 +24,6 @@ export class AppointmentRepository extends Repository<Appointment> {
         } catch (error) {
             if (error.code === "22007") {
                 this.logger.warn(`appointment date is invalid ${appointment.appointmentDate}`);
-                //throw new ConflictException("Appointment already exists");
             } else {
                 this.logger.error(`Unexpected Appointment save error` + error.message);
                 throw new InternalServerErrorException();

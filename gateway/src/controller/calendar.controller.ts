@@ -19,24 +19,6 @@ export class CalendarController {
 
     constructor( private readonly calendarService : CalendarService){}
 
-    // @Get('appointmentsView')
-    // @ApiOkResponse({ description: 'Appointment List' })
-    //  @ApiBearerAuth('JWT')
-    // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
-    //   this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(appInfo)}`);
-
-    //   var opts = {
-    //     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    //     secretOrKey : 'secret'
-    // }
-    // var JwtStrategy = require('passport-jwt').Strategy,
-    //     ExtractJwt = require('passport-jwt').ExtractJwt;
-    // const decodedJwt =  new JwtStrategy(opts);
-    // this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(decodedJwt)}`);
-    //   return this.calendarService.appointmentList();
-  
-    // }
-
 
     @Post('createAppointment')
     @ApiOkResponse({ description: 'Create Appointment' })
@@ -56,7 +38,6 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor List' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@UseInterceptors(ClassSerializerInterceptor)
     doctorList(@Request() req) {
       return this.calendarService.doctorList(req.user.role,req.user.doctor_key);
     }
@@ -67,7 +48,6 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor View' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@ApiBody({ type: DoctorDto })
     doctorView(@Request() req) {
       this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
       return this.calendarService.doctorView(req.user.doctor_key);
@@ -106,7 +86,6 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@UseInterceptors(ClassSerializerInterceptor)
     doctorCanReschView(@Request() req) {
       this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
       return this.calendarService.doctorCanReschView(req.user.doctor_key);
@@ -117,12 +96,9 @@ export class CalendarController {
      @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @Roles('doctor', 'patient')
-  // getAppointmentList1(@GetUser() userInfo : UserDto) {
-    getAppointmentList1(@Request() req) {
-   // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
+    getAppointmentList(@Request() req) {
       this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-      return this.calendarService.appointmentList1(req.user.doctor_key);
-  
+      return this.calendarService.appointmentList(req.user.doctor_key);  
     }
 
 

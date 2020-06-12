@@ -13,12 +13,10 @@ export class AppointmentController {
     }
 
     @MessagePattern({ cmd: 'calendar_appointment_get_list' })
-    //async appointmentList(appointmentDto : any): Promise<any> {
         async appointmentList(doctorKey): Promise<any> {
         console.log("asdasd");
         const docId = await this.appointmentService.doctorDetails(doctorKey);
        var doctorId = docId.doctor_id
-       // const appointment = await this.appointmentService.getAppointmentList(appointmentDto);
        const appointment = await this.appointmentService.getAppointmentList(doctorId);
         this.logger.log("asfn >>> " + appointment);
         return appointment;
