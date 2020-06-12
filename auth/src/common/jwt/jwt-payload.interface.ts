@@ -1,5 +1,7 @@
 export interface JwtPayLoad {
-   // name : string,
     email : string,
-    userId : number;
+    userId : number,
+    doctor_key : string,
+    account_key: string,
+    role: string
 }

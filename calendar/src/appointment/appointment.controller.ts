@@ -13,11 +13,11 @@ export class AppointmentController {
     }
 
     @MessagePattern({ cmd: 'calendar_appointment_get_list' })
-    //async appointmentList(appointmentDto : any): Promise<any> {
-        async appointmentList(): Promise<any> {
+        async appointmentList(doctorKey): Promise<any> {
         console.log("asdasd");
-       // const appointment = await this.appointmentService.getAppointmentList(appointmentDto);
-       const appointment = await this.appointmentService.getAppointmentList();
+        const docId = await this.appointmentService.doctorDetails(doctorKey);
+       var doctorId = docId.doctor_id
+       const appointment = await this.appointmentService.getAppointmentList(doctorId);
         this.logger.log("asfn >>> " + appointment);
         return appointment;
     }
@@ -44,7 +44,7 @@ export class AppointmentController {
 
     @MessagePattern({ cmd: 'app_doctor_list' })
     async doctorList(arr) : Promise<any> {
-        if(arr[0]=="Doctor"){
+        if(arr[0]=="DOCTOR"){
             var doctorKey = arr[1];
             const doctor = await this.appointmentService.doctorDetails(doctorKey);
             var accountKey = doctor.accountKey;
@@ -52,7 +52,7 @@ export class AppointmentController {
             return {
                 doctorList:account
             }
-        }else if(arr[0]=='Admin'){
+        }else if(arr[0]=='ADMIN'){
             var accountKey = arr[1];
             const account = await this.appointmentService.accountDetails(accountKey);
             const doctor = await this.appointmentService.doctor_List(accountKey);

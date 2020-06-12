@@ -56,6 +56,7 @@ export class UserRepository extends Repository<Users> {
         if(user && await user.validatePassword(password)){
             return user;
         }else {
+            console.log("===",JSON.stringify(user))
             return null;
         }
 

@@ -5,13 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './config/database.config';
 import { UserModule } from './user/user.module';
 //import { DoctorModule } from './doctor/doctor.module';
-import { AccountModule } from './account/account.module';
+//import { AccountModule } from './account/account.module';
 //import { AppointmentModule } from '.calendar/appointment/appointment.module';
 
 
 @Module({
   imports: [
-    UserModule,AccountModule,
+    UserModule,
+    //AccountModule,
     TypeOrmModule.forRoot(databaseConfig),
   ],
   controllers: [AppController],

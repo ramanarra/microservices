@@ -1,4 +1,4 @@
-import { Controller, Logger, Get, UseGuards, Post,Query,Put,Param, UseFilters, Body, UsePipes, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Logger, Get, UseGuards, Post,Query,Put,Param, UseFilters, Body, UsePipes, ValidationPipe,Request, ClassSerializerInterceptor } from '@nestjs/common';
 import { CalendarService } from 'src/service/calendar.service';
 import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth, ApiCreatedResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,24 +19,6 @@ export class CalendarController {
 
     constructor( private readonly calendarService : CalendarService){}
 
-    // @Get('appointmentsView')
-    // @ApiOkResponse({ description: 'Appointment List' })
-    //  @ApiBearerAuth('JWT')
-    // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
-    //   this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(appInfo)}`);
-
-    //   var opts = {
-    //     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    //     secretOrKey : 'secret'
-    // }
-    // var JwtStrategy = require('passport-jwt').Strategy,
-    //     ExtractJwt = require('passport-jwt').ExtractJwt;
-    // const decodedJwt =  new JwtStrategy(opts);
-    // this.logger.log(`Appointments view Api -> Request data ${JSON.stringify(decodedJwt)}`);
-    //   return this.calendarService.appointmentList();
-  
-    // }
-
 
     @Post('createAppointment')
     @ApiOkResponse({ description: 'Create Appointment' })
@@ -52,22 +34,23 @@ export class CalendarController {
     }
 
     @Get('doctor_List')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor List' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@UseInterceptors(ClassSerializerInterceptor)
-    doctorList(@Query('Role') role: string,@Query('Key') key: string) {
-      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(role)}`);
-      return this.calendarService.doctorList(role,key);
+    doctorList(@Request() req) {
+      return this.calendarService.doctorList(req.user.role,req.user.doctor_key);
     }
 
 
     @Post('doctorSettingsPersonalView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor View' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@ApiBody({ type: DoctorDto })
-    doctorView(@Query('Key') key: string) {
-      this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(key)}`);
-      return this.calendarService.doctorView(key);
+    doctorView(@Request() req) {
+      this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
+      return this.calendarService.doctorView(req.user.doctor_key);
     }
 
     @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -80,12 +63,12 @@ export class CalendarController {
     }
 
     @Get('HospitalDetails')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Hospital Details' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    //@UseInterceptors(ClassSerializerInterceptor)
-    hospitalDetails(@Query('AccountKey') accountKey: string) {
-      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(accountKey)}`);
-      return this.calendarService.hospitalDetails(accountKey);
+    hospitalDetails(@Request() req) {
+      this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(req.user.account_key)}`);
+      return this.calendarService.hospitalDetails(req.user.account_key);
     }
 
     @Post('doctorConfigCancelRescheduleEdit')
@@ -98,27 +81,25 @@ export class CalendarController {
     }
 
 
-    // @Get('doctorConfigCancelRescheduleView')
-    // @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
-    // @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    // //@UseInterceptors(ClassSerializerInterceptor)
-    // doctorCanReschView(@Query('doctorKey') doctorKey: string) {
-    //   this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(doctorKey)}`);
-    //   return this.calendarService.doctorCanReschView(doctorKey);
-    // }
+    @Get('doctorConfigCancelRescheduleView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({ description: 'Cancel &  Reschedule View' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    doctorCanReschView(@Request() req) {
+      this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
+      return this.calendarService.doctorCanReschView(req.user.doctor_key);
+    }
 
-  //   @Get('appointmentsinView')
-  //   @ApiOkResponse({ description: 'Appointment List' })
-  //    @ApiBearerAuth('JWT')
-  //  // @UseGuards(AuthGuard())
-  //  // @Roles('doctor', 'patient')
-  //  getAppointmentList(@GetUser() userInfo : UserDto) {
-  //  // getAppointmentList(@GetAppointment() appInfo : AppointmentDto) {
-  //     this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(userInfo)}`);
-  //     return this.calendarService.appointmentList();
-  //     //return this.calendarService.appointmentList();
-  
-  //   }
+    @Get('appointmentsView')
+    @ApiOkResponse({ description: 'Appointment List' })
+     @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @Roles('doctor', 'patient')
+    getAppointmentList(@Request() req) {
+      this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
+      return this.calendarService.appointmentList(req.user.doctor_key);  
+    }
 
 
 
