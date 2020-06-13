@@ -26,11 +26,11 @@ export class CalendarController {
     @ApiBadRequestResponse({description:'Invalid Schema'})
     @ApiBody({ type: AppointmentDto })
     @ApiBearerAuth('JWT')
- // @UseGuards(AuthGuard())
+    @UseGuards(AuthGuard())
     @Roles('admin')
-    createAppointment(@Body() appointmentDto : AppointmentDto) {
-      this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto)}`);
-      return this.calendarService.createAppointment(appointmentDto);
+    createAppointment(@Request() req, @Body() appointmentDto : AppointmentDto) {
+      this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto,req.user)}`);
+      return this.calendarService.createAppointment(appointmentDto,req.user);
     }
 
     @Get('doctor_List')
@@ -56,10 +56,12 @@ export class CalendarController {
     @Post('doctorConfigCostAndPreconsultationUpdate')
     @ApiOkResponse({ description: 'Cost &  Preconsultation Update' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiBody({ type: DoctorConfigPreConsultationDto })
-    doctor_Login(@Body() doctorConfigPreConsultationDto : DoctorConfigPreConsultationDto) {
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorConfigPreConsultationDto)}`);
-      return this.calendarService.doctorPreconsultation(doctorConfigPreConsultationDto);
+    doctor_Login(@Request() req,@Body() doctorConfigPreConsultationDto : DoctorConfigPreConsultationDto) {
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(doctorConfigPreConsultationDto,req.user)}`);
+      return this.calendarService.doctorPreconsultation(doctorConfigPreConsultationDto,req.user);
     }
 
     @Get('HospitalDetails')
@@ -74,10 +76,12 @@ export class CalendarController {
     @Post('doctorConfigCancelRescheduleEdit')
     @ApiOkResponse({ description: 'Cancel &  Reschedule Update' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiBody({ type: DoctorConfigCanReschDto })
-    doctorCanReschEdit(@Body() doctorConfigCanReschDto : DoctorConfigCanReschDto) {
-      this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(doctorConfigCanReschDto)}`);
-      return this.calendarService.doctorCanReschEdit(doctorConfigCanReschDto);
+    doctorCanReschEdit(@Request() req,@Body() doctorConfigCanReschDto : DoctorConfigCanReschDto) {
+      this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(doctorConfigCanReschDto,req.user)}`);
+      return this.calendarService.doctorCanReschEdit(doctorConfigCanReschDto,req.user);
     }
 
 

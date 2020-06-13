@@ -8,7 +8,7 @@ import { Doctor } from "./doctor.entity";
 export class AppointmentRepository extends Repository<Appointment> {
 
     private logger = new Logger('AppointmentRepository');
-    async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
+    async createAppointment(appointmentDto: any): Promise<any> {
 
         const { doctorId, patientId, appointmentDate, startTime, endTime } = appointmentDto;
 
@@ -18,6 +18,9 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.appointmentDate = new Date(appointmentDto.appointmentDate);
         appointment.startTime = appointmentDto.startTime;
         appointment.endTime = appointmentDto.endTime;
+        appointment.isActive= true;
+        appointment.createdBy = appointmentDto.user.role;
+        appointment.createdId = appointmentDto.user.userId;
 
         try {
             return await appointment.save();          
