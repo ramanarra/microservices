@@ -9,13 +9,12 @@ import { AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDt
 export class DoctorConfigCanReschRepository extends Repository<DoctorConfigCanResch> {
 
     private logger = new Logger('DoctorConfigCanReschRepository');
-    async doctorCanReschEdit(doctorConfigCanReschDto: DoctorConfigCanReschDto): Promise<any> {
+    async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
 
     const { docConfigCanReschId, doctorKey, isPatientCancellationAllowed, cancellationDays,cancellationHours,cancellationMinutes,isPatientReschAllowed,rescheduleDays,rescheduleHours,rescheduleMinutes,autoCancelDays,autoCancelHours,autoCancelMinutes,isActive,createdOn,modifiedOn } = doctorConfigCanReschDto;
 
         const appointment = new DoctorConfigCanResch();
-        appointment.docConfigCanReschId = doctorConfigCanReschDto.docConfigCanReschId;
-        appointment.doctorKey =doctorConfigCanReschDto.doctorKey ;
+        appointment.doctorKey =doctorConfigCanReschDto.user.doctor_key ;
         appointment.isPatientCancellationAllowed = doctorConfigCanReschDto.isPatientCancellationAllowed;
         appointment.cancellationDays = doctorConfigCanReschDto.cancellationDays;
         appointment.cancellationHours = doctorConfigCanReschDto.cancellationHours;
