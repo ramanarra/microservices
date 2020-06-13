@@ -21,9 +21,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
          this.redisClient.close();
      }
 
-
+    
     @UseFilters(AllClientServiceException)
-    public createAppointment(appointmentDto : AppointmentDto): Observable<any> {
+    public createAppointment(appointmentDto : any,user : any): Observable<any> {
+        appointmentDto.user = user;
         return this.redisClient.send({ cmd: 'calendar_appointment_create' },appointmentDto);
     }
 
@@ -41,7 +42,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorPreconsultation(doctorConfigPreConsultationDto): Observable<any> {
+    public doctorPreconsultation(doctorConfigPreConsultationDto : any,user : any): Observable<any> {
+        doctorConfigPreConsultationDto.user = user;
         return this.redisClient.send( { cmd: 'app_doctor_preconsultation' }, doctorConfigPreConsultationDto);
     }
 
@@ -51,7 +53,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorCanReschEdit(doctorConfigCanReschDto : DoctorConfigCanReschDto): Observable<any> {
+    public doctorCanReschEdit(doctorConfigCanReschDto : any,user : any): Observable<any> {
+        doctorConfigCanReschDto.user = user;
         return this.redisClient.send( { cmd: 'app_canresch_edit' }, doctorConfigCanReschDto);
     }
 
