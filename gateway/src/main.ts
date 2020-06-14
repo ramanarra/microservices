@@ -8,7 +8,8 @@ import { AllExceptionsFilter } from './common/filter/all-exceptions.filter';
 async function bootstrap() {
   const logger = new Logger('bootstrap');
   const serverConfig = config.get('server');
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {cors: true});
+  app.enableCors();
 
   const options = new DocumentBuilder()
     .setTitle('Microservice')
