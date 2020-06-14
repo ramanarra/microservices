@@ -1,7 +1,7 @@
 import { Repository, EntityRepository } from "typeorm";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { DoctorConfigCanResch } from "./doc_config_can_resch.entity";
-import { AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDto} from  "common-dto";
+import { AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDto} from "common-dto";
 
 
 

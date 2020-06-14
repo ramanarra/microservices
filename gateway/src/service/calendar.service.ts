@@ -30,15 +30,16 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
 
     @UseFilters(AllClientServiceException)
     public doctorList(role,key): Observable<any> {
-        var arr=[];
-         arr[0]=role;
-         arr[1]=key;
-        return this.redisClient.send( { cmd: 'app_doctor_list' }, arr);
+        var roleKey = {
+            role: role,
+            key: key
+        }
+        return this.redisClient.send( { cmd: 'app_doctor_list' }, roleKey);
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorView(key): Observable<any> {
-        return this.redisClient.send( { cmd: 'app_doctor_view' }, key);
+    public doctorView(doctorKey): Observable<any> {
+        return this.redisClient.send( { cmd: 'app_doctor_view' }, doctorKey);
     }
 
     @UseFilters(AllClientServiceException)

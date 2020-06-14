@@ -5,7 +5,7 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { RolesPolicy } from 'src/common/decorator/roles-policy.decorator';
 import { UserService } from 'src/service/user.service';
 
-@Controller('user')
+@Controller('api/user')
 @UseGuards(AuthGuard())
 export class UserController {
 

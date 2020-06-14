@@ -1,8 +1,8 @@
 import { Repository, EntityRepository } from "typeorm";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
-import { Appointment } from "./appointment.entity";
-import { AppointmentDto , DoctorConfigPreConsultationDto} from  "common-dto";
-import { Doctor } from "./doctor.entity";
+import { Appointment } from "../appointment.entity";
+import { AppointmentDto , DoctorConfigPreConsultationDto} from "common-dto";
+import { Doctor } from "../doctor/doctor.entity";
 import { DoctorConfigPreConsultation } from "./doctor_config_preconsultation.entity";
 
 @EntityRepository(DoctorConfigPreConsultation)

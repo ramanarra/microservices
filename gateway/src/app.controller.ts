@@ -6,7 +6,7 @@ import { GetAppointment } from './common/decorator/get-appointment.decorator';
 import { GetDoctor } from './common/decorator/get-doctor.decorator';
 import { UserDto,AppointmentDto, DoctorDto, DoctorConfigPreConsultationDto } from 'common-dto';
 
-@Controller('')
+@Controller('api')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 

@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('chat')
+@Controller('api/chat')
 export class ChatController {
 
 

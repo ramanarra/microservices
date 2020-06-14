@@ -43,10 +43,11 @@ export class UserService {
 
 
     async doctor_Login(email, password): Promise<any> {
-        try {
+
             const user = await this.userRepository.validateEmailAndPassword(email, password);
             if (!user)
                 throw new UnauthorizedException("Invalid Credentials");
+
             var accountId = user.account_id;
             var accountData = await this.accountKey(accountId);
             user.account_key = accountData.account_key;
@@ -66,10 +67,6 @@ export class UserService {
             user.accessToken = accessToken;
             user.rolesPermission = rolesPermission;
             return user;
-        } catch (e) {
-            console.log(e);
-            return {message: "Content Not Available"};
-        }
     }
 
 

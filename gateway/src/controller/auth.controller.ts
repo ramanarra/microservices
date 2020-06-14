@@ -10,7 +10,7 @@ import {
   ApiResponse
 } from '@nestjs/swagger';
 
-@Controller('auth')
+@Controller('api/auth')
 @UseFilters(AllExceptionsFilter)
 export class AuthController {
 
