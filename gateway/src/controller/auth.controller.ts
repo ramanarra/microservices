@@ -19,7 +19,10 @@ export class AuthController {
   constructor(private readonly userService: UserService) { }
 
     @Post('doctorLogin')
-    @ApiOkResponse({ description: 'Doctor Login' })
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"email":"test@apollo.com",\n' +
+          '"password": "123456" \n' +
+          '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     doctorsLogin(@Body() userDto : UserDto) {

@@ -62,7 +62,7 @@ export class CalendarController {
     @Post('doctorSettingsPersonalView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({ description: 'Doctor View' })
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     doctorView(@Request() req, @Body() userDto : UserDto) {
