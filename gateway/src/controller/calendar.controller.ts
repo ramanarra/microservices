@@ -1,4 +1,20 @@
-import { Controller, Logger, Get, UseGuards, Post,Query,Put,Param, UseFilters, Body, UsePipes, ValidationPipe,Request, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+    Controller,
+    Logger,
+    Get,
+    UseGuards,
+    Post,
+    Query,
+    Put,
+    Param,
+    UseFilters,
+    Body,
+    UsePipes,
+    ValidationPipe,
+    Request,
+    ClassSerializerInterceptor,
+    UnauthorizedException
+} from '@nestjs/common';
 import { CalendarService } from 'src/service/calendar.service';
 import { ApiOkResponse, ApiUnauthorizedResponse, ApiBody, ApiBearerAuth, ApiCreatedResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,7 +26,7 @@ import { UserDto, AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigC
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 import { Strategy, ExtractJwt} from 'passport-jwt';
 
-@Controller('calendar')
+@Controller('api/calendar')
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseFilters(AllExceptionsFilter)
 export class CalendarController {
@@ -48,7 +64,12 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'Doctor View' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    doctorView(@Request() req) {
+    @ApiBody({ type: UserDto })
+    doctorView(@Request() req, @Body() userDto : UserDto) {
+        // check if doctor key and token doctor key are same
+        if(req.user.doctor_key !== userDto.doctorKey){
+            throw new UnauthorizedException("Invalid User")
+        }
       this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
       return this.calendarService.doctorView(req.user.doctor_key);
     }

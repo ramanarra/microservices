@@ -8,16 +8,14 @@ import { RolesRepository } from './roles.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import * as config from 'config';
-import { AppModule } from 'src/app.module';
-import { ClientProxyFactory } from '@nestjs/microservices';
-import { NestFactory } from '@nestjs/core';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import {RolePermissionRepository} from "./rolesPermission/role_permissions.repository";
+import {PermissionRepository} from "./permissions/permission.repository";
 
 const jwtConfig = config.get('JWT'); 
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([UserRepository,AccountRepository,RolesRepository]),
+        TypeOrmModule.forFeature([UserRepository,AccountRepository,RolesRepository, RolePermissionRepository, PermissionRepository]),
         JwtModule.register({
             secret : jwtConfig.secret,
             signOptions : {
