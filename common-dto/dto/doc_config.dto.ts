@@ -9,7 +9,7 @@ export declare class DocConfigDto {
     cancellationDays : string;
     cancellationHours : string;
     cancellationMins : string;
-    isPatientRescheduleAllowed : string;
+    isPatientRescheduleAllowed : boolean;
     rescheduleDays : string;
     rescheduleHours : string;
     rescheduleMins : string;
