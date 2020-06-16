@@ -22,7 +22,7 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { GetAppointment } from 'src/common/decorator/get-appointment.decorator';
 import { GetDoctor } from 'src/common/decorator/get-doctor.decorator';
-import { UserDto, AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDto,DoctorDto} from 'common-dto';
+import { UserDto, AppointmentDto , DoctorConfigPreConsultationDto, DoctorConfigCanReschDto,DoctorDto,DocConfigDto} from 'common-dto';
 import { AllExceptionsFilter } from 'src/common/filter/all-exceptions.filter';
 import { Strategy, ExtractJwt} from 'passport-jwt';
 
