@@ -126,5 +126,11 @@ export class AppointmentController {
         return preconsultation;
     }
 
+    // @MessagePattern({cmd: 'app_doc_config_update'})
+    // async doctorConfigUpdate(doctorConfigDto: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.doctorConfigUpdate(doctorConfigDto);
+    //     return preconsultation;
+    // }
+
 
 }

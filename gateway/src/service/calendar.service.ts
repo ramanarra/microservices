@@ -1,7 +1,7 @@
 import { Injectable, Inject, UseFilters, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { UserDto, AppointmentDto,DoctorConfigCanReschDto } from 'common-dto';
+import { UserDto, AppointmentDto,DoctorConfigCanReschDto,DocConfigDto } from 'common-dto';
 import { AllClientServiceException } from 'src/common/filter/all-clientservice-exceptions.filter';
 
 
@@ -68,6 +68,12 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy{
     @UseFilters(AllClientServiceException)
     public appointmentList(doctorKey): Observable<any> {
         return this.redisClient.send({ cmd: 'calendar_appointment_get_list' }, doctorKey);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorConfigUpdate(docConfigDto : any,user : any): Observable<any> {
+        docConfigDto.user = user;
+        return this.redisClient.send( { cmd: 'app_doc_config_update' }, docConfigDto);
     }
 
 

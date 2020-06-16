@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
-import {AppointmentDto, UserDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto} from 'common-dto';
+import {AppointmentDto, UserDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto,DocConfigDto} from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
@@ -67,5 +67,9 @@ export class AppointmentService {
     async getDoctorConfigDetails(doctorKey): Promise<any> {
         return await this.doctorConfigRepository.findOne({doctorKey: doctorKey});
     }
+
+    // async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
+    //     return await this.doctorConfigRepository.doctorCanReschEdit(doctorConfigDto);
+    // }
 
 }

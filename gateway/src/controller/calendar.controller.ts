@@ -126,6 +126,34 @@ export class CalendarController {
       return this.calendarService.appointmentList(req.user.doctor_key);  
     }
 
+    @Post('doctorConfigUpdate')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+    '"doctorKey":"Doc_5",\n' +
+    '"consultationCost": "123456" \n' +
+    '"isPreconsultationAllowed": "123456" \n' +
+    '"preconsultationHours": "123456" \n' +
+    '"preconsultationMins": "123456" \n' +
+    '"isPatientCancellationAllowed": "123456" \n' +
+    '"cancellationDays": "123456" \n' +
+    '"cancellationHours": "123456" \n' +
+    '"cancellationMins": "123456" \n' +
+    '"isPatientRescheduleAllowed": "123456" \n' +
+    '"rescheduleDays": "123456" \n' +
+    '"rescheduleHours": "123456" \n' +
+    '"rescheduleMins": "123456" \n' +
+    '"autoCancelDays": "123456" \n' +
+    '"autoCancelHours": "123456" \n' +
+    '"autoCancelMins": "123456" \n' +
+    '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({ type: DocConfigDto })
+    doctorConfigUpdate(@Request() req,@Body() docConfigDto : DocConfigDto) {
+      this.logger.log(`Doctor config Update  Api -> Request data ${JSON.stringify(docConfigDto,req.user)}`);
+      return this.calendarService.doctorConfigUpdate(docConfigDto,req.user);
+    }
+
 
 
 
