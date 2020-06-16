@@ -1,7 +1,13 @@
-import {Injectable} from '@nestjs/common';
+import {HttpStatus, Injectable} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
-import {AppointmentDto, UserDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto} from 'common-dto';
+import {
+    AppointmentDto,
+    UserDto,
+    DoctorConfigPreConsultationDto,
+    DoctorConfigCanReschDto,
+    DocConfigDto
+} from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
@@ -12,6 +18,7 @@ import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_c
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
+import {queries} from "../config/query";
 
 
 @Injectable()
@@ -66,6 +73,32 @@ export class AppointmentService {
     // get details from docConfig table
     async getDoctorConfigDetails(doctorKey): Promise<any> {
         return await this.doctorConfigRepository.findOne({doctorKey: doctorKey});
+    }
+
+    async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
+        // update the doctorConfig details
+        if (!doctorConfigDto.doctorKey) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: 'Invalid Request'
+            }
+        }
+        var condition = {
+            doctorKey: doctorConfigDto.doctorKey
+        }
+        var values: any = doctorConfigDto;
+        var updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+        if (updateDoctorConfig.affected) {
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Updated Successfully'
+            }
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_MODIFIED,
+                message: 'Updation Failed'
+            }
+        }
     }
 
 }
