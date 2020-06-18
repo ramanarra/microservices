@@ -1,7 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {AppointmentDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto, DocConfigDto} from 'common-dto';
+import {AppointmentDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto} from 'common-dto';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -70,13 +70,13 @@ export class AppointmentController {
                 accountDetails: account,
                 doctorList: doctor
             }
-        } else if (roleKey.role === 'DOC_ASSISTANT ') {
+        } else if (roleKey.role === 'DOC_ASSISTANT') {
             var accountKey = roleKey.key;
-            const account = await this.appointmentService.accountDetails(accountKey);
+            //const account = await this.appointmentService.accountDetails(accountKey);
             const doctor = await this.appointmentService.doctor_List(accountKey);
             return {
                 statusCode: HttpStatus.OK,
-                accountDetails: account,
+                //accountDetails: account,
                 doctorList: doctor
             }
         } else {
@@ -146,6 +146,34 @@ export class AppointmentController {
         const docConfig = await this.appointmentService.doctorConfigUpdate(doctorConfigDto);
         return docConfig;
     }
+
+    @MessagePattern({cmd: 'app_work_schedule_edit'})
+    async workScheduleEdit(workScheduleDto: any): Promise<any> {
+        const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto);
+        return docConfig;
+    }
+
+    @MessagePattern({cmd: 'app_work_schedule_view'})
+    async workScheduleView(doctorKey:any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(doctorKey);
+        if(!doctor){
+            return{
+                statusCode: HttpStatus.NOT_FOUND,
+                message: "DOCTOR Not found"
+            }
+        }
+        var docId = doctor.doctor_id;
+        const docConfig = await this.appointmentService.workScheduleView(docId);
+        if(docConfig){
+            return docConfig;
+        }else {
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Invalid request"
+            }
+        }
+    }
+
 
 
 }

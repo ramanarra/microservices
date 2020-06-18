@@ -6,7 +6,8 @@ import {
     UserDto,
     DoctorConfigPreConsultationDto,
     DoctorConfigCanReschDto,
-    DocConfigDto
+    DocConfigDto,
+    WorkScheduleDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -19,6 +20,9 @@ import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_c
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
 import {queries} from "../config/query";
+import {WorkScheduleRepository} from "./workSchedule/workSchedule.repository";
+import { DocConfigScheduleDayRepository } from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
+import { DocConfigScheduleIntervalRepository } from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
 
 
 @Injectable()
@@ -29,7 +33,11 @@ export class AppointmentService {
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
         private doctorConfigPreConsultationRepository: DoctorConfigPreConsultationRepository,
         private doctorConfigCanReschRepository: DoctorConfigCanReschRepository,
-        private doctorConfigRepository: docConfigRepository
+        private doctorConfigRepository: docConfigRepository,
+        private workScheduleRepository: WorkScheduleRepository,
+        private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
+        private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository
+
     ) {
     }
 
@@ -99,6 +107,31 @@ export class AppointmentService {
                 message: 'Updation Failed'
             }
         }
+    }
+
+    async workScheduleEdit(workScheduleDto: WorkScheduleDto): Promise<any> {
+        //update work schedule
+       // return await this.workScheduleRepository.update({condition, values});
+    }
+
+    // async workScheduleView(docId): Promise<any> {
+    //     const day = await this.docConfigScheduleDayRepository.find({doctorId : docId});
+    //     var workSched=[];
+        
+    //     day.forEach( async function (workSchedule) {
+    //         var dayDetails = workSchedule.docConfigScheduleDayId;
+    //         const interval = this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:dayDetails});
+    //         var res = {
+    //             day: workSchedule,
+    //             interval: interval
+    //         }
+    //         workSched.push(res);
+    //     });
+    //     return workSched;
+    // }
+
+    async workScheduleView(doctorId: number): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
     }
 
 }

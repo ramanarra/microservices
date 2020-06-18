@@ -3,6 +3,11 @@ import { ConflictException, InternalServerErrorException, Logger } from "@nestjs
 import { Appointment } from "./appointment.entity";
 import { AppointmentDto , DoctorConfigPreConsultationDto} from  "common-dto";
 import { Doctor } from "./doctor/doctor.entity";
+import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfigScheduleInterval.entity";
+import { DocConfigScheduleDay } from "./DocConfigScheduleDay/docConfigScheduleDay.entity";
+import { DocConfigScheduleDayRepository } from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
+import { DocConfigScheduleIntervalRepository } from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
+
 
 @EntityRepository(Appointment)
 export class AppointmentRepository extends Repository<Appointment> {

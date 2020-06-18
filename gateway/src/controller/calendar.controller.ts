@@ -35,7 +35,8 @@ import {
     DoctorConfigPreConsultationDto,
     DoctorConfigCanReschDto,
     DoctorDto,
-    DocConfigDto
+    DocConfigDto,
+    WorkScheduleDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -70,7 +71,13 @@ export class CalendarController {
     @ApiOkResponse({description: 'Doctor List'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorList(@Request() req) {
+      if(req.user.role === 'DOCTOR'){
         return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
+      }
+       else{
+         return this.calendarService.doctorList(req.user.role, req.user.account_key);
+       }
+
     }
 
 
@@ -83,10 +90,12 @@ export class CalendarController {
     doctorView(@Request() req, @Body() userDto: UserDto) {
         // check if doctor key and token doctor key are same
         if (req.user.doctor_key !== userDto.doctorKey) {
+     // if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
             throw new UnauthorizedException("Invalid User")
         }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
         return this.calendarService.doctorView(req.user.doctor_key);
+       // return this.calendarService.doctorView(userDto.doctorKey);
     }
 
     // @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -145,20 +154,20 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"doctorKey":"Doc_5",\n' +
-            '"consultationCost": "5000" \n' +
-            '"isPreconsultationAllowed": true \n' +
-            '"preconsultationHours": "5" \n' +
-            '"preconsultationMins": "30" \n' +
-            '"isPatientCancellationAllowed": false \n' +
-            '"cancellationDays": "2" \n' +
-            '"cancellationHours": "3" \n' +
-            '"cancellationMins": "30" \n' +
-            '"isPatientRescheduleAllowed": false \n' +
-            '"rescheduleDays": "2" \n' +
-            '"rescheduleHours": "4" \n' +
-            '"rescheduleMins": "15" \n' +
-            '"autoCancelDays": "1" \n' +
-            '"autoCancelHours": "3" \n' +
+            '"consultationCost": "5000" ,\n' +
+            '"isPreconsultationAllowed": true, \n' +
+            '"preconsultationHours": "5", \n' +
+            '"preconsultationMins": "30", \n' +
+            '"isPatientCancellationAllowed": false ,\n' +
+            '"cancellationDays": "2" ,\n' +
+            '"cancellationHours": "3" ,\n' +
+            '"cancellationMins": "30", \n' +
+            '"isPatientRescheduleAllowed": false, \n' +
+            '"rescheduleDays": "2", \n' +
+            '"rescheduleHours": "4" ,\n' +
+            '"rescheduleMins": "15", \n' +
+            '"autoCancelDays": "1", \n' +
+            '"autoCancelHours": "3" ,\n' +
             '"autoCancelMins": "15" \n' +
             '}'
     })
@@ -176,6 +185,30 @@ export class CalendarController {
         }
         this.logger.log(`Doctor config Update  Api -> Request data ${JSON.stringify(docConfigDto, req.user)}`);
         return this.calendarService.doctorConfigUpdate(docConfigDto, req.user);
+    }
+
+    @Post('workScheduleEdit')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+    '"doctorId":"1",\n' +
+    '"date": "20-06-2020" \n' +
+    '}' })
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBody({type: WorkScheduleDto})
+    workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto)}`);
+        return this.calendarService.workScheduleEdit(workScheduleDto);
+    }
+
+    @Get('workScheduleView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'Work Schedule View'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    workScheduleView(@Request() req) {
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
+         return this.calendarService.workScheduleView(req.user.doctor_key);
     }
 
 
