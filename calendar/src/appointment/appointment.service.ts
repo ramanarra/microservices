@@ -109,10 +109,18 @@ export class AppointmentService {
         }
     }
 
-    async workScheduleEdit(workScheduleDto: WorkScheduleDto): Promise<any> {
-        //update work schedule
-       // return await this.workScheduleRepository.update({condition, values});
+    async workScheduleEdit(workScheduleDto: any,doctorId:any): Promise<any> {
+        var values1: any = workScheduleDto;
+        const day = await this.docConfigScheduleDayRepository.findOne({doctorId : doctorId,dayOfWeek:workScheduleDto.dayOfWeek});
+        var ref = day.docConfigScheduleDayId;
+        var condition1 = {
+            docConfigScheduleDayId: ref
+        }
+        //var updateWorkSchedule = await this.docConfigScheduleIntervalRepository.update(condition1, values1);
+       
     }
+
+
 
     // async workScheduleView(docId): Promise<any> {
     //     const day = await this.docConfigScheduleDayRepository.find({doctorId : docId});

@@ -198,7 +198,7 @@ export class CalendarController {
     @ApiBody({type: WorkScheduleDto})
     workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto)}`);
-        return this.calendarService.workScheduleEdit(workScheduleDto);
+        return this.calendarService.workScheduleEdit(workScheduleDto,req.user.doctor_key);
     }
 
     @Get('workScheduleView')
