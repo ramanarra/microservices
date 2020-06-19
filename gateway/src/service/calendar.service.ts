@@ -76,8 +76,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public workScheduleEdit(workScheduleDto: any,doctorKey:any): Observable<any> {
-        workScheduleDto.doctorKey = doctorKey;
+    public workScheduleEdit(workScheduleDto: any,user:any): Observable<any> {
+        workScheduleDto.user = user;
         return this.redisClient.send({cmd: 'app_work_schedule_edit'}, workScheduleDto);
     }
 

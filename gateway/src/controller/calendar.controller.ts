@@ -192,21 +192,29 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
     '"doctorKey":"Doc_5",\n' +
-    '"date": "20-06-2020" \n' +
+    '"date": "20-06-2020",\n' +
     '"dayOfWeek": "Monday" \n' +
     '}' })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: WorkScheduleDto})
     workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
-         // validate req.token.doctorykey and paramter doctorkey are same or not
-        if (workScheduleDto.doctorKey != req.user.doctor_key) {
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: 'Invalid Request'
+        if(req.user.role == 'ADMIN'){
+            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto,req.user)}`);
+            return this.calendarService.workScheduleEdit(workScheduleDto,req.user);
+        }else if(req.user.role == 'DOCTOR'){
+            if (workScheduleDto.doctorKey != req.user.doctor_key) {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: 'Invalid Request'
+                }
             }
+            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto,req.user)}`);
+            return this.calendarService.workScheduleEdit(workScheduleDto,req.user);
         }
-        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto)}`);
-        return this.calendarService.workScheduleEdit(workScheduleDto,req.user.doctor_key);
+        return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: 'Invalid Request'
+        }
     }
 
     @Get('workScheduleView')
@@ -216,7 +224,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     workScheduleView(@Request() req) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-         return this.calendarService.workScheduleView(req.user.doctor_key);
+        return this.calendarService.workScheduleView(req.user.doctor_key);
     }
 
 
