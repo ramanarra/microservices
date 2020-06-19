@@ -112,9 +112,9 @@ export class AppointmentService {
         }
     }
 
-    async workScheduleEdit(workScheduleDto: any,doctorId:any): Promise<any> {
+    async workScheduleEdit(workScheduleDto: any,doctorKey:any): Promise<any> {
         var values1: any = workScheduleDto;
-        const day = await this.docConfigScheduleDayRepository.findOne({doctorId : doctorId,dayOfWeek:workScheduleDto.dayOfWeek});
+        const day = await this.docConfigScheduleDayRepository.findOne({doctorKey :workScheduleDto.doctorKey,dayOfWeek:workScheduleDto.dayOfWeek});
         var ref = day.docConfigScheduleDayId;
         var condition1 = {
             docConfigScheduleDayId: ref

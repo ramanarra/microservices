@@ -4,4 +4,5 @@ export class WorkScheduleDto {
     date: Date;
     startTime:string;
     endTime:string;
+    doctorKey:string;
   }

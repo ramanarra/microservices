@@ -191,12 +191,20 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
-    '"doctorId":"1",\n' +
+    '"doctorKey":"Doc_5",\n' +
     '"date": "20-06-2020" \n' +
+    '"dayOfWeek": "Monday" \n' +
     '}' })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: WorkScheduleDto})
     workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
+         // validate req.token.doctorykey and paramter doctorkey are same or not
+        if (workScheduleDto.doctorKey != req.user.doctor_key) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: 'Invalid Request'
+            }
+        }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto)}`);
         return this.calendarService.workScheduleEdit(workScheduleDto,req.user.doctor_key);
     }

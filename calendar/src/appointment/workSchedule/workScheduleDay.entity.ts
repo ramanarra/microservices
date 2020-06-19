@@ -23,4 +23,9 @@ export class WorkScheduleDay extends BaseEntity{
     })
     isActive : boolean;
 
+    @Column({
+        name : 'doctor_key'
+    })
+    doctorKey : string;
+
 }

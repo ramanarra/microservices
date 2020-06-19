@@ -149,15 +149,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
-        const doctor = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
-        if(!doctor){
-            return{
-                statusCode: HttpStatus.NOT_FOUND,
-                message: "DOCTOR Not found"
-            }
-        }
-        var docId = doctor.doctor_id;
-        const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto,docId);
+        const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto,workScheduleDto.doctorKey);
         return docConfig;
     }
 

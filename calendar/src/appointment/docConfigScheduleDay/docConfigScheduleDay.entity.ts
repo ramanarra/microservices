@@ -18,5 +18,10 @@ export class DocConfigScheduleDay extends BaseEntity{
     })
     dayOfWeek : string;
 
+    @Column({
+        name : 'doctor_key'
+    })
+    doctorKey : string;
+
 
 }
