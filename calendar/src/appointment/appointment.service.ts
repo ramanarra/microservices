@@ -20,9 +20,11 @@ import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_c
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
 import {queries} from "../config/query";
-import {WorkScheduleRepository} from "./workSchedule/workSchedule.repository";
 import { DocConfigScheduleDayRepository } from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
 import { DocConfigScheduleIntervalRepository } from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
+import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
+import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
+
 
 
 @Injectable()
@@ -34,9 +36,10 @@ export class AppointmentService {
         private doctorConfigPreConsultationRepository: DoctorConfigPreConsultationRepository,
         private doctorConfigCanReschRepository: DoctorConfigCanReschRepository,
         private doctorConfigRepository: docConfigRepository,
-        private workScheduleRepository: WorkScheduleRepository,
         private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
-        private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository
+        private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
+        private workScheduleDayRepository: WorkScheduleDayRepository,
+        private workScheduleIntervalRepository: WorkScheduleIntervalRepository
 
     ) {
     }
