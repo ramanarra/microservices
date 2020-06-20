@@ -142,7 +142,49 @@ export class AppointmentService {
     // }
 
     async workScheduleView(doctorId: number): Promise<any> {
-        return await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
+        let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
+        if (docConfig) {
+            let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
+            // format the response
+            docConfig.forEach(v => {
+                if (v.day_of_week === 'Monday') {
+                    monday.push(v);
+                }
+                if (v.day_of_week === 'Tuesday') {
+                    tuesday.push(v);
+                }
+                if (v.day_of_week === 'Wednesday') {
+                    wednesday.push(v);
+                }
+                if (v.day_of_week === 'Thursday') {
+                    thursday.push(v);
+                }
+                if (v.day_of_week === 'Friday') {
+                    friday.push(v);
+                }
+                if (v.day_of_week === 'Saturday') {
+                    saturday.push(v);
+                }
+                if (v.day_of_week === 'Sunday') {
+                    sunday.push(v);
+                }
+            })
+            let responseData = {
+                Monday: monday,
+                Tuesday : tuesday,
+                Wednesday: wednesday,
+                Thursday: thursday,
+                Friday: friday,
+                Saturday: saturday,
+                Sunday: sunday
+            }
+            return responseData;
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Invalid request"
+            }
+        }
     }
 
     async appointmentSlotsView(user: any): Promise<any> {
