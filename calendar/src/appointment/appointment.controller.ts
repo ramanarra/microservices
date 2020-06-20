@@ -1,7 +1,13 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {AppointmentDto, DoctorConfigPreConsultationDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto} from 'common-dto';
+import {
+    AppointmentDto,
+    DoctorConfigPreConsultationDto,
+    DoctorConfigCanReschDto,
+    DocConfigDto,
+    WorkScheduleDto
+} from 'common-dto';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -50,12 +56,16 @@ export class AppointmentController {
         if (roleKey.role === "DOCTOR") {
             var doctorKey = roleKey.key;
             const doctor = await this.appointmentService.doctorDetails(doctorKey);
-            if(doctor){
+            // add static response for fees, today's appointmenet, available seats
+            doctor.fees = 5000;
+            doctor.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
+            doctor.todaysAvailabilitySeats = 12;
+            if (doctor) {
                 return {
                     statusCode: HttpStatus.OK,
                     doctorList: doctor
                 }
-            }else{
+            } else {
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
                     message: 'content not available'
@@ -65,6 +75,12 @@ export class AppointmentController {
             var accountKey = roleKey.key;
             const account = await this.appointmentService.accountDetails(accountKey);
             const doctor = await this.appointmentService.doctor_List(accountKey);
+            // add static values for temp
+            doctor.forEach(v => {
+                v.fees = 5000;
+                v.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
+                v.todaysAvailabilitySeats = 12;
+            })
             return {
                 statusCode: HttpStatus.OK,
                 accountDetails: account,
@@ -74,6 +90,12 @@ export class AppointmentController {
             var accountKey = roleKey.key;
             //const account = await this.appointmentService.accountDetails(accountKey);
             const doctor = await this.appointmentService.doctor_List(accountKey);
+            // add static values for temp
+            doctor.forEach(v => {
+                v.fees = 5000;
+                v.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
+                v.todaysAvailabilitySeats = 12;
+            })
             return {
                 statusCode: HttpStatus.OK,
                 //accountDetails: account,
@@ -149,20 +171,19 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
-        if(workScheduleDto.user.role =='ADMIN'){
-            const acc=await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
-            var accKey=acc.accountkey;
-            if(accKey !== workScheduleDto.user.accountKey){
+        if (workScheduleDto.user.role == 'ADMIN') {
+            const acc = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
+            var accKey = acc.accountkey;
+            if (accKey !== workScheduleDto.user.accountKey) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: 'Invalid Request'
                 }
             }
-            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto,workScheduleDto.doctorKey);
+            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
             return docConfig;
-        }
-        else if(workScheduleDto.user.role =='DOCTOR'){
-            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto,workScheduleDto.doctorKey);
+        } else if (workScheduleDto.user.role == 'DOCTOR') {
+            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
             return docConfig;
         }
         return {
@@ -172,26 +193,25 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'app_work_schedule_view'})
-    async workScheduleView(doctorKey:any): Promise<any> {
+    async workScheduleView(doctorKey: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(doctorKey);
-        if(!doctor){
-            return{
+        if (!doctor) {
+            return {
                 statusCode: HttpStatus.NOT_FOUND,
                 message: "DOCTOR Not found"
             }
         }
         var docId = doctor.doctor_id;
         const docConfig = await this.appointmentService.workScheduleView(docId);
-        if(docConfig){
+        if (docConfig) {
             return docConfig;
-        }else {
-            return{
+        } else {
+            return {
                 statusCode: HttpStatus.BAD_REQUEST,
                 message: "Invalid request"
             }
         }
     }
-
 
 
 }

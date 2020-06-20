@@ -71,12 +71,11 @@ export class CalendarController {
     @ApiOkResponse({description: 'Doctor List'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorList(@Request() req) {
-      if(req.user.role === 'DOCTOR'){
-        return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
-      }
-       else{
-         return this.calendarService.doctorList(req.user.role, req.user.account_key);
-       }
+        if (req.user.role === 'DOCTOR') {
+            return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
+        } else {
+            return this.calendarService.doctorList(req.user.role, req.user.account_key);
+        }
 
     }
 
@@ -90,12 +89,12 @@ export class CalendarController {
     doctorView(@Request() req, @Body() userDto: UserDto) {
         // check if doctor key and token doctor key are same
         if (req.user.doctor_key !== userDto.doctorKey) {
-     // if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
+            // if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
             throw new UnauthorizedException("Invalid User")
         }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
         return this.calendarService.doctorView(req.user.doctor_key);
-       // return this.calendarService.doctorView(userDto.doctorKey);
+        // return this.calendarService.doctorView(userDto.doctorKey);
     }
 
     // @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -190,26 +189,28 @@ export class CalendarController {
     @Post('workScheduleEdit')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({ description: 'requestBody example :   {\n' +
-    '"doctorKey":"Doc_5",\n' +
-    '"date": "20-06-2020",\n' +
-    '"dayOfWeek": "Monday" \n' +
-    '}' })
+    @ApiOkResponse({
+        description: 'requestBody example :   {\n' +
+            '"doctorKey":"Doc_5",\n' +
+            '"date": "20-06-2020",\n' +
+            '"dayOfWeek": "Monday" \n' +
+            '}'
+    })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: WorkScheduleDto})
     workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
-        if(req.user.role == 'ADMIN'){
-            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto,req.user)}`);
-            return this.calendarService.workScheduleEdit(workScheduleDto,req.user);
-        }else if(req.user.role == 'DOCTOR'){
+        if (req.user.role == 'ADMIN') {
+            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
+            return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
+        } else if (req.user.role == 'DOCTOR') {
             if (workScheduleDto.doctorKey != req.user.doctor_key) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: 'Invalid Request'
                 }
             }
-            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto,req.user)}`);
-            return this.calendarService.workScheduleEdit(workScheduleDto,req.user);
+            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
+            return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
         }
         return {
             statusCode: HttpStatus.BAD_REQUEST,
