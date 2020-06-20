@@ -270,6 +270,12 @@ export class AppointmentController {
         }
     }
 
+    @MessagePattern({cmd: 'app_patient_search'})
+    async patientSearch(patientDto: any): Promise<any> {
+        const patient = await this.appointmentService.patientSearch(patientDto);
+        return patient;
+    }
+
 
 
 }

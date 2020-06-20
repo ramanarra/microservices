@@ -12,12 +12,13 @@ import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigSc
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
+import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AppointmentRepository,DoctorRepository, AccountDetailsRepository,
       DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
-      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository])
+      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository])
   ],
   controllers: [AppointmentController],
   providers: [AppointmentService]

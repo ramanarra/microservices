@@ -24,6 +24,9 @@ import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfig
 import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
+import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
+import {PatientDetails} from './patientDetails/patientDetails.entity';
+
 
 var async = require('async');
 
@@ -40,7 +43,9 @@ export class AppointmentService {
         private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
         private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
         private workScheduleDayRepository: WorkScheduleDayRepository,
-        private workScheduleIntervalRepository: WorkScheduleIntervalRepository
+        private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
+        private patientDetailsRepository: PatientDetailsRepository
+
 
     ) {
     }
@@ -296,5 +301,11 @@ export class AppointmentService {
         }
 
    }
+
+   
+   async patientSearch(patientDto: any): Promise<any> {
+    return await this.patientDetailsRepository.findOne({phoneNumber : patientDto.phoneNumber});
+}
+
 
 }
