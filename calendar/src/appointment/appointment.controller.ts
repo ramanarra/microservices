@@ -1,13 +1,9 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {
-    AppointmentDto,
-    DoctorConfigPreConsultationDto,
-    DoctorConfigCanReschDto,
-    DocConfigDto,
-    WorkScheduleDto
-} from 'common-dto';
+
+var async = require('async');
+
 
 @Controller('appointment')
 export class AppointmentController {
@@ -171,25 +167,29 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
-        if (workScheduleDto.user.role == 'ADMIN') {
-            const acc = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
-            var accKey = acc.accountkey;
-            if (accKey !== workScheduleDto.user.accountKey) {
-                return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Invalid Request'
-                }
-            }
-            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
-            return docConfig;
-        } else if (workScheduleDto.user.role == 'DOCTOR') {
-            const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
-            return docConfig;
-        }
-        return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: 'Invalid Request'
-        }
+        const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
+
+
+
+        // if (workScheduleDto.user.role == 'ADMIN') {
+        //     const acc = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
+        //     var accKey = acc.accountkey;
+        //     if (accKey !== workScheduleDto.user.accountKey) {
+        //         return {
+        //             statusCode: HttpStatus.BAD_REQUEST,
+        //             message: 'Invalid Request'
+        //         }
+        //     }
+        //     const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
+        //     return docConfig;
+        // } else if (workScheduleDto.user.role == 'DOCTOR') {
+        //     const docConfig = await this.appointmentService.workScheduleEdit(workScheduleDto, workScheduleDto.doctorKey);
+        //     return docConfig;
+        // }
+        // return {
+        //     statusCode: HttpStatus.BAD_REQUEST,
+        //     message: 'Invalid Request'
+        // }
     }
 
     @MessagePattern({cmd: 'app_work_schedule_view'})

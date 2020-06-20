@@ -25,6 +25,7 @@ import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
 
+var async = require('async');
 
 
 @Injectable()
@@ -112,23 +113,25 @@ export class AppointmentService {
         }
     }
 
-    async workScheduleEdit(workScheduleDto: any,doctorKey:any): Promise<any> {
-        var values1: any = workScheduleDto;
-        const day = await this.docConfigScheduleDayRepository.findOne({doctorKey :workScheduleDto.doctorKey,dayOfWeek:workScheduleDto.dayOfWeek});
-        var ref = day.docConfigScheduleDayId;
-        var condition1 = {
-            docConfigScheduleDayId: ref
-        }
-        //var updateWorkSchedule = await this.docConfigScheduleIntervalRepository.update(condition1, values1);
-       
-    }
-
+    // async workScheduleEdit(workScheduleDto: any, doctorKey: any): Promise<any> {
+    //     var values1: any = workScheduleDto;
+    //     const day = await this.docConfigScheduleDayRepository.findOne({
+    //         doctorKey: workScheduleDto.doctorKey,
+    //         dayOfWeek: workScheduleDto.dayOfWeek
+    //     });
+    //     var ref = day.docConfigScheduleDayId;
+    //     var condition1 = {
+    //         docConfigScheduleDayId: ref
+    //     }
+    //     //var updateWorkSchedule = await this.docConfigScheduleIntervalRepository.update(condition1, values1);
+    //
+    // }
 
 
     // async workScheduleView(docId): Promise<any> {
     //     const day = await this.docConfigScheduleDayRepository.find({doctorId : docId});
     //     var workSched=[];
-        
+
     //     day.forEach( async function (workSchedule) {
     //         var dayDetails = workSchedule.docConfigScheduleDayId;
     //         const interval = this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:dayDetails});
@@ -185,6 +188,53 @@ export class AppointmentService {
                 message: "Invalid request"
             }
         }
+    }
+
+
+    async workScheduleEdit(workScheduleDto: any): Promise<any> {
+
+        let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
+        if (scheduleTimeIntervals.length) {
+            for (let scheduleTimeInterval of scheduleTimeIntervals) {
+                if (scheduleTimeInterval.scheduletimeid) {
+                    // if scheduletimeid is there then need to update
+
+                } else {
+                    // if scheduletimeid is not there  then new insert new records then
+                    // get the previous interval timing from db
+                    let doctorKey = workScheduleDto.user.doctor_key;
+                    let dayOfWeek = workScheduleDto.dayOfWeek;
+                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
+                    console.log('test=====', doctorScheduledDays);
+                    if (doctorScheduledDays && doctorScheduledDays.length) {
+                     // validate with previous data
+                        let starTime = scheduleTimeInterval.startTime;
+                        let endTime = scheduleTimeInterval.endTime;
+                        let  isOverLapping = false;
+                        // convert starttime into milliseconds
+                        let splitStartTime = starTime.split(':');
+                        console.log("===split",splitStartTime)
+
+
+
+                    } else {
+                        // no previous datas are there just insert
+
+
+
+                    }
+                }
+            }
+        } else {
+            // return
+        }
+
+
+    }
+
+
+    async getDoctorConfigSchedule(doctorKey: string, dayOfWeek: string): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, dayOfWeek]);
     }
 
     async appointmentSlotsView(user: any): Promise<any> {
