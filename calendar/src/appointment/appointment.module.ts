@@ -16,7 +16,8 @@ import {WorkScheduleIntervalRepository} from "./WorkSchedule/workScheduleInterva
 @Module({
   imports: [
     TypeOrmModule.forFeature([AppointmentRepository,DoctorRepository, AccountDetailsRepository,
-      DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository])
+      DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
+      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository])
   ],
   controllers: [AppointmentController],
   providers: [AppointmentService]
