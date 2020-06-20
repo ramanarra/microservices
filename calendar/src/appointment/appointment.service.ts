@@ -145,4 +145,64 @@ export class AppointmentService {
         return await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
     }
 
+    async appointmentSlotsView(user: any): Promise<any> {
+        return await this.appointmentRepository.find({ });
+    }
+
+    async appointmentReschedule(appointmentDto: any): Promise<any> {
+
+         if (!appointmentDto.appointmentId) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: 'Invalid Request'
+            }
+        }
+        var condition = {
+            id: appointmentDto.appointmentId
+        }
+        var values:any = {
+            isCancel: true,
+            cancelledBy:appointmentDto.user.role,
+            cancelledId:appointmentDto.user.userId
+        }
+        var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+      //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
+      return await this.appointmentRepository.createAppointment(appointmentDto)
+    }
+
+    async appointmentDetails(id: any): Promise<any> {
+        return await this.appointmentRepository.findOne({id : id});
+    }
+
+    async appointmentCancel(appointmentDto: any): Promise<any> {
+
+        if (!appointmentDto.appointmentId) {
+           return {
+               statusCode: HttpStatus.NO_CONTENT,
+               message: 'Invalid Request'
+           }
+       }
+       var condition = {
+           id: appointmentDto.appointmentId
+       }
+       var values:any = {
+           isCancel: true,
+           cancelledBy:appointmentDto.user.role,
+           cancelledId:appointmentDto.user.userId
+       }
+       var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+       if (pastAppointment.affected) {
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Appointment Cancelled Successfully'
+            }
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_MODIFIED,
+                message: 'Updation Failed'
+            }
+        }
+
+   }
+
 }

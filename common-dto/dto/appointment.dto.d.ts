@@ -5,4 +5,11 @@ export declare class AppointmentDto {
     appointmentDate: Date;
     startTime: string;
     endTime: string;
+    paymentStatus: boolean;
+    isActive: boolean;
+    isCancel: boolean;
+    createdBy: string;
+    createdId: number;
+    cancelledBy: string;
+    cancelledId: number;
 }

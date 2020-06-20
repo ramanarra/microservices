@@ -30,5 +30,17 @@ export class AuthController {
       return this.userService.doctorsLogin(userDto);
     }
 
+    @Post('patientLogin')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"email":"patient@gmail.com",\n' +
+          '"password": "123456" \n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    patientLogin(@Body() userDto : UserDto) {
+      this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      return this.userService.patientLogin(userDto);
+    }
+
 
 }
