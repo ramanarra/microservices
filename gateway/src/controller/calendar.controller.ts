@@ -198,7 +198,7 @@ export class CalendarController {
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: WorkScheduleDto})
-    workScheduleEdit(@Request() req, @Body() workScheduleDto: WorkScheduleDto) {
+    workScheduleEdit(@Request() req, @Body() workScheduleDto: any) {
         if (req.user.role == 'ADMIN') {
             this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
             return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
