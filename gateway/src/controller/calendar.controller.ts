@@ -228,5 +228,42 @@ export class CalendarController {
         return this.calendarService.workScheduleView(req.user.doctor_key);
     }
 
+    @Get('appointmentSlotsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'appointmentSlotsView'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    appointmentSlotsView(@Request() req) {
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.appointmentSlotsView(req.user);
+    }
+
+    @Post('appointmentReschedule')
+    @ApiOkResponse({description: 'Appointment Reschedule'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: AppointmentDto})
+    appointmentReschedule(@Request() req, @Body() appointmentDto: AppointmentDto) {
+        if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
+            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+            return this.calendarService.appointmentReschedule(appointmentDto, req.user);
+        }
+    }
+
+    @Post('appointmentCancel')
+    @ApiOkResponse({description: 'Appointment Cancel'})
+    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: AppointmentDto})
+    appointmentCancel(@Request() req, @Body() appointmentDto: AppointmentDto) {
+        if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
+            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+            return this.calendarService.appointmentCancel(appointmentDto, req.user);
+        }
+    }
+
+
 
 }

@@ -20,8 +20,8 @@ import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_c
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
 import {queries} from "../config/query";
-import {DocConfigScheduleDayRepository} from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
-import {DocConfigScheduleIntervalRepository} from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
+import { DocConfigScheduleDayRepository } from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
+import { DocConfigScheduleIntervalRepository } from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
 
@@ -37,10 +37,11 @@ export class AppointmentService {
         private doctorConfigPreConsultationRepository: DoctorConfigPreConsultationRepository,
         private doctorConfigCanReschRepository: DoctorConfigCanReschRepository,
         private doctorConfigRepository: docConfigRepository,
-        private docConfigScheduleDayRepository: DocConfigScheduleDayRepository,
-        private docConfigScheduleIntervalRepository: DocConfigScheduleIntervalRepository,
+        private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
+        private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
         private workScheduleDayRepository: WorkScheduleDayRepository,
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository
+
     ) {
     }
 
@@ -173,7 +174,7 @@ export class AppointmentService {
             })
             let responseData = {
                 Monday: monday,
-                Tuesday: tuesday,
+                Tuesday : tuesday,
                 Wednesday: wednesday,
                 Thursday: thursday,
                 Friday: friday,
@@ -235,5 +236,65 @@ export class AppointmentService {
     async getDoctorConfigSchedule(doctorKey: string, dayOfWeek: string): Promise<any> {
         return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, dayOfWeek]);
     }
+
+    async appointmentSlotsView(user: any): Promise<any> {
+        return await this.appointmentRepository.find({ });
+    }
+
+    async appointmentReschedule(appointmentDto: any): Promise<any> {
+
+         if (!appointmentDto.appointmentId) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: 'Invalid Request'
+            }
+        }
+        var condition = {
+            id: appointmentDto.appointmentId
+        }
+        var values:any = {
+            isCancel: true,
+            cancelledBy:appointmentDto.user.role,
+            cancelledId:appointmentDto.user.userId
+        }
+        var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+      //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
+      return await this.appointmentRepository.createAppointment(appointmentDto)
+    }
+
+    async appointmentDetails(id: any): Promise<any> {
+        return await this.appointmentRepository.findOne({id : id});
+    }
+
+    async appointmentCancel(appointmentDto: any): Promise<any> {
+
+        if (!appointmentDto.appointmentId) {
+           return {
+               statusCode: HttpStatus.NO_CONTENT,
+               message: 'Invalid Request'
+           }
+       }
+       var condition = {
+           id: appointmentDto.appointmentId
+       }
+       var values:any = {
+           isCancel: true,
+           cancelledBy:appointmentDto.user.role,
+           cancelledId:appointmentDto.user.userId
+       }
+       var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+       if (pastAppointment.affected) {
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Appointment Cancelled Successfully'
+            }
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_MODIFIED,
+                message: 'Updation Failed'
+            }
+        }
+
+   }
 
 }

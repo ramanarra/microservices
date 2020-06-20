@@ -10,8 +10,8 @@ import { DoctorConfigCanReschRepository } from './docConfigReschedule/doc_config
 import {docConfigRepository} from "./doc_config/docConfig.repository";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
-import {WorkScheduleDayRepository} from "./WorkSchedule/workScheduleDay.repository";
-import {WorkScheduleIntervalRepository} from "./WorkSchedule/workScheduleInterval.repository";
+import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
+import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
 
 @Module({
   imports: [

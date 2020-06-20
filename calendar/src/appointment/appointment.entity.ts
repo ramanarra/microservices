@@ -55,7 +55,16 @@ export class Appointment extends BaseEntity{
     @Column({
         name : 'created_id'
     })
-    createdId : number;  
+    createdId : number; 
+    
+    @Column({
+        name : 'cancelled_by'
+    })
+    cancelledBy : string;
 
+    @Column({
+        name : 'cancelled_id'
+    })
+    cancelledId : number;  
 
 }
