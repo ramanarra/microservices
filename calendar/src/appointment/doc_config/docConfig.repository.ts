@@ -7,6 +7,6 @@ import {docConfig} from "./docConfig.entity";
 export class docConfigRepository extends Repository<docConfig> {
 
     private logger = new Logger('docConfigRepository');
-
+    
 
 }

@@ -79,7 +79,6 @@ export class UserService {
     }
 
     async getRolesPermissionId(roleId: number): Promise<any> {
-        // return  await  this.rolePersmissionRepository.find({roleId: roleId});
         return await this.rolePersmissionRepository.query(queries.getRolesPermission, [roleId]);
     }
 
