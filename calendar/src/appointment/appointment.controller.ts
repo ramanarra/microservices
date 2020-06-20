@@ -203,14 +203,8 @@ export class AppointmentController {
         }
         var docId = doctor.doctor_id;
         const docConfig = await this.appointmentService.workScheduleView(docId);
-        if (docConfig) {
-            return docConfig;
-        } else {
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: "Invalid request"
-            }
-        }
+        return docConfig;
+
     }
 
 
