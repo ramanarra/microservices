@@ -168,6 +168,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
         const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
+        return  updateRes;
 
 
 
