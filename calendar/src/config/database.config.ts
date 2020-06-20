@@ -8,8 +8,8 @@ import { DoctorConfigCanResch } from 'src/appointment/docConfigReschedule/doc_co
 import {docConfig} from "../appointment/doc_config/docConfig.entity";
 import {DocConfigScheduleDay} from "../appointment/docConfigScheduleDay/docConfigScheduleDay.entity";
 import {DocConfigScheduleInterval} from "../appointment/docConfigScheduleInterval/docConfigScheduleInterval.entity";
-import {WorkScheduleDay} from "../appointment/WorkSchedule/workScheduleDay.entity";
-import {WorkScheduleInterval} from "../appointment/WorkSchedule/workScheduleInterval.entity";
+import {WorkScheduleDay} from "../appointment/workSchedule/workScheduleDay.entity";
+import {WorkScheduleInterval} from "../appointment/workSchedule/workScheduleInterval.entity";
 
 const dbConfig = config.get('database');
 

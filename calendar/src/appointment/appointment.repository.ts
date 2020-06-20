@@ -4,9 +4,9 @@ import { Appointment } from "./appointment.entity";
 import { AppointmentDto , DoctorConfigPreConsultationDto} from  "common-dto";
 import { Doctor } from "./doctor/doctor.entity";
 import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfigScheduleInterval.entity";
-import { DocConfigScheduleDay } from "./DocConfigScheduleDay/docConfigScheduleDay.entity";
-import { DocConfigScheduleDayRepository } from "./DocConfigScheduleDay/docConfigScheduleDay.repository";
-import { DocConfigScheduleIntervalRepository } from "./DocConfigScheduleInterval/docConfigScheduleInterval.repository";
+import { DocConfigScheduleDay } from "./docConfigScheduleDay/docConfigScheduleDay.entity";
+import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfigScheduleDay.repository";
+import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 
 
 @EntityRepository(Appointment)
