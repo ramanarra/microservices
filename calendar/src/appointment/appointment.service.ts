@@ -212,19 +212,42 @@ export class AppointmentService {
                     let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
                     console.log('test=====', doctorScheduledDays);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
-                     // validate with previous data
+                        // validate with previous data
                         let starTime = scheduleTimeInterval.startTime;
                         let endTime = scheduleTimeInterval.endTime;
-                        let  isOverLapping = false;
+                        let isOverLapping = false;
                         // convert starttime into milliseconds
                         let splitStartTime = starTime.split(':');
-                        console.log("===split",splitStartTime)
+                        let startTimeMilliSeconds = (splitStartTime[0] * (60000 * 60)) + (splitStartTime[1] * 60000);
+                        let splitEndTime = endTime.split(':');
+                        let endTimeMilliSeconds = (splitEndTime[0] * (60000 * 60)) + (splitEndTime[1] * 60000);
+                        console.log("==milli", startTimeMilliSeconds)
+                        // compare the startTime in any previous records, if start time or endTime comes between previous time interval
+                        doctorScheduledDays.forEach(v => {
+                            let vStartTime = v.start_time;
+                            let vsplitStartTime = vStartTime.split(':');
+                            let vstartTimeMilliSeconds = (vsplitStartTime[0] * (60000 * 60)) + (vsplitStartTime[1] * 60000);
+                            let vEndTime = v.end_time;
+                            let vsplitEndTime = vEndTime.split(':');
+                            let vEndTimeMilliSeconds = (vsplitEndTime[0] * (60000 * 60)) + (vsplitEndTime[1] * 60000);
+                            if (startTimeMilliSeconds > vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
+                                isOverLapping = true;
+                            } else if (endTimeMilliSeconds < vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
+                                isOverLapping = true;
+                            }
+                        })
+                        if(isOverLapping){
+                            //return error message
+                            return {
+                                statusCode: HttpStatus.NOT_FOUND,
+                                message: 'Time Overlapping with previous Time Interval'
+                            }
+                        }else{
+                            // insert new records
 
-
-
+                        }
                     } else {
                         // no previous datas are there just insert
-
 
 
                     }
@@ -243,7 +266,7 @@ export class AppointmentService {
     }
 
     async appointmentSlotsView(user: any): Promise<any> {
-        return await this.appointmentRepository.find({ });
+        return await this.appointmentRepository.find({});
     }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
