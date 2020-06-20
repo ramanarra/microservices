@@ -4,5 +4,12 @@ export class AppointmentDto {
   patientId : number;
   appointmentDate : Date;
   startTime : string;
-  endTime : string;    
+  endTime : string;   
+  paymentStatus : boolean;
+  isActive : boolean; 
+  isCancel : boolean;
+  createdBy : string;
+  createdId : number;
+  cancelledBy : string;
+  cancelledId : number;
 }

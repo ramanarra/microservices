@@ -86,5 +86,23 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({cmd: 'app_work_schedule_view'},doctorKey);
     }
 
+    @UseFilters(AllClientServiceException)
+    public appointmentSlotsView(user: any): Observable<any> {
+        return this.redisClient.send({cmd: 'appointment_slots_view'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public appointmentReschedule(appointmentDto: any,user:any): Observable<any> {
+        appointmentDto.user = user;
+        return this.redisClient.send({cmd: 'appointment_reschedule'},appointmentDto);
+    }
+
+    
+    @UseFilters(AllClientServiceException)
+    public appointmentCancel(appointmentDto: any,user:any): Observable<any> {
+        appointmentDto.user = user;
+        return this.redisClient.send({cmd: 'appointment_cancel'},appointmentDto);
+    }
+
 
 }
