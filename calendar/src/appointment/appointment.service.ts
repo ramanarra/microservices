@@ -20,12 +20,15 @@ import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_c
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
 import {queries} from "../config/query";
-import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
-import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
+import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfigScheduleDay.repository";
+import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
 import {getRepository} from "typeorm";
 import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.entity";
+import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
+import {PatientDetails} from './patientDetails/patientDetails.entity';
+
 
 var async = require('async');
 
@@ -39,10 +42,13 @@ export class AppointmentService {
         private doctorConfigPreConsultationRepository: DoctorConfigPreConsultationRepository,
         private doctorConfigCanReschRepository: DoctorConfigCanReschRepository,
         private doctorConfigRepository: docConfigRepository,
-        private docConfigScheduleDayRepository: DocConfigScheduleDayRepository,
-        private docConfigScheduleIntervalRepository: DocConfigScheduleIntervalRepository,
+        private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
+        private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
         private workScheduleDayRepository: WorkScheduleDayRepository,
-        private workScheduleIntervalRepository: WorkScheduleIntervalRepository
+        private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
+        private patientDetailsRepository: PatientDetailsRepository
+
+
     ) {
     }
 
@@ -175,7 +181,7 @@ export class AppointmentService {
             })
             let responseData = {
                 Monday: monday,
-                Tuesday: tuesday,
+                Tuesday : tuesday,
                 Wednesday: wednesday,
                 Thursday: thursday,
                 Friday: friday,
@@ -350,38 +356,38 @@ export class AppointmentService {
         var condition = {
             id: appointmentDto.appointmentId
         }
-        var values: any = {
+        var values:any = {
             isCancel: true,
-            cancelledBy: appointmentDto.user.role,
-            cancelledId: appointmentDto.user.userId
+            cancelledBy:appointmentDto.user.role,
+            cancelledId:appointmentDto.user.userId
         }
         var pastAppointment = await this.doctorConfigRepository.update(condition, values);
-        //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
-        return await this.appointmentRepository.createAppointment(appointmentDto)
+      //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
+      return await this.appointmentRepository.createAppointment(appointmentDto)
     }
 
     async appointmentDetails(id: any): Promise<any> {
-        return await this.appointmentRepository.findOne({id: id});
+        return await this.appointmentRepository.findOne({id : id});
     }
 
     async appointmentCancel(appointmentDto: any): Promise<any> {
 
         if (!appointmentDto.appointmentId) {
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: 'Invalid Request'
-            }
-        }
-        var condition = {
-            id: appointmentDto.appointmentId
-        }
-        var values: any = {
-            isCancel: true,
-            cancelledBy: appointmentDto.user.role,
-            cancelledId: appointmentDto.user.userId
-        }
-        var pastAppointment = await this.doctorConfigRepository.update(condition, values);
-        if (pastAppointment.affected) {
+           return {
+               statusCode: HttpStatus.NO_CONTENT,
+               message: 'Invalid Request'
+           }
+       }
+       var condition = {
+           id: appointmentDto.appointmentId
+       }
+       var values:any = {
+           isCancel: true,
+           cancelledBy:appointmentDto.user.role,
+           cancelledId:appointmentDto.user.userId
+       }
+       var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+       if (pastAppointment.affected) {
             return {
                 statusCode: HttpStatus.OK,
                 message: 'Appointment Cancelled Successfully'
@@ -394,5 +400,11 @@ export class AppointmentService {
         }
 
     }
+
+
+   async patientSearch(patientDto: any): Promise<any> {
+    return await this.patientDetailsRepository.findOne({phoneNumber : patientDto.phoneNumber});
+}
+
 
 }
