@@ -71,7 +71,7 @@ export class CalendarController {
         return this.calendarService.createAppointment(appointmentDto, req.user);
     }
 
-    @Get('doctor_List')
+    @Get('doctorList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'Doctor List'})
