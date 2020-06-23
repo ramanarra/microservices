@@ -227,14 +227,17 @@ export class AppointmentController {
             return appointment;
         }
         else {
-            const doctor = await this.appointmentService.doctorDetails(appointmentDto.doctor_key);
-            var docId = doctor.doctorId;
-            if(docId !== appointmentDto.doctorId){
+            const doctor = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
+            var docId = doctor.doctor_id;
+            const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId);
+            var doc = Number(app.doctorId);
+            if(docId !== doc){
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: 'Invalid Request'
                 }
             }
+            appointmentDto.doctorId = docId;
             const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
             return appointment;
         }
@@ -256,10 +259,10 @@ export class AppointmentController {
             return appointment;
         }
         else {
-            const doctor = await this.appointmentService.doctorDetails(appointmentDto.doctor_key);
-            var docId = doctor.doctorId;
-            const appId = await this.appointmentService.appointmentDetails(appointmentDto.id)
-            var app = appId.doctorId;
+            const doctor = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
+            var docId = doctor.doctor_id;
+            const appId = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+            var app = Number(appId.doctorId);
             if(docId !== app){
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,

@@ -53,18 +53,23 @@ export class CalendarController {
     }
 
 
-    // @Post('createAppointment')
-    // @ApiOkResponse({description: 'Create Appointment'})
-    // @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    // @ApiBadRequestResponse({description: 'Invalid Schema'})
-    // @ApiBody({type: AppointmentDto})
-    // @ApiBearerAuth('JWT')
-    // @UseGuards(AuthGuard())
-    // @Roles('admin')
-    // createAppointment(@Request() req, @Body() appointmentDto: AppointmentDto) {
-    //     this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-    //     return this.calendarService.createAppointment(appointmentDto, req.user);
-    // }
+    @Post('createAppointment')
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                '"patientId":"1",\n' +
+                                '"startTime": "10:00 AM",\n' +
+                                '"endTime": "11:00 AM",\n' +
+                                '"appointmentDate": "2020-06-12" \n' +
+                                '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBadRequestResponse({description: 'Invalid Schema'})
+    @ApiBody({type: AppointmentDto})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @Roles('admin')
+    createAppointment(@Request() req, @Body() appointmentDto: AppointmentDto) {
+        this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+        return this.calendarService.createAppointment(appointmentDto, req.user);
+    }
 
     @Get('doctor_List')
     @ApiBearerAuth('JWT')
@@ -240,7 +245,13 @@ export class CalendarController {
     }
 
     @Post('appointmentReschedule')
-    @ApiOkResponse({description: 'Appointment Reschedule'})
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                                    '"appointmentId":"33",\n' +
+                                                    '"patientId":"1",\n' +
+                                                    '"startTime": "10:00 AM",\n' +
+                                                    '"endTime": "11:00 AM",\n' +
+                                                    '"appointmentDate": "2020-06-12" \n' +
+                                                    '}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -254,7 +265,7 @@ export class CalendarController {
 
     @Post('appointmentCancel')
     @ApiOkResponse({description: 'Appointment Cancel'})
-    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiUnauthorizedResponse({description: 'request body example:   {"appointmentId": "28"}'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
@@ -267,7 +278,7 @@ export class CalendarController {
 
     @Post('patientSearch')
     @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999991"}'})
-    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type:PatientDto})
