@@ -63,6 +63,11 @@ export class Doctor extends BaseEntity{
     @Column({
         name : 'last_name'
     })
-    latName : string;
+    lastName : string;
+
+    @Column({
+        name : 'registration_number'
+    })
+    registrationNumber : string;
 
 }

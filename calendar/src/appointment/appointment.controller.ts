@@ -280,6 +280,11 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'appointment_view'})
+    async AppointmentView(user: any): Promise<any> {
+        const appointment = await this.appointmentService.appointmentDetails(user.appointmentId.appointmentId);
+        return appointment;
+    }
 
 
 }

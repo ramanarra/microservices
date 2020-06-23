@@ -287,6 +287,17 @@ export class CalendarController {
             return this.calendarService.patientSearch(patientDto, req.user);
     }
 
+    @Post('appointmentView')
+    @ApiOkResponse({description: 'request body example:   {"appointmentId": "28"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type:AppointmentDto})
+    AppointmentView(@Request() req,  @Body() appointmentId: AppointmentDto) {
+        this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.AppointmentView(req.user,appointmentId);
+    }
+
 
 
 }
