@@ -2,7 +2,6 @@ import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/com
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
 
-var async = require('async');
 
 
 @Controller('appointment')
