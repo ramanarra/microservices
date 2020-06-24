@@ -10,6 +10,7 @@ import {DocConfigScheduleDay} from "../appointment/docConfigScheduleDay/docConfi
 import {DocConfigScheduleInterval} from "../appointment/docConfigScheduleInterval/docConfigScheduleInterval.entity";
 import {WorkScheduleDay} from "../appointment/workSchedule/workScheduleDay.entity";
 import {WorkScheduleInterval} from "../appointment/workSchedule/workScheduleInterval.entity";
+import {PatientDetails} from "../appointment/patientDetails/patientDetails.entity";
 
 const dbConfig = config.get('database');
 
@@ -21,7 +22,7 @@ export const databaseConfig : TypeOrmModuleOptions = {
     username : dbConfig.username,
     password : dbConfig.password,
     database : dbConfig.database,
-    entities : [Appointment,AccountDetails,DoctorConfigPreConsultation, Doctor, DoctorConfigCanResch, docConfig,DocConfigScheduleDay,DocConfigScheduleInterval,WorkScheduleDay,WorkScheduleInterval],
+    entities : [Appointment,AccountDetails,DoctorConfigPreConsultation, Doctor, DoctorConfigCanResch, docConfig,DocConfigScheduleDay,DocConfigScheduleInterval,WorkScheduleDay,WorkScheduleInterval,PatientDetails],
     synchronize : dbConfig.synchronize
 
 } 

@@ -36,7 +36,8 @@ import {
     DoctorConfigCanReschDto,
     DoctorDto,
     DocConfigDto,
-    WorkScheduleDto
+    WorkScheduleDto,
+    PatientDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -246,7 +247,7 @@ export class CalendarController {
     @ApiBody({type: AppointmentDto})
     appointmentReschedule(@Request() req, @Body() appointmentDto: AppointmentDto) {
         if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
-            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+            this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
             return this.calendarService.appointmentReschedule(appointmentDto, req.user);
         }
     }
@@ -259,9 +260,20 @@ export class CalendarController {
     @ApiBody({type: AppointmentDto})
     appointmentCancel(@Request() req, @Body() appointmentDto: AppointmentDto) {
         if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
-            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+            this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
             return this.calendarService.appointmentCancel(appointmentDto, req.user);
         }
+    }
+
+    @Post('patientSearch')
+    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999991"}'})
+    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type:PatientDto})
+    patientSearch(@Request() req, @Body() patientDto: PatientDto) {  
+            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
+            return this.calendarService.patientSearch(patientDto, req.user);
     }
 
 

@@ -24,6 +24,11 @@ import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfig
 import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
+import {getRepository} from "typeorm";
+import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.entity";
+import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
+import {PatientDetails} from './patientDetails/patientDetails.entity';
+
 
 var async = require('async');
 
@@ -40,7 +45,9 @@ export class AppointmentService {
         private docConfigScheduleDayRepository:DocConfigScheduleDayRepository,
         private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
         private workScheduleDayRepository: WorkScheduleDayRepository,
-        private workScheduleIntervalRepository: WorkScheduleIntervalRepository
+        private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
+        private patientDetailsRepository: PatientDetailsRepository
+
 
     ) {
     }
@@ -192,31 +199,82 @@ export class AppointmentService {
 
 
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
-
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
         if (scheduleTimeIntervals.length) {
             for (let scheduleTimeInterval of scheduleTimeIntervals) {
                 if (scheduleTimeInterval.scheduletimeid) {
-                    // if scheduletimeid is there then need to update
-
+                    if (scheduleTimeInterval.isDelete) {
+                        // if delete, then delete the record
+                        let scheduleTimeId = scheduleTimeInterval.scheduletimeid;
+                        let scheduleDayId = scheduleTimeInterval.scheduledayid;
+                        let deleteInterval = await  this.deleteDoctorConfigScheduleInterval(scheduleTimeId, scheduleDayId);
+                    } else {
+                        // if scheduletimeid is there then need to update
+                        let doctorKey = workScheduleDto.user.doctor_key;
+                        let dayOfWeek = workScheduleDto.dayOfWeek;
+                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
+                        if (doctorScheduledDays && doctorScheduledDays.length) {
+                            // validate with previous data
+                            let starTime = scheduleTimeInterval.startTime;
+                            let endTime = scheduleTimeInterval.endTime;
+                            let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
+                            let isOverLapping = false;
+                            // convert starttime into milliseconds
+                            let splitStartTime = starTime.split(':');
+                            let startTimeMilliSeconds = (splitStartTime[0] * (60000 * 60)) + (splitStartTime[1] * 60000);
+                            let splitEndTime = endTime.split(':');
+                            let endTimeMilliSeconds = (splitEndTime[0] * (60000 * 60)) + (splitEndTime[1] * 60000);
+                            // compare the startTime in any previous records, if start time or endTime comes between previous time interval
+                            doctorScheduledDays.forEach(v => {
+                                let vStartTime = v.start_time;
+                                let vsplitStartTime = vStartTime.split(':');
+                                let vstartTimeMilliSeconds = (vsplitStartTime[0] * (60000 * 60)) + (vsplitStartTime[1] * 60000);
+                                let vEndTime = v.end_time;
+                                let vsplitEndTime = vEndTime.split(':');
+                                let vEndTimeMilliSeconds = (vsplitEndTime[0] * (60000 * 60)) + (vsplitEndTime[1] * 60000);
+                                if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
+                                    isOverLapping = true;
+                                } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
+                                    isOverLapping = true;
+                                } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
+                                    isOverLapping = true;
+                                }
+                            })
+                            if (isOverLapping) {
+                                //return error message
+                                return {
+                                    statusCode: HttpStatus.NOT_FOUND,
+                                    message: 'Time Overlapping with previous Time Interval'
+                                }
+                            } else {
+                                // insert new records
+                                const insertRecord = await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
+                            }
+                        } else {
+                            // no records, so cant update
+                            return {
+                                statusCode: HttpStatus.NO_CONTENT,
+                                message: 'Invalid Request'
+                            }
+                        }
+                    }
                 } else {
                     // if scheduletimeid is not there  then new insert new records then
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
                     let dayOfWeek = workScheduleDto.dayOfWeek;
                     let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
-                    console.log('test=====', doctorScheduledDays);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
                         let starTime = scheduleTimeInterval.startTime;
                         let endTime = scheduleTimeInterval.endTime;
+                        let doctorConfigScheduleDayId = scheduleTimeInterval.scheduledayid;
                         let isOverLapping = false;
                         // convert starttime into milliseconds
                         let splitStartTime = starTime.split(':');
                         let startTimeMilliSeconds = (splitStartTime[0] * (60000 * 60)) + (splitStartTime[1] * 60000);
                         let splitEndTime = endTime.split(':');
                         let endTimeMilliSeconds = (splitEndTime[0] * (60000 * 60)) + (splitEndTime[1] * 60000);
-                        console.log("==milli", startTimeMilliSeconds)
                         // compare the startTime in any previous records, if start time or endTime comes between previous time interval
                         doctorScheduledDays.forEach(v => {
                             let vStartTime = v.start_time;
@@ -225,34 +283,43 @@ export class AppointmentService {
                             let vEndTime = v.end_time;
                             let vsplitEndTime = vEndTime.split(':');
                             let vEndTimeMilliSeconds = (vsplitEndTime[0] * (60000 * 60)) + (vsplitEndTime[1] * 60000);
-                            if (startTimeMilliSeconds > vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
+                            if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
                                 isOverLapping = true;
-                            } else if (endTimeMilliSeconds < vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
+                            } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
+                                isOverLapping = true;
+                            } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
                                 isOverLapping = true;
                             }
                         })
-                        if(isOverLapping){
+                        if (isOverLapping) {
                             //return error message
                             return {
                                 statusCode: HttpStatus.NOT_FOUND,
                                 message: 'Time Overlapping with previous Time Interval'
                             }
-                        }else{
+                        } else {
                             // insert new records
-
+                            const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                         }
                     } else {
                         // no previous datas are there just insert
-
-
+                        let starTime = scheduleTimeInterval.startTime;
+                        let endTime = scheduleTimeInterval.endTime;
+                        let doctorConfigScheduleDayId = scheduleTimeInterval.scheduledayid;
+                        const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                     }
                 }
             }
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Updated SuccessFully'
+            }
         } else {
-            // return
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: 'Invalid Request data'
+            }
         }
-
-
     }
 
 
@@ -260,13 +327,27 @@ export class AppointmentService {
         return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, dayOfWeek]);
     }
 
+    async deleteDoctorConfigScheduleInterval(scheduletimeid: number, scheduleDayId: number): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.deleteDocConfigScheduleInterval, [scheduletimeid, scheduleDayId]);
+    }
+
+
+    async insertIntoDocConfigScheduleInterval(startTime, endTime, doctorConfigScheduleDayId): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.insertIntoDocConfigScheduleInterval, [startTime, endTime, doctorConfigScheduleDayId])
+    }
+
+    async updateIntoDocConfigScheduleInterval(startTime, endTime, doctorConfigScheduleDayId): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.updateIntoDocConfigScheduleInterval, [startTime, endTime, doctorConfigScheduleDayId]);
+    }
+
+
     async appointmentSlotsView(user: any): Promise<any> {
         return await this.appointmentRepository.find({});
     }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
 
-         if (!appointmentDto.appointmentId) {
+        if (!appointmentDto.appointmentId) {
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: 'Invalid Request'
@@ -318,6 +399,12 @@ export class AppointmentService {
             }
         }
 
-   }
+    }
+
+
+   async patientSearch(patientDto: any): Promise<any> {
+    return await this.patientDetailsRepository.findOne({phoneNumber : patientDto.phoneNumber});
+}
+
 
 }
