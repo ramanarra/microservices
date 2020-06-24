@@ -77,11 +77,12 @@ export class CalendarController {
     @ApiOkResponse({description: 'Doctor List'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorList(@Request() req) {
-        if (req.user.role === 'DOCTOR') {
-            return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
-        } else {
-            return this.calendarService.doctorList(req.user.role, req.user.account_key);
-        }
+        // if (req.user.role === 'DOCTOR') {
+        //     return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
+        // } else {
+             return this.calendarService.doctorList(req.user.role, req.user.account_key);
+        // }
+       // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
 
     }
 
@@ -93,14 +94,11 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: UserDto})
     doctorView(@Request() req, @Body() userDto: UserDto) {
-        // check if doctor key and token doctor key are same
-        if (req.user.doctor_key !== userDto.doctorKey) {
-            // if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException("Invalid User")
-        }
+        // if (req.user.role == 'DOC_ASSISTANT' || req.user.role == 'PATIENT') {
+        //     throw new UnauthorizedException("Invalid User")
+        // }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-        return this.calendarService.doctorView(req.user.doctor_key);
-        // return this.calendarService.doctorView(userDto.doctorKey);
+        return this.calendarService.doctorView(req.user,userDto.doctorKey);
     }
 
     // @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -277,7 +275,7 @@ export class CalendarController {
     }
 
     @Post('patientSearch')
-    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999991"}'})
+    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999993"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())

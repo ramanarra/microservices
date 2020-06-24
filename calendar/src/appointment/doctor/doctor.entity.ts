@@ -70,4 +70,9 @@ export class Doctor extends BaseEntity{
     })
     registrationNumber : string;
 
+    @Column({
+        name : 'email'
+    })
+    email : string;
+
 }
