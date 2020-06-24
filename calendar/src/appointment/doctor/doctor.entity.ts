@@ -55,4 +55,24 @@ export class Doctor extends BaseEntity{
     })
     signature : string;
 
+    @Column({
+        name : 'first_name'
+    })
+    firstName : string;
+
+    @Column({
+        name : 'last_name'
+    })
+    lastName : string;
+
+    @Column({
+        name : 'registration_number'
+    })
+    registrationNumber : string;
+
+    @Column({
+        name : 'email'
+    })
+    email : string;
+
 }

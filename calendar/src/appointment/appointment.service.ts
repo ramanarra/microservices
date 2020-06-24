@@ -64,6 +64,12 @@ export class AppointmentService {
         return await this.doctorRepository.findOne({doctorKey: doctorKey});
     }
 
+    async doctorListDetails(doctorKey): Promise<any> {
+        //  return await this.doctorRepository.findOne({doctorKey: doctorKey});
+        let docConfig = await this.docConfigScheduleDayRepository.query(queries.getDocDetails, [doctorKey]);
+        return docConfig;
+      }
+
     async accountDetails(accountKey): Promise<any> {
         return await this.accountDetailsRepository.findOne({accountKey: accountKey});
     }
@@ -75,6 +81,11 @@ export class AppointmentService {
 
     async doctor_List(accountKey): Promise<any> {
         return await this.doctorRepository.find({accountKey: accountKey});
+    }
+
+    async doctorListAccount(accountKey): Promise<any> {
+        let docConfig = await this.docConfigScheduleDayRepository.query(queries.getDocListDetails, [accountKey]);
+        return docConfig;
     }
 
     async doctorPreconsultation(doctorConfigPreConsultationDto: DoctorConfigPreConsultationDto): Promise<any> {
@@ -361,7 +372,7 @@ export class AppointmentService {
             cancelledBy:appointmentDto.user.role,
             cancelledId:appointmentDto.user.userId
         }
-        var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+        var pastAppointment = await this.appointmentRepository.update(condition, values);
       //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
       return await this.appointmentRepository.createAppointment(appointmentDto)
     }
@@ -386,7 +397,7 @@ export class AppointmentService {
            cancelledBy:appointmentDto.user.role,
            cancelledId:appointmentDto.user.userId
        }
-       var pastAppointment = await this.doctorConfigRepository.update(condition, values);
+       var pastAppointment = await this.appointmentRepository.update(condition, values);
        if (pastAppointment.affected) {
             return {
                 statusCode: HttpStatus.OK,

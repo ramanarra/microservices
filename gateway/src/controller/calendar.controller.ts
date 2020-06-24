@@ -53,30 +53,36 @@ export class CalendarController {
     }
 
 
-    // @Post('createAppointment')
-    // @ApiOkResponse({description: 'Create Appointment'})
-    // @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    // @ApiBadRequestResponse({description: 'Invalid Schema'})
-    // @ApiBody({type: AppointmentDto})
-    // @ApiBearerAuth('JWT')
-    // @UseGuards(AuthGuard())
-    // @Roles('admin')
-    // createAppointment(@Request() req, @Body() appointmentDto: AppointmentDto) {
-    //     this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-    //     return this.calendarService.createAppointment(appointmentDto, req.user);
-    // }
+    @Post('createAppointment')
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                '"patientId":"1",\n' +
+                                '"startTime": "10:00 AM",\n' +
+                                '"endTime": "11:00 AM",\n' +
+                                '"appointmentDate": "2020-06-12" \n' +
+                                '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBadRequestResponse({description: 'Invalid Schema'})
+    @ApiBody({type: AppointmentDto})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @Roles('admin')
+    createAppointment(@Request() req, @Body() appointmentDto: AppointmentDto) {
+        this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+        return this.calendarService.createAppointment(appointmentDto, req.user);
+    }
 
-    @Get('doctor_List')
+    @Get('doctorList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'Doctor List'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorList(@Request() req) {
-        if (req.user.role === 'DOCTOR') {
-            return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
-        } else {
-            return this.calendarService.doctorList(req.user.role, req.user.account_key);
-        }
+        // if (req.user.role === 'DOCTOR') {
+        //     return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
+        // } else {
+             return this.calendarService.doctorList(req.user.role, req.user.account_key);
+        // }
+       // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
 
     }
 
@@ -88,14 +94,11 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: UserDto})
     doctorView(@Request() req, @Body() userDto: UserDto) {
-        // check if doctor key and token doctor key are same
-        if (req.user.doctor_key !== userDto.doctorKey) {
-            // if (req.user.role !== 'DOCTOR' && req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException("Invalid User")
-        }
+        // if (req.user.role == 'DOC_ASSISTANT' || req.user.role == 'PATIENT') {
+        //     throw new UnauthorizedException("Invalid User")
+        // }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-        return this.calendarService.doctorView(req.user.doctor_key);
-        // return this.calendarService.doctorView(userDto.doctorKey);
+        return this.calendarService.doctorView(req.user,userDto.doctorKey);
     }
 
     // @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -240,7 +243,13 @@ export class CalendarController {
     }
 
     @Post('appointmentReschedule')
-    @ApiOkResponse({description: 'Appointment Reschedule'})
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                                    '"appointmentId":"33",\n' +
+                                                    '"patientId":"1",\n' +
+                                                    '"startTime": "10:00 AM",\n' +
+                                                    '"endTime": "11:00 AM",\n' +
+                                                    '"appointmentDate": "2020-06-12" \n' +
+                                                    '}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -254,7 +263,7 @@ export class CalendarController {
 
     @Post('appointmentCancel')
     @ApiOkResponse({description: 'Appointment Cancel'})
-    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiUnauthorizedResponse({description: 'request body example:   {"appointmentId": "28"}'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
@@ -266,14 +275,25 @@ export class CalendarController {
     }
 
     @Post('patientSearch')
-    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999991"}'})
-    @ApiUnauthorizedResponse({description: 'request body example:   {"id": "20"}'})
+    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999993"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type:PatientDto})
     patientSearch(@Request() req, @Body() patientDto: PatientDto) {  
             this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
             return this.calendarService.patientSearch(patientDto, req.user);
+    }
+
+    @Post('appointmentView')
+    @ApiOkResponse({description: 'request body example:   {"appointmentId": "28"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type:AppointmentDto})
+    AppointmentView(@Request() req,  @Body() appointmentId: AppointmentDto) {
+        this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.AppointmentView(req.user,appointmentId);
     }
 
 
