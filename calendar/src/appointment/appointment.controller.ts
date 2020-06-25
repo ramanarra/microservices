@@ -110,6 +110,33 @@ export class AppointmentController {
     async doctorList(roleKey): Promise<any> {
         console.log(roleKey)
         if (roleKey.key) {
+            
+            if(roleKey.user.role=='DOCTOR'){
+                if(roleKey.user.doctor_key !==roleKey.key){
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: "Invalid request"
+                    }
+                }
+                var docKey = await this.appointmentService.doctorDetails(roleKey.key);
+                var accountKey = docKey.accountKey
+                const account = await this.appointmentService.accountDetails(accountKey);
+                docKey.fees = 5000;
+                docKey.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
+                docKey.todaysAvailabilitySeats = 12;
+                return {
+                    statusCode: HttpStatus.OK,
+                    accountDetails: account,
+                    doctorList: docKey
+                }
+
+            }
+            if(roleKey.user.account_key !== roleKey.key){
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: "Invalid request"
+                }
+            }
             var accountKey = roleKey.key;
             const account = await this.appointmentService.accountDetails(accountKey);
             const doctor = await this.appointmentService.doctor_List(accountKey);
@@ -154,7 +181,7 @@ export class AppointmentController {
             const account = await this.appointmentService.accountDetails(accountKey);
             return {
                 doctorDetails: doctor,
-                accountDetails: account,
+               // accountDetails: account,
                 configDetails: doctorConfigDetails
             }
         } catch (e) {

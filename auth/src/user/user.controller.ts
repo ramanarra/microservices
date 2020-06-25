@@ -41,8 +41,20 @@ export class UserController {
         return {
             "doctorKey": doctor.doctor_key,
             "accountKey": doctor.account_key,
+            "role":doctor.role,
             "accessToken": doctor.accessToken,
             "rolesPermission": doctor.rolesPermission
+        }
+    };
+
+    @MessagePattern({cmd: 'auth_patient_login'})
+    async patientLogin(doctorDto: any): Promise<any> {
+        const {email, password} = doctorDto;
+        const doctor = await this.userService.patientLogin(email, password);
+        return {
+            "accessToken": doctor.accessToken,
+            // "rolesPermission": doctor.rolesPermission,
+            "userId":doctor.id
         }
     };
 

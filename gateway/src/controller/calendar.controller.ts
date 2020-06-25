@@ -74,13 +74,13 @@ export class CalendarController {
     @Get('doctorList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'Doctor List'})
+    @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorList(@Request() req) {
+    doctorList(@Request() req,@Query('key') key:String) {
         // if (req.user.role === 'DOCTOR') {
         //     return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
         // } else {
-             return this.calendarService.doctorList(req.user.role, req.user.account_key);
+             return this.calendarService.doctorList(req.user, key);
         // }
        // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
 

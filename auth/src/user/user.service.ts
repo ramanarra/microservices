@@ -66,6 +66,7 @@ export class UserService {
             const accessToken = this.jwtService.sign(jwtUserInfo);
             user.accessToken = accessToken;
             user.rolesPermission = rolesPermission;
+            user.role = roles.roles;
             return user;
     }
 
@@ -81,6 +82,30 @@ export class UserService {
     async getRolesPermissionId(roleId: number): Promise<any> {
         return await this.rolePersmissionRepository.query(queries.getRolesPermission, [roleId]);
     }
+
+    async patientLogin(email, password): Promise<any> {
+
+        const user = await this.userRepository.validateEmailAndPassword(email, password);
+        if (!user)
+            throw new UnauthorizedException("Invalid Credentials");
+        var roles = await this.role(user.id);
+        if (!roles)
+            throw  new UnauthorizedException('Content Not Available');
+        var rolesPermission = await this.getRolesPermissionId(roles.roles_id);
+        const jwtUserInfo: JwtPayLoad = {
+            email: user.email,
+            userId: user.id,
+            account_key: null,
+            doctor_key: null,
+            role: roles.roles
+        };
+        console.log("=======jwtUserInfo", jwtUserInfo)
+        const accessToken = this.jwtService.sign(jwtUserInfo);
+        user.accessToken = accessToken;
+        user.rolesPermission = rolesPermission;
+        return user;
+}
+
 
 
 }
