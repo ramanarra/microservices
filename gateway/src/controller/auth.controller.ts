@@ -32,7 +32,7 @@ export class AuthController {
 
     @Post('patientLogin')
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
-          '"email":"patient@gmail.com",\n' +
+          '"email":"nirmala@gmail.com",\n' +
           '"password": "123456" \n' +
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
