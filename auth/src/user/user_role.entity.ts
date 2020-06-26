@@ -1,12 +1,15 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique, Timestamp } from 'typeorm';
 
 @Entity()
-export class Roles extends BaseEntity{
+export class UserRole extends BaseEntity{
 
     @PrimaryGeneratedColumn()
-    roles_id : number;
+    id : number;
 
     @Column()
-    roles : string;
+    user_id : number;
+
+    @Column()
+    role_id : number;
 
 }

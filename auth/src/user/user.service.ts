@@ -9,6 +9,7 @@ import {RolesRepository} from './roles.repository';
 import {RolePermissionRepository} from "./rolesPermission/role_permissions.repository";
 import {PermissionRepository} from "./permissions/permission.repository";
 import {queries} from "../config/query";
+import {UserRoleRepository} from './user_role.repository';
 
 @Injectable()
 export class UserService {
@@ -16,7 +17,7 @@ export class UserService {
     constructor(
         @InjectRepository(UserRepository) private userRepository: UserRepository, private accountRepository: AccountRepository,
         private rolesRepository: RolesRepository, private rolePersmissionRepository: RolePermissionRepository,
-        private permissionRepository: PermissionRepository,
+        private permissionRepository: PermissionRepository,private userRoleRepository: UserRoleRepository,
         private readonly jwtService: JwtService
     ) {
     }
@@ -51,10 +52,11 @@ export class UserService {
             var accountId = user.account_id;
             var accountData = await this.accountKey(accountId);
             user.account_key = accountData.account_key;
-            var roles = await this.role(user.id);
+            var roleId = await this.roleId(user.id);
+            var roles = await this.role(roleId.role_id);
             if (!roles)
                 throw  new UnauthorizedException('Content Not Available');
-            var rolesPermission = await this.getRolesPermissionId(roles.roles_id);
+            var rolesPermission = await this.getRolesPermissionId(roleId.role_id);
             const jwtUserInfo: JwtPayLoad = {
                 email: user.email,
                 userId: user.id,
@@ -75,8 +77,12 @@ export class UserService {
         return await this.accountRepository.findOne({account_id: accountId});
     }
 
-    async role(userId: number): Promise<any> {
-        return await this.rolesRepository.findOne({user_id: userId});
+    async role(id: number): Promise<any> {
+        return await this.rolesRepository.findOne({roles_id: id});
+    }
+
+    async roleId(userId: number): Promise<any> {
+        return await this.userRoleRepository.findOne({user_id: userId});
     }
 
     async getRolesPermissionId(roleId: number): Promise<any> {
