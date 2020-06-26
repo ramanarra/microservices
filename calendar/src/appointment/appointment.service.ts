@@ -24,10 +24,11 @@ import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfig
 import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
-import {getRepository} from "typeorm";
+import {getRepository, Any} from "typeorm";
 import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.entity";
 import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
 import {PatientDetails} from './patientDetails/patientDetails.entity';
+import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 
 
 var async = require('async');
@@ -46,7 +47,8 @@ export class AppointmentService {
         private docConfigScheduleIntervalRepository:DocConfigScheduleIntervalRepository,
         private workScheduleDayRepository: WorkScheduleDayRepository,
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
-        private patientDetailsRepository: PatientDetailsRepository
+        private patientDetailsRepository: PatientDetailsRepository,
+        private paymentDetailsRepository: PaymentDetailsRepository
 
 
     ) {
@@ -352,8 +354,23 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
-        return await this.appointmentRepository.find({});
+    // async appointmentSlotsView(user: any): Promise<any> {
+    //     return await this.appointmentRepository.find({});
+    // }
+
+    async appointmentSlotsView(user:any): Promise<any> {
+        const app = await this.appointmentRepository.find({});
+        var appo:any = app;
+        for(var i=0; i<appo.length; i++){
+            if(appo[i].isCancel == false && appo[i].isActive == true){
+                const patId = appo[i].patientId;
+                const pat = await this.patientDetailsRepository.findOne({id : patId});
+                appo[i].patientDetails = pat;
+                const pay = await this.paymentDetailsRepository.findOne({appointmentId : appo[i].id});
+                appo[i].paymentDetails = pay;
+            }
+        }
+        return appo;
     }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {

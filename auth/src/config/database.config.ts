@@ -5,6 +5,7 @@ import { Account } from 'src/user/account.entity';
 import { Roles } from 'src/user/roles.entity';
 import { Permissions} from "../user/permissions/permission.entity";
 import {RolePermissions} from "../user/rolesPermission/role_permissions.entity";
+import { UserRole } from 'src/user/user_role.entity';
 
 const dbConfig = config.get('database');
 
@@ -16,7 +17,7 @@ export const databaseConfig : TypeOrmModuleOptions = {
     username : dbConfig.username,
     password : dbConfig.password,
     database : dbConfig.database,
-    entities : [Users,Account,Roles,Permissions, RolePermissions],
+    entities : [Users,Account,Roles,Permissions, RolePermissions,UserRole],
     synchronize : dbConfig.synchronize
 
 } 
