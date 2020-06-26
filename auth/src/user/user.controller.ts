@@ -54,7 +54,8 @@ export class UserController {
         return {
             "accessToken": doctor.accessToken,
             // "rolesPermission": doctor.rolesPermission,
-            "userId":doctor.id
+            "userId":doctor.id,
+            "role":doctor.role
         }
     };
 

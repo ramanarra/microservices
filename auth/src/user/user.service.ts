@@ -94,7 +94,8 @@ export class UserService {
         const user = await this.userRepository.validateEmailAndPassword(email, password);
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
-        var roles = await this.role(user.id);
+        var roleId = await this.roleId(user.id);
+        var roles = await this.role(roleId.role_id);
         if (!roles)
             throw  new UnauthorizedException('Content Not Available');
         var rolesPermission = await this.getRolesPermissionId(roles.roles_id);
@@ -109,6 +110,7 @@ export class UserService {
         const accessToken = this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
         user.rolesPermission = rolesPermission;
+        user.role = roles.roles;
         return user;
 }
 
