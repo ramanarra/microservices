@@ -343,5 +343,11 @@ export class AppointmentController {
         return appointment;
     }
 
+    @MessagePattern({cmd: 'doctor_list_patients'})
+    async doctorListForPatients(user: any): Promise<any> {
+        const doctor = await this.appointmentService.doctor_List(user.accountKey);
+        return doctor;
+    }
+
 
 }

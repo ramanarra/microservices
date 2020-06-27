@@ -296,6 +296,17 @@ export class CalendarController {
         return this.calendarService.AppointmentView(req.user,appointmentId);
     }
 
+    @Get('doctorListForPatients')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'request body example:  Acc_1'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    doctorListForPatients(@Request() req,@Query('accountKey') accountKey:String) {
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.doctorListForPatients(req.user,accountKey);
+    }
+
+
 
 
 }
