@@ -359,7 +359,9 @@ export class AppointmentService {
     // }
 
     async appointmentSlotsView(user:any): Promise<any> {
-        const app = await this.appointmentRepository.find({});
+        const doc = await this.doctorDetails(user.doctorKey);
+        var docId = doc.doctor_id;
+        const app = await this.appointmentRepository.find({doctorId:docId});
         var appo:any = app;
         for(var i=0; i<appo.length; i++){
             if(appo[i].isCancel == false && appo[i].isActive == true){
