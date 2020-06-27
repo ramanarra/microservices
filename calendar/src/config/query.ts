@@ -7,6 +7,7 @@ export const queries: any = {
  updateIntoDocConfigScheduleInterval: 'update  doc_config_schedule_interval set "start_time" = $1, "end_time" = $2  where "id" = $3',
  deleteDocConfigScheduleInterval: 'delete from doc_config_schedule_interval where "id" = $1 and "doc_config_schedule_day_id" = $2',
  getDocDetails:'SELECT * from doctor d join doc_config dc on dc."doctor_key"=d."doctor_key" where d."doctor_key" = $1',
- getDocListDetails:'SELECT * from doctor d join doc_config dc on dc."doctor_key"=d."doctor_key" where d."account_key" = $1'
+ getDocListDetails:'SELECT * from doctor d join doc_config dc on dc."doctor_key"=d."doctor_key" where d."account_key" = $1',
+ getConfig:'SELECT "consultation_session_timings","over_booking_type","over_booking_count","overbooking_enable" from doc_config where "doctor_key" = $1'
 
 }

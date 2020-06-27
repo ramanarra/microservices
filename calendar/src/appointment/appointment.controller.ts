@@ -260,7 +260,7 @@ export class AppointmentController {
             }
         }
         var docId = doctor.doctor_id;
-        const docConfig = await this.appointmentService.workScheduleView(docId);
+        const docConfig = await this.appointmentService.workScheduleView(docId,doctorKey);
         return docConfig;
 
     }
