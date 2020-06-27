@@ -164,7 +164,7 @@ export class AppointmentService {
     //     return workSched;
     // }
 
-    async workScheduleView(doctorId: number): Promise<any> {
+    async workScheduleView(doctorId: number, docKey:string): Promise<any> {
         let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
         if (docConfig) {
             let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
@@ -192,6 +192,7 @@ export class AppointmentService {
                     sunday.push(v);
                 }
             })
+            const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
             let responseData = {
                 Monday: monday,
                 Tuesday : tuesday,
@@ -199,7 +200,8 @@ export class AppointmentService {
                 Thursday: thursday,
                 Friday: friday,
                 Saturday: saturday,
-                Sunday: sunday
+                Sunday: sunday,
+                ConfigDetails:config
             }
             return responseData;
         } else {
