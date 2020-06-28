@@ -11,12 +11,13 @@ import * as config from 'config';
 import {RolePermissionRepository} from "./rolesPermission/role_permissions.repository";
 import {PermissionRepository} from "./permissions/permission.repository";
 import { UserRoleRepository } from './user_role.repository';
+import { PatientRepository } from './patient.repository';
 
 const jwtConfig = config.get('JWT'); 
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([UserRepository,AccountRepository,RolesRepository, RolePermissionRepository, PermissionRepository, UserRoleRepository]),
+        TypeOrmModule.forFeature([UserRepository,AccountRepository,RolesRepository, RolePermissionRepository, PermissionRepository, UserRoleRepository, PatientRepository]),
         JwtModule.register({
             secret : jwtConfig.secret,
             signOptions : {

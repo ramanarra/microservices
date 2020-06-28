@@ -10,9 +10,9 @@ export class PatientDetails extends BaseEntity{
     id : number;
 
     @Column({
-        name : 'patient_name'
+        name : 'name'
     })
-    patientName : string;
+    name : string;
 
   //  @Exclude()
     @Column({
@@ -46,9 +46,9 @@ export class PatientDetails extends BaseEntity{
     pincode : string;
 
     @Column({
-        name : 'email_id'
+        name : 'email'
     })
-    emailId : string;
+    email : string;
 
     @Column({
         name : 'photo'
@@ -56,8 +56,8 @@ export class PatientDetails extends BaseEntity{
     photo : string;
 
     @Column({
-        name : 'phone_number'
+        name : 'phone'
     })
-    phoneNumber : number;
+    phone : string;
 
 }

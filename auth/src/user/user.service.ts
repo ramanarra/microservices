@@ -1,7 +1,7 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto} from 'common-dto';
+import {UserDto,PatientDto} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtService} from '@nestjs/jwt';
 import {AccountRepository} from './account.repository';
@@ -10,6 +10,7 @@ import {RolePermissionRepository} from "./rolesPermission/role_permissions.repos
 import {PermissionRepository} from "./permissions/permission.repository";
 import {queries} from "../config/query";
 import {UserRoleRepository} from './user_role.repository';
+import {PatientRepository} from './patient.repository';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
         @InjectRepository(UserRepository) private userRepository: UserRepository, private accountRepository: AccountRepository,
         private rolesRepository: RolesRepository, private rolePersmissionRepository: RolePermissionRepository,
         private permissionRepository: PermissionRepository,private userRoleRepository: UserRoleRepository,
+        private patientRepository: PatientRepository,
         private readonly jwtService: JwtService
     ) {
     }
@@ -112,7 +114,12 @@ export class UserService {
         user.rolesPermission = rolesPermission;
         user.role = roles.roles;
         return user;
-}
+    }
+
+
+    async patientRegistration(patientDto: PatientDto): Promise<any> {
+        return await this.patientRepository.patientRegistration(patientDto);
+    }
 
 
 

@@ -7,7 +7,8 @@ import {
     DoctorConfigPreConsultationDto,
     DoctorConfigCanReschDto,
     DocConfigDto,
-    WorkScheduleDto
+    WorkScheduleDto,
+    PatientDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -325,17 +326,18 @@ export class AppointmentService {
     //     return await this.appointmentRepository.find({});
     // }
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async appointmentSlotsView(user:any): Promise<any> {
         const doc = await this.doctorDetails(user.doctorKey);
         var docId = doc.doctor_id;
-        const app = await this.appointmentRepository.find({doctorId: docId});
-        var appo: any = app;
-        for (var i = 0; i < appo.length; i++) {
-            if (appo[i].isCancel == false && appo[i].isActive == true) {
-                const patId = appo[i].patientId;
-                const pat = await this.patientDetailsRepository.findOne({id: patId});
+       // const app = await this.appointmentRepository.find({doctorId:docId});
+       const app = await this.appointmentRepository.query(queries.getAppointment,[user.startDate, user.endDate, docId]);
+        var appo:any = app;
+        for(var i=0; i<appo.length; i++){
+            if(appo[i].is_cancel == false && appo[i].is_active == true){
+                const patId = appo[i].patient_id;
+                const pat = await this.patientDetailsRepository.findOne({id : patId});
                 appo[i].patientDetails = pat;
-                const pay = await this.paymentDetailsRepository.findOne({appointmentId: appo[i].id});
+                const pay = await this.paymentDetailsRepository.findOne({appointmentId : appo[i].id});
                 appo[i].paymentDetails = pay;
             }
         }
@@ -399,9 +401,13 @@ export class AppointmentService {
     }
 
 
-    async patientSearch(patientDto: any): Promise<any> {
-        return await this.patientDetailsRepository.findOne({phoneNumber: patientDto.phoneNumber});
-    }
+//    async patientSearch(patientDto: any): Promise<any> {
+//     return await this.patientDetailsRepository.findOne({phoneNumber : patientDto.phoneNumber});
+//     }
+
+    // async patientRegistration(patientDto:PatientDto): Promise<any> {
+    //     return await this.patientDetailsRepository.patientRegistration(patientDto);
+    // }
 
 
     // common functions below===============================================================
