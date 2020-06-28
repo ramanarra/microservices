@@ -1,6 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
+import  {messagesDto} from 'common-dto';
 import { PatientDto } from 'common-dto';
 
 
