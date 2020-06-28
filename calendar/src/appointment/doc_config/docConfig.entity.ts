@@ -107,4 +107,24 @@ export class docConfig extends BaseEntity{
     })
     modifiedOn : Date;
 
+    @Column({
+        name : 'consultation_session_timings'
+    })
+    consultationSessionTimings : number;
+
+    @Column({
+        name : 'overBooking_type'
+    })
+    overBookingType : string;
+
+    @Column({
+        name : 'over_booking_count'
+    })
+    overBookingCount : number;
+
+    @Column({
+        name : 'overbooking_enable'
+    })
+    overBookingEnabled : boolean;
+
 }

@@ -24,6 +24,7 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.startTime = appointmentDto.startTime;
         appointment.endTime = appointmentDto.endTime;
         appointment.isActive= true;
+        appointment.isCancel= false;
         appointment.createdBy = appointmentDto.user.role;
         appointment.createdId = appointmentDto.user.userId;
 

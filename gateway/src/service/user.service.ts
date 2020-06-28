@@ -1,6 +1,6 @@
 import { Injectable, Inject, UseFilters, RequestTimeoutException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ClientProxy } from "@nestjs/microservices";
-import { UserDto ,DoctorDto, HealthCheckMicroServiceInterface} from 'common-dto';
+import { UserDto ,DoctorDto, HealthCheckMicroServiceInterface,PatientDto} from 'common-dto';
 import { Observable, throwError, TimeoutError, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { HealthCheckService } from './health-check.service';
@@ -73,6 +73,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     public patientLogin(userDto: UserDto): Observable<any> {
         return this.redisClient.send( { cmd: 'auth_patient_login' }, userDto);
     }
+
+    public patientRegistration(patientDto: PatientDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto);
+    }
+
 
 
 }

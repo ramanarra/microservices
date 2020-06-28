@@ -1,6 +1,6 @@
 import { Repository, EntityRepository } from "typeorm";
 import { Users } from "./users.entity";
-import { UserDto } from "common-dto";
+import { UserDto,PatientDto } from "common-dto";
 import * as bcrypt from "bcrypt";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 
@@ -63,5 +63,19 @@ export class UserRepository extends Repository<Users> {
         }
 
     }
+
+    // async validatePhoneAndPassword(phone,password) : Promise<any> {
+    //     console.log("======test")
+
+    //     const user = await this.findOne({email : phone});
+    //     if(user && await user.validatePassword(password)){
+    //         return user;
+    //     }else {
+    //         console.log("===",JSON.stringify(user))
+    //         return null;
+    //     }
+
+    // }
+
 
 }

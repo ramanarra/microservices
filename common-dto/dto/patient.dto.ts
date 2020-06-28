@@ -1,13 +1,15 @@
 export class PatientDto {
     id:number;
-    patientName: string;
+    name: string;
     landmark: string;
     country: string;
     registrationNumber: string;
     address: string;
     state: string;
     pincode: string;
-    emailId: string; 
+    email: string; 
     photo: string;
-    phoneNumber: number;  
+    phone: string;  
+    patientId:number;
+    password:string;
   }
