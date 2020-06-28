@@ -113,7 +113,7 @@ export class docConfig extends BaseEntity{
     consultationSessionTimings : number;
 
     @Column({
-        name : 'over_booking_type'
+        name : 'overBooking_type'
     })
     overBookingType : string;
 

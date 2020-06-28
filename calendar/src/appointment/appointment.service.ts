@@ -213,8 +213,17 @@ export class AppointmentService {
 
 
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
+        if (workScheduleDto.workScheduleConfig) {
+            // update on workScheduleConfig
+            var condition = {
+                doctorKey: workScheduleDto.doctorKey
+            }
+            var values: any = workScheduleDto.workScheduleConfig;
+            let updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+        }
+        // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
-        if (scheduleTimeIntervals.length) {
+        if (scheduleTimeIntervals && scheduleTimeIntervals.length) {
             for (let scheduleTimeInterval of scheduleTimeIntervals) {
                 if (scheduleTimeInterval.scheduletimeid) {
                     if (scheduleTimeInterval.isDelete) {
@@ -232,7 +241,7 @@ export class AppointmentService {
                             let starTime = scheduleTimeInterval.startTime;
                             let endTime = scheduleTimeInterval.endTime;
                             let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
-                            let isOverLapping = await  this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
+                            let isOverLapping = await this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
                             if (isOverLapping) {
                                 //return error message
                                 return {
@@ -262,7 +271,7 @@ export class AppointmentService {
                         let starTime = scheduleTimeInterval.startTime;
                         let endTime = scheduleTimeInterval.endTime;
                         let doctorConfigScheduleDayId = scheduleTimeInterval.scheduledayid;
-                        let isOverLapping = await  this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
+                        let isOverLapping = await this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
                         if (isOverLapping) {
                             //return error message
                             return {
@@ -286,11 +295,10 @@ export class AppointmentService {
                 statusCode: HttpStatus.OK,
                 message: 'Updated SuccessFully'
             }
-        } else {
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: 'Invalid Request data'
-            }
+        }
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Updated SuccessFully'
         }
     }
 
@@ -309,7 +317,7 @@ export class AppointmentService {
     }
 
     async updateIntoDocConfigScheduleInterval(startTime, endTime, doctorConfigScheduleDayId): Promise<any> {
-        return await this.docConfigScheduleDayRepository.query(queries  .updateIntoDocConfigScheduleInterval, [startTime, endTime, doctorConfigScheduleDayId]);
+        return await this.docConfigScheduleDayRepository.query(queries.updateIntoDocConfigScheduleInterval, [startTime, endTime, doctorConfigScheduleDayId]);
     }
 
 

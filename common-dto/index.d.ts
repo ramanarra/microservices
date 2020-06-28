@@ -10,4 +10,3 @@ export * from './dto/patient.dto';
 export * from './interface/index';
 export * from './config/index';
 export * from './dto/dbQueries/query.dto';
-export * from './dto/constants/messages.dto';

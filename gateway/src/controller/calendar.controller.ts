@@ -54,12 +54,14 @@ export class CalendarController {
 
 
     @Post('createAppointment')
-    @ApiOkResponse({description: 'requestBody example :   {\n' +
-                                '"patientId":"1",\n' +
-                                '"startTime": "10:00 AM",\n' +
-                                '"endTime": "11:00 AM",\n' +
-                                '"appointmentDate": "2020-06-12" \n' +
-                                '}'})
+    @ApiOkResponse({
+        description: 'requestBody example :   {\n' +
+            '"patientId":"1",\n' +
+            '"startTime": "10:00 AM",\n' +
+            '"endTime": "11:00 AM",\n' +
+            '"appointmentDate": "2020-06-12" \n' +
+            '}'
+    })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBadRequestResponse({description: 'Invalid Schema'})
     @ApiBody({type: AppointmentDto})
@@ -76,13 +78,13 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorList(@Request() req,@Query('key') key:String) {
+    doctorList(@Request() req, @Query('key') key: String) {
         // if (req.user.role === 'DOCTOR') {
         //     return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
         // } else {
-             return this.calendarService.doctorList(req.user, key);
+        return this.calendarService.doctorList(req.user, key);
         // }
-       // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
+        // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
 
     }
 
@@ -98,7 +100,7 @@ export class CalendarController {
         //     throw new UnauthorizedException("Invalid User")
         // }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-        return this.calendarService.doctorView(req.user,userDto.doctorKey);
+        return this.calendarService.doctorView(req.user, userDto.doctorKey);
     }
 
     // @Post('doctorConfigCostAndPreconsultationUpdate')
@@ -237,25 +239,27 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@Request() req,@Query('doctorKey') doctorKey:String) {
+    appointmentSlotsView(@Request() req, @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user,doctorKey);
+        return this.calendarService.appointmentSlotsView(req.user, doctorKey);
     }
 
     @Post('appointmentReschedule')
-    @ApiOkResponse({description: 'requestBody example :   {\n' +
-                                                    '"appointmentId":"33",\n' +
-                                                    '"patientId":"1",\n' +
-                                                    '"startTime": "10:00 AM",\n' +
-                                                    '"endTime": "11:00 AM",\n' +
-                                                    '"appointmentDate": "2020-06-12" \n' +
-                                                    '}'})
+    @ApiOkResponse({
+        description: 'requestBody example :   {\n' +
+            '"appointmentId":"33",\n' +
+            '"patientId":"1",\n' +
+            '"startTime": "10:00 AM",\n' +
+            '"endTime": "11:00 AM",\n' +
+            '"appointmentDate": "2020-06-12" \n' +
+            '}'
+    })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
     appointmentReschedule(@Request() req, @Body() appointmentDto: AppointmentDto) {
-        if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
+        if (req.user.role == 'PATIENT' || req.user.role == 'DOCTOR') {
             this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
             return this.calendarService.appointmentReschedule(appointmentDto, req.user);
         }
@@ -268,7 +272,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
     appointmentCancel(@Request() req, @Body() appointmentDto: AppointmentDto) {
-        if(req.user.role == 'PATIENT' || req.user.role == 'DOCTOR'){
+        if (req.user.role == 'PATIENT' || req.user.role == 'DOCTOR') {
             this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
             return this.calendarService.appointmentCancel(appointmentDto, req.user);
         }
@@ -279,10 +283,10 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiBody({type:PatientDto})
-    patientSearch(@Request() req, @Body() patientDto: PatientDto) {  
-            this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
-            return this.calendarService.patientSearch(patientDto, req.user);
+    @ApiBody({type: PatientDto})
+    patientSearch(@Request() req, @Body() patientDto: PatientDto) {
+        this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
+        return this.calendarService.patientSearch(patientDto, req.user);
     }
 
     @Post('appointmentView')
@@ -290,10 +294,10 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiBody({type:AppointmentDto})
-    AppointmentView(@Request() req,  @Body() appointmentId: AppointmentDto) {
+    @ApiBody({type: AppointmentDto})
+    AppointmentView(@Request() req, @Body() appointmentId: AppointmentDto) {
         this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.AppointmentView(req.user,appointmentId);
+        return this.calendarService.AppointmentView(req.user, appointmentId);
     }
 
     @Get('doctorListForPatients')
@@ -301,12 +305,10 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorListForPatients(@Request() req,@Query('accountKey') accountKey:String) {
+    doctorListForPatients(@Request() req, @Query('accountKey') accountKey: String) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.doctorListForPatients(req.user,accountKey);
+        return this.calendarService.doctorListForPatients(req.user, accountKey);
     }
-
-
 
 
 }
