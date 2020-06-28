@@ -235,11 +235,11 @@ export class CalendarController {
     @Get('appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request body example:  Doc_5'})
+    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05, 2020-06-21'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@Request() req,@Query('doctorKey') doctorKey:String) {
+    appointmentSlotsView(@Request() req,@Query('doctorKey') doctorKey:String,@Query('startDate') startDate:String,@Query('endDate') endDate:String) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user,doctorKey);
+        return this.calendarService.appointmentSlotsView(req.user,doctorKey,startDate,endDate);
     }
 
     @Post('appointmentReschedule')

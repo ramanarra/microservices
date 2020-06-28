@@ -1,6 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
+import { PatientDto } from 'common-dto';
 
 
 
@@ -331,11 +332,11 @@ export class AppointmentController {
         }
     }
 
-    @MessagePattern({cmd: 'app_patient_search'})
-    async patientSearch(patientDto: any): Promise<any> {
-        const patient = await this.appointmentService.patientSearch(patientDto);
-        return patient;
-    }
+    // @MessagePattern({cmd: 'app_patient_search'})
+    // async patientSearch(patientDto: any): Promise<any> {
+    //     const patient = await this.appointmentService.patientSearch(patientDto);
+    //     return patient;
+    // }
 
     @MessagePattern({cmd: 'appointment_view'})
     async AppointmentView(user: any): Promise<any> {
@@ -348,6 +349,12 @@ export class AppointmentController {
         const doctor = await this.appointmentService.doctor_List(user.accountKey);
         return doctor;
     }
+
+    // @MessagePattern({cmd: 'patient_details_insertion'})
+    // async patientRegistration(patientDto: PatientDto): Promise<any> {
+    //     const patient = await this.appointmentService.patientRegistration(patientDto);
+    //     return patient;
+    // }
 
 
 }
