@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto
+    PatientDto, CONSTANT_MSG
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -82,7 +82,22 @@ export class AppointmentService {
 
 
     async doctor_List(accountKey): Promise<any> {
-        return await this.doctorRepository.find({accountKey: accountKey});
+        try {
+            const doctorList = await this.doctorRepository.find({accountKey: accountKey});
+            if (doctorList.length) {
+                return doctorList;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
     }
 
     async doctorListAccount(accountKey): Promise<any> {
@@ -326,22 +341,36 @@ export class AppointmentService {
     //     return await this.appointmentRepository.find({});
     // }
 
-    async appointmentSlotsView(user:any): Promise<any> {
-        const doc = await this.doctorDetails(user.doctorKey);
-        var docId = doc.doctor_id;
-       // const app = await this.appointmentRepository.find({doctorId:docId});
-       const app = await this.appointmentRepository.query(queries.getAppointment,[user.startDate, user.endDate, docId]);
-        var appo:any = app;
-        for(var i=0; i<appo.length; i++){
-            if(appo[i].is_cancel == false && appo[i].is_active == true){
-                const patId = appo[i].patient_id;
-                const pat = await this.patientDetailsRepository.findOne({id : patId});
-                appo[i].patientDetails = pat;
-                const pay = await this.paymentDetailsRepository.findOne({appointmentId : appo[i].id});
-                appo[i].paymentDetails = pay;
+    async appointmentSlotsView(user: any): Promise<any> {
+        try {
+            const doc = await this.doctorDetails(user.doctorKey);
+            var docId = doc.doctor_id;
+            // const app = await this.appointmentRepository.find({doctorId:docId});
+            const app = await this.appointmentRepository.query(queries.getAppointment, [user.startDate, user.endDate, docId]);
+            if (app.length) {
+                var appointment: any = app;
+                for (var i = 0; i < appointment.length; i++) {
+                    if (!appointment[i].is_cancel && appointment[i].is_active) {
+                        const patId = appointment[i].patient_id;
+                        const pat = await this.patientDetailsRepository.findOne({id: patId});
+                        appointment[i].patientDetails = pat;
+                        const pay = await this.paymentDetailsRepository.findOne({appointmentId: appointment[i].id});
+                        appointment[i].paymentDetails = pay;
+                    }
+                }
+                return appointment;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
-        return appo;
     }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
@@ -366,44 +395,80 @@ export class AppointmentService {
     }
 
     async appointmentDetails(id: any): Promise<any> {
-        return await this.appointmentRepository.findOne({id: id});
+        try {
+            const appointmentDetails = await this.appointmentRepository.findOne({id: id});
+            return appointmentDetails;
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
     }
 
     async appointmentCancel(appointmentDto: any): Promise<any> {
-
-        if (!appointmentDto.appointmentId) {
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: 'Invalid Request'
+        try {
+            if (!appointmentDto.appointmentId) {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: 'Invalid Request'
+                }
             }
-        }
-        var condition = {
-            id: appointmentDto.appointmentId
-        }
-        var values: any = {
-            isCancel: true,
-            cancelledBy: appointmentDto.user.role,
-            cancelledId: appointmentDto.user.userId
-        }
-        var pastAppointment = await this.appointmentRepository.update(condition, values);
-        if (pastAppointment.affected) {
-            return {
-                statusCode: HttpStatus.OK,
-                message: 'Appointment Cancelled Successfully'
+            var condition = {
+                id: appointmentDto.appointmentId
             }
-        } else {
+            var values: any = {
+                isCancel: true,
+                cancelledBy: appointmentDto.user.role,
+                cancelledId: appointmentDto.user.userId
+            }
+            var pastAppointment = await this.appointmentRepository.update(condition, values);
+            if (pastAppointment.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.APPOINT_CANCELED
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
             return {
                 statusCode: HttpStatus.NOT_MODIFIED,
-                message: 'Updation Failed'
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
+
+
+    async patientSearch(patientDto: any): Promise<any> {
+        try {
+            if (patientDto.phoneNumber && patientDto.phoneNumber.length === 10) {
+                const patientDetails = await this.patientDetailsRepository.findOne({phone: patientDto.phoneNumber});
+                if (patientDetails) {
+                    return patientDetails;
+                } else {
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.INVALID_MOBILE_NO
+                    }
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.INVALID_MOBILE_NO
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
 
     }
-
-
-//    async patientSearch(patientDto: any): Promise<any> {
-//     return await this.patientDetailsRepository.findOne({phoneNumber : patientDto.phoneNumber});
-//     }
 
     // async patientRegistration(patientDto:PatientDto): Promise<any> {
     //     return await this.patientDetailsRepository.patientRegistration(patientDto);

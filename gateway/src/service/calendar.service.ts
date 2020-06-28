@@ -116,7 +116,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
     @UseFilters(AllClientServiceException)
     public AppointmentView(user: any,appointmentId: any): Observable<any> {
-        user.appointmentId=appointmentId;
+        user.appointmentId=appointmentId.appointmentId;
         return this.redisClient.send({cmd: 'appointment_view'},user);
     }
 
