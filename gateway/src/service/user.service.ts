@@ -44,6 +44,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email);
     }
 
+    public findUserByPhone(phone : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
+    }
+
     public usersList() : Observable <any> {
         return this.redisClient.send( {cmd : 'auth_user_list'},'');
     }
@@ -66,16 +70,31 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     }
 
     public doctorsLogin(userDto: UserDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto);
+        const doc = this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto);
+        return doc;
     }
 
     
-    public patientLogin(userDto: UserDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_patient_login' }, userDto);
+    public patientLogin(patientDto: PatientDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_login' }, patientDto);
     }
 
-    public patientRegistration(patientDto: PatientDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto);
+    public patientRegistration(patientDto: any):Promise<any> {
+        const patient = this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto)
+        .pipe(catchError(err => {
+            // console.log(err);
+            // return of({ error: err.message ? err.message : 'Auth service is in offline' })
+            return throwError(err);
+        }),).toPromise();
+        return patient;
+    }
+
+    public findPatientByPhone(phone : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
+    }
+
+    public rolesPermission(role : any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_roles_permission'}, role);
     }
 
 

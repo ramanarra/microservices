@@ -33,6 +33,12 @@ export class UserController {
         return user;
     }
 
+    @MessagePattern({cmd: 'auth_patient_find_by_phone'})
+    async findByPhone(phone: string): Promise<any> {
+        const user = await this.userService.findByPhone(phone);
+        return user;
+    }
+
 
     @MessagePattern({cmd: 'auth_doctor_login'})
     async doctorLogin(doctorDto: any): Promise<any> {
@@ -48,14 +54,13 @@ export class UserController {
     };
 
     @MessagePattern({cmd: 'auth_patient_login'})
-    async patientLogin(doctorDto: any): Promise<any> {
-        const {email, password} = doctorDto;
-        const doctor = await this.userService.patientLogin(email, password);
+    async patientLogin(patientDto: any): Promise<any> {
+        const {phone, password} = patientDto;
+        const doctor = await this.userService.patientLogin(phone, password);
         return {
             "accessToken": doctor.accessToken,
             // "rolesPermission": doctor.rolesPermission,
-            "userId":doctor.id,
-            "role":doctor.role
+            "patientId":doctor.patient_id
         }
     };
 
@@ -63,13 +68,14 @@ export class UserController {
     @MessagePattern({cmd: 'auth_patient_registration'})
     async patientRegistration(patientDto: PatientDto): Promise<any> {
         const patient = await this.userService.patientRegistration(patientDto);
-        return {
-            "accessToken": patient.accessToken,
-            // "rolesPermission": doctor.rolesPermission,
-            "userId":patient.id,
-            "role":patient.role
-        }
+        return patient;
     };
+
+    @MessagePattern({cmd: 'auth_roles_permission'})
+    async rolesPermission(role: string): Promise<any> {
+        const user = await this.userService.getRolesPermisssion(role);
+        return user;
+    }
 
 
 }

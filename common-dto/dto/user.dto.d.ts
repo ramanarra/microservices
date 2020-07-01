@@ -7,4 +7,5 @@ export declare class UserDto {
     doctorKey: string;
     isActive: boolean;
     updatedTime: Date;
+    role: string;
 }

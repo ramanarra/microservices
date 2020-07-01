@@ -265,6 +265,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_view'})
     async AppointmentView(user: any): Promise<any> {
         const appointment = await this.appointmentService.appointmentDetails(user.appointmentId);
+        if (!appointment) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
         return appointment;
     }
 
@@ -274,11 +280,11 @@ export class AppointmentController {
         return doctor;
     }
 
-    // @MessagePattern({cmd: 'patient_details_insertion'})
-    // async patientRegistration(patientDto: PatientDto): Promise<any> {
-    //     const patient = await this.appointmentService.patientRegistration(patientDto);
-    //     return patient;
-    // }
+    @MessagePattern({cmd: 'patient_details_insertion'})
+    async patientInsertion(patientDto: PatientDto): Promise<any> {
+        const patient = await this.appointmentService.patientRegistration(patientDto);
+        return patient;
+    }
 
 
 }

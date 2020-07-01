@@ -40,6 +40,19 @@ export class PatientRepository extends Repository<Patient> {
         return bcrypt.hash(password, salt);
     }
 
+    async validatePhoneAndPassword(phone,password) : Promise<any> {
+        console.log("======test")
+
+        const patient = await this.findOne({phone : phone});
+        if(patient && await patient.validatePassword(password)){
+            return patient;
+        }else {
+            console.log("===",JSON.stringify(patient))
+            return null;
+        }
+
+    }
+
 
 
 
