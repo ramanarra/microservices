@@ -470,9 +470,9 @@ export class AppointmentService {
 
     }
 
-    // async patientRegistration(patientDto:PatientDto): Promise<any> {
-    //     return await this.patientDetailsRepository.patientRegistration(patientDto);
-    // }
+    async patientRegistration(patientDto:PatientDto): Promise<any> {
+        return await this.patientDetailsRepository.patientRegistration(patientDto);
+    }
 
 
     // common functions below===============================================================

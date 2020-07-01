@@ -1,6 +1,8 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique, Timestamp } from 'typeorm';
+import * as bcrypt from "bcrypt";
 
 @Entity()
+@Unique(['phone'])
 export class Patient extends BaseEntity{
 
     @PrimaryGeneratedColumn()
@@ -14,6 +16,11 @@ export class Patient extends BaseEntity{
 
     @Column()
     salt : string;
+
+    async validatePassword(password : string) : Promise<boolean> {
+        const newPassword = await bcrypt.hash(password, this.salt);
+        return newPassword === this.password;
+    }
 
 
 }
