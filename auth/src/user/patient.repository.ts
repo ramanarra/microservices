@@ -41,8 +41,6 @@ export class PatientRepository extends Repository<Patient> {
     }
 
     async validatePhoneAndPassword(phone,password) : Promise<any> {
-        console.log("======test")
-
         const patient = await this.findOne({phone : phone});
         if(patient && await patient.validatePassword(password)){
             return patient;
