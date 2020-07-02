@@ -1,7 +1,7 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto} from 'common-dto';
+import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
@@ -113,6 +113,13 @@ export class UserService {
 
 
     async patientRegistration(patientDto: PatientDto): Promise<any> {
+        const pat = await this.findByPhone(patientDto.phone);
+        if(pat){
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.ALREADY_PRESENT
+            }
+        }
         return await this.patientRepository.patientRegistration(patientDto);
     }
 

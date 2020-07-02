@@ -282,8 +282,18 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_details_insertion'})
     async patientInsertion(patientDto: PatientDto): Promise<any> {
+        // const pat = await this.appointmentService.patientSearch(patientDto);
+        // if(pat){
+
+        // }
         const patient = await this.appointmentService.patientRegistration(patientDto);
         return patient;
+    }
+
+    @MessagePattern({cmd: 'find_doctor_by_codeOrName'})
+    async findDoctorByCodeOrName(user: any): Promise<any> {
+        const doctor = await this.appointmentService.findDoctorByCodeOrName(user.codeOrName.codeOrName);
+        return doctor;
     }
 
 

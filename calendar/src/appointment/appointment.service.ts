@@ -445,8 +445,8 @@ export class AppointmentService {
 
     async patientSearch(patientDto: any): Promise<any> {
         try {
-            if (patientDto.phoneNumber && patientDto.phoneNumber.length === 10) {
-                const patientDetails = await this.patientDetailsRepository.findOne({phone: patientDto.phoneNumber});
+            if (patientDto.phone && patientDto.phone.length === 10) {
+                const patientDetails = await this.patientDetailsRepository.findOne({phone: patientDto.phone});
                 if (patientDetails) {
                     return patientDetails;
                 } else {
@@ -498,6 +498,24 @@ export class AppointmentService {
             }
         })
         return isOverLapping;
+    }
+
+    async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
+        const name = await this.doctorRepository.findOne({doctorName:codeOrName});
+        if(name){
+            return name;
+        }else {
+            const code = await this.doctorRepository.findOne({registrationNumber:codeOrName});
+            if(code){
+                return code;
+            }else{
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+        }
+
     }
 
 

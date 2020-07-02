@@ -6,5 +6,6 @@ export class DoctorDto {
     accountId: number;
     doctorName: string;
     doctorExperience: number;
-    speciality: string;  
+    speciality: string;
+    registrationNumber:string;  
   }

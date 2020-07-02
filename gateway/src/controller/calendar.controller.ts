@@ -275,7 +275,7 @@ export class CalendarController {
     }
 
     @Post('patientSearch')
-    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999993"}'})
+    @ApiOkResponse({description: 'request body example:   {"phone": "9999999993"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -306,7 +306,16 @@ export class CalendarController {
         return this.calendarService.doctorListForPatients(req.user,accountKey);
     }
 
-
+    @Post('findDoctorByCodeOrName')
+    @ApiOkResponse({description: 'request body example:   {"codeOrName": "RegD_1"}  or {"codeOrName": "Adithya K"} '})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type:DoctorDto})
+    findDoctorByCodeOrName(@Request() req,  @Body() codeOrName: DoctorDto) {
+        this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.findDoctorByCodeOrName(req.user,codeOrName);
+    }
 
 
 }

@@ -1,7 +1,7 @@
-import {Controller, UseFilters, Body, Logger, Inject} from '@nestjs/common';
+import {Controller, UseFilters, Body, Logger,HttpStatus, Inject} from '@nestjs/common';
 import {MessagePattern} from '@nestjs/microservices';
 import {UserService} from './user.service';
-import {UserDto,PatientDto} from 'common-dto';
+import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {ClientProxy} from "@nestjs/microservices";
 import {async} from 'rxjs/internal/scheduler/async';
@@ -68,7 +68,15 @@ export class UserController {
     @MessagePattern({cmd: 'auth_patient_registration'})
     async patientRegistration(patientDto: PatientDto): Promise<any> {
         const patient = await this.userService.patientRegistration(patientDto);
-        return patient;
+        if(patient.message){
+            return patient;
+        } else {
+            return{
+                phone:patient.phone,
+                patientId:patient.patient_id
+            } 
+        }
+        
     };
 
     @MessagePattern({cmd: 'auth_roles_permission'})

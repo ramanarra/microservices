@@ -10,4 +10,6 @@ export declare const CONSTANT_MSG: {
     INVALID_MOBILE_NO: string;
     UPDATE_FAILED: string;
     APPOINT_CANCELED: string;
+    DAY_OF_WEEK: string;
+    ALREADY_PRESENT: string;
 };

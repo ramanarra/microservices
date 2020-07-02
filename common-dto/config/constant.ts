@@ -9,5 +9,7 @@ export const CONSTANT_MSG = {
     CONTENT_NOT_AVAILABLE: 'Content Not Available',
     INVALID_MOBILE_NO: 'Invalid mobile Number',
     UPDATE_FAILED: "Updation Failed",
-    APPOINT_CANCELED: 'Appointment Cancelled Successfully'
+    APPOINT_CANCELED: 'Appointment Cancelled Successfully',
+    DAY_OF_WEEK:'Please enter DayOfWeek Correctly',
+    ALREADY_PRESENT:'User already present.Do login'
 }

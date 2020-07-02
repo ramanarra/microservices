@@ -15,7 +15,7 @@ export class PatientDetailsRepository extends Repository<PatientDetails> {
 
         const patient = new PatientDetails();
        // patient.doctorId = patientDto.doctorId;
-        patient.id =patientDto.patientId ;
+        patient.patientId =patientDto.patientId ;
        // patient.appointmentDate =new Date(patientDto.appointmentDate);
         patient.name = patientDto.name;
         patient.landmark = patientDto.landmark;
