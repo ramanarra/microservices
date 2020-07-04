@@ -209,14 +209,14 @@ export class AppointmentService {
             })
             const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
             let responseData = {
-                Monday: monday,
-                Tuesday: tuesday,
-                Wednesday: wednesday,
-                Thursday: thursday,
-                Friday: friday,
-                Saturday: saturday,
-                Sunday: sunday,
-                ConfigDetails: config
+                monday: monday,
+                tuesday: tuesday,
+                wednesday: wednesday,
+                thursday: thursday,
+                friday: friday,
+                saturday: saturday,
+                sunday: sunday,
+                configDetails: config
             }
             return responseData;
         } else {
@@ -336,10 +336,6 @@ export class AppointmentService {
         return await this.docConfigScheduleDayRepository.query(queries.updateIntoDocConfigScheduleInterval, [startTime, endTime, doctorConfigScheduleDayId]);
     }
 
-
-    // async appointmentSlotsView(user: any): Promise<any> {
-    //     return await this.appointmentRepository.find({});
-    // }
 
     async appointmentSlotsView(user: any): Promise<any> {
         try {
