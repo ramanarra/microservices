@@ -208,6 +208,7 @@ export class AppointmentService {
                 }
             })
             const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
+            let config1=config[0];
             let responseData = {
                 monday: monday,
                 tuesday: tuesday,
@@ -216,7 +217,7 @@ export class AppointmentService {
                 friday: friday,
                 saturday: saturday,
                 sunday: sunday,
-                configDetails: config
+                configDetails: config1
             }
             return responseData;
         } else {
