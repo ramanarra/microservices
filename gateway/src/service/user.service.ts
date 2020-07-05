@@ -44,12 +44,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email);
     }
 
-    public usersList() : Observable <any> {
-        return this.redisClient.send( {cmd : 'auth_user_list'},'');
+    public findUserByPhone(phone : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
     }
 
-    public doctorLogin(doctorDto: DoctorDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor_login' }, doctorDto);
+    public usersList() : Observable <any> {
+        return this.redisClient.send( {cmd : 'auth_user_list'},'');
     }
 
     public doctorList(id): Observable<any> {
@@ -60,22 +60,30 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send( { cmd: 'auth_doctor_view' }, doctorDto);
     }
 
-    
-    public doctor_Login(doctorDto: DoctorDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor__login' }, doctorDto);
-    }
-
     public doctorsLogin(userDto: UserDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto);
+        const doc = this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto);
+        return doc;
     }
 
     
-    public patientLogin(userDto: UserDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_patient_login' }, userDto);
+    public patientLogin(patientDto: PatientDto): Observable<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_login' }, patientDto);
     }
 
-    public patientRegistration(patientDto: PatientDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto);
+    public patientRegistration(patientDto: any):Promise<any> {
+        const patient = this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto)
+        .pipe(catchError(err => {
+            return throwError(err);
+        }),).toPromise();
+        return patient;
+    }
+
+    public findPatientByPhone(phone : string) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
+    }
+
+    public rolesPermission(role : any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_roles_permission'}, role);
     }
 
 

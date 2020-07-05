@@ -7,4 +7,5 @@ export declare class DoctorDto {
     doctorName: string;
     doctorExperience: number;
     speciality: string;
+    registrationNumber: string;
 }

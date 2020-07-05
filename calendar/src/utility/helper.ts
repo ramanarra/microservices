@@ -6,5 +6,10 @@ export class Helper {
         return startTimeMilliSeconds;
     }
 
+    static getConsultationTimeInMilliSeconds(time: any) {
+        let startTimeMilliSeconds =(time * 60000);
+        return startTimeMilliSeconds;
+    }
+
 
 }

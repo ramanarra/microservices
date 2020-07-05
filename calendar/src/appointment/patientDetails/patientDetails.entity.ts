@@ -60,4 +60,9 @@ export class PatientDetails extends BaseEntity{
     })
     phone : string;
 
+    @Column({
+        name : 'patient_id'
+    })
+    patientId : number;
+
 }

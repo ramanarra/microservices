@@ -1,8 +1,9 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto} from 'common-dto';
+import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
+import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
 import {AccountRepository} from './account.repository';
 import {RolesRepository} from './roles.repository';
@@ -42,6 +43,10 @@ export class UserService {
 
     async findByEmail(email: string): Promise<any> {
         return await this.userRepository.findOne({email});
+    }
+
+    async findByPhone(phone: string): Promise<any> {
+        return await this.patientRepository.findOne({phone});
     }
 
 
@@ -93,32 +98,35 @@ export class UserService {
 
     async patientLogin(email, password): Promise<any> {
 
-        const user = await this.userRepository.validateEmailAndPassword(email, password);
+        const user = await this.patientRepository.validatePhoneAndPassword(email, password);
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
-        var roleId = await this.roleId(user.id);
-        var roles = await this.role(roleId.role_id);
-        if (!roles)
-            throw  new UnauthorizedException('Content Not Available');
-        var rolesPermission = await this.getRolesPermissionId(roles.roles_id);
-        const jwtUserInfo: JwtPayLoad = {
-            email: user.email,
-            userId: user.id,
-            account_key: null,
-            doctor_key: null,
-            role: roles.roles
+        const jwtUserInfo: JwtPatientLoad = {
+            phone: user.phone,
+            patientId: user.patient_id
         };
         console.log("=======jwtUserInfo", jwtUserInfo)
         const accessToken = this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
-        user.rolesPermission = rolesPermission;
-        user.role = roles.roles;
         return user;
     }
 
 
     async patientRegistration(patientDto: PatientDto): Promise<any> {
+        const pat = await this.findByPhone(patientDto.phone);
+        if(pat){
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.ALREADY_PRESENT
+            }
+        }
         return await this.patientRepository.patientRegistration(patientDto);
+    }
+
+    async getRolesPermisssion(role: string): Promise<any> {
+        const roleid = await this.rolesRepository.findOne({roles: role});
+        var rolesPermission = await this.getRolesPermissionId(roleid.roles_id);
+        return rolesPermission;
     }
 
 

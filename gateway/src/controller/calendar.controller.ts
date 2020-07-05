@@ -225,11 +225,11 @@ export class CalendarController {
     @Get('workScheduleView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'Work Schedule View'})
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    workScheduleView(@Request() req) {
+    workScheduleView(@Request() req,@Query('doctorKey') doctorKey:String) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-        return this.calendarService.workScheduleView(req.user.doctor_key);
+        return this.calendarService.workScheduleView(req.user,doctorKey);
     }
 
     @Get('appointmentSlotsView')
@@ -275,7 +275,7 @@ export class CalendarController {
     }
 
     @Post('patientSearch')
-    @ApiOkResponse({description: 'request body example:   {"phoneNumber": "9999999993"}'})
+    @ApiOkResponse({description: 'request body example:   {"phone": "9999999993"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -305,6 +305,59 @@ export class CalendarController {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
         return this.calendarService.doctorListForPatients(req.user,accountKey);
     }
+
+    @Post('findDoctorByCodeOrName')
+    @ApiOkResponse({description: 'request body example:   {"codeOrName": "RegD_1"}  or {"codeOrName": "Adithya K"} '})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type:DoctorDto})
+    findDoctorByCodeOrName(@Request() req,  @Body() codeOrName: DoctorDto) {
+        this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.findDoctorByCodeOrName(req.user,codeOrName);
+    }
+
+    @Post('patientDetailsEdit')
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+    '"patientId":"5",\n' +
+    '"email":"nirmala@gmail.com",\n' +
+    '"landmark":"landmark", \n' +
+    '"country":"country", \n' +
+    '"name":"name", \n' +
+    '"address":"address", \n' +
+    '"state":"state", \n' +
+    '"pincode":"12346", \n' +
+    '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
+    '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBody({type:PatientDto})
+    patientDetailsEdit(@Request() req,  @Body() patientDto: PatientDto) {
+        this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(patientDto)}`);
+        return this.calendarService.patientDetailsEdit(patientDto);
+    }
+
+    @Post('patientBookAppointment')
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                        '"patientId":"1",\n' +
+                                        '"startTime": "10:00 AM",\n' +
+                                        '"endTime": "11:00 AM",\n' +
+                                        '"appointmentDate": "2020-06-12" \n' +
+                                        '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBody({type:PatientDto})
+    patientBookAppointment(@Request() req,  @Body() patientDto: PatientDto) {
+        this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(patientDto)}`);
+        return this.calendarService.patientBookAppointment(patientDto);
+    }
+
+    @Get('viewAppointmentSlotsForPatient')
+    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    viewAppointmentSlotsForPatient(@Request() req,@Query('doctorKey') doctorKey:String,@Query('appointmentDate') appointmentDate:String) {
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorKey)}`);
+        return this.calendarService.viewAppointmentSlotsForPatient(doctorKey,appointmentDate);
+    }
+
 
 
 

@@ -54,7 +54,7 @@ export class AppointmentController {
                 if (roleKey.user.doctor_key !== roleKey.key) {
                     return {
                         statusCode: HttpStatus.BAD_REQUEST,
-                        message: "Invalid request"
+                        message: CONSTANT_MSG.INVALID_REQUEST
                     }
                 }
                 var docKey = await this.appointmentService.doctorDetails(roleKey.key);
@@ -73,7 +73,7 @@ export class AppointmentController {
             if (roleKey.user.account_key !== roleKey.key) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: "Invalid request"
+                    message: CONSTANT_MSG.INVALID_REQUEST
                 }
             }
             var accountKey = roleKey.key;
@@ -93,7 +93,7 @@ export class AppointmentController {
         } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
-                message: "Invalid request"
+                message:  CONSTANT_MSG.INVALID_REQUEST
             }
         }
 
@@ -106,9 +106,15 @@ export class AppointmentController {
             const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
             // if not doctor details return
             if (!doctor)
-                return "Content Not Available";
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
             if (user.role == 'DOCTOR' && user.doctor_key !== user.doctorKey || user.role == 'ADMIN' && user.account_key !== doctor.accountKey || user.role == 'DOC_ASSISTANT' && user.account_key !== doctor.accountKey) {
-                return ('Invalid user');
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
             }
 
             const doctorConfigDetails = await this.appointmentService.getDoctorConfigDetails(user.doctorKey);
@@ -116,7 +122,6 @@ export class AppointmentController {
             // check accountKey validation
             if (accountKey !== user.account_key)
                 throw new UnauthorizedException('Invalid User');
-
             const account = await this.appointmentService.accountDetails(accountKey);
             return {
                 doctorDetails: doctor,
@@ -125,7 +130,10 @@ export class AppointmentController {
             }
         } catch (e) {
             console.log(e)
-            return "Content Not Available";
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
         }
     }
 
@@ -163,23 +171,40 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
-        const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
-        return updateRes;
+        const doctor = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
+        if((workScheduleDto.user.role == 'ADMIN' && workScheduleDto.user.account_key == doctor.accountKey) || (workScheduleDto.user.role == 'DOCTOR' && workScheduleDto.user.doctor_key == doctor.doctorKey)){
+            const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
+            return updateRes;
+        }
+        return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: CONSTANT_MSG.INVALID_REQUEST
+        }
+        
     }
 
     @MessagePattern({cmd: 'app_work_schedule_view'})
-    async workScheduleView(doctorKey: any): Promise<any> {
-        const doctor = await this.appointmentService.doctorDetails(doctorKey);
+    async workScheduleView(user: any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
         if (!doctor) {
             return {
                 statusCode: HttpStatus.NOT_FOUND,
-                message: "DOCTOR Not found"
+                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
         var docId = doctor.doctor_id;
-        const docConfig = await this.appointmentService.workScheduleView(docId, doctorKey);
-        return docConfig;
-
+        if(user.role == 'ADMIN' || user.role == 'DOC_ASSISTANT' && user.account_key== doctor.accountKey){
+            const docConfig = await this.appointmentService.workScheduleView(docId, user.doctorKey);
+            return docConfig;
+        } else if(user.role == 'DOCTOR' && user.doctor_key == doctor.doctorKey){
+            const docConfig = await this.appointmentService.workScheduleView(docId, user.doctorKey);
+            return docConfig;
+        } else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }      
     }
 
     @MessagePattern({cmd: 'appointment_slots_view'})
@@ -194,7 +219,7 @@ export class AppointmentController {
             if (appointmentDto.user.patient_id !== appointmentDto.patientId) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Invalid Request'
+                    message: CONSTANT_MSG.INVALID_REQUEST
                 }
             }
             const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
@@ -207,7 +232,7 @@ export class AppointmentController {
             if (docId !== doc) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Invalid Request'
+                    message:  CONSTANT_MSG.INVALID_REQUEST
                 }
             }
             appointmentDto.doctorId = docId;
@@ -224,7 +249,7 @@ export class AppointmentController {
                 var pat = patId.patientId;
                 if (appointmentDto.user.patient_id !== pat) {
                     return {
-                        statusCode: HttpStatus.BAD_REQUEST,
+                        statusCode: HttpStatus.NO_CONTENT,
                         message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                     }
                 }
@@ -241,7 +266,7 @@ export class AppointmentController {
                 }
                 if (docId !== app) {
                     return {
-                        statusCode: HttpStatus.BAD_REQUEST,
+                        statusCode: HttpStatus.NO_CONTENT,
                         message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                     }
                 }
@@ -250,7 +275,7 @@ export class AppointmentController {
             }
         } catch (e) {
             return {
-                statusCode: HttpStatus.BAD_REQUEST,
+                statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
@@ -265,6 +290,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_view'})
     async AppointmentView(user: any): Promise<any> {
         const appointment = await this.appointmentService.appointmentDetails(user.appointmentId);
+        if (!appointment) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
         return appointment;
     }
 
@@ -274,11 +305,35 @@ export class AppointmentController {
         return doctor;
     }
 
-    // @MessagePattern({cmd: 'patient_details_insertion'})
-    // async patientRegistration(patientDto: PatientDto): Promise<any> {
-    //     const patient = await this.appointmentService.patientRegistration(patientDto);
-    //     return patient;
-    // }
+    @MessagePattern({cmd: 'patient_details_insertion'})
+    async patientInsertion(patientDto: PatientDto): Promise<any> {
+        const patient = await this.appointmentService.patientRegistration(patientDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'find_doctor_by_codeOrName'})
+    async findDoctorByCodeOrName(user: any): Promise<any> {
+        const doctor = await this.appointmentService.findDoctorByCodeOrName(user.codeOrName.codeOrName);
+        return doctor;
+    }
+
+    @MessagePattern({cmd: 'patient_details_edit'})
+    async patientDetailsEdit(patientDto: any): Promise<any> {
+        const patient = await this.appointmentService.patientDetailsEdit(patientDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'patient_book_appointment'})
+    async patientBookAppointment(patientDto: any): Promise<any> {
+        const patient = await this.appointmentService.patientBookAppointment(patientDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'patient_view_appointment'})
+    async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
+        const appointment = await this.appointmentService.viewAppointmentSlotsForPatient(doctor);
+        return appointment;
+    }
 
 
 }
