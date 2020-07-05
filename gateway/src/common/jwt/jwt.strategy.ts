@@ -37,4 +37,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     //     return patient;
     // }
 
+       
+    // async validate(payload : any) : Promise<UserDto>{
+    // console.log("JWT Payload >> "+ JSON.stringify(payload));
+    // if(payload.email){
+    // const user : UserDto = await this.userService.findUserByEmail(payload.email).toPromise();
+    // if(!user){
+    // throw new UnauthorizedException("Malformed User");
+    // }
+    // }else if(!payload.phone){
+    // const patient : PatientDto = await this.userService.findPatientByPhone(payload.phone).toPromise();
+    // if(!patient){
+    // throw new UnauthorizedException("Malformed User");
+    // }
+    // } else {
+    // throw new UnauthorizedException("Malformed User");
+    // }
+    // return payload;
+
 }

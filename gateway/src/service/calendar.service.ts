@@ -83,8 +83,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public workScheduleView(doctorKey: any): Observable<any> {
-        return this.redisClient.send({cmd: 'app_work_schedule_view'},doctorKey);
+    public workScheduleView(user: any,key:any): Observable<any> {
+        user.doctorKey = key;
+        return this.redisClient.send({cmd: 'app_work_schedule_view'},user);
     }
 
     @UseFilters(AllClientServiceException)
@@ -136,6 +137,22 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public findDoctorByCodeOrName(user: any,codeOrName:any): Observable<any> {
         user.codeOrName = codeOrName;
         return this.redisClient.send({cmd: 'find_doctor_by_codeOrName'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientDetailsEdit(patientDto : any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_details_edit'}, patientDto);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientBookAppointment(patientDto : any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_book_appointment'}, patientDto);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public viewAppointmentSlotsForPatient(doctorKey : any, appointmentDate : any) : Observable <any> {
+        doctorKey.appointmentDate = appointmentDate;
+        return this.redisClient.send({ cmd : 'patient_view_appointment'}, doctorKey);
     }
 
 

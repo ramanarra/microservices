@@ -52,21 +52,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send( {cmd : 'auth_user_list'},'');
     }
 
-    public doctorLogin(doctorDto: DoctorDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor_login' }, doctorDto);
-    }
-
     public doctorList(id): Observable<any> {
         return this.redisClient.send( { cmd: 'auth_doctor_list' }, id);
     }
 
     public doctorView(doctorDto: DoctorDto): Observable<any> {
         return this.redisClient.send( { cmd: 'auth_doctor_view' }, doctorDto);
-    }
-
-    
-    public doctor_Login(doctorDto: DoctorDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_doctor__login' }, doctorDto);
     }
 
     public doctorsLogin(userDto: UserDto): Observable<any> {
@@ -82,8 +73,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     public patientRegistration(patientDto: any):Promise<any> {
         const patient = this.redisClient.send( { cmd: 'auth_patient_registration' }, patientDto)
         .pipe(catchError(err => {
-            // console.log(err);
-            // return of({ error: err.message ? err.message : 'Auth service is in offline' })
             return throwError(err);
         }),).toPromise();
         return patient;

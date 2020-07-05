@@ -11,5 +11,6 @@ export const CONSTANT_MSG = {
     UPDATE_FAILED: "Updation Failed",
     APPOINT_CANCELED: 'Appointment Cancelled Successfully',
     DAY_OF_WEEK:'Please enter DayOfWeek Correctly',
-    ALREADY_PRESENT:'User already present.Do login'
+    ALREADY_PRESENT:'User already present.Do login',
+    INVALID_REQUEST:'Invalid request'
 }

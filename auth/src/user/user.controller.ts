@@ -59,7 +59,6 @@ export class UserController {
         const doctor = await this.userService.patientLogin(phone, password);
         return {
             "accessToken": doctor.accessToken,
-            // "rolesPermission": doctor.rolesPermission,
             "patientId":doctor.patient_id
         }
     };
