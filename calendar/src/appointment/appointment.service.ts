@@ -182,8 +182,6 @@ export class AppointmentService {
     // }
 
     async workScheduleView(doctorId: number, docKey: string): Promise<any> {
-
-        console.log("===test", doctorId)
         let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
         if (docConfig) {
             let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
