@@ -9,17 +9,17 @@ export class DocConfigScheduleInterval extends BaseEntity{
     docConfigScheduleIntervalId : number;
 
     @Column({
-        name : 'doc_config_schedule_day_id'
+        name : 'docConfigScheduleDayId'
     })
     docConfigScheduleDayId : number;
 
     @Column({
-        name : 'start_time'
+        name : 'startTime'
     })
     startTime : string;
 
     @Column({
-        name : 'end_time'
+        name : 'endTime'
     })
     endTime : string;
 
