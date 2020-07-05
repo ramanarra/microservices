@@ -182,30 +182,32 @@ export class AppointmentService {
     // }
 
     async workScheduleView(doctorId: number, docKey: string): Promise<any> {
+
+        console.log("===test", doctorId)
         let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
         if (docConfig) {
             let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
             // format the response
             docConfig.forEach(v => {
-                if (v.day_of_week === 'Monday') {
+                if (v.dayOfWeek === 'Monday') {
                     monday.push(v);
                 }
-                if (v.day_of_week === 'Tuesday') {
+                if (v.dayOfWeek === 'Tuesday') {
                     tuesday.push(v);
                 }
-                if (v.day_of_week === 'Wednesday') {
+                if (v.dayOfWeek === 'Wednesday') {
                     wednesday.push(v);
                 }
-                if (v.day_of_week === 'Thursday') {
+                if (v.dayOfWeek === 'Thursday') {
                     thursday.push(v);
                 }
-                if (v.day_of_week === 'Friday') {
+                if (v.dayOfWeek === 'Friday') {
                     friday.push(v);
                 }
-                if (v.day_of_week === 'Saturday') {
+                if (v.dayOfWeek === 'Saturday') {
                     saturday.push(v);
                 }
-                if (v.day_of_week === 'Sunday') {
+                if (v.dayOfWeek === 'Sunday') {
                     sunday.push(v);
                 }
             })
@@ -497,8 +499,8 @@ export class AppointmentService {
         let endTimeMilliSeconds = Helper.getTimeInMilliSeconds(endTime);
         // compare the startTime in any previous records, if start time or endTime comes between previous time interval
         doctorScheduledDays.forEach(v => {
-            let vstartTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.start_time);
-            let vEndTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.end_time);
+            let vstartTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.startTime);
+            let vEndTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.endTime);
             if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
                 isOverLapping = true;
             } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {

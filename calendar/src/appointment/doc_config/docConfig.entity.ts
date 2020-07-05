@@ -108,22 +108,22 @@ export class docConfig extends BaseEntity{
     modifiedOn : Date;
 
     @Column({
-        name : 'consultation_session_timings'
+        name : 'consultationSessionTimings'
     })
     consultationSessionTimings : number;
 
     @Column({
-        name : 'overBooking_type'
+        name : 'overBookingType'
     })
     overBookingType : string;
 
     @Column({
-        name : 'over_booking_count'
+        name : 'overBookingCount'
     })
     overBookingCount : number;
 
     @Column({
-        name : 'overbooking_enable'
+        name : 'overBookingEnabled'
     })
     overBookingEnabled : boolean;
 
