@@ -52,8 +52,6 @@ export class UserRepository extends Repository<Users> {
     }
 
     async validateEmailAndPassword(email,password) : Promise<any> {
-        console.log("======test")
-
         const user = await this.findOne({email : email});
         if(user && await user.validatePassword(password)){
             return user;
