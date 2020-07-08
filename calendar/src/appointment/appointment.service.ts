@@ -253,8 +253,8 @@ export class AppointmentService {
                     } else {
                         // if scheduletimeid is there then need to update
                         let doctorKey = workScheduleDto.user.doctor_key;
-                        let dayOfWeek = workScheduleDto.dayOfWeek;
-                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
+                        let scheduleDayId = scheduleTimeInterval.scheduledayid;
+                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
                         if (doctorScheduledDays && doctorScheduledDays.length) {
                             // // validate with previous data
                             let starTime = scheduleTimeInterval.startTime;
@@ -283,8 +283,8 @@ export class AppointmentService {
                     // if scheduletimeid is not there  then new insert new records then
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
-                    let dayOfWeek = workScheduleDto.dayOfWeek;
-                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, dayOfWeek);
+                    let scheduleDayId = scheduleTimeInterval.scheduledayid;;
+                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
                         let starTime = scheduleTimeInterval.startTime;
@@ -310,17 +310,6 @@ export class AppointmentService {
                     }
                 }
             }
-            // const doc = await this.getDoctorConfigDetails(workScheduleDto.doctorKey);
-            // let consultSession = doc.consultationSessionTimings;
-            // let start = workScheduleDto.updateWorkSchedule.startTime;
-            // let end =  workScheduleDto.updateWorkSchedule.endTime;
-            //let startm = Helper.getTimeInMilliSeconds(start); 
-            //let endm = Helper.getTimeInMilliSeconds(end); 
-            // let consultSessionm = Helper.getConsultationTimeInMilliSeconds(consultSession);
-            //let x = endm - startm;
-            //let y = x/consultSessionm;
-            //
-            
             return {
                 statusCode: HttpStatus.OK,
                 message: 'Updated SuccessFully'
@@ -333,8 +322,8 @@ export class AppointmentService {
     }
 
 
-    async getDoctorConfigSchedule(doctorKey: string, dayOfWeek: string): Promise<any> {
-        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, dayOfWeek]);
+    async getDoctorConfigSchedule(doctorKey: string, scheduleDayId: string): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, scheduleDayId]);
     }
 
     async deleteDoctorConfigScheduleInterval(scheduletimeid: number, scheduleDayId: number): Promise<any> {
