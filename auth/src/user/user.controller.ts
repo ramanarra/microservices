@@ -78,11 +78,5 @@ export class UserController {
         
     };
 
-    @MessagePattern({cmd: 'auth_roles_permission'})
-    async rolesPermission(role: string): Promise<any> {
-        const user = await this.userService.getRolesPermisssion(role);
-        return user;
-    }
-
 
 }

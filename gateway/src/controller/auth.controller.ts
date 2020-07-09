@@ -74,15 +74,4 @@ export class AuthController {
       }
     }
 
-    @Post('rolesPermission')
-    @ApiOkResponse({ description: 'requestBody example :   {\n' +
-          '"role":"DOCTOR"\n' +
-          '}' })
-    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: UserDto })
-    rolesPermission(@Body() role : UserDto) {
-      this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(role)}`);
-      return this.userService.rolesPermission(role.role);
-    }
-
 }

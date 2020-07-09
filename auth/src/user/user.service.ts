@@ -128,11 +128,6 @@ export class UserService {
         return await this.patientRepository.patientRegistration(patientDto);
     }
 
-    async getRolesPermisssion(role: string): Promise<any> {
-        const roleid = await this.rolesRepository.findOne({roles: role});
-        var rolesPermission = await this.getRolesPermissionId(roleid.roles_id);
-        return rolesPermission;
-    }
 
 
 

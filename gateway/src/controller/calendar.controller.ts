@@ -42,6 +42,14 @@ import {
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
 import {selfUserSettingRead} from "../common/decorator/selfUserSettingRead.decorator";
+import {selfUserSettingWrite} from "../common/decorator/selfUserSettingWrite.decorator";
+import {accountUsersSettingsRead} from "../common/decorator/accountUsersSettingsRead.decorator";
+import {selfAppointmentWrite} from "../common/decorator/selfAppointmentWrite.decorator";
+import {accountUsersSettingsWrite} from "../common/decorator/accountUsersSettingsWrite.decorator";
+import {selfAppointmentRead} from "../common/decorator/selfAppointmentRead.decorator";
+import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppointmentRead.decorator";
+import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
+
 
 @Controller('api/calendar')
 @UsePipes(new ValidationPipe({transform: true}))
@@ -69,7 +77,9 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @Roles('admin')
-    createAppointment(@Request() req, @Body() appointmentDto: AppointmentDto) {
+    createAppointment(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.createAppointment(appointmentDto, req.user);
     }
@@ -79,15 +89,10 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorList(@selfUserSettingRead() check: boolean, @Request() req, @Query('key') key: String) {
-        if (!check)
+    doctorList(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Query('key') key: String) {
+        if (!check && !check2)
             return {message: 'No persmission'}
-        // if (req.user.role === 'DOCTOR') {
-        //     return this.calendarService.doctorList(req.user.role, req.user.doctor_key);
-        // } else {
         return this.calendarService.doctorList(req.user, key.trim());
-        // }
-        // return this.calendarService.doctorList(req.user.role,req.user.role=='DOCTOR'? req.user.doctor_key : req.user.account_key);
 
     }
 
@@ -98,10 +103,9 @@ export class CalendarController {
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: UserDto})
-    doctorView(@Request() req, @Body() userDto: UserDto) {
-        // if (req.user.role == 'DOC_ASSISTANT' || req.user.role == 'PATIENT') {
-        //     throw new UnauthorizedException("Invalid User")
-        // }
+    doctorView(@selfUserSettingWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() userDto: UserDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
         return this.calendarService.doctorView(req.user, userDto.doctorKey);
     }
@@ -143,9 +147,11 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'Cancel &  Reschedule View'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorCanReschView(@Request() req) {
-        this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-        return this.calendarService.doctorCanReschView(req.user.doctor_key);
+    doctorCanReschView(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req , @Query('doctorKey') doctorKey: String) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
+        this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.doctorCanReschView(req.user,doctorKey);
     }
 
     // @Get('appointmentsView')
@@ -183,16 +189,11 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: DocConfigDto})
-    doctorConfigUpdate(@Request() req, @Body() docConfigDto: DocConfigDto) {
-        // validate req.token.doctorykey and paramter doctorkey are same or not
-        if (docConfigDto.doctorKey != req.user.doctor_key) {
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: 'Invalid Request'
-            }
-        }
+    doctorConfigUpdate(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Body() docConfigDto: DocConfigDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Doctor config Update  Api -> Request data ${JSON.stringify(docConfigDto, req.user)}`);
-        return this.calendarService.doctorConfigUpdate(docConfigDto, req.user);
+        return this.calendarService.doctorConfigUpdate(req.user, docConfigDto);
     }
 
     @Post('workScheduleEdit')
@@ -207,24 +208,11 @@ export class CalendarController {
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: WorkScheduleDto})
-    workScheduleEdit(@Request() req, @Body() workScheduleDto: any) {
-        if (req.user.role == 'ADMIN') {
-            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
-            return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
-        } else if (req.user.role == 'DOCTOR') {
-            if (workScheduleDto.doctorKey != req.user.doctor_key) {
-                return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Invalid Request'
-                }
-            }
-            this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
-            return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
-        }
-        return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: 'Invalid Request'
-        }
+    workScheduleEdit(@selfAppointmentWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() workScheduleDto: any) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
+        return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
     }
 
     @Get('workScheduleView')
@@ -232,7 +220,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    workScheduleView(@Request() req, @Query('doctorKey') doctorKey: String) {
+    workScheduleView(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
         return this.calendarService.workScheduleView(req.user, doctorKey);
     }
@@ -242,7 +232,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05, 2020-06-21'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@Request() req, @Query('doctorKey') doctorKey: String, @Query('startDate') startDate: String, @Query('endDate') endDate: String) {
+    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('startDate') startDate: String, @Query('endDate') endDate: String) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
         return this.calendarService.appointmentSlotsView(req.user, doctorKey, startDate, endDate);
     }
@@ -261,11 +253,11 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
-    appointmentReschedule(@Request() req, @Body() appointmentDto: AppointmentDto) {
-        if (req.user.role == 'PATIENT' || req.user.role == 'DOCTOR') {
-            this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-            return this.calendarService.appointmentReschedule(appointmentDto, req.user);
-        }
+    appointmentReschedule(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
+        this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+        return this.calendarService.appointmentReschedule(appointmentDto, req.user);
     }
 
     @Post('appointmentCancel')
@@ -274,11 +266,11 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
-    appointmentCancel(@Request() req, @Body() appointmentDto: AppointmentDto) {
-        if (req.user.role == 'PATIENT' || req.user.role == 'DOCTOR') {
-            this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-            return this.calendarService.appointmentCancel(appointmentDto, req.user);
-        }
+    appointmentCancel(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
+        this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+        return this.calendarService.appointmentCancel(appointmentDto, req.user);
     }
 
     @Post('patientSearch')
@@ -298,7 +290,9 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: AppointmentDto})
-    AppointmentView(@Request() req, @Body() appointmentId: AppointmentDto) {
+    AppointmentView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Body() appointmentId: AppointmentDto) {
+        if (!check && !check2)
+            return {message: 'No persmission'}
         this.logger.log(`Doctor List  Api -> Request data ${JSON.stringify(req.user)}`);
         return this.calendarService.AppointmentView(req.user, appointmentId);
     }
