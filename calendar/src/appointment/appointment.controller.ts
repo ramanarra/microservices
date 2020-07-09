@@ -212,7 +212,7 @@ export class AppointmentController {
                 message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
-        var docId = doctor.doctor_id;
+        var docId = doctor.doctorId;
         if(user.role == 'ADMIN' || user.role == 'DOC_ASSISTANT' && user.account_key== doctor.accountKey){
             const docConfig = await this.appointmentService.workScheduleView(docId, user.doctorKey);
             return docConfig;
