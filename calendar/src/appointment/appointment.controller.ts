@@ -26,9 +26,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'calendar_appointment_create'})
     async createAppointment(appointmentDto: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
-        const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
-        var doctorId = docId.doctor_id;
-        appointmentDto.doctorId = doctorId;
+        if(appointmentDto.role == 'DOCTOR'){
+            const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
+            var doctorId = docId.doctorId;
+            appointmentDto.doctorId = doctorId;
+        }
+        
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
@@ -158,15 +161,32 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'app_canresch_view'})
-    async doctorCanReschView(doctorKey: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorCanReschView(doctorKey);
-        return preconsultation;
+    async doctorCanReschView(user: any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == 'DOCTOR' && user.doctor_key == user.doctorKey) || user.account_key == doctor.accountKey){
+            const preconsultation = await this.appointmentService.doctorCanReschView(user.doctorKey);
+            return preconsultation;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        
     }
 
     @MessagePattern({cmd: 'app_doc_config_update'})
-    async doctorConfigUpdate(doctorConfigDto: any): Promise<any> {
-        const docConfig = await this.appointmentService.doctorConfigUpdate(doctorConfigDto);
-        return docConfig;
+    async doctorConfigUpdate(user: any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.docConfigDto.doctorKey);
+        if((user.role == 'DOCTOR' && user.doctor_key == user.docConfigDto.doctorKey) || user.account_key == doctor.accountKey){
+            const docConfig = await this.appointmentService.doctorConfigUpdate(user.docConfigDto);
+            return docConfig;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }   
     }
 
     @MessagePattern({cmd: 'app_work_schedule_edit'})

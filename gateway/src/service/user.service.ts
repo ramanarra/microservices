@@ -82,10 +82,5 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
     }
 
-    public rolesPermission(role : any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'auth_roles_permission'}, role);
-    }
-
-
 
 }

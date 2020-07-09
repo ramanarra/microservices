@@ -62,8 +62,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
 
     @UseFilters(AllClientServiceException)
-    public doctorCanReschView(doctorKey): Observable<any> {
-        return this.redisClient.send({cmd: 'app_canresch_view'}, doctorKey);
+    public doctorCanReschView(user,key): Observable<any> {
+        user.doctorKey = key;
+        return this.redisClient.send({cmd: 'app_canresch_view'}, user);
     }
 
     @UseFilters(AllClientServiceException)
@@ -72,8 +73,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorConfigUpdate(docConfigDto: DocConfigDto, user: any): Observable<any> {
-        return this.redisClient.send({cmd: 'app_doc_config_update'}, docConfigDto);
+    public doctorConfigUpdate(user: any, docConfigDto: any): Observable<any> {
+        user.docConfigDto = docConfigDto;
+        return this.redisClient.send({cmd: 'app_doc_config_update'}, user);
     }
 
     @UseFilters(AllClientServiceException)

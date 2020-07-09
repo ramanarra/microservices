@@ -8,7 +8,7 @@ export class Appointment extends BaseEntity{
     id : number;
 
     @Column({
-        name : 'doctor_id'
+        name : 'doctorId'
     })
     doctorId : number;
 

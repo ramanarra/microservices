@@ -9,7 +9,7 @@ export const queries =  {
      getDocDetails: 'SELECT * from doctor d join doc_config dc on dc."doctor_key"=d."doctor_key" where d."doctor_key" = $1',
      getDocListDetails: 'SELECT * from doctor d join doc_config dc on dc."doctor_key"=d."doctor_key" where d."account_key" = $1',
      getConfig:'SELECT "consultationSessionTimings","overBookingType","overBookingCount","overBookingEnabled" from doc_config where "doctor_key" = $1',
-     getAppointment:'SELECT * FROM appointment WHERE $1 <= "appointment_date" AND "appointment_date" <= $2 AND "doctor_id" = $3',
+     getAppointment:'SELECT * FROM appointment WHERE $1 <= "appointment_date" AND "appointment_date" <= $2 AND "doctorId" = $3',
      getAppointmentOnDate:'SELECT * FROM appointment WHERE "appointment_date" = $1'
 
 

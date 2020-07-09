@@ -59,7 +59,26 @@ export class AppointmentService {
     }
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
-        return await this.appointmentRepository.createAppointment(appointmentDto);
+         const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+         if(app){
+                 // // validate with previous data
+                 let starTime = appointmentDto.startTime;
+                 let endTime = appointmentDto.endTime;
+                 let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                 if (isOverLapping) {
+                     //return error message
+                     return {
+                         statusCode: HttpStatus.NOT_FOUND,
+                         message: 'Time Overlapping with previous Time Interval'
+                     }
+                 } else {
+                     // create appointment on existing date old records
+                     return await this.appointmentRepository.createAppointment(appointmentDto);
+                 }
+         
+      }
+       
+          return await this.appointmentRepository.createAppointment(appointmentDto);
     }
 
     async doctorDetails(doctorKey): Promise<any> {
@@ -77,7 +96,7 @@ export class AppointmentService {
     }
 
     async doctor_Details(doctorId): Promise<any> {
-        return await this.doctorRepository.findOne({doctor_id: doctorId});
+        return await this.doctorRepository.findOne({doctorId: doctorId});
     }
 
 
@@ -343,7 +362,7 @@ export class AppointmentService {
     async appointmentSlotsView(user: any): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
-            var docId = doc.doctor_id;
+            var docId = doc.doctorId;
             // const app = await this.appointmentRepository.find({doctorId:docId});
             const app = await this.appointmentRepository.query(queries.getAppointment, [user.startDate, user.endDate, docId]);
             if (app.length) {
