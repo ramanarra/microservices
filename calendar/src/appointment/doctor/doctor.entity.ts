@@ -5,7 +5,7 @@ import { Exclude } from 'class-transformer';
 export class Doctor extends BaseEntity{
 
     @PrimaryGeneratedColumn({
-        name : 'doctorId'
+        name : 'doctorid'
     })
     doctorId : number;
 
