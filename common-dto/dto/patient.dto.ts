@@ -12,4 +12,6 @@ export class PatientDto {
     phone: string;  
     patientId:number;
     password:string;
+    firstName:string;
+    lastName:string;
   }
