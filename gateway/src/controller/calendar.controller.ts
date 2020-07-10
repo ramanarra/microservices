@@ -66,8 +66,8 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"patientId":"1",\n' +
-            '"startTime": "10:00 AM",\n' +
-            '"endTime": "11:00 AM",\n' +
+            '"startTime": "10:00",\n' +
+            '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
             '}'
     })
@@ -244,8 +244,8 @@ export class CalendarController {
         description: 'requestBody example :   {\n' +
             '"appointmentId":"33",\n' +
             '"patientId":"1",\n' +
-            '"startTime": "10:00 AM",\n' +
-            '"endTime": "11:00 AM",\n' +
+            '"startTime": "10:00",\n' +
+            '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
             '}'
     })

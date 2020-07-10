@@ -371,7 +371,11 @@ export class AppointmentService {
                     if (!appointment[i].is_cancel && appointment[i].is_active) {
                         const patId = appointment[i].patient_id;
                         const pat = await this.patientDetailsRepository.findOne({id: patId});
-                        appointment[i].patientDetails = pat;
+                        let patient ={
+                            id:pat.id,
+                            name:pat.name
+                        }
+                        appointment[i].patientDetails = patient;
                         const pay = await this.paymentDetailsRepository.findOne({appointmentId: appointment[i].id});
                         appointment[i].paymentDetails = pay;
                     }
@@ -409,13 +413,49 @@ export class AppointmentService {
         }
         var pastAppointment = await this.appointmentRepository.update(condition, values);
         //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
-        return await this.appointmentRepository.createAppointment(appointmentDto)
+
+        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+        if(app){
+                // // validate with previous data
+                let starTime = appointmentDto.startTime;
+                let endTime = appointmentDto.endTime;
+                let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                if (isOverLapping) {
+                    //return error message
+                    return {
+                        statusCode: HttpStatus.NOT_FOUND,
+                        message: 'Time Overlapping with previous Time Interval'
+                    }
+                } else {
+                    // create appointment on existing date old records
+                    return await this.appointmentRepository.createAppointment(appointmentDto);
+                }
+        
+        }
+      
+        return await this.appointmentRepository.createAppointment(appointmentDto);
+
+        //return await this.appointmentRepository.createAppointment(appointmentDto)
     }
 
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
-            return appointmentDetails;
+            const pat = await this.patientDetailsRepository.findOne({id: appointmentDetails.patientId});
+            const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            let patient ={
+                id:pat.id,
+                firstName:pat.firstName,
+                lastName:pat.lastName,
+                phone:pat.phone,
+                email:pat.email
+            }
+            let res ={
+                appointmentDetails:appointmentDetails,
+                patientDetails:patient,
+                paymentDetails:pay
+            }
+            return res;
         } catch (e) {
             return {
                 statusCode: HttpStatus.NO_CONTENT,
