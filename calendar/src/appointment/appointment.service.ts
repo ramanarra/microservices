@@ -54,9 +54,6 @@ export class AppointmentService {
     ) {
     }
 
-    async getAppointmentList(doctorId): Promise<Appointment[]> {
-        return await this.appointmentRepository.find({doctorId: doctorId});
-    }
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
          const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})

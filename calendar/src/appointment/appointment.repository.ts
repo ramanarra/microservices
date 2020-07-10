@@ -1,6 +1,7 @@
 import { Repository, EntityRepository } from "typeorm";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Appointment } from "./appointment.entity";
+import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 import { AppointmentDto , DoctorConfigPreConsultationDto} from  "common-dto";
 import { Doctor } from "./doctor/doctor.entity";
 import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfigScheduleInterval.entity";
@@ -29,7 +30,14 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.createdId = appointmentDto.user.userId;
 
         try {
-            return await appointment.save();          
+            const app =  await appointment.save();  
+            const pay = new PaymentDetails();
+            pay.appointmentId = app.id;
+            const payment = await pay.save();
+            return {
+                appointmentdetails:app,
+                paymentDetails:payment
+            };         
         } catch (error) {
             if (error.code === "22007") {
                 this.logger.warn(`appointment date is invalid ${appointment.appointmentDate}`);
