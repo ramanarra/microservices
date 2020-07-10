@@ -26,7 +26,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'calendar_appointment_create'})
     async createAppointment(appointmentDto: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
-        if(appointmentDto.role == 'DOCTOR'){
+        if(appointmentDto.user.role == 'DOCTOR'){
             const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
             var doctorId = docId.doctorId;
             appointmentDto.doctorId = doctorId;
