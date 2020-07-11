@@ -180,7 +180,7 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: DocConfigDto})
-    doctorConfigUpdate(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Body() docConfigDto: DocConfigDto) {
+    doctorConfigUpdate(@selfUserSettingWrite() check: boolean, @accountUsersSettingsWrite() check2: boolean, @Request() req, @Body() docConfigDto: DocConfigDto) {
         if (!check && !check2)
             return {message: 'No persmission'}
         this.logger.log(`Doctor config Update  Api -> Request data ${JSON.stringify(docConfigDto, req.user)}`);
