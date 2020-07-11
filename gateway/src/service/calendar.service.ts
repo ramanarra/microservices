@@ -29,12 +29,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorList(user, key): Observable<any> {
-        var roleKey = {
-            user: user,
-            key: key
-        }
-        return this.redisClient.send({cmd: 'app_doctor_list'}, roleKey);
+    public doctorList(user): Observable<any> {
+        return this.redisClient.send({cmd: 'app_doctor_list'}, user);
     }
 
     @UseFilters(AllClientServiceException)
@@ -65,11 +61,6 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public doctorCanReschView(user,key): Observable<any> {
         user.doctorKey = key;
         return this.redisClient.send({cmd: 'app_canresch_view'}, user);
-    }
-
-    @UseFilters(AllClientServiceException)
-    public appointmentList(doctorKey): Observable<any> {
-        return this.redisClient.send({cmd: 'calendar_appointment_get_list'}, doctorKey);
     }
 
     @UseFilters(AllClientServiceException)
@@ -155,6 +146,17 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public viewAppointmentSlotsForPatient(doctorKey : any, appointmentDate : any) : Observable <any> {
         doctorKey.appointmentDate = appointmentDate;
         return this.redisClient.send({ cmd : 'patient_view_appointment'}, doctorKey);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientPastAppointments(patientId:any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_past_appointments'},patientId);
+    }
+
+    
+    @UseFilters(AllClientServiceException)
+    public patientUpcomingAppointments(patientId:any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},patientId);
     }
 
 
