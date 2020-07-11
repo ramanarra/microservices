@@ -28,6 +28,7 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     doctorsLogin(@Body() userDto : UserDto) {
+    console.log("dotcor login req data =>", userDto)
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc = this.userService.doctorsLogin(userDto);
       return doc;
