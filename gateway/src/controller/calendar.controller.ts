@@ -103,7 +103,7 @@ export class CalendarController {
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: UserDto})
-    doctorView(@selfUserSettingWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() userDto: UserDto) {
+    doctorView(@selfUserSettingRead() check:boolean,@accountUsersSettingsRead() check2:boolean, @Request() req, @Body() userDto: UserDto) {
         if (!check && !check2)
             return {message: 'No persmission'}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
