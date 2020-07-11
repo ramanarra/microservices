@@ -411,7 +411,7 @@ export class AppointmentService {
         var pastAppointment = await this.appointmentRepository.update(condition, values);
         //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
 
-        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate,doctorId:appointmentDto.doctorId})
         if(app){
                 // // validate with previous data
                 let starTime = appointmentDto.startTime;

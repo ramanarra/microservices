@@ -203,72 +203,53 @@ export class AppointmentController {
         return appointment;
     }
 
+    
     @MessagePattern({cmd: 'appointment_reschedule'})
     async appointmentReschedule(appointmentDto: any): Promise<any> {
-        if (appointmentDto.user.role == 'PATIENT') {
-            if (appointmentDto.user.patient_id !== appointmentDto.patientId) {
-                return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message: CONSTANT_MSG.INVALID_REQUEST
-                }
-            }
-            const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
-            return appointment;
-        } else {
-            const doctor = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
-            var docId = doctor.doctor_id;
-            const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId);
-            var doc = Number(app.doctorId);
-            if (docId !== doc) {
-                return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message:  CONSTANT_MSG.INVALID_REQUEST
-                }
-            }
-            appointmentDto.doctorId = docId;
-            const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
-            return appointment;
+    const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+    const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
+    if ((appointmentDto.user.role == 'PATIENT' && (appointmentDto.user.patient_id !== appointmentDto.patientId))||(appointmentDto.user.role == 'DOCTOR' && doctor.doctorId!==Number(app.appointmentDetails.doctorId))||((appointmentDto.user.role == 'ADMIN'||appointmentDto.user.role == 'DOC_ASSISITANT') && (appointmentDto.user.account_key!==doctor.accountKey))) {
+        return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
-
-    @MessagePattern({cmd: 'appointment_cancel'})
-    async appointmentCancel(appointmentDto: any): Promise<any> {
-        try {
-            if (appointmentDto.user.role == 'PATIENT') {
-                const patId = await this.appointmentService.appointmentDetails(appointmentDto.id)
-                var pat = patId.appointmentDetails.patientId;
-                if (appointmentDto.user.patient_id !== pat) {
-                    return {
-                        statusCode: HttpStatus.NO_CONTENT,
-                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-                    }
-                }
-                const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
-                return appointment;
-            } else {
-                const doctor = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
-                if (doctor && doctor.doctorId) {
-                    var docId = doctor.doctorId;
-                }
-                const appId = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
-                if (appId) {
-                    var app = Number(appId.doctorId);
-                }
-                if (docId !== app) {
-                    return {
-                        statusCode: HttpStatus.NO_CONTENT,
-                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-                    }
-                }
-                const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
-                return appointment;
-            }
-        } catch (e) {
+    if(appointmentDto.user.role == 'DOCTOR'){
+        appointmentDto.doctorId = doctor.doctorId;
+        if(!doctor){
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
+    }
+    const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+    return appointment;
+    }
+
+    @MessagePattern({cmd: 'appointment_cancel'})
+    async appointmentCancel(appointmentDto: any): Promise<any> {
+    const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId);
+    if(app.message){
+        return{
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        }
+    }
+    const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+    if(!doctor)
+        return{
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        }
+    if ((appointmentDto.user.role == 'PATIENT' && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == 'DOCTOR' && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == 'ADMIN'||appointmentDto.user.role == 'DOC_ASSISITANT') && (appointmentDto.user.account_key!==doctor.accountKey))) {
+        return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: CONSTANT_MSG.INVALID_REQUEST
+        }
+    }
+    const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+    return appointment;
     }
 
     @MessagePattern({cmd: 'app_patient_search'})
