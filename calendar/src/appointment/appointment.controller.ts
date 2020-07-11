@@ -306,5 +306,16 @@ export class AppointmentController {
         return appointment;
     }
 
+    @MessagePattern({cmd: 'patient_past_appointments'})
+    async patientPastAppointments(patientId:any): Promise<any> {
+        const appointment = await this.appointmentService.patientPastAppointments(patientId);
+        return appointment;
+    }
+
+    @MessagePattern({cmd: 'patient_upcoming_appointments'})
+    async patientUpcomingAppointments(patientId:any): Promise<any> {
+        const appointment = await this.appointmentService.patientUpcomingAppointments(patientId);
+        return appointment;
+    }
 
 }

@@ -354,5 +354,21 @@ export class CalendarController {
         return this.calendarService.viewAppointmentSlotsForPatient(doctorKey, appointmentDate);
     }
 
+    @Get('patientPastAppointments')
+    @ApiOkResponse({description: 'request body example:  1'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    patientPastAppointments(@Request() req,  @Query('patientId') patientId: String) {
+        this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(patientId)}`);
+        return this.calendarService.patientPastAppointments(patientId);
+    }
+
+    @Get('patientUpcomingAppointments')
+    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String) {
+        this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(patientId)}`);
+        return this.calendarService.patientUpcomingAppointments(patientId);
+    }
+
 
 }
