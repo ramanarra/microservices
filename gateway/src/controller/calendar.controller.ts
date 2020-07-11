@@ -89,10 +89,10 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorList(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Query('key') key: String) {
+    doctorList(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req) {
         if (!check && !check2)
             return {message: 'No persmission'}
-        return this.calendarService.doctorList(req.user, key.trim());
+        return this.calendarService.doctorList(req.user);
 
     }
 
@@ -154,15 +154,6 @@ export class CalendarController {
         return this.calendarService.doctorCanReschView(req.user,doctorKey);
     }
 
-    // @Get('appointmentsView')
-    // @ApiOkResponse({description: 'Appointment List'})
-    // @ApiBearerAuth('JWT')
-    // @UseGuards(AuthGuard())
-    // @Roles('doctor', 'patient')
-    // getAppointmentList(@Request() req) {
-    //     this.logger.log(`Appointments are view Api -> Request data ${JSON.stringify(req.user.doctor_key)}`);
-    //     return this.calendarService.appointmentList(req.user.doctor_key);
-    // }
 
     @Post('doctorConfigUpdate')
     @ApiOkResponse({
@@ -361,6 +352,22 @@ export class CalendarController {
     viewAppointmentSlotsForPatient(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorKey)}`);
         return this.calendarService.viewAppointmentSlotsForPatient(doctorKey, appointmentDate);
+    }
+
+    @Get('patientPastAppointments')
+    @ApiOkResponse({description: 'request body example:  1'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    patientPastAppointments(@Request() req,  @Query('patientId') patientId: String) {
+        this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(patientId)}`);
+        return this.calendarService.patientPastAppointments(patientId);
+    }
+
+    @Get('patientUpcomingAppointments')
+    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String) {
+        this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(patientId)}`);
+        return this.calendarService.patientUpcomingAppointments(patientId);
     }
 
 

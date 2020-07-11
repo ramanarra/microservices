@@ -54,9 +54,6 @@ export class AppointmentService {
     ) {
     }
 
-    async getAppointmentList(doctorId): Promise<Appointment[]> {
-        return await this.appointmentRepository.find({doctorId: doctorId});
-    }
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
          const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
@@ -414,7 +411,7 @@ export class AppointmentService {
         var pastAppointment = await this.appointmentRepository.update(condition, values);
         //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
 
-        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate,doctorId:appointmentDto.doctorId})
         if(app){
                 // // validate with previous data
                 let starTime = appointmentDto.startTime;
@@ -627,6 +624,68 @@ export class AppointmentService {
                     }
                 }
                 return appointment;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
+
+    async patientPastAppointments(patientId:any): Promise<any> {
+        try {
+            let d = new Date();
+            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+            const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId,date]);
+            if (app.length) {
+                 var appo:any=[];
+                for (var i = 0; i < app.length; i++) {
+                    if(app[i].appointment_date == date){
+                        if(app[i].is_active == false){
+                            appo.push(app[i]);
+                        }
+                    }else{
+                        appo.push(app[i]);
+                    }
+                } 
+                return appo;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
+
+    async patientUpcomingAppointments(patientId:any): Promise<any> {
+        try {
+            let d = new Date();
+            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [patientId,date]);
+            if (app.length) {
+                 var appo:any=[];
+                for (var i = 0; i < app.length; i++) {
+                    if(app[i].appointment_date == date){
+                        if(app[i].is_active == true){
+                            appo.push(app[i]);
+                        }
+                    }else{
+                        appo.push(app[i]);
+                    }
+                } 
+                return appo;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
