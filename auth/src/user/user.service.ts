@@ -51,7 +51,7 @@ export class UserService {
 
 
     async doctor_Login(email, password): Promise<any> {
-
+        try {
             const user = await this.userRepository.validateEmailAndPassword(email, password);
             console.log("user data  in user.service=>", user)
             if (!user)
@@ -83,6 +83,14 @@ export class UserService {
             user.rolesPermission = rolesPermission;
             user.role = roles.roles;
             return user;
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+         
     }
 
 
@@ -103,23 +111,32 @@ export class UserService {
     }
 
     async patientLogin(email, password): Promise<any> {
+        try {
+            const user = await this.patientRepository.validatePhoneAndPassword(email, password);
+            if (!user)
+                throw new UnauthorizedException("Invalid Credentials");
+            const jwtUserInfo: JwtPatientLoad = {
+                phone: user.phone,
+                patientId: user.patient_id
+            };
+            console.log("=======jwtUserInfo", jwtUserInfo)
+            const accessToken = this.jwtService.sign(jwtUserInfo);
+            user.accessToken = accessToken;
+            return user;
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
 
-        const user = await this.patientRepository.validatePhoneAndPassword(email, password);
-        if (!user)
-            throw new UnauthorizedException("Invalid Credentials");
-        const jwtUserInfo: JwtPatientLoad = {
-            phone: user.phone,
-            patientId: user.patient_id
-        };
-        console.log("=======jwtUserInfo", jwtUserInfo)
-        const accessToken = this.jwtService.sign(jwtUserInfo);
-        user.accessToken = accessToken;
-        return user;
     }
 
 
     async patientRegistration(patientDto: PatientDto): Promise<any> {
-        const pat = await this.findByPhone(patientDto.phone);
+        try {
+            const pat = await this.findByPhone(patientDto.phone);
         if(pat){
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
@@ -127,6 +144,13 @@ export class UserService {
             }
         }
         return await this.patientRepository.patientRegistration(patientDto);
+        } catch (e) {
+	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
     }
 
 
