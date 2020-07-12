@@ -16,6 +16,7 @@ export const CONSTANT_MSG = {
     INVALID_REQUEST:'Invalid request',
     PHONE_EXISTS:"Phone number already exists",
     TIME_OVERLAP:'Time Overlapping with previous Time Interval',
+    NO_PERMISSION:'No Permission',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

@@ -23,12 +23,12 @@ export class Appointment extends BaseEntity{
     appointmentDate : Date;
 
     @Column({
-        name : 'start_time'
+        name : 'startTime'
     })
     startTime : string;
 
     @Column({
-        name : 'end_time'
+        name : 'endTime'
     })
     endTime : string;
 

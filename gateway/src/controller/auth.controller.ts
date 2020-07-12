@@ -28,23 +28,16 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     doctorsLogin(@Body() userDto : UserDto) {
-      if(userDto.email){
-        if(userDto.password){
-          this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
-          const doc = this.userService.doctorsLogin(userDto);
-          return doc;
-        }else{
-          return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: "Provide password"
-          }
-        }
-      }else{
-        return {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: "Provide email"
-        }
+      if(!userDto.email){
+        console.log("Provide email");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
+      }else if(!userDto.password){
+        console.log("Provide password");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      const doc = this.userService.doctorsLogin(userDto);
+      return doc;
     }
 
     @Post('patientLogin')
@@ -55,22 +48,15 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
     patientLogin(@Body() patientDto : PatientDto) {
-      if(patientDto.phone && patientDto.phone.length == 10){
-        if(patientDto.password){
-          this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
-          return this.userService.patientLogin(patientDto);
-        }else{
-          return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: "Provide password"
-          }
-        }
-      }else{
-        return {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: "Provide valid phonenumber"
-        }
+      if(!patientDto.phone || !(patientDto.phone.length == 10)){
+        console.log("Provide Valid Phone");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide Valid Phone"}
+      }else if(!patientDto.password){
+        console.log("Provide password");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }
+      this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
+      return this.userService.patientLogin(patientDto);
     }
 
     @Post('patientRegistration')
@@ -104,7 +90,7 @@ export class AuthController {
       }else{
         return {
           statusCode: HttpStatus.BAD_REQUEST,
-          message: "Provide valid phonenumber"
+          message: "Provide valid phone"
         }
       }
     }
