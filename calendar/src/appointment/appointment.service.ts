@@ -57,11 +57,10 @@ export class AppointmentService {
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
         try {
-            const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+           //const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
             if(app){
                     // // validate with previous data
-                    let starTime = appointmentDto.startTime;
-                    let endTime = appointmentDto.endTime;
                     let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
                     if (isOverLapping) {
                         //return error message
@@ -430,13 +429,10 @@ export class AppointmentService {
                 cancelledId: appointmentDto.user.userId
             }
             var pastAppointment = await this.appointmentRepository.update(condition, values);
-            //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
 
-            const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate,doctorId:appointmentDto.doctorId})
+            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
             if(app){
                     // // validate with previous data
-                    let starTime = appointmentDto.startTime;
-                    let endTime = appointmentDto.endTime;
                     let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
                     if (isOverLapping) {
                         //return error message
