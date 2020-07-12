@@ -28,9 +28,23 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     doctorsLogin(@Body() userDto : UserDto) {
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
-      const doc = this.userService.doctorsLogin(userDto);
-      return doc;
+      if(userDto.email){
+        if(userDto.password){
+          this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+          const doc = this.userService.doctorsLogin(userDto);
+          return doc;
+        }else{
+          return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: "Provide password"
+          }
+        }
+      }else{
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Provide email"
+        }
+      }
     }
 
     @Post('patientLogin')
@@ -41,8 +55,22 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
     patientLogin(@Body() patientDto : PatientDto) {
-      this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
-      return this.userService.patientLogin(patientDto);
+      if(patientDto.phone && patientDto.phone.length == 10){
+        if(patientDto.password){
+          this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
+          return this.userService.patientLogin(patientDto);
+        }else{
+          return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: "Provide password"
+          }
+        }
+      }else{
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Provide valid phonenumber"
+        }
+      }
     }
 
     @Post('patientRegistration')
@@ -61,15 +89,22 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
     async patientRegistration(@Body() patientDto : PatientDto) {
-      this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
-      const patient = await this.userService.patientRegistration(patientDto);
-      if(patient.message){
-        return patient;
-      }else {
-        const details = await this.calendarService.patientInsertion(patientDto,patient.patient_id);
+      if(patientDto.phone && patientDto.phone.length == 10){
+        this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
+        const patient = await this.userService.patientRegistration(patientDto);
+        if(patient.message){
+          return patient;
+        }else {
+          const details = await this.calendarService.patientInsertion(patientDto,patient.patient_id);
+          return {
+            patient:patient,
+            details:details
+          }
+        }
+      }else{
         return {
-          patient:patient,
-          details:details
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Provide valid phonenumber"
         }
       }
     }

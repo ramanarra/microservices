@@ -111,24 +111,24 @@ export class AppointmentController {
     }
 
 
-    @MessagePattern({cmd: 'app_doctor_preconsultation'})
-    async doctorPreconsultation(doctorConfigPreConsultationDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_doctor_preconsultation'})
+    // async doctorPreconsultation(doctorConfigPreConsultationDto: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
+    //     return preconsultation;
+    // }
 
 
-    @MessagePattern({cmd: 'app_hospital_details'})
-    async hospitalDetails(accountKey: any): Promise<any> {
-        const preconsultation = await this.appointmentService.accountDetails(accountKey);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_hospital_details'})
+    // async hospitalDetails(accountKey: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.accountDetails(accountKey);
+    //     return preconsultation;
+    // }
 
-    @MessagePattern({cmd: 'app_canresch_edit'})
-    async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_canresch_edit'})
+    // async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
+    //     return preconsultation;
+    // }
 
     @MessagePattern({cmd: 'app_canresch_view'})
     async doctorCanReschView(user: any): Promise<any> {

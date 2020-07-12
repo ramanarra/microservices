@@ -126,13 +126,13 @@ export class AppointmentService {
         return docConfig;
     }
 
-    async doctorPreconsultation(doctorConfigPreConsultationDto: DoctorConfigPreConsultationDto): Promise<any> {
-        return await this.doctorConfigPreConsultationRepository.doctorPreconsultation(doctorConfigPreConsultationDto);
-    }
+    // async doctorPreconsultation(doctorConfigPreConsultationDto: DoctorConfigPreConsultationDto): Promise<any> {
+    //     return await this.doctorConfigPreConsultationRepository.doctorPreconsultation(doctorConfigPreConsultationDto);
+    // }
 
-    async doctorCanReschEdit(doctorConfigCanReschDto: DoctorConfigCanReschDto): Promise<any> {
-        return await this.doctorConfigCanReschRepository.doctorCanReschEdit(doctorConfigCanReschDto);
-    }
+    // async doctorCanReschEdit(doctorConfigCanReschDto: DoctorConfigCanReschDto): Promise<any> {
+    //     return await this.doctorConfigCanReschRepository.doctorCanReschEdit(doctorConfigCanReschDto);
+    // }
 
     async doctorCanReschView(doctorKey): Promise<any> {
         return await this.doctorConfigCanReschRepository.findOne({doctorKey: doctorKey});
@@ -144,27 +144,35 @@ export class AppointmentService {
     }
 
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
-        // update the doctorConfig details
-        if (!doctorConfigDto.doctorKey) {
+        try {
+                // update the doctorConfig details
+            if (!doctorConfigDto.doctorKey) {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+            var condition = {
+                doctorKey: doctorConfigDto.doctorKey
+            }
+            var values: any = doctorConfigDto;
+            var updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: 'Updated Successfully'
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+	    console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
-        }
-        var condition = {
-            doctorKey: doctorConfigDto.doctorKey
-        }
-        var values: any = doctorConfigDto;
-        var updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
-        if (updateDoctorConfig.affected) {
-            return {
-                statusCode: HttpStatus.OK,
-                message: 'Updated Successfully'
-            }
-        } else {
-            return {
-                statusCode: HttpStatus.NOT_MODIFIED,
-                message: CONSTANT_MSG.UPDATE_FAILED
+                message: CONSTANT_MSG.DB_ERROR
             }
         }
     }
@@ -203,50 +211,58 @@ export class AppointmentService {
     // }
 
     async workScheduleView(doctorId: number, docKey: string): Promise<any> {
-        let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
-        if (docConfig) {
-            let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
-            // format the response
-            docConfig.forEach(v => {
-                if (v.dayOfWeek === 'Monday') {
-                    monday.push(v);
+        try {
+            let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
+            if (docConfig) {
+                let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
+                // format the response
+                docConfig.forEach(v => {
+                    if (v.dayOfWeek === 'Monday') {
+                        monday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Tuesday') {
+                        tuesday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Wednesday') {
+                        wednesday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Thursday') {
+                        thursday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Friday') {
+                        friday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Saturday') {
+                        saturday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Sunday') {
+                        sunday.push(v);
+                    }
+                })
+                const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
+                let config1=config[0];
+                let responseData = {
+                    monday: monday,
+                    tuesday: tuesday,
+                    wednesday: wednesday,
+                    thursday: thursday,
+                    friday: friday,
+                    saturday: saturday,
+                    sunday: sunday,
+                    configDetails: config1
                 }
-                if (v.dayOfWeek === 'Tuesday') {
-                    tuesday.push(v);
+                return responseData;
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
                 }
-                if (v.dayOfWeek === 'Wednesday') {
-                    wednesday.push(v);
-                }
-                if (v.dayOfWeek === 'Thursday') {
-                    thursday.push(v);
-                }
-                if (v.dayOfWeek === 'Friday') {
-                    friday.push(v);
-                }
-                if (v.dayOfWeek === 'Saturday') {
-                    saturday.push(v);
-                }
-                if (v.dayOfWeek === 'Sunday') {
-                    sunday.push(v);
-                }
-            })
-            const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
-            let config1=config[0];
-            let responseData = {
-                monday: monday,
-                tuesday: tuesday,
-                wednesday: wednesday,
-                thursday: thursday,
-                friday: friday,
-                saturday: saturday,
-                sunday: sunday,
-                configDetails: config1
             }
-            return responseData;
-        } else {
+        } catch (e) {
+	    console.log(e);
             return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_REQUEST
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
     }
