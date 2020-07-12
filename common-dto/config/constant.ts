@@ -12,5 +12,11 @@ export const CONSTANT_MSG = {
     APPOINT_CANCELED: 'Appointment Cancelled Successfully',
     DAY_OF_WEEK:'Please enter DayOfWeek Correctly',
     ALREADY_PRESENT:'User already present.Do login',
-    INVALID_REQUEST:'Invalid request'
+    INVALID_REQUEST:'Invalid request',
+    ROLES:{
+        DOCTOR:'DOCTOR',
+        ADMIN:'ADMIN',
+        DOC_ASSISTANT:'DOC_ASSISTANT',
+        PATIENT:'PATIENT'
+    }
 }

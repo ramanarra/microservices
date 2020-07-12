@@ -390,7 +390,7 @@ export class CalendarController {
     @ApiBody({type: DoctorDto})
     findDoctorByCodeOrName(@Request() req, @Body() codeOrName: DoctorDto) {
         if(req.body.codeOrName){
-            this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(req.user)}`);
+            this.logger.log(`Find Doctor Api -> Request data ${JSON.stringify(req.user)}`);
             return this.calendarService.findDoctorByCodeOrName(req.user, codeOrName);
         }else{
             return {
@@ -418,7 +418,7 @@ export class CalendarController {
     @ApiBody({type: PatientDto})
     patientDetailsEdit(@Request() req, @Body() patientDto: PatientDto) {
         if(req.body.patientId){
-            this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(patientDto)}`);
+            this.logger.log(`Patient Details Edit Api -> Request data ${JSON.stringify(patientDto)}`);
             return this.calendarService.patientDetailsEdit(patientDto);
         }else{
             return {
@@ -444,7 +444,7 @@ export class CalendarController {
         if(req.body.doctorId){
             if(req.body.appointmentDate){
                 if(req.body.startTime){
-                    this.logger.log(`Find DOctor Api -> Request data ${JSON.stringify(patientDto)}`);
+                    this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
                     return this.calendarService.patientBookAppointment(patientDto);
                 }else{
                     return {

@@ -586,6 +586,16 @@ export class AppointmentService {
     async patientDetailsEdit(patientDto: any): Promise<any> {
         try {
             const patient = await this.patientDetailsRepository.findOne({id:patientDto.patientId});
+            if(patientDto.phone){
+                let isPhone = await this.isPhoneExists(patientDto.phone);
+                if (isPhone) {
+                    //return error message
+                    return {
+                        statusCode: HttpStatus.NOT_FOUND,
+                        message: 'Phone Number already exists'
+                    }
+                }
+            }
             if(!patient){
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -617,12 +627,7 @@ export class AppointmentService {
             }
         }
 
-    }
-
-
-    async patientBookAppointment(appointmentDto: AppointmentDto): Promise<any> {
-        return await this.appointmentRepository.patientBookAppointment(appointmentDto);
-    }
+    }    
 
     async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
         try {
@@ -724,7 +729,7 @@ export class AppointmentService {
 
       // common functions below===============================================================
 
-      async findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
+    async findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
         // validate with previous data
         let starTime = scheduleTimeInterval.startTime;
         let endTime = scheduleTimeInterval.endTime;
@@ -747,6 +752,14 @@ export class AppointmentService {
         return isOverLapping;
     }
 
+    async isPhoneExists(phone):Promise<any>{
+        let isPhone = false;
+        const number = await this.patientDetailsRepository.findOne({phone: phone});
+        if(number){
+            isPhone = true;
+        }
+        return isPhone;
+    }
 
 
 }
