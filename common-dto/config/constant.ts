@@ -9,10 +9,13 @@ export const CONSTANT_MSG = {
     CONTENT_NOT_AVAILABLE: 'Content Not Available',
     INVALID_MOBILE_NO: 'Invalid mobile Number',
     UPDATE_FAILED: "Updation Failed",
+    UPDATE_OK:"Updated Successfully",
     APPOINT_CANCELED: 'Appointment Cancelled Successfully',
     DAY_OF_WEEK:'Please enter DayOfWeek Correctly',
     ALREADY_PRESENT:'User already present.Do login',
     INVALID_REQUEST:'Invalid request',
+    PHONE_EXISTS:"Phone number already exists",
+    TIME_OVERLAP:'Time Overlapping with previous Time Interval',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',
