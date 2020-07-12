@@ -2,7 +2,7 @@ import { Repository, EntityRepository } from "typeorm";
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Appointment } from "./appointment.entity";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
-import { AppointmentDto , DoctorConfigPreConsultationDto} from  "common-dto";
+import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG} from  "common-dto";
 import { Doctor } from "./doctor/doctor.entity";
 import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfigScheduleInterval.entity";
 import { DocConfigScheduleDay } from "./docConfigScheduleDay/docConfigScheduleDay.entity";
@@ -30,7 +30,7 @@ export class AppointmentRepository extends Repository<Appointment> {
             appointment.createdBy = appointmentDto.user.role;
             appointment.createdId = appointmentDto.user.userId;
         }else{
-            appointment.createdBy = 'PATIENT';
+            appointment.createdBy = CONSTANT_MSG.ROLES.PATIENT;
             appointment.createdId = appointmentDto.patientId;
         }               
 

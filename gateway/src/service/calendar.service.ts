@@ -39,22 +39,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({cmd: 'app_doctor_view'}, user);
     }
 
-    // @UseFilters(AllClientServiceException)
-    // public doctorPreconsultation(doctorConfigPreConsultationDto: any, user: any): Observable<any> {
-    //     doctorConfigPreConsultationDto.user = user;
-    //     return this.redisClient.send({cmd: 'app_doctor_preconsultation'}, doctorConfigPreConsultationDto);
-    // }
-
     @UseFilters(AllClientServiceException)
     public hospitalDetails(accountKey): Observable<any> {
         return this.redisClient.send({cmd: 'app_hospital_details'}, accountKey);
     }
-
-    // @UseFilters(AllClientServiceException)
-    // public doctorCanReschEdit(doctorConfigCanReschDto: any, user: any): Observable<any> {
-    //     doctorConfigCanReschDto.user = user;
-    //     return this.redisClient.send({cmd: 'app_canresch_edit'}, doctorConfigCanReschDto);
-    // }
 
 
     @UseFilters(AllClientServiceException)

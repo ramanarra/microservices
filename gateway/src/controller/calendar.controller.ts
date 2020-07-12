@@ -62,7 +62,7 @@ export class CalendarController {
     }
 
 
-    @Post('docto/createAppointment')
+    @Post('doctor/createAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"patientId":"1",\n' +
