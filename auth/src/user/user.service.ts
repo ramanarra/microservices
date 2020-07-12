@@ -53,6 +53,7 @@ export class UserService {
     async doctor_Login(email, password): Promise<any> {
         try {
             const user = await this.userRepository.validateEmailAndPassword(email, password);
+            console.log("user data  in user.service=>", user)
             if (!user)
                 throw new UnauthorizedException("Invalid Credentials");
 
