@@ -11,6 +11,6 @@ database :
   synchronize : false
   
 JWT :
-  expiresIn : 3600
+  expiresIn : 36000000
   secret : 'topSecret51'
   defaultStrategy : 'jwt'

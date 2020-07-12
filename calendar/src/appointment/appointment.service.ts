@@ -56,26 +56,32 @@ export class AppointmentService {
 
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
-         const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
-         if(app){
-                 // // validate with previous data
-                 let starTime = appointmentDto.startTime;
-                 let endTime = appointmentDto.endTime;
-                 let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
-                 if (isOverLapping) {
-                     //return error message
-                     return {
-                         statusCode: HttpStatus.NOT_FOUND,
-                         message: 'Time Overlapping with previous Time Interval'
-                     }
-                 } else {
-                     // create appointment on existing date old records
-                     return await this.appointmentRepository.createAppointment(appointmentDto);
-                 }
-         
-      }
-       
-          return await this.appointmentRepository.createAppointment(appointmentDto);
+        try {
+            const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate})
+            if(app){
+                    // // validate with previous data
+                    let starTime = appointmentDto.startTime;
+                    let endTime = appointmentDto.endTime;
+                    let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                    if (isOverLapping) {
+                        //return error message
+                        return {
+                            statusCode: HttpStatus.NOT_FOUND,
+                            message: 'Time Overlapping with previous Time Interval'
+                        }
+                    } else {
+                        // create appointment on existing date old records
+                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                    }
+            }        
+            return await this.appointmentRepository.createAppointment(appointmentDto);
+        } catch (e) {
+	    console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
     }
 
     async doctorDetails(doctorKey): Promise<any> {
@@ -83,7 +89,6 @@ export class AppointmentService {
     }
 
     async doctorListDetails(doctorKey): Promise<any> {
-        //  return await this.doctorRepository.findOne({doctorKey: doctorKey});
         let docConfig = await this.docConfigScheduleDayRepository.query(queries.getDocDetails, [doctorKey]);
         return docConfig;
     }
@@ -121,13 +126,13 @@ export class AppointmentService {
         return docConfig;
     }
 
-    async doctorPreconsultation(doctorConfigPreConsultationDto: DoctorConfigPreConsultationDto): Promise<any> {
-        return await this.doctorConfigPreConsultationRepository.doctorPreconsultation(doctorConfigPreConsultationDto);
-    }
+    // async doctorPreconsultation(doctorConfigPreConsultationDto: DoctorConfigPreConsultationDto): Promise<any> {
+    //     return await this.doctorConfigPreConsultationRepository.doctorPreconsultation(doctorConfigPreConsultationDto);
+    // }
 
-    async doctorCanReschEdit(doctorConfigCanReschDto: DoctorConfigCanReschDto): Promise<any> {
-        return await this.doctorConfigCanReschRepository.doctorCanReschEdit(doctorConfigCanReschDto);
-    }
+    // async doctorCanReschEdit(doctorConfigCanReschDto: DoctorConfigCanReschDto): Promise<any> {
+    //     return await this.doctorConfigCanReschRepository.doctorCanReschEdit(doctorConfigCanReschDto);
+    // }
 
     async doctorCanReschView(doctorKey): Promise<any> {
         return await this.doctorConfigCanReschRepository.findOne({doctorKey: doctorKey});
@@ -139,27 +144,35 @@ export class AppointmentService {
     }
 
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
-        // update the doctorConfig details
-        if (!doctorConfigDto.doctorKey) {
+        try {
+                // update the doctorConfig details
+            if (!doctorConfigDto.doctorKey) {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+            var condition = {
+                doctorKey: doctorConfigDto.doctorKey
+            }
+            var values: any = doctorConfigDto;
+            var updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: 'Updated Successfully'
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+	    console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
-        }
-        var condition = {
-            doctorKey: doctorConfigDto.doctorKey
-        }
-        var values: any = doctorConfigDto;
-        var updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
-        if (updateDoctorConfig.affected) {
-            return {
-                statusCode: HttpStatus.OK,
-                message: 'Updated Successfully'
-            }
-        } else {
-            return {
-                statusCode: HttpStatus.NOT_MODIFIED,
-                message: CONSTANT_MSG.UPDATE_FAILED
+                message: CONSTANT_MSG.DB_ERROR
             }
         }
     }
@@ -198,50 +211,58 @@ export class AppointmentService {
     // }
 
     async workScheduleView(doctorId: number, docKey: string): Promise<any> {
-        let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
-        if (docConfig) {
-            let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
-            // format the response
-            docConfig.forEach(v => {
-                if (v.dayOfWeek === 'Monday') {
-                    monday.push(v);
+        try {
+            let docConfig = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [doctorId]);
+            if (docConfig) {
+                let monday = [], tuesday = [], wednesday = [], thursday = [], friday = [], saturday = [], sunday = [];
+                // format the response
+                docConfig.forEach(v => {
+                    if (v.dayOfWeek === 'Monday') {
+                        monday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Tuesday') {
+                        tuesday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Wednesday') {
+                        wednesday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Thursday') {
+                        thursday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Friday') {
+                        friday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Saturday') {
+                        saturday.push(v);
+                    }
+                    if (v.dayOfWeek === 'Sunday') {
+                        sunday.push(v);
+                    }
+                })
+                const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
+                let config1=config[0];
+                let responseData = {
+                    monday: monday,
+                    tuesday: tuesday,
+                    wednesday: wednesday,
+                    thursday: thursday,
+                    friday: friday,
+                    saturday: saturday,
+                    sunday: sunday,
+                    configDetails: config1
                 }
-                if (v.dayOfWeek === 'Tuesday') {
-                    tuesday.push(v);
+                return responseData;
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
                 }
-                if (v.dayOfWeek === 'Wednesday') {
-                    wednesday.push(v);
-                }
-                if (v.dayOfWeek === 'Thursday') {
-                    thursday.push(v);
-                }
-                if (v.dayOfWeek === 'Friday') {
-                    friday.push(v);
-                }
-                if (v.dayOfWeek === 'Saturday') {
-                    saturday.push(v);
-                }
-                if (v.dayOfWeek === 'Sunday') {
-                    sunday.push(v);
-                }
-            })
-            const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
-            let config1=config[0];
-            let responseData = {
-                monday: monday,
-                tuesday: tuesday,
-                wednesday: wednesday,
-                thursday: thursday,
-                friday: friday,
-                saturday: saturday,
-                sunday: sunday,
-                configDetails: config1
             }
-            return responseData;
-        } else {
+        } catch (e) {
+	    console.log(e);
             return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_REQUEST
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
     }
@@ -360,7 +381,6 @@ export class AppointmentService {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             var docId = doc.doctorId;
-            // const app = await this.appointmentRepository.find({doctorId:docId});
             const app = await this.appointmentRepository.query(queries.getAppointment, [user.startDate, user.endDate, docId]);
             if (app.length) {
                 var appointment: any = app;
@@ -393,46 +413,52 @@ export class AppointmentService {
     }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
+        try {
+            
+            if (!appointmentDto.appointmentId) {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+            var condition = {
+                id: appointmentDto.appointmentId
+            }
+            var values: any = {
+                isCancel: true,
+                cancelledBy: appointmentDto.user.role,
+                cancelledId: appointmentDto.user.userId
+            }
+            var pastAppointment = await this.appointmentRepository.update(condition, values);
+            //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
 
-        if (!appointmentDto.appointmentId) {
+            const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate,doctorId:appointmentDto.doctorId})
+            if(app){
+                    // // validate with previous data
+                    let starTime = appointmentDto.startTime;
+                    let endTime = appointmentDto.endTime;
+                    let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                    if (isOverLapping) {
+                        //return error message
+                        return {
+                            statusCode: HttpStatus.NOT_FOUND,
+                            message: 'Time Overlapping with previous Time Interval'
+                        }
+                    } else {
+                        // create appointment on existing date old records
+                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                    }
+            
+            }
+        
+            return await this.appointmentRepository.createAppointment(appointmentDto);
+        } catch (e) {
+	        console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
-                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
-        var condition = {
-            id: appointmentDto.appointmentId
-        }
-        var values: any = {
-            isCancel: true,
-            cancelledBy: appointmentDto.user.role,
-            cancelledId: appointmentDto.user.userId
-        }
-        var pastAppointment = await this.appointmentRepository.update(condition, values);
-        //  return await this.appointmentRepository.appointmentReschedule(appointmentDto);
-
-        const app = await this.appointmentRepository.find({appointmentDate:appointmentDto.appointmentDate,doctorId:appointmentDto.doctorId})
-        if(app){
-                // // validate with previous data
-                let starTime = appointmentDto.startTime;
-                let endTime = appointmentDto.endTime;
-                let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
-                if (isOverLapping) {
-                    //return error message
-                    return {
-                        statusCode: HttpStatus.NOT_FOUND,
-                        message: 'Time Overlapping with previous Time Interval'
-                    }
-                } else {
-                    // create appointment on existing date old records
-                    return await this.appointmentRepository.createAppointment(appointmentDto);
-                }
-        
-        }
-      
-        return await this.appointmentRepository.createAppointment(appointmentDto);
-
-        //return await this.appointmentRepository.createAppointment(appointmentDto)
     }
 
     async appointmentDetails(id: any): Promise<any> {
@@ -517,6 +543,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -530,81 +557,77 @@ export class AppointmentService {
     }
 
 
-    // common functions below===============================================================
-
-    async findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
-        // validate with previous data
-        let starTime = scheduleTimeInterval.startTime;
-        let endTime = scheduleTimeInterval.endTime;
-        let isOverLapping = false;
-        // convert starttime into milliseconds
-        let startTimeMilliSeconds = Helper.getTimeInMilliSeconds(starTime);
-        let endTimeMilliSeconds = Helper.getTimeInMilliSeconds(endTime);
-        // compare the startTime in any previous records, if start time or endTime comes between previous time interval
-        doctorScheduledDays.forEach(v => {
-            let vstartTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.startTime);
-            let vEndTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.endTime);
-            if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
-                isOverLapping = true;
-            } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
-                isOverLapping = true;
-            } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
-                isOverLapping = true;
-            }
-        })
-        return isOverLapping;
-    }
-
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
-        const name = await this.doctorRepository.findOne({doctorName:codeOrName});
-        if(name){
-            return name;
-        }else {
-            const code = await this.doctorRepository.findOne({registrationNumber:codeOrName});
-            if(code){
-                return code;
-            }else{
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        try {
+            const name = await this.doctorRepository.findOne({doctorName:codeOrName});
+            if(name){
+                return name;
+            }else {
+                const code = await this.doctorRepository.findOne({registrationNumber:codeOrName});
+                if(code){
+                    return code;
+                }else{
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    }
                 }
+            }
+        } catch (e) {
+	    console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
 
     }
 
     async patientDetailsEdit(patientDto: any): Promise<any> {
-        const patient = await this.patientDetailsRepository.findOne({id:patientDto.patientId});
-        if(!patient){
+        try {
+            const patient = await this.patientDetailsRepository.findOne({id:patientDto.patientId});
+            if(patientDto.phone){
+                let isPhone = await this.isPhoneExists(patientDto.phone);
+                if (isPhone) {
+                    //return error message
+                    return {
+                        statusCode: HttpStatus.NOT_FOUND,
+                        message: 'Phone Number already exists'
+                    }
+                }
+            }
+            if(!patient){
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }else {
+                var condition = {
+                    id: patientDto.patientId
+                }
+                var values: any = patientDto;
+                var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
+                if (updatePatientDetails.affected) {
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: 'Updated Successfully'
+                    }
+                } else {
+                    return {
+                        statusCode: HttpStatus.NOT_MODIFIED,
+                        message: CONSTANT_MSG.UPDATE_FAILED
+                    }
+                }
+            }
+        } catch (e) {
+	    console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
-        }else {
-            var condition = {
-                id: patientDto.patientId
-            }
-            var values: any = patientDto;
-            var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
-            if (updatePatientDetails.affected) {
-                return {
-                    statusCode: HttpStatus.OK,
-                    message: 'Updated Successfully'
-                }
-            } else {
-                return {
-                    statusCode: HttpStatus.NOT_MODIFIED,
-                    message: CONSTANT_MSG.UPDATE_FAILED
-                }
+                message: CONSTANT_MSG.DB_ERROR
             }
         }
 
-    }
-
-
-    async patientBookAppointment(appointmentDto: AppointmentDto): Promise<any> {
-        return await this.appointmentRepository.patientBookAppointment(appointmentDto);
-    }
+    }    
 
     async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
         try {
@@ -698,6 +721,44 @@ export class AppointmentService {
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
             }
         }
+    }
+
+
+
+
+
+      // common functions below===============================================================
+
+    async findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
+        // validate with previous data
+        let starTime = scheduleTimeInterval.startTime;
+        let endTime = scheduleTimeInterval.endTime;
+        let isOverLapping = false;
+        // convert starttime into milliseconds
+        let startTimeMilliSeconds = Helper.getTimeInMilliSeconds(starTime);
+        let endTimeMilliSeconds = Helper.getTimeInMilliSeconds(endTime);
+        // compare the startTime in any previous records, if start time or endTime comes between previous time interval
+        doctorScheduledDays.forEach(v => {
+            let vstartTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.startTime);
+            let vEndTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.endTime);
+            if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
+                isOverLapping = true;
+            } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
+                isOverLapping = true;
+            } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
+                isOverLapping = true;
+            }
+        })
+        return isOverLapping;
+    }
+
+    async isPhoneExists(phone):Promise<any>{
+        let isPhone = false;
+        const number = await this.patientDetailsRepository.findOne({phone: phone});
+        if(number){
+            isPhone = true;
+        }
+        return isPhone;
     }
 
 

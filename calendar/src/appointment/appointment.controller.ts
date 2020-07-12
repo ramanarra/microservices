@@ -19,10 +19,14 @@ export class AppointmentController {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
         if(appointmentDto.user.role == 'DOCTOR'){
             const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
-            var doctorId = docId.doctorId;
-            appointmentDto.doctorId = doctorId;
-        }
-        
+            if(!docId){
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+            appointmentDto.doctorId = docId.doctorId;
+        }        
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
@@ -91,14 +95,8 @@ export class AppointmentController {
             }
 
             const doctorConfigDetails = await this.appointmentService.getDoctorConfigDetails(user.doctorKey);
-            var accountKey = doctor.accountKey;
-            // check accountKey validation
-            // if (accountKey !== user.account_key)
-            //     throw new UnauthorizedException('Invalid User');
-            //const account = await this.appointmentService.accountDetails(accountKey);
             return {
                 doctorDetails: doctor,
-                // accountDetails: account,
                 configDetails: doctorConfigDetails
             }
         } catch (e) {
@@ -111,24 +109,24 @@ export class AppointmentController {
     }
 
 
-    @MessagePattern({cmd: 'app_doctor_preconsultation'})
-    async doctorPreconsultation(doctorConfigPreConsultationDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_doctor_preconsultation'})
+    // async doctorPreconsultation(doctorConfigPreConsultationDto: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
+    //     return preconsultation;
+    // }
 
 
-    @MessagePattern({cmd: 'app_hospital_details'})
-    async hospitalDetails(accountKey: any): Promise<any> {
-        const preconsultation = await this.appointmentService.accountDetails(accountKey);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_hospital_details'})
+    // async hospitalDetails(accountKey: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.accountDetails(accountKey);
+    //     return preconsultation;
+    // }
 
-    @MessagePattern({cmd: 'app_canresch_edit'})
-    async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
-        return preconsultation;
-    }
+    // @MessagePattern({cmd: 'app_canresch_edit'})
+    // async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
+    //     const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
+    //     return preconsultation;
+    // }
 
     @MessagePattern({cmd: 'app_canresch_view'})
     async doctorCanReschView(user: any): Promise<any> {
@@ -296,7 +294,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
-        const patient = await this.appointmentService.patientBookAppointment(patientDto);
+        const patient = await this.appointmentService.createAppointment(patientDto);
         return patient;
     }
 
