@@ -12,6 +12,7 @@ export const queries =  {
      getAppointment:'SELECT * FROM appointment WHERE $1 <= "appointment_date" AND "appointment_date" <= $2 AND "doctorId" = $3 order by appointment_date',
      getAppointmentOnDate:'SELECT * FROM appointment WHERE "appointment_date" = $1 order by appointment_date',
      getPastAppointment:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 order by appointment_date',
-     getUpcomingAppointment:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 order by appointment_date'
+     getUpcomingAppointment:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 order by appointment_date',
+     getAppointmentForDoctor:'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2'
 
 }

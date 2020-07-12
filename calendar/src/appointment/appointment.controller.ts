@@ -17,34 +17,24 @@ export class AppointmentController {
     @MessagePattern({cmd: 'calendar_appointment_create'})
     async createAppointment(appointmentDto: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
-        if(appointmentDto.user.role == 'DOCTOR'){
+        if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
-            var doctorId = docId.doctorId;
-            appointmentDto.doctorId = doctorId;
-        }
-        
+            if(!docId){
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                }
+            }
+            appointmentDto.doctorId = docId.doctorId;
+        }        
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
 
-
-    // @MessagePattern({cmd: 'auth_doctor_details'})
-    // async doctor_Login(doctorKey): Promise<any> {
-    //     const doctor = await this.appointmentService.doctorDetails(doctorKey);
-    //     var doc = [];
-    //     doc[0] = doctor;
-    //     var accountKey = doctor.accountKey;
-    //     const account = await this.appointmentService.accountDetails(accountKey);
-    //     doc[1] = account;
-    //     return doc;
-
-    // }
-
-
     @MessagePattern({cmd: 'app_doctor_list'})
     async doctorList(user): Promise<any> {
         const account = await this.appointmentService.accountDetails(user.account_key);
-        if (user.role == 'DOCTOR') {
+        if (user.role == CONSTANT_MSG.ROLES.DOCTOR) {
             var docKey = await this.appointmentService.doctorDetails(user.doctor_key);
             docKey.fees = 5000;
             docKey.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
@@ -83,7 +73,7 @@ export class AppointmentController {
                     statusCode: HttpStatus.NOT_FOUND,
                     message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
-            if ((user.role == 'DOCTOR' && user.doctor_key !== user.doctorKey) || (user.role == 'ADMIN' && user.account_key !== doctor.accountKey )|| (user.role == 'DOC_ASSISTANT' && user.account_key !== doctor.accountKey)) {
+            if ((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key !== user.doctorKey) || (user.role == CONSTANT_MSG.ROLES.ADMIN && user.account_key !== doctor.accountKey )|| (user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT && user.account_key !== doctor.accountKey)) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: CONSTANT_MSG.INVALID_REQUEST
@@ -91,14 +81,8 @@ export class AppointmentController {
             }
 
             const doctorConfigDetails = await this.appointmentService.getDoctorConfigDetails(user.doctorKey);
-            var accountKey = doctor.accountKey;
-            // check accountKey validation
-            // if (accountKey !== user.account_key)
-            //     throw new UnauthorizedException('Invalid User');
-            //const account = await this.appointmentService.accountDetails(accountKey);
             return {
                 doctorDetails: doctor,
-                // accountDetails: account,
                 configDetails: doctorConfigDetails
             }
         } catch (e) {
@@ -111,29 +95,11 @@ export class AppointmentController {
     }
 
 
-    @MessagePattern({cmd: 'app_doctor_preconsultation'})
-    async doctorPreconsultation(doctorConfigPreConsultationDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorPreconsultation(doctorConfigPreConsultationDto);
-        return preconsultation;
-    }
-
-
-    @MessagePattern({cmd: 'app_hospital_details'})
-    async hospitalDetails(accountKey: any): Promise<any> {
-        const preconsultation = await this.appointmentService.accountDetails(accountKey);
-        return preconsultation;
-    }
-
-    @MessagePattern({cmd: 'app_canresch_edit'})
-    async doctorCanReschEdit(doctorConfigCanReschDto: any): Promise<any> {
-        const preconsultation = await this.appointmentService.doctorCanReschEdit(doctorConfigCanReschDto);
-        return preconsultation;
-    }
 
     @MessagePattern({cmd: 'app_canresch_view'})
     async doctorCanReschView(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
-        if((user.role == 'DOCTOR' && user.doctor_key == user.doctorKey) || (user.account_key == doctor.accountKey)){
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || (user.account_key == doctor.accountKey)){
             const preconsultation = await this.appointmentService.doctorCanReschView(user.doctorKey);
             return preconsultation;
         }else {
@@ -148,7 +114,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'app_doc_config_update'})
     async doctorConfigUpdate(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.docConfigDto.doctorKey);
-        if((user.role == 'DOCTOR' && user.doctor_key == user.docConfigDto.doctorKey) || (user.account_key == doctor.accountKey)){
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.docConfigDto.doctorKey) || (user.account_key == doctor.accountKey)){
             const docConfig = await this.appointmentService.doctorConfigUpdate(user.docConfigDto);
             return docConfig;
         }else {
@@ -162,7 +128,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'app_work_schedule_edit'})
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
-        if((workScheduleDto.user.role == 'ADMIN' && workScheduleDto.user.account_key == doctor.accountKey) || (workScheduleDto.user.role == 'DOCTOR' && workScheduleDto.user.doctor_key == doctor.doctorKey)){
+        if((workScheduleDto.user.role == CONSTANT_MSG.ROLES.ADMIN && workScheduleDto.user.account_key == doctor.accountKey) || (workScheduleDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && workScheduleDto.user.doctor_key == doctor.doctorKey)){
             const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
             return updateRes;
         }
@@ -183,10 +149,10 @@ export class AppointmentController {
             }
         }
         var docId = doctor.doctorId;
-        if((user.role == 'ADMIN' || user.role == 'DOC_ASSISTANT') && user.account_key == doctor.accountKey){
+        if((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doctor.accountKey){
             const docConfig = await this.appointmentService.workScheduleView(docId, user.doctorKey);
             return docConfig;
-        } else if(user.role == 'DOCTOR' && user.doctor_key == doctor.doctorKey){
+        } else if(user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey){
             const docConfig = await this.appointmentService.workScheduleView(docId, user.doctorKey);
             return docConfig;
         } else{
@@ -208,13 +174,13 @@ export class AppointmentController {
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
     const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
-    if ((appointmentDto.user.role == 'PATIENT' && (appointmentDto.user.patient_id !== appointmentDto.patientId))||(appointmentDto.user.role == 'DOCTOR' && doctor.doctorId!==Number(app.appointmentDetails.doctorId))||((appointmentDto.user.role == 'ADMIN'||appointmentDto.user.role == 'DOC_ASSISITANT') && (appointmentDto.user.account_key!==doctor.accountKey))) {
+    if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== appointmentDto.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && doctor.doctorId!==Number(app.appointmentDetails.doctorId))||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
         return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
-    if(appointmentDto.user.role == 'DOCTOR'){
+    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = doctor.doctorId;
         if(!doctor){
             return {
@@ -242,7 +208,7 @@ export class AppointmentController {
             statusCode: HttpStatus.NO_CONTENT,
             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
         }
-    if ((appointmentDto.user.role == 'PATIENT' && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == 'DOCTOR' && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == 'ADMIN'||appointmentDto.user.role == 'DOC_ASSISITANT') && (appointmentDto.user.account_key!==doctor.accountKey))) {
+    if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
         return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: CONSTANT_MSG.INVALID_REQUEST
@@ -296,7 +262,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
-        const patient = await this.appointmentService.patientBookAppointment(patientDto);
+        const patient = await this.appointmentService.createAppointment(patientDto);
         return patient;
     }
 
