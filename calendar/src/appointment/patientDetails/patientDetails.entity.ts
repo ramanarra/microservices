@@ -75,4 +75,9 @@ export class PatientDetails extends BaseEntity{
     })
     lastName : string;
 
+    @Column({
+        name : 'dateOfBirth'
+    })
+    dateOfBirth : string;
+
 }

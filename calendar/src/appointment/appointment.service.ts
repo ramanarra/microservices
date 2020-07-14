@@ -676,7 +676,8 @@ export class AppointmentService {
     }
 
     async patientList(): Promise<any> {
-        return await this.patientDetailsRepository.find();
+        //return await this.patientDetailsRepository.find();
+        return await this.patientDetailsRepository.query(queries.getPatientList);
     }
 
 
