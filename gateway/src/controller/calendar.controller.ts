@@ -404,5 +404,14 @@ export class CalendarController {
         return this.calendarService.patientUpcomingAppointments(patientId);
     }
 
+    @Get('patient/list')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    patientList() {
+        this.logger.log(`Upcoming Appointment Api -> Request data }`);
+        return this.calendarService.patientList();
+    }
+ 
+
 
 }

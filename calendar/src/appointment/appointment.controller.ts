@@ -284,4 +284,10 @@ export class AppointmentController {
         return appointment;
     }
 
+    @MessagePattern({cmd: 'patient_list'})
+    async patientList(): Promise<any> {
+        const appointment = await this.appointmentService.patientList();
+        return appointment;
+    }
+
 }

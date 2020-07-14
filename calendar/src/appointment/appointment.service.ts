@@ -670,6 +670,10 @@ export class AppointmentService {
         }
     }
 
+    async patientList(): Promise<any> {
+        return await this.patientDetailsRepository.find();
+    }
+
 
 
 
