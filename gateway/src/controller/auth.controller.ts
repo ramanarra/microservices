@@ -64,12 +64,17 @@ export class AuthController {
           '"phone":"9999999992",\n' +
           '"email":"nirmala@gmail.com",\n' +
           '"password": "123456", \n' +
+          '"firstName":"firstName", \n' +
+          '"lastName":"lastName", \n' +
+          '"dateOfBirth":"DOB", \n' +
           '"landmark":"landmark", \n' +
           '"country":"country", \n' +
           '"name":"name", \n' +
           '"address":"address", \n' +
           '"state":"state", \n' +
           '"pincode":"12346", \n' +
+          '"alternateContact":"alternateContact", \n' +
+          '"age":21, \n' +
           '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
@@ -81,7 +86,7 @@ export class AuthController {
         if(patient.message){
           return patient;
         }else {
-          const details = await this.calendarService.patientInsertion(patientDto,patient.patient_id);
+          const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
           return {
             patient:patient,
             details:details
