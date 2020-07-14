@@ -173,20 +173,20 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_reschedule'})
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+        appointmentDto.doctorId = app.appointmentDetails.doctorId;
+    }
     const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
+    if(!doctor){
+        return {
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        }
+    }
     if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== appointmentDto.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && doctor.doctorId!==Number(app.appointmentDetails.doctorId))||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
         return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: CONSTANT_MSG.INVALID_REQUEST
-        }
-    }
-    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-        appointmentDto.doctorId = doctor.doctorId;
-        if(!doctor){
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
         }
     }
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
@@ -281,6 +281,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_upcoming_appointments'})
     async patientUpcomingAppointments(patientId:any): Promise<any> {
         const appointment = await this.appointmentService.patientUpcomingAppointments(patientId);
+        return appointment;
+    }
+
+    @MessagePattern({cmd: 'patient_list'})
+    async patientList(): Promise<any> {
+        const appointment = await this.appointmentService.patientList();
         return appointment;
     }
 

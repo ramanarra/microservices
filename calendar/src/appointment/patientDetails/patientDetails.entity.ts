@@ -28,7 +28,7 @@ export class PatientDetails extends BaseEntity{
     @Column({
         name : 'registration_number'
     })
-    registrationNumber : number;
+    registrationNumber : string;
 
     @Column({
         name : 'address'
@@ -74,5 +74,20 @@ export class PatientDetails extends BaseEntity{
         name : 'lastName'
     })
     lastName : string;
+
+    @Column({
+        name : 'dateOfBirth'
+    })
+    dateOfBirth : string;
+
+    @Column({
+        name : 'alternateContact'
+    })
+    alternateContact : string;
+
+    @Column({
+        name : 'age'
+    })
+    age : number;
 
 }

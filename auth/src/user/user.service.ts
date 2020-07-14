@@ -54,9 +54,13 @@ export class UserService {
         try {
             const user = await this.userRepository.validateEmailAndPassword(email, password);
             console.log("user data  in user.service=>", user)
-            if (!user)
-                throw new UnauthorizedException("Invalid Credentials");
-
+            if (user.message == CONSTANT_MSG.INVALID_CREDENTIALS){
+                 // throw new UnauthorizedException("Invalid Credentials");
+                 return{
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_CREDENTIALS
+                }
+            }
             var accountId = user.account_id;
             var accountData = await this.accountKey(accountId);
             user.account_key = accountData.account_key;
@@ -113,8 +117,13 @@ export class UserService {
     async patientLogin(email, password): Promise<any> {
         try {
             const user = await this.patientRepository.validatePhoneAndPassword(email, password);
-            if (!user)
-                throw new UnauthorizedException("Invalid Credentials");
+            if (!user){
+               // throw new UnauthorizedException("Invalid Credentials");
+                return{
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_CREDENTIALS
+                }
+            }
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id

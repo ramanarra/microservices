@@ -338,7 +338,8 @@ export class CalendarController {
             '"name":"name", \n' +
             '"address":"address", \n' +
             '"state":"state", \n' +
-            '"pincode":"12346", \n' +
+            '"pincode":"pincode", \n' +
+            '"dateOfBirth":"dateOfBirth", \n' +
             '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
             '}'
     })
@@ -403,6 +404,17 @@ export class CalendarController {
         this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(patientId)}`);
         return this.calendarService.patientUpcomingAppointments(patientId);
     }
+
+    @Get('doctor/patientList')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    patientList() {
+        this.logger.log(`Upcoming Appointment Api -> Request data }`);
+        return this.calendarService.patientList();
+    }
+ 
 
 
 }

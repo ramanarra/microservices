@@ -14,4 +14,7 @@ export class PatientDto {
     password:string;
     firstName:string;
     lastName:string;
+    dateOfBirth:string;
+    alternateContact:string;
+    age:number;
   }

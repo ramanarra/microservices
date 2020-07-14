@@ -25,6 +25,14 @@ export class PatientDetailsRepository extends Repository<PatientDetails> {
         patient.pincode = patientDto.pincode;
         patient.email = patientDto.email;
         patient.photo = patientDto.photo;
+        patient.registrationNumber= patientDto.registrationNumber;
+        patient.phone = patientDto.phone;
+        patient.firstName = patientDto.firstName;
+        patient.lastName = patientDto.lastName;
+        patient.dateOfBirth = patientDto.dateOfBirth;
+        patient.alternateContact = patientDto.alternateContact;
+        patient.age = patientDto.age;
+ 
 
         try {
             return await patient.save();          
