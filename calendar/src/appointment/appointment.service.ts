@@ -369,6 +369,37 @@ export class AppointmentService {
         }
     }
 
+    // async appointmentSlotsView(user: any): Promise<any> {
+    //     try {
+    //         const doc = await this.doctorDetails(user.doctorKey);
+    //         var docId = doc.doctorId;
+    //         const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
+    //         if(app.length){
+    //             const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+    //             let consultSession = config.consultationSessionTimings;
+    //             let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
+    //             var schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
+    //             var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    //             schInterval.forEach(sch => {
+    //                 let start = sch.startTime;
+    //                 if(start <= sch.endTime){
+
+    //                 }
+                    
+    //             });
+                
+    //             var d = new Date('date');
+    //             var dayName = days[d.getDay()];
+
+    //         }
+    //     } catch (e) {
+    //         return {
+    //             statusCode: HttpStatus.NO_CONTENT,
+    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+    //         }
+    //     }
+    // }
+
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
 
