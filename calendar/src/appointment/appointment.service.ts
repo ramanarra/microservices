@@ -371,15 +371,6 @@ export class AppointmentService {
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
-            var condition = {
-                id: appointmentDto.appointmentId
-            }
-            var values: any = {
-                isCancel: true,
-                cancelledBy: appointmentDto.user.role,
-                cancelledId: appointmentDto.user.userId
-            }
-            var pastAppointment = await this.appointmentRepository.update(condition, values);
 
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
             if(app){
@@ -392,8 +383,14 @@ export class AppointmentService {
                             message:  CONSTANT_MSG.TIME_OVERLAP
                         }
                     } else {
-                        // create appointment on existing date old records
-                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                        //cancelling current appointment
+                        var isCancel = await this.appointmentCancel(appointmentDto);
+                        if(isCancel.message == CONSTANT_MSG.APPOINT_ALREADY_CANCELLED){
+                            return isCancel;
+                        }else{
+                            // create appointment on existing date old records
+                            return await this.appointmentRepository.createAppointment(appointmentDto);
+                        }                       
                     }
             
             }
@@ -442,10 +439,18 @@ export class AppointmentService {
                     message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
             }
+            var appoint=await this.appointmentRepository.findOne({id:appointmentDto.appointmentId});
+            if(appoint.isCancel == true){
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.APPOINT_ALREADY_CANCELLED
+                }
+            }
             var condition = {
                 id: appointmentDto.appointmentId
             }
             var values: any = {
+                isActive:false,
                 isCancel: true,
                 cancelledBy: appointmentDto.user.role,
                 cancelledId: appointmentDto.user.userId
@@ -614,16 +619,16 @@ export class AppointmentService {
             var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
             const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId,date]);
             if (app.length) {
-                 var appo:any=[];
-                for (var i = 0; i < app.length; i++) {
-                    if(app[i].appointment_date == date){
-                        if(app[i].is_active == false){
-                            appo.push(app[i]);
+                var appo:any=[];
+                app.forEach(a => {
+                    if(a.appointment_date == date){
+                        if(a.is_active == false){
+                            appo.push(a);
                         }
                     }else{
-                        appo.push(app[i]);
+                        appo.push(a);
                     }
-                } 
+                });
                 return appo;
             } else {
                 return {

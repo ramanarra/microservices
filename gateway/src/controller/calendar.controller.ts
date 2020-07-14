@@ -338,7 +338,7 @@ export class CalendarController {
             '"name":"name", \n' +
             '"address":"address", \n' +
             '"state":"state", \n' +
-            '"pincode":"12346", \n' +
+            '"pincode":"pincode", \n' +
             '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
             '}'
     })

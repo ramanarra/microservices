@@ -1,8 +1,8 @@
 import { Repository, EntityRepository } from "typeorm";
 import { Users } from "./users.entity";
-import { UserDto,PatientDto } from "common-dto";
+import { UserDto,PatientDto,CONSTANT_MSG } from "common-dto";
 import * as bcrypt from "bcrypt";
-import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
+import { ConflictException, InternalServerErrorException, Logger ,HttpStatus} from "@nestjs/common";
 
 @EntityRepository(Users)
 export class UserRepository extends Repository<Users> {
@@ -57,7 +57,11 @@ export class UserRepository extends Repository<Users> {
             return user;
         }else {
             console.log("===",JSON.stringify(user))
-            return null;
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_CREDENTIALS
+            }
+            //return null;
         }
 
     }

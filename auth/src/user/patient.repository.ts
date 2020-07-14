@@ -1,9 +1,9 @@
 import { Repository, EntityRepository } from "typeorm";
 import { Users } from "./users.entity";
 import { Account } from "./account.entity";
-import { UserDto,PatientDto } from "common-dto";
+import { UserDto,PatientDto,CONSTANT_MSG } from "common-dto";
 import * as bcrypt from "bcrypt";
-import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
+import { ConflictException, InternalServerErrorException, Logger,HttpStatus } from "@nestjs/common";
 import { Patient } from "./patient.entity";
 
 @EntityRepository(Patient)
@@ -46,7 +46,11 @@ export class PatientRepository extends Repository<Patient> {
             return patient;
         }else {
             console.log("===",JSON.stringify(patient))
-            return null;
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_CREDENTIALS
+            }
+           // return null;
         }
 
     }

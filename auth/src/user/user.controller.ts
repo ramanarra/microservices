@@ -44,6 +44,12 @@ export class UserController {
     async doctorLogin(doctorDto: any): Promise<any> {
         const {email, password} = doctorDto;
         const doctor = await this.userService.doctor_Login(email, password);
+        if(doctor.message == CONSTANT_MSG.INVALID_CREDENTIALS){
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_CREDENTIALS
+            }
+        }
         return {
             "doctorKey": doctor.doctor_key,
             "accountKey": doctor.account_key,
@@ -57,6 +63,12 @@ export class UserController {
     async patientLogin(patientDto: any): Promise<any> {
         const {phone, password} = patientDto;
         const doctor = await this.userService.patientLogin(phone, password);
+        if(doctor.message == CONSTANT_MSG.INVALID_CREDENTIALS){
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_CREDENTIALS
+            }
+        }
         return {
             "accessToken": doctor.accessToken,
             "patientId":doctor.patient_id
