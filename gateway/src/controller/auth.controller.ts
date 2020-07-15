@@ -1,4 +1,16 @@
-import { Controller,HttpStatus, Body, Param, Query, Post, Get, Put, UseFilters, Logger } from '@nestjs/common';
+import {
+  Controller,
+  HttpStatus,
+  Body,
+  Param,
+  Query,
+  Post,
+  Get,
+  Put,
+  UseFilters,
+  Logger,
+  ValidationPipe, UsePipes
+} from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import { UserDto, DoctorDto, PatientDto,CONSTANT_MSG } from 'common-dto';
@@ -79,6 +91,7 @@ export class AuthController {
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
+    @UsePipes(new ValidationPipe({ transform: true }))
     async patientRegistration(@Body() patientDto : PatientDto) {
       if(patientDto.phone && patientDto.phone.length == 10){
         this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
