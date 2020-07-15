@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG,queries
+    PatientDto, CONSTANT_MSG, queries
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -57,24 +57,24 @@ export class AppointmentService {
 
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
         try {
-            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
-            if(app){
-                    // // validate with previous data
-                    let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
-                    if (isOverLapping) {
-                        //return error message
-                        return {
-                            statusCode: HttpStatus.NOT_FOUND,
-                            message: CONSTANT_MSG.TIME_OVERLAP
-                        }
-                    } else {
-                        // create appointment on existing date old records
-                        return await this.appointmentRepository.createAppointment(appointmentDto);
+            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
+            if (app) {
+                // // validate with previous data
+                let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                if (isOverLapping) {
+                    //return error message
+                    return {
+                        statusCode: HttpStatus.NOT_FOUND,
+                        message: CONSTANT_MSG.TIME_OVERLAP
                     }
-            }        
+                } else {
+                    // create appointment on existing date old records
+                    return await this.appointmentRepository.createAppointment(appointmentDto);
+                }
+            }
             return await this.appointmentRepository.createAppointment(appointmentDto);
         } catch (e) {
-	    console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
@@ -135,7 +135,7 @@ export class AppointmentService {
 
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
         try {
-                // update the doctorConfig details
+            // update the doctorConfig details
             if (!doctorConfigDto.doctorKey) {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -159,7 +159,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
-	    console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
@@ -197,7 +197,7 @@ export class AppointmentService {
                     }
                 })
                 const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
-                let config1=config[0];
+                let config1 = config[0];
                 let responseData = {
                     monday: monday,
                     tuesday: tuesday,
@@ -216,7 +216,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
-	    console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -269,7 +269,7 @@ export class AppointmentService {
                             // no records, so cant update
                             return {
                                 statusCode: HttpStatus.NO_CONTENT,
-                                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                             }
                         }
                     }
@@ -277,7 +277,8 @@ export class AppointmentService {
                     // if scheduletimeid is not there  then new insert new records then
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
-                    let scheduleDayId = scheduleTimeInterval.scheduledayid;;
+                    let scheduleDayId = scheduleTimeInterval.scheduledayid;
+                    ;
                     let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
@@ -334,7 +335,7 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async oldappointmentSlotsView(user: any): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             var docId = doc.doctorId;
@@ -345,9 +346,9 @@ export class AppointmentService {
                     if (!appointment[i].is_cancel && appointment[i].is_active) {
                         const patId = appointment[i].patient_id;
                         const pat = await this.patientDetailsRepository.findOne({id: patId});
-                        let patient ={
-                            id:pat.id,
-                            name:pat.name
+                        let patient = {
+                            id: pat.id,
+                            name: pat.name
                         }
                         appointment[i].patientDetails = patient;
                         const pay = await this.paymentDetailsRepository.findOne({appointmentId: appointment[i].id});
@@ -369,66 +370,70 @@ export class AppointmentService {
         }
     }
 
-    // async appointmentSlotsView(user: any): Promise<any> {
-    //     try {
-    //         const doc = await this.doctorDetails(user.doctorKey);
-    //         var docId = doc.doctorId;
-    //         const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
-    //         if(app.length){
-    //             const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-    //             let consultSession = config.consultationSessionTimings;
-    //             let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
-    //             var schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
-    //             var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    //             schInterval.forEach(sch => {
-    //                 let start = sch.startTime;
-    //                 if(start <= sch.endTime){
 
-    //                 }
-                    
-    //             });
-                
-    //             var d = new Date('date');
-    //             var dayName = days[d.getDay()];
+    async appointmentSlotsView(user: any): Promise<any> {
+        try {
+            let doc = await this.doctorDetails(user.doctorKey);
+            let docId = doc.doctorId;
+            let appointmentSlots = [];
+            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
+            if (appointmentDates && appointmentDates.length) {
+                let appDate =  appointmentDates[0].appointment_date;
+                console.log('date=>', appDate.getDate(), 'monthh--->', appDate.getMonth())
 
-    //         }
-    //     } catch (e) {
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-    //         }
-    //     }
-    // }
+
+            }
+            let todayDay = new Date();
+            console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
+
+
+            // if(app.length){
+            //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+            //     let consultSession = config.consultationSessionTimings;
+            //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
+            //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
+            //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            //
+            //
+            // }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
 
-            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
-            if(app){
-                    // // validate with previous data
-                    let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
-                    if (isOverLapping) {
-                        //return error message
-                        return {
-                            statusCode: HttpStatus.NOT_FOUND,
-                            message:  CONSTANT_MSG.TIME_OVERLAP
-                        }
-                    } else {
-                        //cancelling current appointment
-                        var isCancel = await this.appointmentCancel(appointmentDto);
-                        if(isCancel.message == CONSTANT_MSG.APPOINT_ALREADY_CANCELLED){
-                            return isCancel;
-                        }else{
-                            // create appointment on existing date old records
-                            return await this.appointmentRepository.createAppointment(appointmentDto);
-                        }                       
+            const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
+            if (app) {
+                // // validate with previous data
+                let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
+                if (isOverLapping) {
+                    //return error message
+                    return {
+                        statusCode: HttpStatus.NOT_FOUND,
+                        message: CONSTANT_MSG.TIME_OVERLAP
                     }
-            
+                } else {
+                    //cancelling current appointment
+                    var isCancel = await this.appointmentCancel(appointmentDto);
+                    if (isCancel.message == CONSTANT_MSG.APPOINT_ALREADY_CANCELLED) {
+                        return isCancel;
+                    } else {
+                        // create appointment on existing date old records
+                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                    }
+                }
+
             }
-        
+
             return await this.appointmentRepository.createAppointment(appointmentDto);
         } catch (e) {
-	        console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -441,17 +446,17 @@ export class AppointmentService {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
             const pat = await this.patientDetailsRepository.findOne({id: appointmentDetails.patientId});
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
-            let patient ={
-                id:pat.id,
-                firstName:pat.firstName,
-                lastName:pat.lastName,
-                phone:pat.phone,
-                email:pat.email
+            let patient = {
+                id: pat.id,
+                firstName: pat.firstName,
+                lastName: pat.lastName,
+                phone: pat.phone,
+                email: pat.email
             }
-            let res ={
-                appointmentDetails:appointmentDetails,
-                patientDetails:patient,
-                paymentDetails:pay
+            let res = {
+                appointmentDetails: appointmentDetails,
+                patientDetails: patient,
+                paymentDetails: pay
             }
             return res;
         } catch (e) {
@@ -470,8 +475,8 @@ export class AppointmentService {
                     message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
             }
-            var appoint=await this.appointmentRepository.findOne({id:appointmentDto.appointmentId});
-            if(appoint.isCancel == true){
+            var appoint = await this.appointmentRepository.findOne({id: appointmentDto.appointmentId});
+            if (appoint.isCancel == true) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: CONSTANT_MSG.APPOINT_ALREADY_CANCELLED
@@ -481,7 +486,7 @@ export class AppointmentService {
                 id: appointmentDto.appointmentId
             }
             var values: any = {
-                isActive:false,
+                isActive: false,
                 isCancel: true,
                 cancelledBy: appointmentDto.user.role,
                 cancelledId: appointmentDto.user.userId
@@ -535,21 +540,21 @@ export class AppointmentService {
 
     }
 
-    async patientRegistration(patientDto:PatientDto): Promise<any> {
+    async patientRegistration(patientDto: PatientDto): Promise<any> {
         return await this.patientDetailsRepository.patientRegistration(patientDto);
     }
 
 
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
-            const name = await this.doctorRepository.findOne({doctorName:codeOrName});
-            if(name){
+            const name = await this.doctorRepository.findOne({doctorName: codeOrName});
+            if (name) {
                 return name;
-            }else {
-                const code = await this.doctorRepository.findOne({registrationNumber:codeOrName});
-                if(code){
+            } else {
+                const code = await this.doctorRepository.findOne({registrationNumber: codeOrName});
+                if (code) {
                     return code;
-                }else{
+                } else {
                     return {
                         statusCode: HttpStatus.NO_CONTENT,
                         message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -557,7 +562,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
-	    console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -568,8 +573,8 @@ export class AppointmentService {
 
     async patientDetailsEdit(patientDto: any): Promise<any> {
         try {
-            const patient = await this.patientDetailsRepository.findOne({id:patientDto.patientId});
-            if(patientDto.phone){
+            const patient = await this.patientDetailsRepository.findOne({id: patientDto.patientId});
+            if (patientDto.phone) {
                 let isPhone = await this.isPhoneExists(patientDto.phone);
                 if (isPhone) {
                     //return error message
@@ -579,12 +584,12 @@ export class AppointmentService {
                     }
                 }
             }
-            if(!patient){
+            if (!patient) {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
                     message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
-            }else {
+            } else {
                 var condition = {
                     id: patientDto.patientId
                 }
@@ -603,14 +608,14 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
-	    console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
             }
         }
 
-    }    
+    }
 
     async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
         try {
@@ -644,19 +649,19 @@ export class AppointmentService {
         }
     }
 
-    async patientPastAppointments(patientId:any): Promise<any> {
+    async patientPastAppointments(patientId: any): Promise<any> {
         try {
             let d = new Date();
-            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-            const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId,date]);
+            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId, date]);
             if (app.length) {
-                var appo:any=[];
+                var appo: any = [];
                 app.forEach(a => {
-                    if(a.appointment_date == date){
-                        if(a.is_active == false){
+                    if (a.appointment_date == date) {
+                        if (a.is_active == false) {
                             appo.push(a);
                         }
-                    }else{
+                    } else {
                         appo.push(a);
                     }
                 });
@@ -675,22 +680,22 @@ export class AppointmentService {
         }
     }
 
-    async patientUpcomingAppointments(patientId:any): Promise<any> {
+    async patientUpcomingAppointments(patientId: any): Promise<any> {
         try {
             let d = new Date();
-            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [patientId,date]);
+            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [patientId, date]);
             if (app.length) {
-                 var appo:any=[];
+                var appo: any = [];
                 for (var i = 0; i < app.length; i++) {
-                    if(app[i].appointment_date == date){
-                        if(app[i].is_active == true){
+                    if (app[i].appointment_date == date) {
+                        if (app[i].is_active == true) {
                             appo.push(app[i]);
                         }
-                    }else{
+                    } else {
                         appo.push(app[i]);
                     }
-                } 
+                }
                 return appo;
             } else {
                 return {
@@ -712,10 +717,7 @@ export class AppointmentService {
     }
 
 
-
-
-
-      // common functions below===============================================================
+    // common functions below===============================================================
 
     async findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
         // validate with previous data
@@ -740,10 +742,10 @@ export class AppointmentService {
         return isOverLapping;
     }
 
-    async isPhoneExists(phone):Promise<any>{
+    async isPhoneExists(phone): Promise<any> {
         let isPhone = false;
         const number = await this.patientDetailsRepository.findOne({phone: phone});
-        if(number){
+        if (number) {
             isPhone = true;
         }
         return isPhone;
