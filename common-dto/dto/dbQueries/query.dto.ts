@@ -16,6 +16,7 @@ export const queries = {
     getAppointmentForDoctor: 'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2',
     getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >= current_date group by appointment_date limit 7',
     getListOfAppointmentFromDates : 'select * from appointment where "doctorId" = $1 and  appointment_date in $2 order by appointment_date',
-    getPatientList:'SELECT "firstName","lastName","email","phone","dateOfBirth" FROM patient_details'
+    getPatientList:'SELECT "firstName","lastName","email","phone","dateOfBirth" FROM patient_details',
+    getAppList:'select * from appointment  where "doctorId" = $1 and appointment_date >= $2 group by appointment_date limit 7'
 
 }
