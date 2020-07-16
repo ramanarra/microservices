@@ -373,6 +373,7 @@ export class AppointmentService {
     async appointmentSlotsView(user: any): Promise<any> {
         try {
             let paginationLimit = 0; // should get from request
+            paginationLimit = paginationLimit * 7;
             let doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let appointmentSlots = [];
