@@ -373,13 +373,14 @@ export class AppointmentService {
 
     async appointmentSlotsView(user: any): Promise<any> {
         try {
+            let paginationLimit = 0; // should get from request
             let doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let appointmentSlots = [];
-            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
+            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
             if (appointmentDates && appointmentDates.length) {
                 let appDate =  appointmentDates[0].appointment_date;
-                console.log('date=>', appDate.getDate(), 'monthh--->', appDate.getMonth())
+                console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
 
 
             }
