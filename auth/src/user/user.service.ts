@@ -124,6 +124,9 @@ export class UserService {
                     message: CONSTANT_MSG.INVALID_CREDENTIALS
                 }
             }
+            if(user.message){
+                return user
+            }
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id

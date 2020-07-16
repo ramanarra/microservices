@@ -1,7 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {CONSTANT_MSG, queries} from 'common-dto';
+import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
 
 
@@ -288,6 +288,21 @@ export class AppointmentController {
     async patientList(): Promise<any> {
         const appointment = await this.appointmentService.patientList();
         return appointment;
+    }
+
+    @MessagePattern({cmd: 'doctor_details_edit'})
+    async doctorPersonalSettingsEdit(user:any): Promise<any> {
+        const doc = await this.appointmentService.doctor_Details(user.doctorDto.doctorId);
+        if(doc.doctorKey == user.doctor_key){
+            const doctor = await this.appointmentService.doctorPersonalSettingsEdit(user.doctorDto);
+            return doctor;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        
     }
 
 }
