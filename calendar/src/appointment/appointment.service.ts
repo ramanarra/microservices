@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG,queries
+    PatientDto, CONSTANT_MSG,queries, DoctorDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -58,6 +58,7 @@ export class AppointmentService {
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
         try {
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
+            const config = await this.doctorConfigRepository 
             if(app){
                     // // validate with previous data
                     let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
@@ -715,6 +716,33 @@ export class AppointmentService {
     async patientList(): Promise<any> {
         //return await this.patientDetailsRepository.find();
         return await this.patientDetailsRepository.query(queries.getPatientList);
+    }
+
+    async doctorPersonalSettingsEdit(doctorDto:DoctorDto): Promise<any> {
+       try {
+            var condition = {
+                doctorId: doctorDto.doctorId
+            }
+            var values: any = doctorDto;
+            var updateDoctorConfig = await this.doctorRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.UPDATE_OK
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+
     }
 
 

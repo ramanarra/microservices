@@ -1,6 +1,8 @@
-import {IsEmail} from 'class-validator';
+import {IsEmail,IsNumber,IsPhoneNumber,IsOptional } from 'class-validator';
 
 export class PatientDto {
+    @IsOptional ()
+    @IsNumber()
     id: number;
     name: string;
     landmark: string;
@@ -9,10 +11,15 @@ export class PatientDto {
     address: string;
     state: string;
     pincode: string;
+    @IsOptional ()
     @IsEmail()
     email: string;
     photo: string;
+    @IsOptional ()
+    @IsPhoneNumber('IN')
     phone: string;
+    @IsOptional ()
+    @IsNumber()
     patientId: number;
     password: string;
     firstName: string;

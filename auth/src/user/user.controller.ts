@@ -63,11 +63,8 @@ export class UserController {
     async patientLogin(patientDto: any): Promise<any> {
         const {phone, password} = patientDto;
         const doctor = await this.userService.patientLogin(phone, password);
-        if(doctor.message == CONSTANT_MSG.INVALID_CREDENTIALS){
-            return{
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_CREDENTIALS
-            }
+        if(doctor.message ){
+            return{doctor}
         }
         return {
             "accessToken": doctor.accessToken,
