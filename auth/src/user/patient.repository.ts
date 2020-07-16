@@ -42,13 +42,19 @@ export class PatientRepository extends Repository<Patient> {
 
     async validatePhoneAndPassword(phone,password) : Promise<any> {
         const patient = await this.findOne({phone : phone});
+        if(!patient){
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_PHONE
+            }
+        }
         if(patient && await patient.validatePassword(password)){
             return patient;
         }else {
             console.log("===",JSON.stringify(patient))
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_CREDENTIALS
+                message: CONSTANT_MSG.INVALID_PASSWORD
             }
            // return null;
         }

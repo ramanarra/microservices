@@ -18,6 +18,8 @@ export const CONSTANT_MSG = {
     TIME_OVERLAP:'Time Overlapping with previous Time Interval',
     APPOINT_ALREADY_CANCELLED:'Appointment already Cancelled',
     NO_PERMISSION:'No Permission',
+    INVALID_PHONE:'Invalid Phone',
+    INVALID_PASSWORD:'Invalid Password',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

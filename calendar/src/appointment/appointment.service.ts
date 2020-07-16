@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG,queries
+    PatientDto, CONSTANT_MSG,queries, DoctorDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -58,6 +58,7 @@ export class AppointmentService {
     async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
         try {
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate,appointmentDto.doctorId]);
+            const config = await this.doctorConfigRepository 
             if(app){
                     // // validate with previous data
                     let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
@@ -277,7 +278,7 @@ export class AppointmentService {
                     // if scheduletimeid is not there  then new insert new records then
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
-                    let scheduleDayId = scheduleTimeInterval.scheduledayid;;
+                    let scheduleDayId = scheduleTimeInterval.scheduledayid;
                     let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
@@ -334,7 +335,7 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async oldappointmentSlotsView(user: any): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             var docId = doc.doctorId;
@@ -345,9 +346,9 @@ export class AppointmentService {
                     if (!appointment[i].is_cancel && appointment[i].is_active) {
                         const patId = appointment[i].patient_id;
                         const pat = await this.patientDetailsRepository.findOne({id: patId});
-                        let patient ={
-                            id:pat.id,
-                            name:pat.name
+                        let patient = {
+                            id: pat.id,
+                            name: pat.name
                         }
                         appointment[i].patientDetails = patient;
                         const pay = await this.paymentDetailsRepository.findOne({appointmentId: appointment[i].id});
@@ -369,36 +370,42 @@ export class AppointmentService {
         }
     }
 
-    // async appointmentSlotsView(user: any): Promise<any> {
-    //     try {
-    //         const doc = await this.doctorDetails(user.doctorKey);
-    //         var docId = doc.doctorId;
-    //         const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
-    //         if(app.length){
-    //             const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-    //             let consultSession = config.consultationSessionTimings;
-    //             let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
-    //             var schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
-    //             var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    //             schInterval.forEach(sch => {
-    //                 let start = sch.startTime;
-    //                 if(start <= sch.endTime){
 
-    //                 }
-                    
-    //             });
-                
-    //             var d = new Date('date');
-    //             var dayName = days[d.getDay()];
+    async appointmentSlotsView(user: any): Promise<any> {
+        try {
+            let paginationLimit = 0; // should get from request
+            paginationLimit = paginationLimit * 7;
+            let doc = await this.doctorDetails(user.doctorKey);
+            let docId = doc.doctorId;
+            let appointmentSlots = [];
+            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
+            if (appointmentDates && appointmentDates.length) {
+                let appDate =  appointmentDates[0].appointment_date;
+                console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
 
-    //         }
-    //     } catch (e) {
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-    //         }
-    //     }
-    // }
+
+            }
+            let todayDay = new Date();
+            console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
+
+
+            // if(app.length){
+            //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+            //     let consultSession = config.consultationSessionTimings;
+            //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
+            //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
+            //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            //
+            //
+            // }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
@@ -709,6 +716,33 @@ export class AppointmentService {
     async patientList(): Promise<any> {
         //return await this.patientDetailsRepository.find();
         return await this.patientDetailsRepository.query(queries.getPatientList);
+    }
+
+    async doctorPersonalSettingsEdit(doctorDto:DoctorDto): Promise<any> {
+       try {
+            var condition = {
+                doctorId: doctorDto.doctorId
+            }
+            var values: any = doctorDto;
+            var updateDoctorConfig = await this.doctorRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.UPDATE_OK
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+
     }
 
 
