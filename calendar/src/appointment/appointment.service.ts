@@ -371,226 +371,33 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
-        try {
-            let paginationLimit = 0; // should get from request
-            paginationLimit = paginationLimit * 7;
-            let doc = await this.doctorDetails(user.doctorKey);
-            let docId = doc.doctorId;
-            let appointmentSlots = [];
-            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
-            if (appointmentDates && appointmentDates.length) {
-                let appDate =  appointmentDates[0].appointment_date;
-                console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
-
-
-            }
-            let todayDay = new Date();
-            console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
-
-
-            // if(app.length){
-            //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-            //     let consultSession = config.consultationSessionTimings;
-            //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
-            //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
-            //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-            //
-            //
-            // }
-        } catch (e) {
-            console.log(e);
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
-        }
-    }
-
     // async appointmentSlotsView(user: any): Promise<any> {
     //     try {
-    //     const doc = await this.doctorDetails(user.doctorKey);
-    //     var docId = doc.doctorId;
-    //     let d = new Date();
-    //     var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-    //    // const app = await this.appointmentRepository.query(queries.getAppList, [docId,date]);
-    //    const app = await this.appointmentRepository.query(queries.getAppList, [docId]);
-    //     console.log(app);
-    //     // const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
-    //     if(app.length){
-    //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-    //     let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-    //     let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
-    //     console.log(schDay);
-    //     var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
-    //     schDay.forEach( e => {
-    //     if(e.dayOfWeek=='Sunday'){
-    //     Sunday.push(e);
-    //     }else if(e.dayOfWeek=='Monday'){
-    //     Monday.push(e);
-    //     }else if(e.dayOfWeek=='Tuesday'){
-    //     Tuesday.push(e);
-    //     }else if(e.dayOfWeek=='Wednesday'){
-    //     Wednesday.push(e);
-    //     }else if(e.dayOfWeek=='Thursday'){
-    //     Thursday.push(e);
-    //     }else if(e.dayOfWeek=='Friday'){
-    //     Friday.push(e);
-    //     }else if(e.dayOfWeek=='Saturday'){
-    //     Saturday.push(e);
-    //     }
-    //     });
-    //     console.log(Sunday,Monday)
-    //     var sundaySlots=[];
-    //     if(Sunday.length){
-    //         Sunday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Sunday';
-    //                     start = start + consultSession;
-    //                     sundaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
+    //         let paginationLimit = 0; // should get from request
+    //         paginationLimit = paginationLimit * 7;
+    //         let doc = await this.doctorDetails(user.doctorKey);
+    //         let docId = doc.doctorId;
+    //         let appointmentSlots = [];
+    //         let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
+    //         if (appointmentDates && appointmentDates.length) {
+    //             let appDate =  appointmentDates[0].appointment_date;
+    //             console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
 
-    //     console.log(sundaySlots);
-       
-    //     var mondaySlots=[];
-    //     if(Monday.length){
-    //         Monday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start < end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Monday';
-    //                     start = start + consultSession;
-    //                     mondaySlots.push(day);
-    //                 }
-    //             }
-    //          })
-    //     }
-       
-    //     var tuesdaySlots=[];
-    //     if(Tuesday.length){
-    //         Tuesday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Tuesday';
-    //                     start = start + consultSession;
-    //                     tuesdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var wednesdaySlots=[];
-    //     if(Wednesday.length){
-    //         Wednesday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Wednesday';
-    //                     start = start + consultSession;
-    //                     wednesdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var thursdaySlots=[];
-    //     if(Thursday.length){
-    //         Thursday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Thursday';
-    //                     start = start + consultSession;
-    //                     thursdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var fridaySlots=[];
-    //     if(Friday.length){
-    //         Friday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Friday';
-    //                     start = start + consultSession;
-    //                     fridaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var saturdaySlots=[];
-    //     if(Saturday.length){
-    //         Saturday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Saturday';
-    //                     start = start + consultSession;
-    //                     saturdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
 
-    //     console.log(sundaySlots,mondaySlots,tuesdaySlots,wednesdaySlots,thursdaySlots,fridaySlots,saturdaySlots);
-    //     var daysOfWeek = [];
-    //     daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
-    //     var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    //     days.forEach(day =>{
-       
-    //     })
-    //     app.forEach(a => {
-    //     let date = a.appointment_date;
-    //     var d = new Date(date);
-    //     var d1 = d.getDay();
-    //     var dayName = days[d.getDay()];
-    //     daysOfWeek[d1].forEach(week =>{
-    //     if(week.day.start == a.startTime){
-    //     week.day = a;
-    //     }
-    //     })
-    //     });
-       
-    //    return (daysOfWeek);
-       
-    //     }
+    //         }
+    //         let todayDay = new Date();
+    //         console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
+
+
+    //         // if(app.length){
+    //         //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+    //         //     let consultSession = config.consultationSessionTimings;
+    //         //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
+    //         //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
+    //         //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    //         //
+    //         //
+    //         // }
     //     } catch (e) {
     //         console.log(e);
     //         return {
@@ -599,6 +406,201 @@ export class AppointmentService {
     //         }
     //     }
     // }
+
+    async appointmentSlotsView(user: any): Promise<any> {
+        try {
+        const doc = await this.doctorDetails(user.doctorKey);
+        var docId = doc.doctorId;
+        let d = new Date();
+        var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+       // const app = await this.appointmentRepository.query(queries.getAppList, [docId,date]);
+       const app = await this.appointmentRepository.query(queries.getAppList, [docId]);
+        //console.log(app);
+        // const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
+        if(app.length){
+        const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+        let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+        let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
+       
+        var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
+        schDay.forEach( e => {
+        if(e.dayOfWeek=='Sunday'){
+        Sunday.push(e);
+        }else if(e.dayOfWeek=='Monday'){
+        Monday.push(e);
+        }else if(e.dayOfWeek=='Tuesday'){
+        Tuesday.push(e);
+        }else if(e.dayOfWeek=='Wednesday'){
+        Wednesday.push(e);
+        }else if(e.dayOfWeek=='Thursday'){
+        Thursday.push(e);
+        }else if(e.dayOfWeek=='Friday'){
+        Friday.push(e);
+        }else if(e.dayOfWeek=='Saturday'){
+        Saturday.push(e);
+        }
+        });
+
+        var sundaySlots=[];
+        if(Sunday.length){
+            Sunday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Sunday'
+                        }
+                        start = start + consultSession;
+                        sundaySlots.push(day);
+                    }
+                }
+            })
+        }
+       
+        var mondaySlots=[];
+        if(Monday.length){
+            Monday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start < end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Monday'
+                        }
+                        start = start + consultSession;
+                        mondaySlots.push(day);
+                    }
+                }
+             })
+        }
+       
+        var tuesdaySlots=[];
+        if(Tuesday.length){
+            Tuesday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Tuesday'
+                        }
+                        start = start + consultSession;
+                        tuesdaySlots.push(day);
+                    }
+                }
+            })
+        }
+       
+        var wednesdaySlots=[];
+        if(Wednesday.length){
+            Wednesday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Wednesday'
+                        }
+                        start = start + consultSession;
+                        wednesdaySlots.push(day);
+                    }
+                }
+            })
+        }
+       
+        var thursdaySlots=[];
+        if(Thursday.length){
+            Thursday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Thursday'
+                        }
+                        start = start + consultSession;
+                        thursdaySlots.push(day);
+                    }
+                }
+            })
+        }
+
+        var fridaySlots=[];
+        if(Friday.length){
+            Friday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Friday'
+                        }
+                        start = start + consultSession;
+                        fridaySlots.push(day);
+                    }
+                }
+            })
+        }
+       
+        var saturdaySlots=[];
+        if(Saturday.length){
+            Saturday.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt=Helper.getTimeinHrsMins(Number(start));
+                        let day = {
+                            start:strt,
+                            day:'Saturday'
+                        }
+                        start = start + consultSession;
+                        saturdaySlots.push(day);
+                    }
+                }
+            })
+        }
+
+        var daysOfWeek = [];
+        daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
+        //console.log(daysOfWeek);
+        var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        app.forEach(a => {
+            let date = a.appointment_date;
+            var d = new Date(date);
+            var d1 = d.getDay();
+            var dayName = days[d.getDay()];
+            daysOfWeek[d1].forEach((week,iterationNumber) =>{
+            if(week.start == a.startTime){
+                daysOfWeek[d1][iterationNumber] = a;
+            }
+            })
+        });
+        console.log(daysOfWeek); 
+        return (daysOfWeek);
+       
+        }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+    }
 
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
