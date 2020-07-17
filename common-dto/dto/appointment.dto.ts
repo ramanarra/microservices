@@ -15,6 +15,9 @@ export class AppointmentDto {
   @IsOptional()
   @IsMilitaryTime()
   startTime : string;
+  @IsOptional()
+  @IsNumber()
+  appointmentId:number;
   endTime : string;   
   paymentStatus : boolean;
   isActive : boolean; 

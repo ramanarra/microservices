@@ -70,10 +70,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentSlotsView(user: any,doctorKey:any,startDate:any,endDate:any): Observable<any> {
+    public appointmentSlotsView(user: any,doctorKey:any): Observable<any> {
         user.doctorKey = doctorKey;
-        user.startDate = startDate;
-        user.endDate = endDate;
         return this.redisClient.send({cmd: 'appointment_slots_view'},user);
     }
 

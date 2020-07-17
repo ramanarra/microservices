@@ -3,6 +3,7 @@ export class DoctorDto {
     @IsOptional()
     @IsNumber()
     doctorId: number;
+    doctorKey:string;
     @IsOptional()
     @IsEmail()
     email: string;

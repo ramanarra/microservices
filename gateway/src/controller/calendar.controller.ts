@@ -143,19 +143,19 @@ export class CalendarController {
             '"doctorKey":"Doc_5",\n' +
             '"consultationCost": "5000" ,\n' +
             '"isPreconsultationAllowed": true, \n' +
-            '"preconsultationHours": "5", \n' +
-            '"preconsultationMins": "30", \n' +
+            '"preconsultationHours": 5, \n' +
+            '"preconsultationMins": 30, \n' +
             '"isPatientCancellationAllowed": false ,\n' +
-            '"cancellationDays": "2" ,\n' +
-            '"cancellationHours": "3" ,\n' +
-            '"cancellationMins": "30", \n' +
+            '"cancellationDays": 2 ,\n' +
+            '"cancellationHours": 3 ,\n' +
+            '"cancellationMins": 30, \n' +
             '"isPatientRescheduleAllowed": false, \n' +
-            '"rescheduleDays": "2", \n' +
-            '"rescheduleHours": "4" ,\n' +
-            '"rescheduleMins": "15", \n' +
-            '"autoCancelDays": "1", \n' +
-            '"autoCancelHours": "3" ,\n' +
-            '"autoCancelMins": "15" \n' +
+            '"rescheduleDays": 2, \n' +
+            '"rescheduleHours": 4 ,\n' +
+            '"rescheduleMins": 15, \n' +
+            '"autoCancelDays": 1, \n' +
+            '"autoCancelHours": 3 ,\n' +
+            '"autoCancelMins": 15 \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -209,11 +209,11 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05, 2020-06-21'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('startDate') startDate: String, @Query('endDate') endDate: String) {
+    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user, doctorKey, startDate, endDate);
+        return this.calendarService.appointmentSlotsView(req.user, doctorKey);
     }
 
     @Post('doctor/appointmentReschedule')
@@ -423,9 +423,9 @@ export class CalendarController {
     doctorPersonalSettingsEdit(@selfUserSettingWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() doctorDto: DoctorDto) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        if(!req.body.doctorId){
-            console.log("Provide doctorId");
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
         }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
         return this.calendarService.doctorPersonalSettingsEdit(req.user,doctorDto);

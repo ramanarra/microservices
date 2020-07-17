@@ -71,7 +71,7 @@ export class AppointmentController {
             if (!doctor)
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
-                    message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    message:  CONSTANT_MSG.INVALID_REQUEST
                 }
             if ((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key !== user.doctorKey) || (user.role == CONSTANT_MSG.ROLES.ADMIN && user.account_key !== doctor.accountKey )|| (user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT && user.account_key !== doctor.accountKey)) {
                 return {
@@ -145,7 +145,7 @@ export class AppointmentController {
         if (!doctor) {
             return {
                 statusCode: HttpStatus.NOT_FOUND,
-                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                message:  CONSTANT_MSG.INVALID_REQUEST
             }
         }
         var docId = doctor.doctorId;
@@ -292,8 +292,8 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'doctor_details_edit'})
     async doctorPersonalSettingsEdit(user:any): Promise<any> {
-        const doc = await this.appointmentService.doctor_Details(user.doctorDto.doctorId);
-        if(doc.doctorKey == user.doctor_key){
+        const doc = await this.appointmentService.doctorDetails(user.doctorDto.doctorKey);
+        if(user.doctorDto.doctorKey == user.doctor_key){
             const doctor = await this.appointmentService.doctorPersonalSettingsEdit(user.doctorDto);
             return doctor;
         }else {

@@ -11,5 +11,17 @@ export class Helper {
         return startTimeMilliSeconds;
     }
 
+    static getTimeinHrsMins(x: any) {
+        let h = x / (60*60*1000)
+         x = x - h*(60*60*1000)
+        let  m = x / (60*1000)
+         return (h+':'+m)
+     }
+ 
+     static getMinInMilliSeconds(x: any) {
+         let mi = x * 60000
+          return (mi)
+      }
+
 
 }
