@@ -109,7 +109,7 @@ export class AppointmentService {
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    message: CONSTANT_MSG.INVALID_REQUEST
                 }
             }
         } catch (e) {
@@ -406,6 +406,200 @@ export class AppointmentService {
             }
         }
     }
+
+    // async appointmentSlotsView(user: any): Promise<any> {
+    //     try {
+    //     const doc = await this.doctorDetails(user.doctorKey);
+    //     var docId = doc.doctorId;
+    //     let d = new Date();
+    //     var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+    //    // const app = await this.appointmentRepository.query(queries.getAppList, [docId,date]);
+    //    const app = await this.appointmentRepository.query(queries.getAppList, [docId]);
+    //     console.log(app);
+    //     // const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
+    //     if(app.length){
+    //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+    //     let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+    //     let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
+    //     console.log(schDay);
+    //     var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
+    //     schDay.forEach( e => {
+    //     if(e.dayOfWeek=='Sunday'){
+    //     Sunday.push(e);
+    //     }else if(e.dayOfWeek=='Monday'){
+    //     Monday.push(e);
+    //     }else if(e.dayOfWeek=='Tuesday'){
+    //     Tuesday.push(e);
+    //     }else if(e.dayOfWeek=='Wednesday'){
+    //     Wednesday.push(e);
+    //     }else if(e.dayOfWeek=='Thursday'){
+    //     Thursday.push(e);
+    //     }else if(e.dayOfWeek=='Friday'){
+    //     Friday.push(e);
+    //     }else if(e.dayOfWeek=='Saturday'){
+    //     Saturday.push(e);
+    //     }
+    //     });
+    //     console.log(Sunday,Monday)
+    //     var sundaySlots=[];
+    //     if(Sunday.length){
+    //         Sunday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Sunday';
+    //                     start = start + consultSession;
+    //                     sundaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+
+    //     console.log(sundaySlots);
+       
+    //     var mondaySlots=[];
+    //     if(Monday.length){
+    //         Monday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start < end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Monday';
+    //                     start = start + consultSession;
+    //                     mondaySlots.push(day);
+    //                 }
+    //             }
+    //          })
+    //     }
+       
+    //     var tuesdaySlots=[];
+    //     if(Tuesday.length){
+    //         Tuesday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Tuesday';
+    //                     start = start + consultSession;
+    //                     tuesdaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+       
+    //     var wednesdaySlots=[];
+    //     if(Wednesday.length){
+    //         Wednesday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Wednesday';
+    //                     start = start + consultSession;
+    //                     wednesdaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+       
+    //     var thursdaySlots=[];
+    //     if(Thursday.length){
+    //         Thursday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Thursday';
+    //                     start = start + consultSession;
+    //                     thursdaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+       
+    //     var fridaySlots=[];
+    //     if(Friday.length){
+    //         Friday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Friday';
+    //                     start = start + consultSession;
+    //                     fridaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+       
+    //     var saturdaySlots=[];
+    //     if(Saturday.length){
+    //         Saturday.forEach(d =>{
+    //             if(d.startTime){
+    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
+    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
+    //                 while(start< end){
+    //                     var day:any =[];
+    //                     let strt=Helper.getTimeinHrsMins(start);
+    //                     day.start=strt;
+    //                     day.day = 'Saturday';
+    //                     start = start + consultSession;
+    //                     saturdaySlots.push(day);
+    //                 }
+    //             }
+    //         })
+    //     }
+
+    //     console.log(sundaySlots,mondaySlots,tuesdaySlots,wednesdaySlots,thursdaySlots,fridaySlots,saturdaySlots);
+    //     var daysOfWeek = [];
+    //     daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
+    //     var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    //     days.forEach(day =>{
+       
+    //     })
+    //     app.forEach(a => {
+    //     let date = a.appointment_date;
+    //     var d = new Date(date);
+    //     var d1 = d.getDay();
+    //     var dayName = days[d.getDay()];
+    //     daysOfWeek[d1].forEach(week =>{
+    //     if(week.day.start == a.startTime){
+    //     week.day = a;
+    //     }
+    //     })
+    //     });
+       
+    //    return (daysOfWeek);
+       
+    //     }
+    //     } catch (e) {
+    //         console.log(e);
+    //         return {
+    //             statusCode: HttpStatus.NO_CONTENT,
+    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+    //         }
+    //     }
+    // }
+
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
@@ -721,7 +915,7 @@ export class AppointmentService {
     async doctorPersonalSettingsEdit(doctorDto:DoctorDto): Promise<any> {
        try {
             var condition = {
-                doctorId: doctorDto.doctorId
+                doctorKey: doctorDto.doctorKey
             }
             var values: any = doctorDto;
             var updateDoctorConfig = await this.doctorRepository.update(condition, values);
