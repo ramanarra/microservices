@@ -371,53 +371,16 @@ export class AppointmentService {
     }
 
 
-    // async appointmentSlotsView(user: any): Promise<any> {
-    //     try {
-    //         let paginationLimit = 0; // should get from request
-    //         paginationLimit = paginationLimit * 7;
-    //         let doc = await this.doctorDetails(user.doctorKey);
-    //         let docId = doc.doctorId;
-    //         let appointmentSlots = [];
-    //         let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
-    //         if (appointmentDates && appointmentDates.length) {
-    //             let appDate =  appointmentDates[0].appointment_date;
-    //             console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
-
-
-    //         }
-    //         let todayDay = new Date();
-    //         console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
-
-
-    //         // if(app.length){
-    //         //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-    //         //     let consultSession = config.consultationSessionTimings;
-    //         //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
-    //         //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
-    //         //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    //         //
-    //         //
-    //         // }
-    //     } catch (e) {
-    //         console.log(e);
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-    //         }
-    //     }
-    // }
-
     async appointmentSlotsView(user: any): Promise<any> {
         try {
         const doc = await this.doctorDetails(user.doctorKey);
         var docId = doc.doctorId;
         let d = new Date();
         var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-       // const app = await this.appointmentRepository.query(queries.getAppList, [docId,date]);
-       const app = await this.appointmentRepository.query(queries.getAppList, [docId]);
-        //console.log(app);
-        // const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
-        if(app.length){
+        var x:number = user.paginationNumber;
+        var date1 = new Date(Date.now() + (x*7 * 24 * 60 * 60 * 1000));
+        var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
+        const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId,date1,last]);
         const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
         let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
         let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
@@ -576,7 +539,6 @@ export class AppointmentService {
 
         var daysOfWeek = [];
         daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
-        //console.log(daysOfWeek);
         var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
         app.forEach(a => {
             let date = a.appointment_date;
@@ -590,9 +552,7 @@ export class AppointmentService {
             })
         });
         console.log(daysOfWeek); 
-        return (daysOfWeek);
-       
-        }
+        return (daysOfWeek);       
         } catch (e) {
             console.log(e);
             return {

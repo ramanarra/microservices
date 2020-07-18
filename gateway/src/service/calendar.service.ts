@@ -3,6 +3,7 @@ import {ClientProxy} from '@nestjs/microservices';
 import {Observable} from 'rxjs';
 import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto} from 'common-dto';
 import {AllClientServiceException} from 'src/common/filter/all-clientservice-exceptions.filter';
+import { UserService } from './user.service';
 
 
 @Injectable()
@@ -70,8 +71,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentSlotsView(user: any,doctorKey:any): Observable<any> {
+    public appointmentSlotsView(user: any,doctorKey:any,paginationNumber:number): Observable<any> {
         user.doctorKey = doctorKey;
+        user.paginationNumber = paginationNumber;
         return this.redisClient.send({cmd: 'appointment_slots_view'},user);
     }
 

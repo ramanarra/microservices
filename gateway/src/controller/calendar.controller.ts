@@ -207,13 +207,13 @@ export class CalendarController {
     @Get('doctor/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request body example:  Doc_5'})
+    @ApiOkResponse({description: 'request body example:  Doc_5,1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
+    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('paginationNumber') paginationNumber: number) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user, doctorKey);
+        return this.calendarService.appointmentSlotsView(req.user, doctorKey,paginationNumber);
     }
 
     @Post('doctor/appointmentReschedule')

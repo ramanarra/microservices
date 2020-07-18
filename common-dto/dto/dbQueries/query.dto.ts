@@ -19,6 +19,7 @@ export const queries = {
     getPatientList:'SELECT "firstName","lastName","email","phone","dateOfBirth" FROM patient_details',
     //getAppList:'select * from appointment  where "doctorId" = $1 and appointment_date >= $2 group by appointment_date limit 7',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
+    getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND $2 <= "appointment_date" AND "appointment_date" <= $3 order by appointment_date',
     getScheduleIntervalDays: 'select "docConfigScheduleDayId" from doc_config_schedule_interval  where doctorkey  =  $1 group by "docConfigScheduleDayId"'
 
 }
