@@ -37,7 +37,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG
+    PatientDto,CONSTANT_MSG,HospitalDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -49,6 +49,8 @@ import {accountUsersSettingsWrite} from "../common/decorator/accountUsersSetting
 import {selfAppointmentRead} from "../common/decorator/selfAppointmentRead.decorator";
 import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppointmentRead.decorator";
 import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
+import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
+import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
 
 
 @Controller('api/calendar')
@@ -444,6 +446,37 @@ export class CalendarController {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
         return this.calendarService.doctorPersonalSettingsEdit(req.user,doctorDto);
     }
+
+    @Get('doctor/hospitaldetailsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: ' '})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsView(@accountSettingsRead() check: boolean, @Request() req , @Query('accountKey') accountKey: String) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.hospitaldetailsView(req.user,accountKey);
+    }
+
+    @Post('doctor/hospitaldetailsEdit')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.accountKey){
+            console.log("Provide accountKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide accountKey"}
+        }
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(hospitalDto)}`);
+        return this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
+    }
+
+
  
 
 

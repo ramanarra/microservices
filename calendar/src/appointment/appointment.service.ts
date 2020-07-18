@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG,queries, DoctorDto
+    PatientDto, CONSTANT_MSG,queries, DoctorDto, HospitalDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -775,6 +775,34 @@ export class AppointmentService {
             }
         }
 
+    }
+
+    async hospitaldetailsEdit(hospitalDto: HospitalDto): Promise<any> {
+        try {
+                // update the doctorConfig details
+            var condition = {
+                accountKey: hospitalDto.accountKey
+            }
+            var values: any = hospitalDto;
+            var updateHospital = await this.accountDetailsRepository.update(condition, values);
+            if (updateHospital.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.UPDATE_OK
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+	    console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
     }
 
 
