@@ -233,7 +233,7 @@ export class AppointmentService {
                 doctorKey: workScheduleDto.doctorKey
             }
             var values: any = workScheduleDto.workScheduleConfig;
-            let updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+            await this.doctorConfigRepository.update(condition, values);
         }
         // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
@@ -244,17 +244,17 @@ export class AppointmentService {
                         // if delete, then delete the record
                         let scheduleTimeId = scheduleTimeInterval.scheduletimeid;
                         let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                        let deleteInterval = await this.deleteDoctorConfigScheduleInterval(scheduleTimeId, scheduleDayId);
+                         await this.deleteDoctorConfigScheduleInterval(scheduleTimeId, scheduleDayId);
                     } else {
                         // if scheduletimeid is there then need to update
                         let doctorKey = workScheduleDto.user.doctor_key;
                         let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
+                        let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
+                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId, doctorConfigScheduleIntervalId);
+                        let starTime = scheduleTimeInterval.startTime;
+                        let endTime = scheduleTimeInterval.endTime;
                         if (doctorScheduledDays && doctorScheduledDays.length) {
                             // // validate with previous data
-                            let starTime = scheduleTimeInterval.startTime;
-                            let endTime = scheduleTimeInterval.endTime;
-                            let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
                             let isOverLapping = await this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
                             if (isOverLapping) {
                                 //return error message
@@ -264,14 +264,11 @@ export class AppointmentService {
                                 }
                             } else {
                                 // update old records
-                                const updateRecord = await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
+                                await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
                             }
                         } else {
-                            // no records, so cant update
-                            return {
-                                statusCode: HttpStatus.NO_CONTENT,
-                                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-                            }
+                            // only one record present in table update existing records
+                            await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
                         }
                     }
                 } else {
@@ -279,7 +276,8 @@ export class AppointmentService {
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
                     let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
+                    // for inserting new schedule interval, for checking previous interval, passing as zero, as to work the query
+                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId, 0);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
                         let starTime = scheduleTimeInterval.startTime;
@@ -294,14 +292,14 @@ export class AppointmentService {
                             }
                         } else {
                             // insert new records
-                            const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
+                             await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                         }
                     } else {
                         // no previous datas are there just insert
                         let starTime = scheduleTimeInterval.startTime;
                         let endTime = scheduleTimeInterval.endTime;
                         let doctorConfigScheduleDayId = scheduleTimeInterval.scheduledayid;
-                        const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
+                         await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                     }
                 }
             }
@@ -317,8 +315,8 @@ export class AppointmentService {
     }
 
 
-    async getDoctorConfigSchedule(doctorKey: string, scheduleDayId: string): Promise<any> {
-        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, scheduleDayId]);
+    async getDoctorConfigSchedule(doctorKey: string, scheduleDayId: number, scheduleIntervalId: number): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, scheduleDayId, scheduleIntervalId]);
     }
 
     async deleteDoctorConfigScheduleInterval(scheduletimeid: number, scheduleDayId: number): Promise<any> {
@@ -380,6 +378,7 @@ export class AppointmentService {
             var x:number = user.paginationNumber;
             var date1 = new Date(Date.now() + (x*7 * 24 * 60 * 60 * 1000));
             var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
+            console.log("---test", queries.getPaginationAppList)
             const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId,date1,last]);
             const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
             let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
