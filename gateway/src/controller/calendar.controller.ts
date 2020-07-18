@@ -65,7 +65,7 @@ export class CalendarController {
     @Post('doctor/createAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
+            '"patientId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
@@ -89,6 +89,13 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        }
+        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+        if(appointmentDto.appointmentDate < new Date()){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
         }
         this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.createAppointment(appointmentDto, req.user);
@@ -356,16 +363,16 @@ export class CalendarController {
     @Post('patient/bookAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
-            '"doctorId":"1",\n' +
-            '"startTime": "10:00 AM",\n' +
-            '"endTime": "11:00 AM",\n' +
+            '"patientId":1,\n' +
+            '"doctorId":1,\n' +
+            '"startTime": "10:00",\n' +
+            '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
-    patientBookAppointment(@Request() req, @Body() patientDto: PatientDto) {
+    patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
         if(!req.body.doctorId){
             console.log("Provide doctorId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
@@ -375,6 +382,13 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        }
+        patientDto.appointmentDate= new Date(patientDto.appointmentDate);
+        if(patientDto.appointmentDate < new Date()){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
         }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
         return this.calendarService.patientBookAppointment(patientDto);
