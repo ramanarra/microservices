@@ -404,139 +404,16 @@ export class AppointmentService {
         }
         });
 
-        var sundaySlots=[];
-        if(Sunday.length){
-            Sunday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Sunday'
-                        }
-                        start = start + consultSession;
-                        sundaySlots.push(day);
-                    }
-                }
-            })
-        }
-       
-        var mondaySlots=[];
-        if(Monday.length){
-            Monday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start < end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Monday'
-                        }
-                        start = start + consultSession;
-                        mondaySlots.push(day);
-                    }
-                }
-             })
-        }
-       
-        var tuesdaySlots=[];
-        if(Tuesday.length){
-            Tuesday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Tuesday'
-                        }
-                        start = start + consultSession;
-                        tuesdaySlots.push(day);
-                    }
-                }
-            })
-        }
-       
-        var wednesdaySlots=[];
-        if(Wednesday.length){
-            Wednesday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Wednesday'
-                        }
-                        start = start + consultSession;
-                        wednesdaySlots.push(day);
-                    }
-                }
-            })
-        }
-       
-        var thursdaySlots=[];
-        if(Thursday.length){
-            Thursday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Thursday'
-                        }
-                        start = start + consultSession;
-                        thursdaySlots.push(day);
-                    }
-                }
-            })
-        }
-
-        var fridaySlots=[];
-        if(Friday.length){
-            Friday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Friday'
-                        }
-                        start = start + consultSession;
-                        fridaySlots.push(day);
-                    }
-                }
-            })
-        }
-       
-        var saturdaySlots=[];
-        if(Saturday.length){
-            Saturday.forEach(d =>{
-                if(d.startTime){
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while(start< end){
-                        let strt=Helper.getTimeinHrsMins(Number(start));
-                        let day = {
-                            start:strt,
-                            day:'Saturday'
-                        }
-                        start = start + consultSession;
-                        saturdaySlots.push(day);
-                    }
-                }
-            })
-        }
-
+      
+        var sundaySlots=[],mondaySlots=[],tuesdaySlots=[],wednesdaySlots=[],thursdaySlots=[],fridaySlots=[],saturdaySlots=[];
+        let con = config.consultationSessionTimings;
+        await this.freeSlots(Sunday,sundaySlots,consultSession,'Sunday',con);
+        await this.freeSlots(Monday,mondaySlots,consultSession,'Monday',con);
+        await this.freeSlots(Tuesday,tuesdaySlots,consultSession,'Tuesday',con);
+        await this.freeSlots(Wednesday,wednesdaySlots,consultSession,'Wednesday',con);
+        await this.freeSlots(Thursday,thursdaySlots,consultSession,'Thursday',con);
+        await this.freeSlots(Friday,fridaySlots,consultSession,'Friday',con);
+        await this.freeSlots(Saturday,saturdaySlots,consultSession,'Saturday',con);
         var daysOfWeek = [];
         daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
         var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -938,6 +815,31 @@ export class AppointmentService {
         }
         return isPhone;
     }
+
+    async freeSlots(a,b,c,e,f): Promise<any> {
+        if(a.length){
+            a.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt = Helper.getTimeinHrsMins(Number(start));
+                        let last = Helper.getTimeinHrsMins(Number(end));
+                        let day = {
+                            slotType:'Free Slot',
+                            start:strt,
+                            end:last,
+                            sessiontime:f,
+                            day:e
+                        }
+                        start = start + c;
+                        b.push(day);
+                    }
+                }
+            })
+        }
+    }
+
 
 
 }
