@@ -373,63 +373,63 @@ export class AppointmentService {
 
     async appointmentSlotsView(user: any): Promise<any> {
         try {
-        const doc = await this.doctorDetails(user.doctorKey);
-        var docId = doc.doctorId;
-        let d = new Date();
-        var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-        var x:number = user.paginationNumber;
-        var date1 = new Date(Date.now() + (x*7 * 24 * 60 * 60 * 1000));
-        var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
-        const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId,date1,last]);
-        const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-        let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-        let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
-       
-        var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
-        schDay.forEach( e => {
-        if(e.dayOfWeek=='Sunday'){
-        Sunday.push(e);
-        }else if(e.dayOfWeek=='Monday'){
-        Monday.push(e);
-        }else if(e.dayOfWeek=='Tuesday'){
-        Tuesday.push(e);
-        }else if(e.dayOfWeek=='Wednesday'){
-        Wednesday.push(e);
-        }else if(e.dayOfWeek=='Thursday'){
-        Thursday.push(e);
-        }else if(e.dayOfWeek=='Friday'){
-        Friday.push(e);
-        }else if(e.dayOfWeek=='Saturday'){
-        Saturday.push(e);
-        }
-        });
-
-      
-        var sundaySlots=[],mondaySlots=[],tuesdaySlots=[],wednesdaySlots=[],thursdaySlots=[],fridaySlots=[],saturdaySlots=[];
-        let con = config.consultationSessionTimings;
-        await this.freeSlots(Sunday,sundaySlots,consultSession,'Sunday',con);
-        await this.freeSlots(Monday,mondaySlots,consultSession,'Monday',con);
-        await this.freeSlots(Tuesday,tuesdaySlots,consultSession,'Tuesday',con);
-        await this.freeSlots(Wednesday,wednesdaySlots,consultSession,'Wednesday',con);
-        await this.freeSlots(Thursday,thursdaySlots,consultSession,'Thursday',con);
-        await this.freeSlots(Friday,fridaySlots,consultSession,'Friday',con);
-        await this.freeSlots(Saturday,saturdaySlots,consultSession,'Saturday',con);
-        var daysOfWeek = [];
-        daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
-        var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        app.forEach(a => {
-            let date = a.appointment_date;
-            var d = new Date(date);
-            var d1 = d.getDay();
-            var dayName = days[d.getDay()];
-            daysOfWeek[d1].forEach((week,iterationNumber) =>{
-            if(week.start == a.startTime){
-                daysOfWeek[d1][iterationNumber] = a;
+            const doc = await this.doctorDetails(user.doctorKey);
+            var docId = doc.doctorId;
+            let d = new Date();
+            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+            var x:number = user.paginationNumber;
+            var date1 = new Date(Date.now() + (x*7 * 24 * 60 * 60 * 1000));
+            var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
+            const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId,date1,last]);
+            const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+            let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+            let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
+        
+            var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
+            schDay.forEach( e => {
+            if(e.dayOfWeek=='Sunday'){
+            Sunday.push(e);
+            }else if(e.dayOfWeek=='Monday'){
+            Monday.push(e);
+            }else if(e.dayOfWeek=='Tuesday'){
+            Tuesday.push(e);
+            }else if(e.dayOfWeek=='Wednesday'){
+            Wednesday.push(e);
+            }else if(e.dayOfWeek=='Thursday'){
+            Thursday.push(e);
+            }else if(e.dayOfWeek=='Friday'){
+            Friday.push(e);
+            }else if(e.dayOfWeek=='Saturday'){
+            Saturday.push(e);
             }
-            })
-        });
-        console.log(daysOfWeek); 
-        return (daysOfWeek);       
+            });
+
+        
+            var sundaySlots=[],mondaySlots=[],tuesdaySlots=[],wednesdaySlots=[],thursdaySlots=[],fridaySlots=[],saturdaySlots=[];
+            let con = config.consultationSessionTimings;
+            await this.freeSlots(Sunday,sundaySlots,consultSession,'Sunday',con);
+            await this.freeSlots(Monday,mondaySlots,consultSession,'Monday',con);
+            await this.freeSlots(Tuesday,tuesdaySlots,consultSession,'Tuesday',con);
+            await this.freeSlots(Wednesday,wednesdaySlots,consultSession,'Wednesday',con);
+            await this.freeSlots(Thursday,thursdaySlots,consultSession,'Thursday',con);
+            await this.freeSlots(Friday,fridaySlots,consultSession,'Friday',con);
+            await this.freeSlots(Saturday,saturdaySlots,consultSession,'Saturday',con);
+            var daysOfWeek = [];
+            daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
+            var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            app.forEach(a => {
+                let date = a.appointment_date;
+                var d = new Date(date);
+                var d1 = d.getDay();
+                var dayName = days[d.getDay()];
+                daysOfWeek[d1].forEach((week,iterationNumber) =>{
+                if(week.start == a.startTime){
+                    daysOfWeek[d1][iterationNumber] = a;
+                }
+                })
+            });
+            console.log(daysOfWeek); 
+            return (daysOfWeek);       
         } catch (e) {
             console.log(e);
             return {

@@ -17,8 +17,10 @@ export class PatientRepository extends Repository<Patient> {
 
         const patient = new Patient();
         const salt = await bcrypt.genSalt();
-        patient.password = await this.hashPassword(password, salt);
-        patient.salt = salt
+        if(password){
+            patient.password = await this.hashPassword(password, salt);
+            patient.salt = salt
+        }        
         patient.phone = phone;
 
         try {

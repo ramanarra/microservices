@@ -129,11 +129,13 @@ export class UserService {
             }
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
-                patientId: user.patient_id
+                patientId: user.patient_id,
+                permission: 'CUSTOMER'
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
             user.accessToken = accessToken;
+            user.permission = 'CUSTOMER';
             return user;
         } catch (e) {
             console.log(e);
