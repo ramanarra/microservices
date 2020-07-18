@@ -305,4 +305,32 @@ export class AppointmentController {
         
     }
 
+    @MessagePattern({cmd: 'hospital_details_view'})
+    async hospitaldetailsView(user:any): Promise<any> {
+        if(user.accountKey == user.account_key){
+            const hospital = await this.appointmentService.accountDetails(user.accountKey);
+            return hospital;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        
+    }
+
+    @MessagePattern({cmd: 'hospital_details_edit'})
+    async hospitaldetailsEdit(user:any): Promise<any> {
+        if(user.hospitalDto.accountKey == user.account_key){
+            const hospital = await this.appointmentService.hospitaldetailsEdit(user.hospitalDto);
+            return hospital;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        
+    }
+
 }
