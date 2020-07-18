@@ -1,6 +1,6 @@
 import { Injectable, Inject, UseFilters, RequestTimeoutException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ClientProxy } from "@nestjs/microservices";
-import { UserDto ,DoctorDto, HealthCheckMicroServiceInterface,PatientDto} from 'common-dto';
+import { UserDto ,DoctorDto, HealthCheckMicroServiceInterface,PatientDto,HospitalDto} from 'common-dto';
 import { Observable, throwError, TimeoutError, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { HealthCheckService } from './health-check.service';

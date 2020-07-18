@@ -1,8 +1,9 @@
 import {Injectable, Inject, UseFilters, OnModuleDestroy, OnModuleInit, HttpStatus} from '@nestjs/common';
 import {ClientProxy} from '@nestjs/microservices';
 import {Observable} from 'rxjs';
-import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto} from 'common-dto';
+import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto, HospitalDto} from 'common-dto';
 import {AllClientServiceException} from 'src/common/filter/all-clientservice-exceptions.filter';
+import { UserService } from './user.service';
 
 
 @Injectable()
@@ -70,8 +71,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentSlotsView(user: any,doctorKey:any): Observable<any> {
+    public appointmentSlotsView(user: any,doctorKey:any,paginationNumber:number): Observable<any> {
         user.doctorKey = doctorKey;
+        user.paginationNumber = paginationNumber;
         return this.redisClient.send({cmd: 'appointment_slots_view'},user);
     }
 
@@ -124,7 +126,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientBookAppointment(patientDto : any) : Observable <any> {
+    public patientBookAppointment(patientDto : AppointmentDto) : Observable <any> {
         return this.redisClient.send({ cmd : 'patient_book_appointment'}, patientDto);
     }
 
@@ -154,6 +156,18 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public doctorPersonalSettingsEdit(user, doctorDto:DoctorDto) : Observable <any> {
         user.doctorDto=doctorDto;
         return this.redisClient.send({ cmd : 'doctor_details_edit'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public hospitaldetailsView(user, accountKey:any) : Observable <any> {
+        user.accountKey=accountKey;
+        return this.redisClient.send({ cmd : 'hospital_details_view'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public hospitaldetailsEdit(user, hospitalDto:HospitalDto) : Observable <any> {
+        user.hospitalDto=hospitalDto;
+        return this.redisClient.send({ cmd : 'hospital_details_edit'},user);
     }
 
 

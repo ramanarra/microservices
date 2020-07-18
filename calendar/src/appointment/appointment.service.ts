@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG,queries, DoctorDto
+    PatientDto, CONSTANT_MSG,queries, DoctorDto, HospitalDto
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -233,7 +233,7 @@ export class AppointmentService {
                 doctorKey: workScheduleDto.doctorKey
             }
             var values: any = workScheduleDto.workScheduleConfig;
-            let updateDoctorConfig = await this.doctorConfigRepository.update(condition, values);
+            await this.doctorConfigRepository.update(condition, values);
         }
         // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
@@ -244,17 +244,17 @@ export class AppointmentService {
                         // if delete, then delete the record
                         let scheduleTimeId = scheduleTimeInterval.scheduletimeid;
                         let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                        let deleteInterval = await this.deleteDoctorConfigScheduleInterval(scheduleTimeId, scheduleDayId);
+                         await this.deleteDoctorConfigScheduleInterval(scheduleTimeId, scheduleDayId);
                     } else {
                         // if scheduletimeid is there then need to update
                         let doctorKey = workScheduleDto.user.doctor_key;
                         let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
+                        let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
+                        let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId, doctorConfigScheduleIntervalId);
+                        let starTime = scheduleTimeInterval.startTime;
+                        let endTime = scheduleTimeInterval.endTime;
                         if (doctorScheduledDays && doctorScheduledDays.length) {
                             // // validate with previous data
-                            let starTime = scheduleTimeInterval.startTime;
-                            let endTime = scheduleTimeInterval.endTime;
-                            let doctorConfigScheduleIntervalId = scheduleTimeInterval.scheduletimeid;
                             let isOverLapping = await this.findTimeOverlaping(doctorScheduledDays, scheduleTimeInterval);
                             if (isOverLapping) {
                                 //return error message
@@ -264,14 +264,11 @@ export class AppointmentService {
                                 }
                             } else {
                                 // update old records
-                                const updateRecord = await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
+                                await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
                             }
                         } else {
-                            // no records, so cant update
-                            return {
-                                statusCode: HttpStatus.NO_CONTENT,
-                                message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-                            }
+                            // only one record present in table update existing records
+                            await this.updateIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleIntervalId);
                         }
                     }
                 } else {
@@ -279,7 +276,8 @@ export class AppointmentService {
                     // get the previous interval timing from db
                     let doctorKey = workScheduleDto.user.doctor_key;
                     let scheduleDayId = scheduleTimeInterval.scheduledayid;
-                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId);
+                    // for inserting new schedule interval, for checking previous interval, passing as zero, as to work the query
+                    let doctorScheduledDays = await this.getDoctorConfigSchedule(doctorKey, scheduleDayId, 0);
                     if (doctorScheduledDays && doctorScheduledDays.length) {
                         // validate with previous data
                         let starTime = scheduleTimeInterval.startTime;
@@ -294,14 +292,14 @@ export class AppointmentService {
                             }
                         } else {
                             // insert new records
-                            const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
+                             await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                         }
                     } else {
                         // no previous datas are there just insert
                         let starTime = scheduleTimeInterval.startTime;
                         let endTime = scheduleTimeInterval.endTime;
                         let doctorConfigScheduleDayId = scheduleTimeInterval.scheduledayid;
-                        const insertRecord = await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
+                         await this.insertIntoDocConfigScheduleInterval(starTime, endTime, doctorConfigScheduleDayId);
                     }
                 }
             }
@@ -317,8 +315,8 @@ export class AppointmentService {
     }
 
 
-    async getDoctorConfigSchedule(doctorKey: string, scheduleDayId: string): Promise<any> {
-        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, scheduleDayId]);
+    async getDoctorConfigSchedule(doctorKey: string, scheduleDayId: number, scheduleIntervalId: number): Promise<any> {
+        return await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleInterval, [doctorKey, scheduleDayId, scheduleIntervalId]);
     }
 
     async deleteDoctorConfigScheduleInterval(scheduletimeid: number, scheduleDayId: number): Promise<any> {
@@ -373,31 +371,64 @@ export class AppointmentService {
 
     async appointmentSlotsView(user: any): Promise<any> {
         try {
-            let paginationLimit = 0; // should get from request
-            paginationLimit = paginationLimit * 7;
-            let doc = await this.doctorDetails(user.doctorKey);
-            let docId = doc.doctorId;
-            let appointmentSlots = [];
-            let appointmentDates = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId, paginationLimit]);
-            if (appointmentDates && appointmentDates.length) {
-                let appDate =  appointmentDates[0].appointment_date;
-                console.log('date=>', appDate.getDate(), 'month--->', appDate.getMonth())
-
-
+            const doc = await this.doctorDetails(user.doctorKey);
+            var docId = doc.doctorId;
+            let d = new Date();
+            var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+            var x:number = user.paginationNumber;
+            var date1 = new Date(Date.now() + (x*7 * 24 * 60 * 60 * 1000));
+            var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
+            console.log("---test", queries.getPaginationAppList)
+            const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId,date1,last]);
+            const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
+            let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+            let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
+        
+            var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
+            schDay.forEach( e => {
+            if(e.dayOfWeek=='Sunday'){
+            Sunday.push(e);
+            }else if(e.dayOfWeek=='Monday'){
+            Monday.push(e);
+            }else if(e.dayOfWeek=='Tuesday'){
+            Tuesday.push(e);
+            }else if(e.dayOfWeek=='Wednesday'){
+            Wednesday.push(e);
+            }else if(e.dayOfWeek=='Thursday'){
+            Thursday.push(e);
+            }else if(e.dayOfWeek=='Friday'){
+            Friday.push(e);
+            }else if(e.dayOfWeek=='Saturday'){
+            Saturday.push(e);
             }
-            let todayDay = new Date();
-            console.log('date=>', todayDay.getDate(),'month =>', todayDay.getMonth(),  todayDay,   appointmentDates)
+            });
 
-
-            // if(app.length){
-            //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-            //     let consultSession = config.consultationSessionTimings;
-            //     let schDay = await this.docConfigScheduleDayRepository.findOne({doctorKey:doc.doctorKey});
-            //     let schInterval = await this.docConfigScheduleIntervalRepository.find({docConfigScheduleDayId:schDay.docConfigScheduleDayId});
-            //     let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-            //
-            //
-            // }
+        
+            var sundaySlots=[],mondaySlots=[],tuesdaySlots=[],wednesdaySlots=[],thursdaySlots=[],fridaySlots=[],saturdaySlots=[];
+            let con = config.consultationSessionTimings;
+            await this.freeSlots(Sunday,sundaySlots,consultSession,'Sunday',con);
+            await this.freeSlots(Monday,mondaySlots,consultSession,'Monday',con);
+            await this.freeSlots(Tuesday,tuesdaySlots,consultSession,'Tuesday',con);
+            await this.freeSlots(Wednesday,wednesdaySlots,consultSession,'Wednesday',con);
+            await this.freeSlots(Thursday,thursdaySlots,consultSession,'Thursday',con);
+            await this.freeSlots(Friday,fridaySlots,consultSession,'Friday',con);
+            await this.freeSlots(Saturday,saturdaySlots,consultSession,'Saturday',con);
+            var daysOfWeek = [];
+            daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
+            var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            app.forEach(a => {
+                let date = a.appointment_date;
+                var d = new Date(date);
+                var d1 = d.getDay();
+                var dayName = days[d.getDay()];
+                daysOfWeek[d1].forEach((week,iterationNumber) =>{
+                if(week.start == a.startTime){
+                    daysOfWeek[d1][iterationNumber] = a;
+                }
+                })
+            });
+            console.log(daysOfWeek); 
+            return (daysOfWeek);       
         } catch (e) {
             console.log(e);
             return {
@@ -406,199 +437,6 @@ export class AppointmentService {
             }
         }
     }
-
-    // async appointmentSlotsView(user: any): Promise<any> {
-    //     try {
-    //     const doc = await this.doctorDetails(user.doctorKey);
-    //     var docId = doc.doctorId;
-    //     let d = new Date();
-    //     var date =d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-    //    // const app = await this.appointmentRepository.query(queries.getAppList, [docId,date]);
-    //    const app = await this.appointmentRepository.query(queries.getAppList, [docId]);
-    //     console.log(app);
-    //     // const app = await this.appointmentRepository.query(queries.getPossibleListAppointmentDatesFor7Days, [docId]);
-    //     if(app.length){
-    //     const config = await this.doctorConfigRepository.findOne({doctorKey:doc.doctorKey});
-    //     let consultSession =Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-    //     let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
-    //     console.log(schDay);
-    //     var Sunday =[];var Monday = [];var Tuesday = []; var Wednesday = []; var Thursday =[];var Friday = [];var Saturday = [];
-    //     schDay.forEach( e => {
-    //     if(e.dayOfWeek=='Sunday'){
-    //     Sunday.push(e);
-    //     }else if(e.dayOfWeek=='Monday'){
-    //     Monday.push(e);
-    //     }else if(e.dayOfWeek=='Tuesday'){
-    //     Tuesday.push(e);
-    //     }else if(e.dayOfWeek=='Wednesday'){
-    //     Wednesday.push(e);
-    //     }else if(e.dayOfWeek=='Thursday'){
-    //     Thursday.push(e);
-    //     }else if(e.dayOfWeek=='Friday'){
-    //     Friday.push(e);
-    //     }else if(e.dayOfWeek=='Saturday'){
-    //     Saturday.push(e);
-    //     }
-    //     });
-    //     console.log(Sunday,Monday)
-    //     var sundaySlots=[];
-    //     if(Sunday.length){
-    //         Sunday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Sunday';
-    //                     start = start + consultSession;
-    //                     sundaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-
-    //     console.log(sundaySlots);
-       
-    //     var mondaySlots=[];
-    //     if(Monday.length){
-    //         Monday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start < end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Monday';
-    //                     start = start + consultSession;
-    //                     mondaySlots.push(day);
-    //                 }
-    //             }
-    //          })
-    //     }
-       
-    //     var tuesdaySlots=[];
-    //     if(Tuesday.length){
-    //         Tuesday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Tuesday';
-    //                     start = start + consultSession;
-    //                     tuesdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var wednesdaySlots=[];
-    //     if(Wednesday.length){
-    //         Wednesday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Wednesday';
-    //                     start = start + consultSession;
-    //                     wednesdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var thursdaySlots=[];
-    //     if(Thursday.length){
-    //         Thursday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Thursday';
-    //                     start = start + consultSession;
-    //                     thursdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var fridaySlots=[];
-    //     if(Friday.length){
-    //         Friday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Friday';
-    //                     start = start + consultSession;
-    //                     fridaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-       
-    //     var saturdaySlots=[];
-    //     if(Saturday.length){
-    //         Saturday.forEach(d =>{
-    //             if(d.startTime){
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while(start< end){
-    //                     var day:any =[];
-    //                     let strt=Helper.getTimeinHrsMins(start);
-    //                     day.start=strt;
-    //                     day.day = 'Saturday';
-    //                     start = start + consultSession;
-    //                     saturdaySlots.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-
-    //     console.log(sundaySlots,mondaySlots,tuesdaySlots,wednesdaySlots,thursdaySlots,fridaySlots,saturdaySlots);
-    //     var daysOfWeek = [];
-    //     daysOfWeek.push(sundaySlots);daysOfWeek.push(mondaySlots);daysOfWeek.push(tuesdaySlots);daysOfWeek.push(wednesdaySlots);daysOfWeek.push(thursdaySlots);daysOfWeek.push(fridaySlots);daysOfWeek.push(saturdaySlots);
-    //     var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    //     days.forEach(day =>{
-       
-    //     })
-    //     app.forEach(a => {
-    //     let date = a.appointment_date;
-    //     var d = new Date(date);
-    //     var d1 = d.getDay();
-    //     var dayName = days[d.getDay()];
-    //     daysOfWeek[d1].forEach(week =>{
-    //     if(week.day.start == a.startTime){
-    //     week.day = a;
-    //     }
-    //     })
-    //     });
-       
-    //    return (daysOfWeek);
-       
-    //     }
-    //     } catch (e) {
-    //         console.log(e);
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-    //         }
-    //     }
-    // }
 
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
@@ -939,6 +777,34 @@ export class AppointmentService {
 
     }
 
+    async hospitaldetailsEdit(hospitalDto: HospitalDto): Promise<any> {
+        try {
+                // update the doctorConfig details
+            var condition = {
+                accountKey: hospitalDto.accountKey
+            }
+            var values: any = hospitalDto;
+            var updateHospital = await this.accountDetailsRepository.update(condition, values);
+            if (updateHospital.affected) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.UPDATE_OK
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+	    console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
 
 
 
@@ -976,6 +842,31 @@ export class AppointmentService {
         }
         return isPhone;
     }
+
+    async freeSlots(a,b,c,e,f): Promise<any> {
+        if(a.length){
+            a.forEach(d =>{
+                if(d.startTime){
+                    let start = Helper.getTimeInMilliSeconds(d.startTime);
+                    let end = Helper.getTimeInMilliSeconds(d.endTime);
+                    while(start< end){
+                        let strt = Helper.getTimeinHrsMins(Number(start));
+                        let last = Helper.getTimeinHrsMins(Number(end));
+                        let day = {
+                            slotType:'Free Slot',
+                            start:strt,
+                            end:last,
+                            sessiontime:f,
+                            day:e
+                        }
+                        start = start + c;
+                        b.push(day);
+                    }
+                }
+            })
+        }
+    }
+
 
 
 }

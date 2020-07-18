@@ -1,6 +1,6 @@
 import {IsEmail,IsNumber,IsPhoneNumber,IsOptional, Min, Max } from 'class-validator';
 
-export declare class DocConfigDto {
+export class DocConfigDto {
     @IsNumber()
     @IsOptional()
     id : number;

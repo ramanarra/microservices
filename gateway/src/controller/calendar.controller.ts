@@ -37,7 +37,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG
+    PatientDto,CONSTANT_MSG,HospitalDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -49,6 +49,8 @@ import {accountUsersSettingsWrite} from "../common/decorator/accountUsersSetting
 import {selfAppointmentRead} from "../common/decorator/selfAppointmentRead.decorator";
 import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppointmentRead.decorator";
 import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
+import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
+import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
 
 
 @Controller('api/calendar')
@@ -65,7 +67,7 @@ export class CalendarController {
     @Post('doctor/createAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
+            '"patientId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
@@ -89,6 +91,13 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        }
+        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+        if(appointmentDto.appointmentDate < new Date()){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
         }
         this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.createAppointment(appointmentDto, req.user);
@@ -207,13 +216,13 @@ export class CalendarController {
     @Get('doctor/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05, 2020-06-21'})
+    @ApiOkResponse({description: 'request body example:  Doc_5,1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
+    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('paginationNumber') paginationNumber: number) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user, doctorKey);
+        return this.calendarService.appointmentSlotsView(req.user, doctorKey,paginationNumber);
     }
 
     @Post('doctor/appointmentReschedule')
@@ -356,16 +365,16 @@ export class CalendarController {
     @Post('patient/bookAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
-            '"doctorId":"1",\n' +
-            '"startTime": "10:00 AM",\n' +
-            '"endTime": "11:00 AM",\n' +
+            '"patientId":1,\n' +
+            '"doctorId":1,\n' +
+            '"startTime": "10:00",\n' +
+            '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
-    patientBookAppointment(@Request() req, @Body() patientDto: PatientDto) {
+    patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
         if(!req.body.doctorId){
             console.log("Provide doctorId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
@@ -375,6 +384,13 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        }
+        patientDto.appointmentDate= new Date(patientDto.appointmentDate);
+        if(patientDto.appointmentDate < new Date()){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
         }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
         return this.calendarService.patientBookAppointment(patientDto);
@@ -430,6 +446,37 @@ export class CalendarController {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
         return this.calendarService.doctorPersonalSettingsEdit(req.user,doctorDto);
     }
+
+    @Get('doctor/hospitaldetailsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: ' '})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsView(@accountSettingsRead() check: boolean, @Request() req , @Query('accountKey') accountKey: String) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.hospitaldetailsView(req.user,accountKey);
+    }
+
+    @Post('doctor/hospitaldetailsEdit')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.accountKey){
+            console.log("Provide accountKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide accountKey"}
+        }
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(hospitalDto)}`);
+        return this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
+    }
+
+
  
 
 
