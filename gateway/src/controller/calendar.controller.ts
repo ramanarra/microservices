@@ -216,7 +216,7 @@ export class CalendarController {
     @Get('doctor/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request body example:  Doc_5,1'})
+    @ApiOkResponse({description: 'request body example:  Doc_5, 0 (default value)'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('paginationNumber') paginationNumber: number) {
         if (!check && !check2)

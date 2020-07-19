@@ -14,12 +14,13 @@ export const queries = {
     getPastAppointment: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 order by appointment_date',
     getUpcomingAppointment: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 order by appointment_date',
     getAppointmentForDoctor: 'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2',
-    getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >= current_date + $2 group by appointment_date limit 7',
+    getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >=  $2 group by appointment_date limit 7',
     getListOfAppointmentFromDates : 'select * from appointment where "doctorId" = $1 and  appointment_date in $2 order by appointment_date',
     getPatientList:'SELECT "firstName","lastName","email","phone","dateOfBirth" FROM patient_details',
     //getAppList:'select * from appointment  where "doctorId" = $1 and appointment_date >= $2 group by appointment_date limit 7',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
-    getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND $2 <= "appointment_date" AND "appointment_date" <= $3 order by appointment_date',
-    getScheduleIntervalDays: 'select "docConfigScheduleDayId" from doc_config_schedule_interval  where doctorkey  =  $1 group by "docConfigScheduleDayId"'
-
+    getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
+    getScheduleIntervalDays: 'select "docConfigScheduleDayId" from doc_config_schedule_interval  where doctorkey  =  $1 group by "docConfigScheduleDayId"',
+    getAppointByDocId: 'select * from appointment where "doctorId" = $1 and appointment_date >= $2  order by appointment_date limit 7 ',
+    getDoctorScheduleIntervalAndDay: 'select * from doc_config_schedule_day dcsd   join doc_config_schedule_interval dcsi on dcsd.id = dcsi."docConfigScheduleDayId" where dcsd.doctor_key = $1;'
 }
