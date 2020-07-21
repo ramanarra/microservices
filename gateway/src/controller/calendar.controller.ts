@@ -407,9 +407,9 @@ export class CalendarController {
     @Get('patient/pastAppointmentsList')
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number) {
+    patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number, @Query('paginationNumber') paginationNumber: Number) {
         this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(patientId)}`);
-        return this.calendarService.patientPastAppointments(patientId);
+        return this.calendarService.patientPastAppointments(patientId,paginationNumber);
     }
 
     @Get('patient/upcomingAppointmentsList')

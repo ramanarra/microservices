@@ -281,8 +281,8 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'patient_past_appointments'})
-    async patientPastAppointments(patientId:any): Promise<any> {
-        const appointment = await this.appointmentService.patientPastAppointments(patientId);
+    async patientPastAppointments(user:any): Promise<any> {
+        const appointment = await this.appointmentService.patientPastAppointments(user);
         return appointment;
     }
 

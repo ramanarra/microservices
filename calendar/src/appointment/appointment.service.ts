@@ -808,15 +808,15 @@ export class AppointmentService {
         }
     }
 
-    async patientPastAppointments(patientId: any): Promise<any> {
+    async patientPastAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId, date]);
+            let offset = user.paginationNumber*10;
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date,offset]);
             if (app.length) {
                 var appList: any = [];
                 for(let appointmentList of app){
-               // for (var i = 0; i < app.length; i++){
                     if (appointmentList.appointment_date == date) {
                         if (appointmentList.is_active == false) {
                             let doctor = await this.doctor_Details(appointmentList.doctorId);
@@ -866,8 +866,8 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-           // const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [user.patientId, date]);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,user.paginationNumber]);
+            let offset = user.paginationNumber*10;
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,offset]);
             if (app.length) {
                 var appList: any = [];
                 for(let appointmentList of app){
