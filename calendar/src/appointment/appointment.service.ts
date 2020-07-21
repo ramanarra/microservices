@@ -814,39 +814,40 @@ export class AppointmentService {
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId, date]);
             if (app.length) {
-                var appo: any = [];
-                for (var i = 0; i < app.length; i++){
-                    if (app[i].appointment_date == date) {
-                        if (app[i].is_active == false) {
-                            let doctor = await this.doctor_Details(app[i].doctorId);
+                var appList: any = [];
+                for(let appointmentList of app){
+               // for (var i = 0; i < app.length; i++){
+                    if (appointmentList.appointment_date == date) {
+                        if (appointmentList.is_active == false) {
+                            let doctor = await this.doctor_Details(appointmentList.doctorId);
                             let account = await this.accountDetails(doctor.accountKey);
                             let res = {
-                                appointmentDate:app[i].appointment_date,
-                                appointmentId:app[i].id,
-                                startTime:app[i].startTime,
-                                endTime:app[i].endTime,
+                                appointmentDate:appointmentList.appointment_date,
+                                appointmentId:appointmentList.id,
+                                startTime:appointmentList.startTime,
+                                endTime:appointmentList.endTime,
                                 doctorFirstName:doctor.firstName,
                                 doctorLastName:doctor.lastName,
                                 hospitalName:account.hospitalName
                             }
-                            appo.push(res);
+                            appList.push(res);
                         }
                     } else {
-                        let doctor = await this.doctor_Details(app[i].doctorId);
+                        let doctor = await this.doctor_Details(appointmentList.doctorId);
                         let account = await this.accountDetails(doctor.accountKey);
                         let res = {
-                            appointmentDate:app[i].appointment_date,
-                            appointmentId:app[i].id,
-                            startTime:app[i].startTime,
-                            endTime:app[i].endTime,
+                            appointmentDate:appointmentList.appointment_date,
+                            appointmentId:appointmentList.id,
+                            startTime:appointmentList.startTime,
+                            endTime:appointmentList.endTime,
                             doctorFirstName:doctor.firstName,
                             doctorLastName:doctor.lastName,
                             hospitalName:account.hospitalName
                         }
-                        appo.push(res);
+                        appList.push(res);
                     }
                 }
-                return appo;
+                return appList;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -861,17 +862,18 @@ export class AppointmentService {
         }
     }
 
-    async patientUpcomingAppointments(patientId: any): Promise<any> {
+    async patientUpcomingAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [patientId, date]);
+           // const app = await this.appointmentRepository.query(queries.getUpcomingAppointment, [user.patientId, date]);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,user.paginationNumber]);
             if (app.length) {
-                var appo: any = [];
-                for (var i = 0; i < app.length; i++) {
-                    if (app[i].appointment_date == date) {
-                        if (app[i].is_active == true) {
-                            let doctor = await this.doctor_Details(app[i].doctorId);
+                var appList: any = [];
+                for(let appointmentList of app){
+                    if (appointmentList.appointment_date == date) {
+                        if (appointmentList.is_active == true) {
+                            let doctor = await this.doctor_Details(appointmentList.doctorId);
                             let account = await this.accountDetails(doctor.accountKey);
                             let config = await this.getDoctorConfigDetails(doctor.doctorKey);
                             var preConsultationHours = null;
@@ -881,21 +883,20 @@ export class AppointmentService {
                                 preConsultationMins = config.preconsultationMins; 
                             }
                             let res = {
-                                appointmentDate:app[i].appointment_date,
-                                appointmentId:app[i].id,
-                                startTime:app[i].startTime,
-                                endTime:app[i].endTime,
+                                appointmentDate:appointmentList.appointment_date,
+                                appointmentId:appointmentList.id,
+                                startTime:appointmentList.startTime,
+                                endTime:appointmentList.endTime,
                                 doctorFirstName:doctor.firstName,
                                 doctorLastName:doctor.lastName,
                                 hospitalName:account.hospitalName,
                                 preConsultationHours:preConsultationHours,
                                 preConsultationMins:preConsultationMins
                             }
-                            appo.push(res);
-                          //  appo.push(app[i]);
+                            appList.push(res);
                         }
                     } else {
-                        let doctor = await this.doctor_Details(app[i].doctorId);
+                        let doctor = await this.doctor_Details(appointmentList.doctorId);
                         let account = await this.accountDetails(doctor.accountKey);
                         let config = await this.getDoctorConfigDetails(doctor.doctorKey);
                         var preConsultationHours = null;
@@ -905,21 +906,20 @@ export class AppointmentService {
                             preConsultationMins = config.preconsultationMins; 
                         }
                         let res = {
-                            appointmentDate:app[i].appointment_date,
-                            appointmentId:app[i].id,
-                            startTime:app[i].startTime,
-                            endTime:app[i].endTime,
+                            appointmentDate:appointmentList.appointment_date,
+                            appointmentId:appointmentList.id,
+                            startTime:appointmentList.startTime,
+                            endTime:appointmentList.endTime,
                             doctorFirstName:doctor.firstName,
                             doctorLastName:doctor.lastName,
                             hospitalName:account.hospitalName,
                             preConsultationHours:preConsultationHours,
                             preConsultationMins:preConsultationMins
                         }
-                        appo.push(res);
-                       // appo.push(app[i]);
+                        appList.push(res);
                     }
                 }
-                return appo;
+                return appList;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -935,7 +935,6 @@ export class AppointmentService {
     }
 
     async patientList(): Promise<any> {
-        //return await this.patientDetailsRepository.find();
         return await this.patientDetailsRepository.query(queries.getPatientList);
     }
 
