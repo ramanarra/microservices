@@ -815,15 +815,37 @@ export class AppointmentService {
             const app = await this.appointmentRepository.query(queries.getPastAppointment, [patientId, date]);
             if (app.length) {
                 var appo: any = [];
-                app.forEach(a => {
-                    if (a.appointment_date == date) {
-                        if (a.is_active == false) {
-                            appo.push(a);
+                for (var i = 0; i < app.length; i++){
+                    if (app[i].appointment_date == date) {
+                        if (app[i].is_active == false) {
+                            let doctor = await this.doctor_Details(app[i].doctorId);
+                            let account = await this.accountDetails(doctor.accountKey);
+                            let res = {
+                                appointmentDate:app[i].appointment_date,
+                                appointmentId:app[i].id,
+                                startTime:app[i].startTime,
+                                endTime:app[i].endTime,
+                                doctorFirstName:doctor.firstName,
+                                doctorLastName:doctor.lastName,
+                                hospitalName:account.hospitalName
+                            }
+                            appo.push(res);
                         }
                     } else {
-                        appo.push(a);
+                        let doctor = await this.doctor_Details(app[i].doctorId);
+                        let account = await this.accountDetails(doctor.accountKey);
+                        let res = {
+                            appointmentDate:app[i].appointment_date,
+                            appointmentId:app[i].id,
+                            startTime:app[i].startTime,
+                            endTime:app[i].endTime,
+                            doctorFirstName:doctor.firstName,
+                            doctorLastName:doctor.lastName,
+                            hospitalName:account.hospitalName
+                        }
+                        appo.push(res);
                     }
-                });
+                }
                 return appo;
             } else {
                 return {
@@ -849,10 +871,52 @@ export class AppointmentService {
                 for (var i = 0; i < app.length; i++) {
                     if (app[i].appointment_date == date) {
                         if (app[i].is_active == true) {
-                            appo.push(app[i]);
+                            let doctor = await this.doctor_Details(app[i].doctorId);
+                            let account = await this.accountDetails(doctor.accountKey);
+                            let config = await this.getDoctorConfigDetails(doctor.doctorKey);
+                            var preConsultationHours = null;
+                            var preConsultationMins = null;
+                            if(config.isPreconsultationAllowed){
+                                preConsultationHours = config.preconsultationHours; 
+                                preConsultationMins = config.preconsultationMins; 
+                            }
+                            let res = {
+                                appointmentDate:app[i].appointment_date,
+                                appointmentId:app[i].id,
+                                startTime:app[i].startTime,
+                                endTime:app[i].endTime,
+                                doctorFirstName:doctor.firstName,
+                                doctorLastName:doctor.lastName,
+                                hospitalName:account.hospitalName,
+                                preConsultationHours:preConsultationHours,
+                                preConsultationMins:preConsultationMins
+                            }
+                            appo.push(res);
+                          //  appo.push(app[i]);
                         }
                     } else {
-                        appo.push(app[i]);
+                        let doctor = await this.doctor_Details(app[i].doctorId);
+                        let account = await this.accountDetails(doctor.accountKey);
+                        let config = await this.getDoctorConfigDetails(doctor.doctorKey);
+                        var preConsultationHours = null;
+                        var preConsultationMins = null;
+                        if(config.isPreconsultationAllowed){
+                            preConsultationHours = config.preconsultationHours; 
+                            preConsultationMins = config.preconsultationMins; 
+                        }
+                        let res = {
+                            appointmentDate:app[i].appointment_date,
+                            appointmentId:app[i].id,
+                            startTime:app[i].startTime,
+                            endTime:app[i].endTime,
+                            doctorFirstName:doctor.firstName,
+                            doctorLastName:doctor.lastName,
+                            hospitalName:account.hospitalName,
+                            preConsultationHours:preConsultationHours,
+                            preConsultationMins:preConsultationMins
+                        }
+                        appo.push(res);
+                       // appo.push(app[i]);
                     }
                 }
                 return appo;
@@ -928,6 +992,26 @@ export class AppointmentService {
                 message: CONSTANT_MSG.DB_ERROR
             }
         }
+    }
+
+    async viewDoctorDetails(details: any): Promise<any> {
+        const doctor = await this.doctorDetails(details.doctorKey);
+        const account = await this.accountDetails(doctor.accountKey);
+        const app = await this.appointmentDetails(details.appointmentId);
+        const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+            var res = {
+            email:doctor.email,
+            mobileNo:doctor.number,
+            hospitalName:account.hospitalName,
+            location:account.city,
+            appointmentDate:app.appointmentDetails.appointmentDate,
+            startTime:app.appointmentDetails.startTime,
+            endTime:app.appointmentDetails.endTime,
+            preConsultationHours:config.preconsultationHours,
+            preConsulationMinutes:config.preconsultationMins
+        }
+        return res;
+        
     }
 
 
