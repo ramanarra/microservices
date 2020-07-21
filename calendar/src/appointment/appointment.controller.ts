@@ -165,8 +165,16 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'appointment_slots_view'})
     async appointmentSlotsView(user: any): Promise<any> {
-        const appointment = await this.appointmentService.appointmentSlotsView(user);
-        return appointment;
+        const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
+        if(((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) &&  user.account_key == doctor.accountKey) || (user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey)){
+            const appointment = await this.appointmentService.appointmentSlotsView(user);
+            return appointment;
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }  
     }
 
     
@@ -334,8 +342,9 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'app_doctor_details'})
-    async doctorDetails(doctorKey: any): Promise<any> {
-        const doctor = await this.appointmentService.doctorDetails(doctorKey);
+    async doctorDetails(details: any): Promise<any> {
+        //const doctor = await this.appointmentService.doctorDetails(doctorKey);
+        const doctor = await this.appointmentService.viewDoctorDetails(details);
         return doctor;        
     }
 

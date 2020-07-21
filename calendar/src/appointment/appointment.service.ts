@@ -822,6 +822,7 @@ export class AppointmentService {
                             let account = await this.accountDetails(doctor.accountKey);
                             let res = {
                                 appointmentDate:app[i].appointment_date,
+                                appointmentId:app[i].id,
                                 startTime:app[i].startTime,
                                 endTime:app[i].endTime,
                                 doctorFirstName:doctor.firstName,
@@ -835,6 +836,7 @@ export class AppointmentService {
                         let account = await this.accountDetails(doctor.accountKey);
                         let res = {
                             appointmentDate:app[i].appointment_date,
+                            appointmentId:app[i].id,
                             startTime:app[i].startTime,
                             endTime:app[i].endTime,
                             doctorFirstName:doctor.firstName,
@@ -880,6 +882,7 @@ export class AppointmentService {
                             }
                             let res = {
                                 appointmentDate:app[i].appointment_date,
+                                appointmentId:app[i].id,
                                 startTime:app[i].startTime,
                                 endTime:app[i].endTime,
                                 doctorFirstName:doctor.firstName,
@@ -903,6 +906,7 @@ export class AppointmentService {
                         }
                         let res = {
                             appointmentDate:app[i].appointment_date,
+                            appointmentId:app[i].id,
                             startTime:app[i].startTime,
                             endTime:app[i].endTime,
                             doctorFirstName:doctor.firstName,
@@ -988,6 +992,26 @@ export class AppointmentService {
                 message: CONSTANT_MSG.DB_ERROR
             }
         }
+    }
+
+    async viewDoctorDetails(details: any): Promise<any> {
+        const doctor = await this.doctorDetails(details.doctorKey);
+        const account = await this.accountDetails(doctor.accountKey);
+        const app = await this.appointmentDetails(details.appointmentId);
+        const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+            var res = {
+            email:doctor.email,
+            mobileNo:doctor.number,
+            hospitalName:account.hospitalName,
+            location:account.city,
+            appointmentDate:app.appointmentDetails.appointmentDate,
+            startTime:app.appointmentDetails.startTime,
+            endTime:app.appointmentDetails.endTime,
+            preConsultationHours:config.preconsultationHours,
+            preConsulationMinutes:config.preconsultationMins
+        }
+        return res;
+        
     }
 
 
