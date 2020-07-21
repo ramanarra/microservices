@@ -820,48 +820,28 @@ export class AppointmentService {
                         if (app[i].is_active == false) {
                             let doctor = await this.doctor_Details(app[i].doctorId);
                             let account = await this.accountDetails(doctor.accountKey);
-                            let config = await this.getDoctorConfigDetails(doctor.doctorKey);
-                            var preConsultationHours = null;
-                            var preConsultationMins = null;
-                            if(config.isPreconsultationAllowed){
-                                preConsultationHours = config.preconsultationHours; 
-                                preConsultationMins = config.preconsultationMins; 
-                            }
                             let res = {
                                 appointmentDate:app[i].appointment_date,
                                 startTime:app[i].startTime,
                                 endTime:app[i].endTime,
                                 doctorFirstName:doctor.firstName,
                                 doctorLastName:doctor.lastName,
-                                hospitalName:account.hospitalName,
-                                preConsultationHours:preConsultationHours,
-                                preConsultationMins:preConsultationMins
+                                hospitalName:account.hospitalName
                             }
                             appo.push(res);
-                            //appo.push(a);
                         }
                     } else {
                         let doctor = await this.doctor_Details(app[i].doctorId);
                         let account = await this.accountDetails(doctor.accountKey);
-                        let config = await this.getDoctorConfigDetails(doctor.doctorKey);
-                        var preConsultationHours = null;
-                        var preConsultationMins = null;
-                        if(config.isPreconsultationAllowed){
-                            preConsultationHours = config.preconsultationHours; 
-                            preConsultationMins = config.preconsultationMins; 
-                        }
                         let res = {
                             appointmentDate:app[i].appointment_date,
                             startTime:app[i].startTime,
                             endTime:app[i].endTime,
                             doctorFirstName:doctor.firstName,
                             doctorLastName:doctor.lastName,
-                            hospitalName:account.hospitalName,
-                            preConsultationHours:preConsultationHours,
-                            preConsultationMins:preConsultationMins
+                            hospitalName:account.hospitalName
                         }
                         appo.push(res);
-                        //appo.push(a);
                     }
                 }
                 return appo;

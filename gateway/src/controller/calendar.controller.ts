@@ -476,6 +476,18 @@ export class CalendarController {
         return this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
     }
 
+    @Get('patient/viewDoctorDetails')
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    doctorDetails(@Request() req, @Query('doctorKey') doctorKey: String) {
+        if(!doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
+        }
+        this.logger.log(`View Doctor Details  Api -> Request data ${JSON.stringify(doctorKey)}`);
+        return this.calendarService.doctorDetails(doctorKey);
+    }
+
 
  
 

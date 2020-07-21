@@ -333,4 +333,10 @@ export class AppointmentController {
         
     }
 
+    @MessagePattern({cmd: 'app_doctor_details'})
+    async doctorDetails(doctorKey: any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(doctorKey);
+        return doctor;        
+    }
+
 }
