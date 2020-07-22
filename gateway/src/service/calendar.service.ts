@@ -137,14 +137,22 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientPastAppointments(patientId:any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_past_appointments'},patientId);
+    public patientPastAppointments(patientId:any,paginationNumber:any) : Observable <any> {
+        let user = {
+            patientId:patientId,
+            paginationNumber:paginationNumber
+        }
+        return this.redisClient.send({ cmd : 'patient_past_appointments'},user);
     }
 
     
     @UseFilters(AllClientServiceException)
-    public patientUpcomingAppointments(patientId:any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},patientId);
+    public patientUpcomingAppointments(patientId:any,paginationNumber) : Observable <any> {
+        let user = {
+            patientId:patientId,
+            paginationNumber:paginationNumber
+        }
+        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user);
     }
 
     @UseFilters(AllClientServiceException)
@@ -177,6 +185,13 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
             appointmentId:appointmentId
         }
         return this.redisClient.send({cmd: 'app_doctor_details'}, details);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public availableSlots(user:any,doctorKey:any,appointmentDate:any): Observable<any> {
+        user.doctorKey = doctorKey;
+        user.appointmentDate = appointmentDate;
+        return this.redisClient.send({cmd: 'app_doctor_slots'}, user);
     }
 
 
