@@ -8,12 +8,16 @@ import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfig
 import { DocConfigScheduleDay } from "./docConfigScheduleDay/docConfigScheduleDay.entity";
 import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
+import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
+import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+
 
 
 @EntityRepository(Appointment)
 export class AppointmentRepository extends Repository<Appointment> {
 
-    private logger = new Logger('AppointmentRepository');
+    private logger = new Logger('AppointmentRepository');private appointmentDocConfigRepository:AppointmentDocConfigRepository;
+    private appointmentCancelRescheduleRepository:AppointmentCancelRescheduleRepository;
     async createAppointment(appointmentDto: any): Promise<any> {
 
         const { doctorId, patientId, appointmentDate, startTime, endTime } = appointmentDto;

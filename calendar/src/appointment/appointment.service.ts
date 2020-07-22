@@ -30,6 +30,7 @@ import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.
 import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
 import {PatientDetails} from './patientDetails/patientDetails.entity';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
+import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
 
 
@@ -50,7 +51,8 @@ export class AppointmentService {
         private workScheduleDayRepository: WorkScheduleDayRepository,
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
-        private paymentDetailsRepository: PaymentDetailsRepository
+        private paymentDetailsRepository: PaymentDetailsRepository,
+        private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository
     ) {
     }
 
@@ -455,7 +457,7 @@ export class AppointmentService {
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
                                     let startTimeInMilliSec = Helper.getTimeInMilliSeconds(v.startTime);
                                     let slotStartTimeInMilliSec = Helper.getTimeInMilliSeconds(slotStartTime);
-                                    if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (v.is_cancel == false)) {  // if any appointment present then push the booked appointment slots
+                                    if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
                                         v.slotType = 'Booked';
                                        // v.slotTiming = consultationSessionTiming;
                                         slotObject.slots.push(v)
