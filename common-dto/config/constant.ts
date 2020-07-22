@@ -20,6 +20,8 @@ export const CONSTANT_MSG = {
     NO_PERMISSION:'No Permission',
     INVALID_PHONE:'Invalid Phone',
     INVALID_PASSWORD:'Invalid Password',
+    END_TIME_MISMATCHING:'End time is mismatching with respect to doctor session timing',
+    INVALID_TIMINGS:'start time should be less than endTime',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

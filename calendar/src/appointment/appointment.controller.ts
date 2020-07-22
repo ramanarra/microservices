@@ -19,6 +19,8 @@ export class AppointmentController {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
         if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
+            const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.user.doctor_key);
+            appointmentDto.configSession = config.consultationSessionTimings;
             if(!docId){
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
@@ -197,6 +199,8 @@ export class AppointmentController {
         message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
+    const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+    appointmentDto.configSession = config.consultationSessionTimings;
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
     return appointment;
     }
@@ -270,6 +274,9 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
+        const doctor = await this.appointmentService.doctor_Details(patientDto.doctorId);
+        const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+        patientDto.configSession = config.consultationSessionTimings;
         const patient = await this.appointmentService.createAppointment(patientDto);
         return patient;
     }

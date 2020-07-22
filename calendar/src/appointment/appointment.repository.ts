@@ -24,6 +24,7 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.appointmentDate =new Date(appointmentDto.appointmentDate);
         appointment.startTime = appointmentDto.startTime;
         appointment.endTime = appointmentDto.endTime;
+        appointment.slotTiming = appointmentDto.configSession;
         appointment.isActive= true;
         appointment.isCancel= false;
         if(appointmentDto.user){

@@ -55,10 +55,9 @@ export class AppointmentService {
     }
 
 
-    async createAppointment(appointmentDto: AppointmentDto): Promise<any> {
+    async createAppointment(appointmentDto: any): Promise<any> {
         try {
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
-            const config = await this.doctorConfigRepository
             if (app) {
                 // // validate with previous data
                 let isOverLapping = await this.findTimeOverlaping(app, appointmentDto);
@@ -69,6 +68,23 @@ export class AppointmentService {
                         message: CONSTANT_MSG.TIME_OVERLAP
                     }
                 } else {
+                    let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
+                    let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let endTime = start + config;
+                    if(start > end){
+                        return{
+                            statusCode:HttpStatus.BAD_REQUEST,
+                            message:CONSTANT_MSG.INVALID_TIMINGS
+                        }
+                    }
+                    if(endTime !==end){
+                        return{
+                            statusCode:HttpStatus.BAD_GATEWAY,
+                            message:CONSTANT_MSG.END_TIME_MISMATCHING
+                        }
+                    }
+                    
                     // create appointment on existing date old records
                     return await this.appointmentRepository.createAppointment(appointmentDto);
                 }
@@ -578,6 +594,22 @@ export class AppointmentService {
                         message: CONSTANT_MSG.TIME_OVERLAP
                     }
                 } else {
+                    let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
+                    let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let endTime = start + config;
+                    if(start > end){
+                        return{
+                            statusCode:HttpStatus.BAD_REQUEST,
+                            message:CONSTANT_MSG.INVALID_TIMINGS
+                        }
+                    }
+                    if(endTime !==end){
+                        return{
+                            statusCode:HttpStatus.BAD_GATEWAY,
+                            message:CONSTANT_MSG.END_TIME_MISMATCHING
+                        }
+                    }
                     //cancelling current appointment
                     var isCancel = await this.appointmentCancel(appointmentDto);
                     if (isCancel.message == CONSTANT_MSG.APPOINT_ALREADY_CANCELLED) {
@@ -586,6 +618,7 @@ export class AppointmentService {
                         // create appointment on existing date old records
                         return await this.appointmentRepository.createAppointment(appointmentDto);
                     }
+                    
                 }
 
             }

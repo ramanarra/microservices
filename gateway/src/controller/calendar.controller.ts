@@ -93,7 +93,10 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        if(appointmentDto.appointmentDate < new Date()){
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(appointmentDto.appointmentDate < yesterday){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -255,6 +258,16 @@ export class CalendarController {
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
+        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(appointmentDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
         this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.appointmentReschedule(appointmentDto, req.user);
     }
@@ -386,7 +399,10 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         patientDto.appointmentDate= new Date(patientDto.appointmentDate);
-        if(patientDto.appointmentDate < new Date()){
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(patientDto.appointmentDate < yesterday){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"

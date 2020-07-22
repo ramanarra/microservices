@@ -67,4 +67,9 @@ export class Appointment extends BaseEntity{
     })
     cancelledId : number;  
 
+    @Column({
+        name : 'slotTiming'
+    })
+    slotTiming : number;  
+
 }
