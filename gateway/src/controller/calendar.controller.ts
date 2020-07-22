@@ -488,6 +488,19 @@ export class CalendarController {
         return this.calendarService.doctorDetails(doctorKey,appointmentId);
     }
 
+    @Get('doctor/availableSlots')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'request body example:  Doc_5'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    availableSlots(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: string) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        let date = new Date(appointmentDate);    
+        this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.availableSlots(req.user, doctorKey,date);
+    }
+
 
  
 

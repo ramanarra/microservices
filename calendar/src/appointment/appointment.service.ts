@@ -1013,6 +1013,47 @@ export class AppointmentService {
         
     }
 
+    async availableSlots(user: any): Promise<any> {
+        const doctor = await this.doctorDetails(user.doctorKey);
+        const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
+        const config = await this.getDoctorConfigDetails(user.doctorKey)
+        let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        let dt = new Date(user.appointmentDate);
+        let day = days[dt.getDay()]
+        const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
+        let slots = [];
+        let slotsView = [];
+        let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+        for(let worksched of workSchedule){
+            let start = Helper.getTimeInMilliSeconds(worksched.startTime);
+            let end = Helper.getTimeInMilliSeconds(worksched.endTime);
+            while(start < end){
+                let res = {
+                    start:Helper.getTimeinHrsMins(start),
+                    end:Helper.getTimeinHrsMins(start + consultSession),
+                }
+                let flag = false;
+                if(app.length){
+                    for(let appointment of app){
+                        flag = false;
+                        if(appointment.startTime == Helper.getTimeinHrsMins(start)){
+                            flag = true;
+                            end;
+                        }
+                    }
+                    if(flag == false){
+                        slotsView.push(res);
+                    }                        
+                }else{
+                    slotsView.push(res);
+                }
+                start = start + consultSession;
+                slots.push(res);
+            }
+        }
+        return slotsView;
+    }
+
 
     // common functions below===============================================================
 

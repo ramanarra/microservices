@@ -343,9 +343,23 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'app_doctor_details'})
     async doctorDetails(details: any): Promise<any> {
-        //const doctor = await this.appointmentService.doctorDetails(doctorKey);
         const doctor = await this.appointmentService.viewDoctorDetails(details);
         return doctor;        
+    }
+
+    @MessagePattern({cmd: 'app_doctor_slots'})
+    async availableSlots(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const doctor = await this.appointmentService.availableSlots(user);
+            return doctor; 
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+               
     }
 
 }
