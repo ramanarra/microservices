@@ -673,8 +673,9 @@ export class AppointmentService {
 
     async patientSearch(patientDto: any): Promise<any> {
         try {
-            if (patientDto.phone && patientDto.phone.length === 10) {
-                const patientDetails = await this.patientDetailsRepository.findOne({phone: patientDto.phone});
+            if (patientDto.phone) {
+               // const patientDetails = await this.patientDetailsRepository.find({phone: patientDto.phone});
+                const patientDetails = await this.patientDetailsRepository.query(queries.getPatient, [patientDto.phone+'%'])
                 if (patientDetails) {
                     return patientDetails;
                 } else {

@@ -281,9 +281,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiBody({type: PatientDto})
-    patientSearch(@Request() req, @Body() patientDto: PatientDto) {
-        if(req.body.phone && req.body.phone.length == 10){
+    @ApiBody({})
+    patientSearch(@Request() req, @Body() patientDto: string) {
+        if(req.body.phone){
             this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
             return this.calendarService.patientSearch(patientDto, req.user);
         }else{
