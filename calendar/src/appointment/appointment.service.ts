@@ -999,7 +999,6 @@ export class AppointmentService {
             }
             patientList.push(res);
         }
-
         return patientList;
         //return await this.patientDetailsRepository.query(queries.getPatientList,[doctorId]);
     }

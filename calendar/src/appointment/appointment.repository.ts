@@ -1,4 +1,5 @@
 import { Repository, EntityRepository } from "typeorm";
+import {InjectRepository} from '@nestjs/typeorm';
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Appointment } from "./appointment.entity";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
@@ -10,11 +11,13 @@ import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfig
 import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+import { AppointmentDocConfig } from "./appointmentDocConfig/appointmentDocConfig.entity";
 
 
 
 @EntityRepository(Appointment)
 export class AppointmentRepository extends Repository<Appointment> {
+    //constructor AppointmentRepository(appointmentDocConfigRepository: AppointmentDocConfigRepository, appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository): AppointmentRepository
 
     private logger = new Logger('AppointmentRepository');private appointmentDocConfigRepository:AppointmentDocConfigRepository;
     private appointmentCancelRescheduleRepository:AppointmentCancelRescheduleRepository;
@@ -44,6 +47,9 @@ export class AppointmentRepository extends Repository<Appointment> {
             const pay = new PaymentDetails();
             pay.appointmentId = app.id;
             const payment = await pay.save();
+            appointmentDto.appointmentId = app.id;
+           // const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+            //console.log(appDocConfig);
             return {
                 appointmentdetails:app,
                 paymentDetails:payment

@@ -11,7 +11,7 @@ export class AppointmentDocConfig extends BaseEntity{
     @Column({
         name : 'appointment_id'
     })
-    appointmentId : string;
+    appointmentId : number;
 
     @Column({
         name : 'consultation_cost'

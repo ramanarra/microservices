@@ -28,7 +28,8 @@ export class AppointmentController {
                 }
             }
             appointmentDto.doctorId = docId.doctorId;
-        }        
+            appointmentDto.config = config; 
+        } 
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }

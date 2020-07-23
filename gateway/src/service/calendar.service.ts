@@ -24,9 +24,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
 
     @UseFilters(AllClientServiceException)
-    public createAppointment(appointmentDto: any, user: any): Observable<any> {
+    public createAppointment(appointmentDto: any, user: any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'calendar_appointment_create'}, appointmentDto);
+        return this.redisClient.send({cmd: 'calendar_appointment_create'}, appointmentDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
