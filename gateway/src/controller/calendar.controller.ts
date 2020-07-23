@@ -617,6 +617,18 @@ export class CalendarController {
         }
     }
 
+    @Get('doctor/patientDetails')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    patientDetails(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number,  @Query('doctorKey') doctorKey: string) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`PatientDetails Api -> Request data }`);
+        return this.calendarService.patientDetails(req.user, patientId,doctorKey);
+    }
+
 
  
 

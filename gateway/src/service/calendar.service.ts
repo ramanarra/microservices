@@ -194,5 +194,12 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({cmd: 'app_doctor_slots'}, user);
     }
 
+    @UseFilters(AllClientServiceException)
+    public patientDetails(user:any, patientId:any,doctorKey:any) : Observable <any> {
+        user.patientId = patientId;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'patient_details'},user);
+    }
+
 
 }

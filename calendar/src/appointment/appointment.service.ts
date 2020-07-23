@@ -987,20 +987,9 @@ export class AppointmentService {
         let patientList = [];
         for(let x of ids){
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
-            let appointments = [];
-            for(let y of app){
-                if(y.patient_id == x){
-                    appointments.push(y);
-                }
-            }
-            let res = {
-                patientDetails:patient,
-                appointments:appointments
-            }
-            patientList.push(res);
+            patientList.push(patient);
         }
         return patientList;
-        //return await this.patientDetailsRepository.query(queries.getPatientList,[doctorId]);
     }
 
     async doctorPersonalSettingsEdit(doctorDto: DoctorDto): Promise<any> {
@@ -1117,6 +1106,16 @@ export class AppointmentService {
             }
         }
         return slotsView;
+    }
+
+    async patientDetails(patientId:any): Promise<any> {
+        const app = await  this.appointmentRepository.query(queries.getAppListForPatient,[patientId]);
+        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
+        let res = {
+            patientDetails:patient,
+            appointments:app
+        }
+        return res;
     }
 
 

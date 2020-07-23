@@ -371,4 +371,13 @@ export class AppointmentController {
                
     }
 
+    @MessagePattern({cmd: 'patient_details'})
+    async patientDetails(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const patient = await this.appointmentService.patientDetails(user.patientId);
+            return patient;  
+        }
+    }
+
 }
