@@ -32,6 +32,7 @@ import {PatientDetails} from './patientDetails/patientDetails.entity';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
+import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
 
 
 var async = require('async');
@@ -970,8 +971,37 @@ export class AppointmentService {
         }
     }
 
-    async patientList(): Promise<any> {
-        return await this.patientDetailsRepository.query(queries.getPatientList);
+    async patientList(doctorId:any): Promise<any> {
+        const app = await  this.appointmentRepository.query(queries.getAppList,[doctorId]);
+        let ids = [];
+        app.forEach(a => {
+            let flag = false;
+            ids.forEach(i => {
+                if(i == a.patient_id)
+                    flag = true;
+            });
+            if(flag == false){
+                ids.push(a.patient_id)
+            }              
+        });
+        let patientList = [];
+        for(let x of ids){
+            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+            let appointments = [];
+            for(let y of app){
+                if(y.patient_id == x){
+                    appointments.push(y);
+                }
+            }
+            let res = {
+                patientDetails:patient,
+                appointments:appointments
+            }
+            patientList.push(res);
+        }
+
+        return patientList;
+        //return await this.patientDetailsRepository.query(queries.getPatientList,[doctorId]);
     }
 
     async doctorPersonalSettingsEdit(doctorDto: DoctorDto): Promise<any> {

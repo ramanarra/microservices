@@ -441,9 +441,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    patientList() {
+    patientList(@Request() req,  @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
-        return this.calendarService.patientList();
+        return this.calendarService.patientList(doctorKey);
     }
 
     @Post('doctor/personalSettingsEdit')
