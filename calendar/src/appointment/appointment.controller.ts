@@ -169,6 +169,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_slots_view'})
     async appointmentSlotsView(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
+        if(!doctor){
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
         if(((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) &&  user.account_key == doctor.accountKey) || (user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey)){
             const appointment = await this.appointmentService.appointmentSlotsView(user);
             return appointment;
@@ -379,5 +385,19 @@ export class AppointmentController {
             return patient;  
         }
     }
+
+    @MessagePattern({cmd: 'reports_list'})
+    async reports(user: any): Promise<any> {
+        if(user.account_key == user.accountKey){
+           const reports = await this.appointmentService.reports(user.accountKey);
+           return reports;  
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
 
 }

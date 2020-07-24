@@ -388,6 +388,8 @@ export class AppointmentService {
                     }
                 })
                 const doctorConfigDetails = await this.doctorConfigRepository.findOne({doctorKey: doc.doctorKey});
+                let preconsultationHours = doctorConfigDetails.preconsultationHours;
+                let preconsultationMins = doctorConfigDetails.preconsultationMins;
                 let consultationSessionTiming = doctorConfigDetails.consultationSessionTimings;
                 let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
                 let appointmentSlots = [];
@@ -460,6 +462,8 @@ export class AppointmentService {
                                     let slotStartTimeInMilliSec = Helper.getTimeInMilliSeconds(slotStartTime);
                                     if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
                                         v.slotType = 'Booked';
+                                        v.preconsultationHours = preconsultationHours;
+                                        v.preconsultationMins = preconsultationMins;
                                        // v.slotTiming = consultationSessionTiming;
                                         slotObject.slots.push(v)
                                         return true;
@@ -472,7 +476,9 @@ export class AppointmentService {
                                         startTime: slotStartTime,
                                         endTime: slotEndTime,
                                         slotType: 'Free',
-                                        slotTiming: consultationSessionTiming
+                                        slotTiming: consultationSessionTiming,
+                                        preconsultationHours:preconsultationHours,
+                                        preconsultationMins:preconsultationMins
                                     })
                                 }
                                 slotStartTime = slotEndTime; // update the next slot start time
@@ -639,7 +645,7 @@ export class AppointmentService {
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
-            const pat = await this.patientDetailsRepository.findOne({id: appointmentDetails.patientId});
+            const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
             let patient = {
                 id: pat.id,
@@ -655,6 +661,7 @@ export class AppointmentService {
             }
             return res;
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
@@ -865,7 +872,8 @@ export class AppointmentService {
                                 endTime:appointmentList.endTime,
                                 doctorFirstName:doctor.firstName,
                                 doctorLastName:doctor.lastName,
-                                hospitalName:account.hospitalName
+                                hospitalName:account.hospitalName,
+                                doctorKey:doctor.doctorKey
                             }
                             appList.push(res);
                         }
@@ -879,7 +887,8 @@ export class AppointmentService {
                             endTime:appointmentList.endTime,
                             doctorFirstName:doctor.firstName,
                             doctorLastName:doctor.lastName,
-                            hospitalName:account.hospitalName
+                            hospitalName:account.hospitalName,
+                            doctorKey:doctor.doctorKey
                         }
                         appList.push(res);
                     }
@@ -928,7 +937,8 @@ export class AppointmentService {
                                 doctorLastName:doctor.lastName,
                                 hospitalName:account.hospitalName,
                                 preConsultationHours:preConsultationHours,
-                                preConsultationMins:preConsultationMins
+                                preConsultationMins:preConsultationMins,
+                                doctorKey:doctor.doctorKey
                             }
                             appList.push(res);
                         }
@@ -951,7 +961,8 @@ export class AppointmentService {
                             doctorLastName:doctor.lastName,
                             hospitalName:account.hospitalName,
                             preConsultationHours:preConsultationHours,
-                            preConsultationMins:preConsultationMins
+                            preConsultationMins:preConsultationMins,
+                            doctorKey:doctor.doctorKey
                         }
                         appList.push(res);
                     }
@@ -1116,6 +1127,11 @@ export class AppointmentService {
             appointments:app
         }
         return res;
+    }
+
+    async reports(accountKey:any): Promise<any> {
+        const app = await  this.appointmentRepository.query(queries.getReports,[accountKey]);
+        return app;
     }
 
 

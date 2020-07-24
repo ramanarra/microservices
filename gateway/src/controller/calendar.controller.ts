@@ -52,6 +52,7 @@ import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppoi
 import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
 import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
 import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
+import {reports} from "../common/decorator/reports.decorator";
 
 
 @Controller('api/calendar')
@@ -71,7 +72,10 @@ export class CalendarController {
             '"patientId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"dateOfBirth", \n' +
+            '"consultationMode":"DIRECT PAYMENT", \n' +
+            '"preConsultation":"ON" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -383,7 +387,10 @@ export class CalendarController {
             '"doctorId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"dateOfBirth", \n' +
+            '"consultationMode":"DIRECT PAYMENT", \n' +
+            '"preConsultation":"ON" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -627,6 +634,18 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`PatientDetails Api -> Request data }`);
         return this.calendarService.patientDetails(req.user, patientId,doctorKey);
+    }
+
+    @Get('admin/reports')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`admin reports Api -> Request data }`);
+        return this.calendarService.reports(req.user, accountKey);
     }
 
 
