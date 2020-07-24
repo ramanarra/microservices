@@ -28,7 +28,8 @@ export class AppointmentController {
                 }
             }
             appointmentDto.doctorId = docId.doctorId;
-        }        
+            appointmentDto.config = config; 
+        } 
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
@@ -168,6 +169,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_slots_view'})
     async appointmentSlotsView(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
+        if(!doctor){
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
         if(((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) &&  user.account_key == doctor.accountKey) || (user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey)){
             const appointment = await this.appointmentService.appointmentSlotsView(user);
             return appointment;
@@ -300,8 +307,9 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'patient_list'})
-    async patientList(): Promise<any> {
-        const appointment = await this.appointmentService.patientList();
+    async patientList(doctorKey:any): Promise<any> {
+        const doctor =await this.appointmentService.doctorDetails(doctorKey);
+        const appointment = await this.appointmentService.patientList(doctor.doctorId);
         return appointment;
     }
 
@@ -368,5 +376,28 @@ export class AppointmentController {
         }
                
     }
+
+    @MessagePattern({cmd: 'patient_details'})
+    async patientDetails(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const patient = await this.appointmentService.patientDetails(user.patientId);
+            return patient;  
+        }
+    }
+
+    @MessagePattern({cmd: 'reports_list'})
+    async reports(user: any): Promise<any> {
+        if(user.account_key == user.accountKey){
+           const reports = await this.appointmentService.reports(user.accountKey);
+           return reports;  
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
 
 }

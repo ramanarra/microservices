@@ -27,4 +27,10 @@ export class PatientDto {
     dateOfBirth: string;
     alternateContact: string;
     age: number;
+    paymentOption:string;
+    consultationMode:string;
+    preconsultation:string;
+    appointmentDate:Date;
+    startTime:string;
+    endTime:string;
 }

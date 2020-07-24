@@ -94,17 +94,25 @@ export class AuthController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async patientRegistration(@Body() patientDto : PatientDto) {
       if(patientDto.phone && patientDto.phone.length == 10){
-        this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
-        const patient = await this.userService.patientRegistration(patientDto);
-        if(patient.message){
-          return patient;
-        }else {
-          const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
+        if(patientDto.password){
+          this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
+          const patient = await this.userService.patientRegistration(patientDto);
+          if(patient.message){
+            return patient;
+          }else {
+            const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
+            return {
+              patient:patient,
+              details:details
+            }
+          }
+        }else{
           return {
-            patient:patient,
-            details:details
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: "Provide password"
           }
         }
+        
       }else{
         return {
           statusCode: HttpStatus.BAD_REQUEST,

@@ -15,6 +15,7 @@ import {
     ClassSerializerInterceptor,
     UnauthorizedException, HttpStatus
 } from '@nestjs/common';
+import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import {
     ApiOkResponse,
@@ -51,6 +52,7 @@ import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppoi
 import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
 import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
 import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
+import {reports} from "../common/decorator/reports.decorator";
 
 
 @Controller('api/calendar')
@@ -60,7 +62,7 @@ export class CalendarController {
 
     private logger = new Logger('CalendarController');
 
-    constructor(private readonly calendarService: CalendarService) {
+    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService,) {
     }
 
 
@@ -70,7 +72,10 @@ export class CalendarController {
             '"patientId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"dateOfBirth", \n' +
+            '"consultationMode":"DIRECT PAYMENT", \n' +
+            '"preConsultation":"ON" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -382,7 +387,10 @@ export class CalendarController {
             '"doctorId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"dateOfBirth", \n' +
+            '"consultationMode":"DIRECT PAYMENT", \n' +
+            '"preConsultation":"ON" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -441,9 +449,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    patientList() {
+    patientList(@Request() req,  @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
-        return this.calendarService.patientList();
+        return this.calendarService.patientList(doctorKey);
     }
 
     @Post('doctor/personalSettingsEdit')
@@ -515,6 +523,129 @@ export class CalendarController {
         let date = new Date(appointmentDate);    
         this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
         return this.calendarService.availableSlots(req.user, doctorKey,date);
+    }
+
+    @Post('doctor/creatingAppointmetAlongWithRegisteringPatient')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: AppointmentDto})
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                            '"phone":"99999999999",\n' +
+                                            '"firstName":"nirmala@gmail.com",\n' +
+                                            '"lastName":"lastName", \n' +
+                                            '"email":"email@gmail.com", \n' +
+                                            '"dateOfBirth":"1999-10-26", \n' +
+                                            '"appointmentDate":"2020-07-26", \n' +
+                                            '"startTime":"10:00", \n' +
+                                            '"endTime":"11:00", \n' +
+                                            '"paymentOption":"dateOfBirth", \n' +
+                                            '"consultationMode":"DIRECT PAYMENT", \n' +
+                                            '"preConsultation":"ON" \n' +
+                                            '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async RegisteringAndCreateApp(@selfAppointmentWrite() check:boolean, @accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() patientDto: PatientDto) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.phone){
+            console.log("Provide phone");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide phone"}
+        } else if(!req.body.firstName){
+            console.log("Provide firstName");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide firstName"}
+        } else if(!req.body.lastName){
+            console.log("Provide lastName");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide lastName"}
+        } else if(!req.body.email){
+            console.log("Provide email");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide email"}
+        } else if(!req.body.dateOfBirth){
+            console.log("Provide dateOfBirth");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide dateOfBirth"}
+        } else if(!req.body.appointmentDate){
+            console.log("Provide appointmentDate");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}
+        } else if(!req.body.startTime){
+            console.log("Provide startTime");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        } else if(!req.body.endTime){
+            console.log("Provide endTime");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
+        } else if(!req.body.paymentOption){
+            console.log("Provide paymentOption");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide paymentOption"}
+        } else if(!req.body.consultationMode){
+            console.log("Provide consultationMode");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide consultationMode"}
+        }
+        let patientRegDto ={
+            phone:patientDto.phone,
+            firstName:patientDto.firstName,
+            lastName:patientDto.lastName,
+            email:patientDto.email,
+            dateOfBirth:patientDto.dateOfBirth
+        }
+        if(patientDto.phone && patientDto.phone.length == 10){
+            this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientRegDto)}`);
+            const patient = await this.userService.patientRegistration(patientRegDto);
+            if(patient.message){
+                return patient;
+            }else {
+                const details = await this.calendarService.patientInsertion(patientRegDto,patient.patientId);
+                let appointmentDto = {
+                    patientId:patient.patientId,
+                    appointmentDate:patientDto.appointmentDate,
+                    startTime:patientDto.startTime,
+                    endTime:patientDto.endTime
+                }
+               
+                appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+                const today = new Date()
+                const yesterday = new Date(today)
+                yesterday.setDate(yesterday.getDate() - 1)
+                if(appointmentDto.appointmentDate < yesterday){
+                    return{
+                        statusCode:HttpStatus.BAD_REQUEST,
+                        message:"Past Dates are not acceptable"
+                    }
+                }
+                this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+                const app = await this.calendarService.createAppointment(appointmentDto, req.user);
+                return {
+                    patient:patient,
+                    details:details,
+                    appointment:app
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Provide valid phone"
+            }
+        }
+    }
+
+    @Get('doctor/patientDetails')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    patientDetails(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number,  @Query('doctorKey') doctorKey: string) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`PatientDetails Api -> Request data }`);
+        return this.calendarService.patientDetails(req.user, patientId,doctorKey);
+    }
+
+    @Get('admin/reports')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`admin reports Api -> Request data }`);
+        return this.calendarService.reports(req.user, accountKey);
     }
 
 
