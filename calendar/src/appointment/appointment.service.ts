@@ -1084,6 +1084,7 @@ export class AppointmentService {
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
         let dt = new Date(user.appointmentDate);
+        //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
         let slots = [];
@@ -1103,7 +1104,7 @@ export class AppointmentService {
                         flag = false;
                         if(appointment.startTime == Helper.getTimeinHrsMins(start)){
                             flag = true;
-                            end;
+                            break;
                         }
                     }
                     if(flag == false){
