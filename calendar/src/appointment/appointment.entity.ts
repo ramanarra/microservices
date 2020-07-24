@@ -72,4 +72,14 @@ export class Appointment extends BaseEntity{
     })
     slotTiming : number;  
 
+    @Column({
+        name : 'paymentoption'
+    })
+    paymentOption : string;  
+
+    @Column({
+        name : 'consultationmode'
+    })
+    consultationMode : string;  
+
 }

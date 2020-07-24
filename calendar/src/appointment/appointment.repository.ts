@@ -34,6 +34,8 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.slotTiming = appointmentDto.configSession;
         appointment.isActive= true;
         appointment.isCancel= false;
+        appointment.paymentOption = appointmentDto.paymentOption;
+        appointment.consultationMode = appointmentDto.consultationMode;
         if(appointmentDto.user){
             appointment.createdBy = appointmentDto.user.role;
             appointment.createdId = appointmentDto.user.userId;

@@ -73,9 +73,8 @@ export class CalendarController {
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
-            '"paymentOption":"dateOfBirth", \n' +
-            '"consultationMode":"DIRECT PAYMENT", \n' +
-            '"preConsultation":"ON" \n' +
+            '"paymentOption":"directPayment", \n' +
+            '"consultationMode":"online" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -369,6 +368,8 @@ export class CalendarController {
             '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
             '}'
     })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientDetailsEdit(@Request() req, @Body() patientDto: PatientDto) {
@@ -388,11 +389,12 @@ export class CalendarController {
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
-            '"paymentOption":"dateOfBirth", \n' +
-            '"consultationMode":"DIRECT PAYMENT", \n' +
-            '"preConsultation":"ON" \n' +
+            '"paymentOption":"directPayment", \n' +
+            '"consultationMode":"online" \n' +
             '}'
     })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
@@ -421,6 +423,8 @@ export class CalendarController {
     }
 
     @Get('patient/appointmentSlotsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     viewAppointmentSlotsForPatient(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
@@ -429,6 +433,8 @@ export class CalendarController {
     }
 
     @Get('patient/pastAppointmentsList')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number, @Query('paginationNumber') paginationNumber: Number) {
@@ -437,6 +443,8 @@ export class CalendarController {
     }
 
     @Get('patient/upcomingAppointmentsList')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String, @Query('paginationNumber') paginationNumber: Number) {
@@ -502,6 +510,8 @@ export class CalendarController {
 
     @Get('patient/viewDoctorDetails')
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorDetails(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
         if(!doctorKey){
@@ -538,9 +548,8 @@ export class CalendarController {
                                             '"appointmentDate":"2020-07-26", \n' +
                                             '"startTime":"10:00", \n' +
                                             '"endTime":"11:00", \n' +
-                                            '"paymentOption":"dateOfBirth", \n' +
-                                            '"consultationMode":"DIRECT PAYMENT", \n' +
-                                            '"preConsultation":"ON" \n' +
+                                            '"paymentOption":"directPayment", \n' +
+                                            '"consultationMode":"online" \n' +
                                             '}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async RegisteringAndCreateApp(@selfAppointmentWrite() check:boolean, @accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() patientDto: PatientDto) {
