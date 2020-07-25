@@ -5,7 +5,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayLoad } from './jwt-payload.interface';
 import { JwtPatientLoad } from './jwt-patientload.interface';
 import { UserService } from 'src/service/user.service';
-import { UserDto,DoctorDto,AppointmentDto,AccountDto,PatientDto } from 'common-dto';
+import { UserDto,DoctorDto,AppointmentDto,AccountDto,PatientDto,CONSTANT_MSG } from 'common-dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,11 +18,27 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
 
-    async validate(payload : any) : Promise<UserDto>{
+    // async validate(payload : any) : Promise<UserDto>{
+    //     console.log("JWT Payload >> "+ JSON.stringify(payload));
+    //     const user : UserDto = await this.userService.findUserByEmail(payload.email).toPromise();
+    //     if(!user){
+    //         throw new UnauthorizedException("Malformed User");
+    //     }
+    //     return payload;
+    // }
+
+    async validate(payload : any) : Promise<any>{
         console.log("JWT Payload >> "+ JSON.stringify(payload));
-        const user : UserDto = await this.userService.findUserByEmail(payload.email).toPromise();
-        if(!user){
-            throw new UnauthorizedException("Malformed User");
+        if(payload.permission == "CUSTOMER"){
+            const patient : PatientDto = await this.userService.findUserByPhone(payload.phone).toPromise();
+            if(!patient){
+                throw new UnauthorizedException("Malformed User");
+            }
+        }else{
+            const user : any = await this.userService.findUserByEmail(payload.email).toPromise();
+            if(!user){
+                throw new UnauthorizedException("Malformed User");
+            }
         }
         return payload;
     }
