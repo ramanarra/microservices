@@ -53,6 +53,7 @@ import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppo
 import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
 import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
 import {reports} from "../common/decorator/reports.decorator";
+import { AnyARecord } from 'dns';
 
 
 @Controller('api/calendar')
@@ -592,7 +593,7 @@ export class CalendarController {
             console.log("Provide consultationMode");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide consultationMode"}
         }
-        let patientRegDto ={
+        let patientRegDto:any ={
             phone:patientDto.phone,
             firstName:patientDto.firstName,
             lastName:patientDto.lastName,

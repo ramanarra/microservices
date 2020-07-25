@@ -776,15 +776,42 @@ export class AppointmentService {
 
     async patientDetailsEdit(patientDto: any): Promise<any> {
         try {
-            const patient = await this.patientDetailsRepository.findOne({id: patientDto.patientId});
+            const patient = await this.patientDetailsRepository.findOne({patientId: patientDto.patientId});
             if (patientDto.phone) {
                 let isPhone = await this.isPhoneExists(patientDto.phone);
-                if (isPhone) {
-                    //return error message
-                    return {
-                        statusCode: HttpStatus.NOT_FOUND,
-                        message: CONSTANT_MSG.PHONE_EXISTS
+                if (isPhone.isPhone){
+                    if (isPhone.patientDetails.patientId == patientDto.patientId){
+                        if (!patient) {
+                            return {
+                                statusCode: HttpStatus.NO_CONTENT,
+                                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                            }
+                        } else {
+                            var condition = {
+                                patientId: patientDto.patientId
+                            }
+                            var values: any = patientDto;
+                            var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
+                            if (updatePatientDetails.affected) {
+                                return {
+                                    statusCode: HttpStatus.OK,
+                                    message: CONSTANT_MSG.UPDATE_OK
+                                }
+                            } else {
+                                return {
+                                    statusCode: HttpStatus.NOT_MODIFIED,
+                                    message: CONSTANT_MSG.UPDATE_FAILED
+                                }
+                            }
+                        }
+                    }else{
+                         //return error message
+                        return {
+                            statusCode: HttpStatus.NOT_FOUND,
+                            message: CONSTANT_MSG.PHONE_EXISTS
+                        }
                     }
+                   
                 }
             }
             if (!patient) {
@@ -793,11 +820,11 @@ export class AppointmentService {
                     message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
             } else {
-                var condition = {
+                var condition1 = {
                     id: patientDto.patientId
                 }
                 var values: any = patientDto;
-                var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
+                var updatePatientDetails = await this.patientDetailsRepository.update(condition1, values);
                 if (updatePatientDetails.affected) {
                     return {
                         statusCode: HttpStatus.OK,
@@ -1124,7 +1151,7 @@ export class AppointmentService {
         const app = await  this.appointmentRepository.query(queries.getAppListForPatient,[patientId]);
         const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
         let res = {
-            patientDetails:patient,
+            patientDetails:patient[0],
             appointments:app
         }
         return res;
@@ -1194,7 +1221,7 @@ export class AppointmentService {
         if (number) {
             isPhone = true;
         }
-        return isPhone;
+        return {isPhone:isPhone,patientDetails:number};
     }
 
     async freeSlots(a, b, c, e, f): Promise<any> {
