@@ -151,15 +151,51 @@ export class UserService {
     async patientRegistration(patientDto: PatientDto): Promise<any> {
         try {
             const pat = await this.findByPhone(patientDto.phone);
-        if(pat){
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.ALREADY_PRESENT
+            if(pat){
+                if(pat.createdBy == CONSTANT_MSG.ROLES.DOCTOR  && pat.password == null){
+                    const update = await this.patientRegistrationUpdate(patientDto);
+                    return {
+                        update: "updated password",
+                        patientId:pat.patient_id
+                    }
+                } else{
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.ALREADY_PRESENT
+                    }
+                }
             }
-        }
-        return await this.patientRepository.patientRegistration(patientDto);
+            
+            return await this.patientRepository.patientRegistration(patientDto);
         } catch (e) {
 	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+
+    async patientRegistrationUpdate(patientDto: PatientDto): Promise<any> {
+        try {
+            var condition = {
+                phone: patientDto.phone
+            }
+            var values: any = patientDto;
+            var updateDoctorConfig = await this.patientRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    updated:patientDto.password,
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
