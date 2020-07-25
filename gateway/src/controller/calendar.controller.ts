@@ -377,6 +377,9 @@ export class CalendarController {
             console.log("Provide patientId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide patientId"}
         }
+        if(req.body.patientId !== req.user.patientId){
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
+        }
         this.logger.log(`Patient Details Edit Api -> Request data ${JSON.stringify(patientDto)}`);
         return this.calendarService.patientDetailsEdit(patientDto);
     }
@@ -417,6 +420,9 @@ export class CalendarController {
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
             }
+        }
+        if(patientDto.patientId !== req.user.patientId){
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
         }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
         return this.calendarService.patientBookAppointment(patientDto);
@@ -591,7 +597,8 @@ export class CalendarController {
             firstName:patientDto.firstName,
             lastName:patientDto.lastName,
             email:patientDto.email,
-            dateOfBirth:patientDto.dateOfBirth
+            dateOfBirth:patientDto.dateOfBirth,
+            createdBy:req.user.role
         }
         if(patientDto.phone && patientDto.phone.length == 10){
             this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientRegDto)}`);
