@@ -11,6 +11,4 @@ export class AccountRepository extends Repository<Account> {
 
     private logger = new Logger('AccountRepository');
 
-
-
 }

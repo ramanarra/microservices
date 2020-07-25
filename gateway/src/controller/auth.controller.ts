@@ -95,6 +95,7 @@ export class AuthController {
     async patientRegistration(@Body() patientDto : PatientDto) {
       if(patientDto.phone && patientDto.phone.length == 10){
         if(patientDto.password){
+          patientDto.createdBy = CONSTANT_MSG.ROLES.PATIENT;
           this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
           const patient = await this.userService.patientRegistration(patientDto);
           if(patient.message){

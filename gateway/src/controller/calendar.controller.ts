@@ -597,7 +597,8 @@ export class CalendarController {
             firstName:patientDto.firstName,
             lastName:patientDto.lastName,
             email:patientDto.email,
-            dateOfBirth:patientDto.dateOfBirth
+            dateOfBirth:patientDto.dateOfBirth,
+            createdBy:req.user.role
         }
         if(patientDto.phone && patientDto.phone.length == 10){
             this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientRegDto)}`);
