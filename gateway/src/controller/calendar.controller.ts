@@ -15,6 +15,7 @@ import {
     ClassSerializerInterceptor,
     UnauthorizedException, HttpStatus
 } from '@nestjs/common';
+import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import {
     ApiOkResponse,
@@ -37,7 +38,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG
+    PatientDto,CONSTANT_MSG,HospitalDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -49,6 +50,9 @@ import {accountUsersSettingsWrite} from "../common/decorator/accountUsersSetting
 import {selfAppointmentRead} from "../common/decorator/selfAppointmentRead.decorator";
 import {accountUsersAppointmentRead} from "../common/decorator/accountUsersAppointmentRead.decorator";
 import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppointmentWrite.decorator";
+import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
+import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
+import {reports} from "../common/decorator/reports.decorator";
 
 
 @Controller('api/calendar')
@@ -58,17 +62,19 @@ export class CalendarController {
 
     private logger = new Logger('CalendarController');
 
-    constructor(private readonly calendarService: CalendarService) {
+    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService,) {
     }
 
 
     @Post('doctor/createAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
+            '"patientId":1,\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"directPayment", \n' +
+            '"consultationMode":"online" \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -89,6 +95,16 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        }
+        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(appointmentDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
         }
         this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.createAppointment(appointmentDto, req.user);
@@ -143,19 +159,19 @@ export class CalendarController {
             '"doctorKey":"Doc_5",\n' +
             '"consultationCost": "5000" ,\n' +
             '"isPreconsultationAllowed": true, \n' +
-            '"preconsultationHours": "5", \n' +
-            '"preconsultationMins": "30", \n' +
+            '"preconsultationHours": 5, \n' +
+            '"preconsultationMins": 30, \n' +
             '"isPatientCancellationAllowed": false ,\n' +
-            '"cancellationDays": "2" ,\n' +
-            '"cancellationHours": "3" ,\n' +
-            '"cancellationMins": "30", \n' +
+            '"cancellationDays": 2 ,\n' +
+            '"cancellationHours": 3 ,\n' +
+            '"cancellationMins": 30, \n' +
             '"isPatientRescheduleAllowed": false, \n' +
-            '"rescheduleDays": "2", \n' +
-            '"rescheduleHours": "4" ,\n' +
-            '"rescheduleMins": "15", \n' +
-            '"autoCancelDays": "1", \n' +
-            '"autoCancelHours": "3" ,\n' +
-            '"autoCancelMins": "15" \n' +
+            '"rescheduleDays": 2, \n' +
+            '"rescheduleHours": 4 ,\n' +
+            '"rescheduleMins": 15, \n' +
+            '"autoCancelDays": 1, \n' +
+            '"autoCancelHours": 3 ,\n' +
+            '"autoCancelMins": 15 \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -207,13 +223,13 @@ export class CalendarController {
     @Get('doctor/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05, 2020-06-21'})
+    @ApiOkResponse({description: 'request body example:  Doc_5, 0 (default value)'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('startDate') startDate: String, @Query('endDate') endDate: String) {
+    appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('paginationNumber') paginationNumber: number) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.appointmentSlotsView(req.user, doctorKey, startDate, endDate);
+        return this.calendarService.appointmentSlotsView(req.user, doctorKey,paginationNumber);
     }
 
     @Post('doctor/appointmentReschedule')
@@ -246,6 +262,16 @@ export class CalendarController {
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
+        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(appointmentDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
         this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.appointmentReschedule(appointmentDto, req.user);
     }
@@ -272,9 +298,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiBody({type: PatientDto})
-    patientSearch(@Request() req, @Body() patientDto: PatientDto) {
-        if(req.body.phone && req.body.phone.length == 10){
+    @ApiBody({})
+    patientSearch(@Request() req, @Body() patientDto: string) {
+        if(req.body.phone){
             this.logger.log(`Doctor config cancel/reschedule  Api -> Request data ${JSON.stringify(patientDto, req.user)}`);
             return this.calendarService.patientSearch(patientDto, req.user);
         }else{
@@ -342,6 +368,8 @@ export class CalendarController {
             '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
             '}'
     })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientDetailsEdit(@Request() req, @Body() patientDto: PatientDto) {
@@ -356,16 +384,20 @@ export class CalendarController {
     @Post('patient/bookAppointment')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"1",\n' +
-            '"doctorId":"1",\n' +
-            '"startTime": "10:00 AM",\n' +
-            '"endTime": "11:00 AM",\n' +
-            '"appointmentDate": "2020-06-12" \n' +
+            '"patientId":1,\n' +
+            '"doctorId":1,\n' +
+            '"startTime": "10:00",\n' +
+            '"endTime": "11:00",\n' +
+            '"appointmentDate": "2020-06-12", \n' +
+            '"paymentOption":"directPayment", \n' +
+            '"consultationMode":"online" \n' +
             '}'
     })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
-    patientBookAppointment(@Request() req, @Body() patientDto: PatientDto) {
+    patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
         if(!req.body.doctorId){
             console.log("Provide doctorId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
@@ -376,11 +408,23 @@ export class CalendarController {
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
+        patientDto.appointmentDate= new Date(patientDto.appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(patientDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
         return this.calendarService.patientBookAppointment(patientDto);
     }
 
     @Get('patient/appointmentSlotsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     viewAppointmentSlotsForPatient(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
@@ -389,19 +433,23 @@ export class CalendarController {
     }
 
     @Get('patient/pastAppointmentsList')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number) {
+    patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number, @Query('paginationNumber') paginationNumber: Number) {
         this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(patientId)}`);
-        return this.calendarService.patientPastAppointments(patientId);
+        return this.calendarService.patientPastAppointments(patientId,paginationNumber);
     }
 
     @Get('patient/upcomingAppointmentsList')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String) {
+    patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String, @Query('paginationNumber') paginationNumber: Number) {
         this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(patientId)}`);
-        return this.calendarService.patientUpcomingAppointments(patientId);
+        return this.calendarService.patientUpcomingAppointments(patientId,paginationNumber);
     }
 
     @Get('doctor/patientList')
@@ -409,9 +457,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    patientList() {
+    patientList(@Request() req,  @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
-        return this.calendarService.patientList();
+        return this.calendarService.patientList(doctorKey);
     }
 
     @Post('doctor/personalSettingsEdit')
@@ -423,13 +471,193 @@ export class CalendarController {
     doctorPersonalSettingsEdit(@selfUserSettingWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() doctorDto: DoctorDto) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        if(!req.body.doctorId){
-            console.log("Provide doctorId");
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
         }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
         return this.calendarService.doctorPersonalSettingsEdit(req.user,doctorDto);
     }
+
+    @Get('doctor/hospitaldetailsView')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: ' '})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsView(@accountSettingsRead() check: boolean, @Request() req , @Query('accountKey') accountKey: String) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`Doctor config view  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.hospitaldetailsView(req.user,accountKey);
+    }
+
+    @Post('doctor/hospitaldetailsEdit')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.accountKey){
+            console.log("Provide accountKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide accountKey"}
+        }
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(hospitalDto)}`);
+        return this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
+    }
+
+    @Get('patient/viewDoctorDetails')
+    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    doctorDetails(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
+        if(!doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
+        }
+        this.logger.log(`View Doctor Details  Api -> Request data ${JSON.stringify(doctorKey)}`);
+        return this.calendarService.doctorDetails(doctorKey,appointmentId);
+    }
+
+    @Get('doctor/availableSlots')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'request body example:  Doc_5'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    availableSlots(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: string) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        let date = new Date(appointmentDate);    
+        this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
+        return this.calendarService.availableSlots(req.user, doctorKey,date);
+    }
+
+    @Post('doctor/creatingAppointmetAlongWithRegisteringPatient')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: AppointmentDto})
+    @ApiOkResponse({description: 'requestBody example :   {\n' +
+                                            '"phone":"99999999999",\n' +
+                                            '"firstName":"nirmala@gmail.com",\n' +
+                                            '"lastName":"lastName", \n' +
+                                            '"email":"email@gmail.com", \n' +
+                                            '"dateOfBirth":"1999-10-26", \n' +
+                                            '"appointmentDate":"2020-07-26", \n' +
+                                            '"startTime":"10:00", \n' +
+                                            '"endTime":"11:00", \n' +
+                                            '"paymentOption":"directPayment", \n' +
+                                            '"consultationMode":"online" \n' +
+                                            '}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async RegisteringAndCreateApp(@selfAppointmentWrite() check:boolean, @accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() patientDto: PatientDto) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.phone){
+            console.log("Provide phone");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide phone"}
+        } else if(!req.body.firstName){
+            console.log("Provide firstName");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide firstName"}
+        } else if(!req.body.lastName){
+            console.log("Provide lastName");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide lastName"}
+        } else if(!req.body.email){
+            console.log("Provide email");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide email"}
+        } else if(!req.body.dateOfBirth){
+            console.log("Provide dateOfBirth");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide dateOfBirth"}
+        } else if(!req.body.appointmentDate){
+            console.log("Provide appointmentDate");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}
+        } else if(!req.body.startTime){
+            console.log("Provide startTime");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        } else if(!req.body.endTime){
+            console.log("Provide endTime");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
+        } else if(!req.body.paymentOption){
+            console.log("Provide paymentOption");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide paymentOption"}
+        } else if(!req.body.consultationMode){
+            console.log("Provide consultationMode");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide consultationMode"}
+        }
+        let patientRegDto ={
+            phone:patientDto.phone,
+            firstName:patientDto.firstName,
+            lastName:patientDto.lastName,
+            email:patientDto.email,
+            dateOfBirth:patientDto.dateOfBirth
+        }
+        if(patientDto.phone && patientDto.phone.length == 10){
+            this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientRegDto)}`);
+            const patient = await this.userService.patientRegistration(patientRegDto);
+            if(patient.message){
+                return patient;
+            }else {
+                const details = await this.calendarService.patientInsertion(patientRegDto,patient.patientId);
+                let appointmentDto = {
+                    patientId:patient.patientId,
+                    appointmentDate:patientDto.appointmentDate,
+                    startTime:patientDto.startTime,
+                    endTime:patientDto.endTime
+                }
+               
+                appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
+                const today = new Date()
+                const yesterday = new Date(today)
+                yesterday.setDate(yesterday.getDate() - 1)
+                if(appointmentDto.appointmentDate < yesterday){
+                    return{
+                        statusCode:HttpStatus.BAD_REQUEST,
+                        message:"Past Dates are not acceptable"
+                    }
+                }
+                this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+                const app = await this.calendarService.createAppointment(appointmentDto, req.user);
+                return {
+                    patient:patient,
+                    details:details,
+                    appointment:app
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Provide valid phone"
+            }
+        }
+    }
+
+    @Get('doctor/patientDetails')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    patientDetails(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number,  @Query('doctorKey') doctorKey: string) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`PatientDetails Api -> Request data }`);
+        return this.calendarService.patientDetails(req.user, patientId,doctorKey);
+    }
+
+    @Get('admin/reports')
+    @ApiOkResponse({description: 'patientList API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        this.logger.log(`admin reports Api -> Request data }`);
+        return this.calendarService.reports(req.user, accountKey);
+    }
+
+
  
 
 

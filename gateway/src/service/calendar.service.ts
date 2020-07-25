@@ -1,8 +1,9 @@
 import {Injectable, Inject, UseFilters, OnModuleDestroy, OnModuleInit, HttpStatus} from '@nestjs/common';
 import {ClientProxy} from '@nestjs/microservices';
 import {Observable} from 'rxjs';
-import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto} from 'common-dto';
+import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto, HospitalDto} from 'common-dto';
 import {AllClientServiceException} from 'src/common/filter/all-clientservice-exceptions.filter';
+import { UserService } from './user.service';
 
 
 @Injectable()
@@ -23,9 +24,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
 
     @UseFilters(AllClientServiceException)
-    public createAppointment(appointmentDto: any, user: any): Observable<any> {
+    public createAppointment(appointmentDto: any, user: any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'calendar_appointment_create'}, appointmentDto);
+        return this.redisClient.send({cmd: 'calendar_appointment_create'}, appointmentDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -70,10 +71,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentSlotsView(user: any,doctorKey:any,startDate:any,endDate:any): Observable<any> {
+    public appointmentSlotsView(user: any,doctorKey:any,paginationNumber:number): Observable<any> {
         user.doctorKey = doctorKey;
-        user.startDate = startDate;
-        user.endDate = endDate;
+        user.paginationNumber = paginationNumber;
         return this.redisClient.send({cmd: 'appointment_slots_view'},user);
     }
 
@@ -126,7 +126,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientBookAppointment(patientDto : any) : Observable <any> {
+    public patientBookAppointment(patientDto : AppointmentDto) : Observable <any> {
         return this.redisClient.send({ cmd : 'patient_book_appointment'}, patientDto);
     }
 
@@ -137,25 +137,74 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientPastAppointments(patientId:any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_past_appointments'},patientId);
+    public patientPastAppointments(patientId:any,paginationNumber:any) : Observable <any> {
+        let user = {
+            patientId:patientId,
+            paginationNumber:paginationNumber
+        }
+        return this.redisClient.send({ cmd : 'patient_past_appointments'},user);
     }
 
     
     @UseFilters(AllClientServiceException)
-    public patientUpcomingAppointments(patientId:any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},patientId);
+    public patientUpcomingAppointments(patientId:any,paginationNumber) : Observable <any> {
+        let user = {
+            patientId:patientId,
+            paginationNumber:paginationNumber
+        }
+        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user);
     }
 
     @UseFilters(AllClientServiceException)
-    public patientList() : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_list'},'');
+    public patientList(doctorKey:any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_list'},doctorKey);
     }
 
     @UseFilters(AllClientServiceException)
     public doctorPersonalSettingsEdit(user, doctorDto:DoctorDto) : Observable <any> {
         user.doctorDto=doctorDto;
         return this.redisClient.send({ cmd : 'doctor_details_edit'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public hospitaldetailsView(user, accountKey:any) : Observable <any> {
+        user.accountKey=accountKey;
+        return this.redisClient.send({ cmd : 'hospital_details_view'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public hospitaldetailsEdit(user, hospitalDto:HospitalDto) : Observable <any> {
+        user.hospitalDto=hospitalDto;
+        return this.redisClient.send({ cmd : 'hospital_details_edit'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorDetails(doctorKey:any,appointmentId:any): Observable<any> {
+        var details={
+            doctorKey:doctorKey,
+            appointmentId:appointmentId
+        }
+        return this.redisClient.send({cmd: 'app_doctor_details'}, details);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public availableSlots(user:any,doctorKey:any,appointmentDate:any): Observable<any> {
+        user.doctorKey = doctorKey;
+        user.appointmentDate = appointmentDate;
+        return this.redisClient.send({cmd: 'app_doctor_slots'}, user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientDetails(user:any, patientId:any,doctorKey:any) : Observable <any> {
+        user.patientId = patientId;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'patient_details'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public reports(user:any, accountKey:any) : Observable <any> {
+        user.accountKey = accountKey;
+        return this.redisClient.send({ cmd : 'reports_list'},user);
     }
 
 

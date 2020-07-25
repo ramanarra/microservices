@@ -67,4 +67,19 @@ export class Appointment extends BaseEntity{
     })
     cancelledId : number;  
 
+    @Column({
+        name : 'slotTiming'
+    })
+    slotTiming : number;  
+
+    @Column({
+        name : 'paymentoption'
+    })
+    paymentOption : string;  
+
+    @Column({
+        name : 'consultationmode'
+    })
+    consultationMode : string;  
+
 }

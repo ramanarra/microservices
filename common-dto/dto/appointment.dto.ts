@@ -15,6 +15,9 @@ export class AppointmentDto {
   @IsOptional()
   @IsMilitaryTime()
   startTime : string;
+  @IsOptional()
+  @IsNumber()
+  appointmentId:number;
   endTime : string;   
   paymentStatus : boolean;
   isActive : boolean; 
@@ -23,4 +26,6 @@ export class AppointmentDto {
   createdId : number;
   cancelledBy : string;
   cancelledId : number;
+  paymentOption:string;
+  consultationMode:string;
 }
