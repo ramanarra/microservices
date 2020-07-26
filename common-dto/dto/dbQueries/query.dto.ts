@@ -30,5 +30,8 @@ export const queries = {
     getPatient:'SELECT * FROM patient_details WHERE phone LIKE $1',
     getPatientDetails:'SELECT "patient_id", "firstName","lastName","email","dateOfBirth","email", "phone" from patient_details where patient_id = $1',
     getReports:'SELECT doc."doctor_name" as "doctorName", config."consultation_cost" as "consultationFee", app."slotTiming" as "slotTime", app."appointment_date" as "appointmentDate", app."startTime", app."endTime", app."consultationmode" as "consultationType", patient."name" as "patientName", patient."phone" as phone from doctor doc left join appointment app on app."doctorId"=doc."doctorId" left join patient_details patient on patient."patient_id"=app."patient_id" left join doc_config config on config."doctor_key" = doc."doctor_key" where doc."account_key" = $1',
-    getDoctorScheduleIntervalAndDay: 'select * from doc_config_schedule_day dcsd   join doc_config_schedule_interval dcsi on dcsd.id = dcsi."docConfigScheduleDayId" where dcsd.doctor_key = $1;'
+    getDoctorScheduleIntervalAndDay: 'select * from doc_config_schedule_day dcsd   join doc_config_schedule_interval dcsi on dcsd.id = dcsi."docConfigScheduleDayId" where dcsd.doctor_key = $1;',
+    getDoctorByName:'SELECT * FROM doctor WHERE doctor_name LIKE $1 or registration_number LIKE $1',
+    getHospitalByName:'select * from account_details WHERE hospital_name LIKE $1',
+
 }

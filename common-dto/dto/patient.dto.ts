@@ -34,4 +34,5 @@ export class PatientDto {
     startTime:string;
     endTime:string;
     createdBy:string;
+    salt:string;
 }

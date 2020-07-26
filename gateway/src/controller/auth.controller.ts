@@ -81,7 +81,6 @@ export class AuthController {
           '"dateOfBirth":"DOB", \n' +
           '"landmark":"landmark", \n' +
           '"country":"country", \n' +
-          '"name":"name", \n' +
           '"address":"address", \n' +
           '"state":"state", \n' +
           '"pincode":"12346", \n' +
@@ -112,10 +111,10 @@ export class AuthController {
                 patientId:patient.patientId,
                 firstName:patientDto.firstName,
                 lastName:patientDto.lastName,
+                name:patientDto.firstName+" "+patientDto.lastName,
                 dateOfBirth:patientDto.dateOfBirth,
                 landmark:patientDto.landmark,
                 country:patientDto.country,
-                name:patientDto.name,
                 address:patientDto.address,
                 state:patientDto.state,
                 pincode:patientDto.pincode,
