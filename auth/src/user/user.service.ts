@@ -12,6 +12,7 @@ import {PermissionRepository} from "./permissions/permission.repository";
 import {queries} from "../config/query";
 import {UserRoleRepository} from './user_role.repository';
 import {PatientRepository} from './patient.repository';
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService {
@@ -179,6 +180,10 @@ export class UserService {
 
     async patientRegistrationUpdate(patientDto: PatientDto): Promise<any> {
         try {
+            const { name, phone, password} = patientDto;
+            const salt = await bcrypt.genSalt();       
+            patientDto.password = await this.hashPassword(password, salt);
+            patientDto.salt = salt            
             var condition = {
                 phone: patientDto.phone
             }
@@ -201,6 +206,10 @@ export class UserService {
                 message: CONSTANT_MSG.DB_ERROR
             }
         }
+    }
+
+    private async hashPassword(password: string, salt : string): Promise<string> {
+        return bcrypt.hash(password, salt);
     }
 
 
