@@ -680,8 +680,16 @@ export class CalendarController {
         return this.calendarService.reports(req.user, accountKey);
     }
 
+    @Get('patient/listOfDoctorsInHospital')
+    @ApiOkResponse({description: 'listOfDoctorsInHospital API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    listOfDoctorsInHospital(@Request() req, @Query('accountKey') accountKey: string) {
+        this.logger.log(`listOfDoctorsInHospital Api -> Request data }`);
+        return this.calendarService.listOfDoctorsInHospital(req.user, accountKey);
+    }
 
- 
 
 
 }

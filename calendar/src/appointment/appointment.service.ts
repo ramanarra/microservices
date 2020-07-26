@@ -1113,7 +1113,7 @@ export class AppointmentService {
         for(let worksched of workSchedule){
             let start = Helper.getTimeInMilliSeconds(worksched.startTime);
             let end = Helper.getTimeInMilliSeconds(worksched.endTime);
-            let end1 = 0;
+            let end1 = start + consultSession;
             while(start < end && end1 <= end){
                 let res = {
                     start:Helper.getTimeinHrsMins(start),
@@ -1156,6 +1156,29 @@ export class AppointmentService {
         const app = await  this.appointmentRepository.query(queries.getReports,[accountKey]);
         return app;
     }
+
+    async listOfDoctorsInHospital(accountKey:any): Promise<any> {
+        const app = await  this.doctorRepository.query(queries.getDocListDetails,[accountKey]);
+        let res =[];
+        app.forEach(a => {
+           let b = {
+                doctorName:a.doctor_name,
+                doctorKey:a.doctor_key,
+                speciality:a.speciality,
+                phone:a.number,
+                signature:a.signature,
+                photo:a.photo,
+                fee:a.consultation_cost,
+                street1:a.street1,
+                street2:a.street2,
+                city:a.city
+            }
+            res.push(b);
+        });
+        
+        return res;
+    }
+
 
 
     // common functions below===============================================================
