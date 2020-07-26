@@ -529,7 +529,7 @@ export class CalendarController {
         return this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
     }
 
-    @Get('patient/viewDoctorDetails')
+    @Get('patient/appointmentDoctorDetails')
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -688,6 +688,16 @@ export class CalendarController {
     listOfDoctorsInHospital(@Request() req, @Query('accountKey') accountKey: string) {
         this.logger.log(`listOfDoctorsInHospital Api -> Request data }`);
         return this.calendarService.listOfDoctorsInHospital(req.user, accountKey);
+    }
+
+    @Get('patient/viewDoctorDetails')
+    @ApiOkResponse({description: 'viewDoctorDetails API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    viewDoctorDetails(@Request() req, @Query('doctorKey') doctorKey: string) {
+        this.logger.log(`viewDoctorDetails Api -> Request data }`);
+        return this.calendarService.viewDoctorDetails(req.user, doctorKey);
     }
 
 

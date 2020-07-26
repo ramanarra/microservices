@@ -1166,17 +1166,33 @@ export class AppointmentService {
                 doctorKey:a.doctor_key,
                 speciality:a.speciality,
                 phone:a.number,
-                signature:a.signature,
+                hospitalName:a.hospital_name,
                 photo:a.photo,
                 fee:a.consultation_cost,
-                street1:a.street1,
-                street2:a.street2,
+                accountKey:a.account_key,
                 city:a.city
             }
             res.push(b);
         });
         
         return res;
+    }
+
+    async viewDoctor(details: any): Promise<any> {
+        const doctor = await this.doctorDetails(details.doctorKey);
+        const account = await this.accountDetails(doctor.accountKey);
+        const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+        var res = {
+            name:doctor.doctorName,
+            speciality:doctor.speciality,
+            mobileNo:doctor.number,
+            hospitalName:account.hospitalName,
+            location:account.city,
+            fee:config.consultationCost,
+            preConsultationHours:config.preconsultationHours,
+            preConsulationMinutes:config.preconsultationMins
+        }
+        return res;       
     }
 
 

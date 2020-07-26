@@ -132,8 +132,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
     @UseFilters(AllClientServiceException)
     public viewAppointmentSlotsForPatient(doctorKey : any, appointmentDate : any) : Observable <any> {
-        doctorKey.appointmentDate = appointmentDate;
-        return this.redisClient.send({ cmd : 'patient_view_appointment'}, doctorKey);
+        let details={
+            doctorKey:doctorKey,
+            appointmentDate:appointmentDate
+        }
+        return this.redisClient.send({ cmd : 'patient_view_appointment'}, details);
     }
 
     @UseFilters(AllClientServiceException)
@@ -211,6 +214,12 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public listOfDoctorsInHospital(user:any, accountKey:any) : Observable <any> {
         user.accountKey = accountKey;
         return this.redisClient.send({ cmd : 'list_of_doctors'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public viewDoctorDetails(user:any, doctorKey:any) : Observable <any> {
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'view_doctor_details'},user);
     }
 
 
