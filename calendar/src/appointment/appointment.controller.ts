@@ -3,6 +3,7 @@ import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
 import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
+//import {DoctorService} from './doctor/doctor.service';
 
 
 @Controller('appointment')
@@ -10,7 +11,9 @@ export class AppointmentController {
 
     private logger = new Logger('AppointmentController');
 
-    constructor(private readonly appointmentService: AppointmentService) {
+    constructor(private readonly appointmentService: AppointmentService
+       // ,private readonly doctorService: DoctorService
+        ) {
 
     }
 

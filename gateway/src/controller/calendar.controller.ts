@@ -54,6 +54,7 @@ import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decor
 import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
 import {reports} from "../common/decorator/reports.decorator";
 import { AnyARecord } from 'dns';
+import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 
 
 @Controller('api/calendar')
@@ -205,6 +206,19 @@ export class CalendarController {
     workScheduleEdit(@selfAppointmentWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() workScheduleDto: any) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        // if(!req.body.doctorKey){
+        //     console.log("Provide doctorKey");
+        //     return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
+        // }else if(req.body.updateWorkSchedule){
+        //     if(!req.body.updateWorkSchedule[0].scheduledayid){
+        //         console.log("Provide scheduledayid");
+        //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"} 
+        //     }else if(req.body.updateWorkSchedule[0].startTime){
+        //         let startTime= req.body.updateWorkSchedule[0].startTime;
+        //         startTime:WorkScheduleDto;              
+                
+        //     }
+        // }
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
         return this.calendarService.workScheduleEdit(workScheduleDto, req.user);
     }
@@ -599,7 +613,8 @@ export class CalendarController {
             lastName:patientDto.lastName,
             email:patientDto.email,
             dateOfBirth:patientDto.dateOfBirth,
-            createdBy:req.user.role
+            createdBy:req.user.role,
+            name:patientDto.firstName +" "+ patientDto.lastName
         }
         if(patientDto.phone && patientDto.phone.length == 10){
             this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientRegDto)}`);
