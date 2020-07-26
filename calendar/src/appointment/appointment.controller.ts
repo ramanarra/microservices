@@ -292,8 +292,8 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'patient_view_appointment'})
-    async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
-        const appointment = await this.appointmentService.viewAppointmentSlotsForPatient(doctor);
+    async viewAppointmentSlotsForPatient(details: any): Promise<any> {
+        const appointment = await this.appointmentService.availableSlots(details);
         return appointment;
     }
 
@@ -405,6 +405,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'list_of_doctors'})
     async listOfDoctorsInHospital(user: any): Promise<any> {
         const doctors = await this.appointmentService.listOfDoctorsInHospital(user.accountKey);
+        return doctors;  
+    }
+
+    @MessagePattern({cmd: 'view_doctor_details'})
+    async viewDoctorDetails(user: any): Promise<any> {
+        const doctors = await this.appointmentService.viewDoctor(user);
         return doctors;  
     }
 
