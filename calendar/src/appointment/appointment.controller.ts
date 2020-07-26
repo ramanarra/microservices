@@ -402,5 +402,12 @@ export class AppointmentController {
         }
     }
 
+    @MessagePattern({cmd: 'list_of_doctors'})
+    async listOfDoctorsInHospital(user: any): Promise<any> {
+        const doctors = await this.appointmentService.listOfDoctorsInHospital(user.accountKey);
+        return doctors;  
+    }
+
+
 
 }
