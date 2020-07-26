@@ -645,8 +645,11 @@ export class AppointmentService {
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
+            console.log(appointmentDetails);
             const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
+            console.log(pat);
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            console.log(pay);
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
