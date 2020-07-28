@@ -357,7 +357,9 @@ export class AppointmentService {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let page: number = user.paginationNumber;
-            var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
+            var date:any = new Date();
+            var startDate:any = date;
+          //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
             let possibleNextAppointments = await this.appointmentRepository.query(queries.getAppointByDocId, [docId, startDate])
             let doctorWorkSchedule = await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleIntervalAndDay, [user.doctorKey]);
             if (doctorWorkSchedule && doctorWorkSchedule.length) {
@@ -394,7 +396,7 @@ export class AppointmentService {
                 let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
-                while (appointmentSlots.length <= 6) {  // run while loop to get minimum 7  days of appointment slots
+                while (appointmentSlots.length <= page*7+7) {  // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
                     let dayOfWeek = day.getDay();
                     let workScheduleDayPresentOrNot = false;
@@ -488,7 +490,16 @@ export class AppointmentService {
                     }
                     dayOfWeekCount++; // increase to next  Day
                 }
-                return appointmentSlots;
+                var res=[];
+                var count =0;
+                appointmentSlots.forEach((e,iterationNumber) => {
+                    if( page*7 <= iterationNumber && count<7){
+                        res.push(e);
+                        count++;
+                    }
+                });
+                return res;
+                //return appointmentSlots;
             } else {
                 console.log("Error in appointmentSlotsView api 1")
                 return {
@@ -645,8 +656,11 @@ export class AppointmentService {
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
+            console.log(appointmentDetails);
             const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
+            console.log(pat);
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            console.log(pay);
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,

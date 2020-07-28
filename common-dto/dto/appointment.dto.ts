@@ -28,4 +28,5 @@ export class AppointmentDto {
   cancelledId : number;
   paymentOption:string;
   consultationMode:string;
+  confirmation:boolean;
 }
