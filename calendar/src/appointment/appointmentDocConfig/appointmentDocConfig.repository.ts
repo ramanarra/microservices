@@ -27,7 +27,8 @@ export class AppointmentDocConfigRepository extends Repository<AppointmentDocCon
         appointment.autoCancelMinutes= appointmentDto.config.autoCancelMinutes;             
 
         try {
-            const app =  await appointment.save();  
+            const app =  await appointment.save(); 
+            return app; 
         } catch (error) {
             console.log(error);
                 throw new InternalServerErrorException();
