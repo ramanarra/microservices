@@ -288,6 +288,7 @@ export class AppointmentController {
         const doctor = await this.appointmentService.doctor_Details(patientDto.doctorId);
         const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
         patientDto.configSession = config.consultationSessionTimings;
+        patientDto.config = config;
         const patient = await this.appointmentService.createAppointment(patientDto);
         return patient;
     }

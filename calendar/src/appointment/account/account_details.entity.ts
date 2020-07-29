@@ -53,4 +53,9 @@ export class AccountDetails extends BaseEntity{
     })
     supportEmail : string;
 
+    @Column({
+        name : 'photo'
+    })
+    photo : string;
+
 }
