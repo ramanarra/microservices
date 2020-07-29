@@ -461,7 +461,8 @@ export class AppointmentService {
                             return 0;
                         })
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
-                        sortedWorkScheduleTimeInterval.forEach(v => {
+                        //sortedWorkScheduleTimeInterval.forEach(v => {
+                        for(let v of sortedWorkScheduleTimeInterval){
                             let intervalEndTime = v.endTime;
                             let intervalEnd = false;
                             let slotStartTime = v.startTime;
@@ -495,18 +496,27 @@ export class AppointmentService {
                                     }
                                 })
                                 if (!slotPresentOrNot.length) { // if no appointment present on the slot timing, then push the free slots
-                                    slotObject.slots.push({ // push free slot obj
-                                        startTime: slotStartTime,
-                                        endTime: slotEndTime,
-                                        slotType: 'Free',
-                                        slotTiming: consultationSessionTiming,
-                                        preconsultationHours:preconsultationHours,
-                                        preconsultationMins:preconsultationMins
-                                    })
+                                    let dto = {
+                                        startTime : slotStartTime,
+                                        endTime :slotEndTime,
+                                    }
+                                    let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
+                                    if(!isOverLapping){
+                                        slotObject.slots.push({ // push free slot obj
+                                            startTime: slotStartTime,
+                                            endTime: slotEndTime,
+                                            slotType: 'Free',
+                                            slotTiming: consultationSessionTiming,
+                                            preconsultationHours:preconsultationHours,
+                                            preconsultationMins:preconsultationMins
+                                        })
+                                    }
+                                   
                                 }
                                 slotStartTime = slotEndTime; // update the next slot start time
                             }
-                        })
+                    //    })
+                        }
                         appointmentSlots.push(slotObject);
                     }
                     dayOfWeekCount++; // increase to next  Day
@@ -1097,7 +1107,12 @@ export class AppointmentService {
                 if(app.length){
                     for(let appointment of app){
                         flag = false;
-                        if(appointment.startTime == Helper.getTimeinHrsMins(start)){
+                        let dto={
+                            startTime :Helper.getTimeinHrsMins(start),
+                            endTime :Helper.getTimeinHrsMins(start + consultSession)
+                        }
+                        let isOverLapping = await this.findTimeOverlaping(app, dto);
+                        if((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping){
                             flag = true;
                             break;
                         }
@@ -1232,30 +1247,7 @@ export class AppointmentService {
         return {isPhone:isPhone,patientDetails:number};
     }
 
-    // async freeSlots(a, b, c, e, f): Promise<any> {
-    //     if (a.length) {
-    //         a.forEach(d => {
-    //             if (d.startTime) {
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while (start < end) {
-    //                     let strt = Helper.getTimeinHrsMins(Number(start));
-    //                     let last = Helper.getTimeinHrsMins(Number(end));
-    //                     let day = {
-    //                         slotType: 'Free Slot',
-    //                         start: strt,
-    //                         end: last,
-    //                         sessiontime: f,
-    //                         day: e
-    //                     }
-    //                     start = start + c;
-    //                     b.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-    // }
-
+    
     async isWorkScheduleAvailable(day, workScheduleObj): Promise<any> {
         return workScheduleObj[day].length >= 1 ? true : false;
     }
