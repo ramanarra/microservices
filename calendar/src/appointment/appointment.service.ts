@@ -143,9 +143,28 @@ export class AppointmentService {
 
     async doctor_List(accountKey): Promise<any> {
         try {
-            const doctorList = await this.doctorRepository.find({accountKey: accountKey});
+           // const doctorList = await this.doctorRepository.find({accountKey: accountKey});
+            const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
+            let res=[];
+            for(let list of doctorList){
+                var doc={
+                    doctorId:list.doctorId,
+                    accountkey:list.account_key,
+                    doctorKey:list.doctor_key,
+                    speciality:list.speciality,
+                    photo:list.photo,
+                    signature:list.signature,
+                    number:list.number,
+                    firstName:list.first_name,
+                    lastName:list.last_name,
+                    registrationNumber:list.registration_number,
+                    fee:list.consultation_cost,
+                    location:list.city
+                }
+                res.push(doc);
+            }
             if (doctorList.length) {
-                return doctorList;
+                return res;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
