@@ -33,7 +33,7 @@ import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.reposito
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
 import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
-
+import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 
 var async = require('async');
 
@@ -53,7 +53,8 @@ export class AppointmentService {
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
-        private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository
+        private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
+        private appointmentDocConfigRepository: AppointmentDocConfigRepository
     ) {
     }
 
@@ -89,10 +90,30 @@ export class AppointmentService {
                     }
                     
                     // create appointment on existing date old records
-                    return await this.appointmentRepository.createAppointment(appointmentDto);
+                    const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
+                    if(!appoint.message){
+                        const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                        console.log(appDocConfig);
+                        return  {
+                            appointment:appoint,
+                            appointmentDocConfig:appDocConfig
+                        }  
+                    }else {
+                        return appoint;
+                    }
                 }
             }
-            return await this.appointmentRepository.createAppointment(appointmentDto);
+            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+            if(!appoint.message){
+                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                console.log(appDocConfig);
+                return  {
+                    appointment:appoint,
+                    appointmentDocConfig:appDocConfig
+                } 
+            }else {
+                return appoint;
+            }
         } catch (e) {
             console.log(e);
             return {
@@ -440,7 +461,8 @@ export class AppointmentService {
                             return 0;
                         })
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
-                        sortedWorkScheduleTimeInterval.forEach(v => {
+                        //sortedWorkScheduleTimeInterval.forEach(v => {
+                        for(let v of sortedWorkScheduleTimeInterval){
                             let intervalEndTime = v.endTime;
                             let intervalEnd = false;
                             let slotStartTime = v.startTime;
@@ -474,18 +496,27 @@ export class AppointmentService {
                                     }
                                 })
                                 if (!slotPresentOrNot.length) { // if no appointment present on the slot timing, then push the free slots
-                                    slotObject.slots.push({ // push free slot obj
-                                        startTime: slotStartTime,
-                                        endTime: slotEndTime,
-                                        slotType: 'Free',
-                                        slotTiming: consultationSessionTiming,
-                                        preconsultationHours:preconsultationHours,
-                                        preconsultationMins:preconsultationMins
-                                    })
+                                    let dto = {
+                                        startTime : slotStartTime,
+                                        endTime :slotEndTime,
+                                    }
+                                    let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
+                                    if(!isOverLapping){
+                                        slotObject.slots.push({ // push free slot obj
+                                            startTime: slotStartTime,
+                                            endTime: slotEndTime,
+                                            slotType: 'Free',
+                                            slotTiming: consultationSessionTiming,
+                                            preconsultationHours:preconsultationHours,
+                                            preconsultationMins:preconsultationMins
+                                        })
+                                    }
+                                   
                                 }
                                 slotStartTime = slotEndTime; // update the next slot start time
                             }
-                        })
+                    //    })
+                        }
                         appointmentSlots.push(slotObject);
                     }
                     dayOfWeekCount++; // increase to next  Day
@@ -517,87 +548,6 @@ export class AppointmentService {
     }
 
 
-    // async old2appointmentSlotsView(user: any): Promise<any> {
-    //     try {
-    //         const doc = await this.doctorDetails(user.doctorKey);
-    //         var docId = doc.doctorId;
-    //         let d = new Date();
-    //         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-    //         var x: number = user.paginationNumber;
-    //         var date1 = new Date(Date.now() + (x * 7 * 24 * 60 * 60 * 1000));
-    //         var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
-    //         const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId, date1, last]);
-    //         const config = await this.doctorConfigRepository.findOne({doctorKey: doc.doctorKey});
-    //         let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-    //         console.log("====testing", consultSession)
-    //         let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
-
-    //         var Sunday = [];
-    //         var Monday = [];
-    //         var Tuesday = [];
-    //         var Wednesday = [];
-    //         var Thursday = [];
-    //         var Friday = [];
-    //         var Saturday = [];
-    //         schDay.forEach(e => {
-    //             if (e.dayOfWeek == 'Sunday') {
-    //                 Sunday.push(e);
-    //             } else if (e.dayOfWeek == 'Monday') {
-    //                 Monday.push(e);
-    //             } else if (e.dayOfWeek == 'Tuesday') {
-    //                 Tuesday.push(e);
-    //             } else if (e.dayOfWeek == 'Wednesday') {
-    //                 Wednesday.push(e);
-    //             } else if (e.dayOfWeek == 'Thursday') {
-    //                 Thursday.push(e);
-    //             } else if (e.dayOfWeek == 'Friday') {
-    //                 Friday.push(e);
-    //             } else if (e.dayOfWeek == 'Saturday') {
-    //                 Saturday.push(e);
-    //             }
-    //         });
-
-
-    //         var sundaySlots = [], mondaySlots = [], tuesdaySlots = [], wednesdaySlots = [], thursdaySlots = [],
-    //             fridaySlots = [], saturdaySlots = [];
-    //         let con = config.consultationSessionTimings;
-    //         await this.freeSlots(Sunday, sundaySlots, consultSession, 'Sunday', con);
-    //         await this.freeSlots(Monday, mondaySlots, consultSession, 'Monday', con);
-    //         await this.freeSlots(Tuesday, tuesdaySlots, consultSession, 'Tuesday', con);
-    //         await this.freeSlots(Wednesday, wednesdaySlots, consultSession, 'Wednesday', con);
-    //         await this.freeSlots(Thursday, thursdaySlots, consultSession, 'Thursday', con);
-    //         await this.freeSlots(Friday, fridaySlots, consultSession, 'Friday', con);
-    //         await this.freeSlots(Saturday, saturdaySlots, consultSession, 'Saturday', con);
-    //         var daysOfWeek = [];
-    //         daysOfWeek.push(sundaySlots);
-    //         daysOfWeek.push(mondaySlots);
-    //         daysOfWeek.push(tuesdaySlots);
-    //         daysOfWeek.push(wednesdaySlots);
-    //         daysOfWeek.push(thursdaySlots);
-    //         daysOfWeek.push(fridaySlots);
-    //         daysOfWeek.push(saturdaySlots);
-    //         var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    //         app.forEach(a => {
-    //             let date = a.appointment_date;
-    //             var d = new Date(date);
-    //             var d1 = d.getDay();
-    //             var dayName = days[d.getDay()];
-    //             daysOfWeek[d1].forEach((week, iterationNumber) => {
-    //                 if (week.start == a.startTime) {
-    //                     daysOfWeek[d1][iterationNumber] = a;
-    //                 }
-    //             })
-    //         });
-    //         console.log(daysOfWeek);
-    //         return (daysOfWeek);
-    //     } catch (e) {
-    //         console.log(e);
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-    //         }
-    //     }
-    // }
 
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
@@ -636,14 +586,34 @@ export class AppointmentService {
                         return isCancel;
                     } else {
                         // create appointment on existing date old records
-                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                        const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                        if(!appoint.message){
+                            const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                            console.log(appDocConfig);
+                            return  {
+                                appointment:appoint,
+                                appointmentDocConfig:appDocConfig
+                            } 
+                        }else {
+                            return appoint;
+                        }
                     }
                     
                 }
 
             }
 
-            return await this.appointmentRepository.createAppointment(appointmentDto);
+            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+            if(!appoint.message){
+                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                console.log(appDocConfig);
+                return  {
+                    appointment:appoint,
+                    appointmentDocConfig:appDocConfig
+                } 
+            }else {
+                return appoint;
+            }
         } catch (e) {
             console.log(e);
             return {
@@ -1137,7 +1107,12 @@ export class AppointmentService {
                 if(app.length){
                     for(let appointment of app){
                         flag = false;
-                        if(appointment.startTime == Helper.getTimeinHrsMins(start)){
+                        let dto={
+                            startTime :Helper.getTimeinHrsMins(start),
+                            endTime :Helper.getTimeinHrsMins(start + consultSession)
+                        }
+                        let isOverLapping = await this.findTimeOverlaping(app, dto);
+                        if((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping){
                             flag = true;
                             break;
                         }
@@ -1272,30 +1247,7 @@ export class AppointmentService {
         return {isPhone:isPhone,patientDetails:number};
     }
 
-    // async freeSlots(a, b, c, e, f): Promise<any> {
-    //     if (a.length) {
-    //         a.forEach(d => {
-    //             if (d.startTime) {
-    //                 let start = Helper.getTimeInMilliSeconds(d.startTime);
-    //                 let end = Helper.getTimeInMilliSeconds(d.endTime);
-    //                 while (start < end) {
-    //                     let strt = Helper.getTimeinHrsMins(Number(start));
-    //                     let last = Helper.getTimeinHrsMins(Number(end));
-    //                     let day = {
-    //                         slotType: 'Free Slot',
-    //                         start: strt,
-    //                         end: last,
-    //                         sessiontime: f,
-    //                         day: e
-    //                     }
-    //                     start = start + c;
-    //                     b.push(day);
-    //                 }
-    //             }
-    //         })
-    //     }
-    // }
-
+    
     async isWorkScheduleAvailable(day, workScheduleObj): Promise<any> {
         return workScheduleObj[day].length >= 1 ? true : false;
     }

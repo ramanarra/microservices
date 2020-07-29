@@ -44,6 +44,9 @@ export class AppointmentRepository extends Repository<Appointment> {
             const app =  await appointment.save();  
             const pay = new PaymentDetails();
             pay.appointmentId = app.id;
+            if(app.createdBy == CONSTANT_MSG.ROLES.PATIENT){
+                pay.isPaid = true;
+            }
             const payment = await pay.save();
             appointmentDto.appointmentId = app.id;
            // const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);

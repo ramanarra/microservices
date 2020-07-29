@@ -211,6 +211,7 @@ export class AppointmentController {
     }
     const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
     appointmentDto.configSession = config.consultationSessionTimings;
+    appointmentDto.config = config;
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
     return appointment;
     }

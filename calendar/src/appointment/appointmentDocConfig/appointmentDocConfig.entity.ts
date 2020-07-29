@@ -19,17 +19,17 @@ export class AppointmentDocConfig extends BaseEntity{
     consultationCost : string;
 
     @Column({
-        name : 'is_patient_preconsultation_allowed'
+        name : 'is_preconsultation_allowed'
     })
     isPatientPreconsultationAllowed : boolean;
 
     @Column({
-        name : 'preconsultation_hours'
+        name : 'pre_consultation_hours'
     })
     preconsultationHours : number;
 
     @Column({
-        name : 'preconsultation_mins'
+        name : 'pre_consultation_mins'
     })
     preconsultationMinutes : number;
 
