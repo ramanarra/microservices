@@ -52,7 +52,7 @@ export class AppointmentController {
             }
 
         }else{
-            const doctor = await this.appointmentService.doctor_List(user.account_key);
+            const doctor = await this.appointmentService.doctor_lists(user.account_key);
               // add static values for temp
               doctor.forEach(v => {
                 v.fees = 5000;

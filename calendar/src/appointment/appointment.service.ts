@@ -140,6 +140,43 @@ export class AppointmentService {
         return await this.doctorRepository.findOne({doctorId: doctorId});
     }
 
+    async doctor_lists(accountKey): Promise<any> {
+        try {
+            const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
+            let res=[];
+            for(let list of doctorList){
+                var doc={
+                    doctorId:list.doctorId,
+                    accountkey:list.account_key,
+                    doctorKey:list.doctor_key,
+                    speciality:list.speciality,
+                    photo:list.photo,
+                    signature:list.signature,
+                    number:list.number,
+                    firstName:list.first_name,
+                    lastName:list.last_name,
+                    registrationNumber:list.registration_number,
+                    fee:list.consultation_cost,
+                    location:list.city
+                }
+                res.push(doc);
+            }
+            if (doctorList.length) {
+                return res;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
 
     async doctor_List(user): Promise<any> {
         try {
@@ -531,6 +568,9 @@ export class AppointmentService {
                                         endTime :slotEndTime,
                                     }
                                     let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
+                                    var time = date.getHours() + ":" + date.getMinutes();
+                                    var timeInMS = Helper.getTimeInMilliSeconds(time);
+                                    var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
                                     if(!isOverLapping){
                                         slotObject.slots.push({ // push free slot obj
                                             startTime: slotStartTime,
