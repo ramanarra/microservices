@@ -261,7 +261,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'doctor_list_patients'})
     async doctorListForPatients(user: any): Promise<any> {
-        const doctor = await this.appointmentService.doctor_List(user.accountKey);
+        const doctor = await this.appointmentService.doctor_List(user);
         return doctor;
     }
 
@@ -394,7 +394,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'reports_list'})
     async reports(user: any): Promise<any> {
         if(user.account_key == user.accountKey){
-           const reports = await this.appointmentService.reports(user.accountKey);
+           const reports = await this.appointmentService.reports(user.accountKey,user.paginationNumber);
            return reports;  
         }else{
             return {

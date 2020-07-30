@@ -351,9 +351,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorListForPatients(@Request() req, @Query('accountKey') accountKey: String) {
+    doctorListForPatients(@Request() req) {
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.doctorListForPatients(req.user, accountKey);
+        return this.calendarService.doctorListForPatients(req.user);
     }
 
     @Post('patient/findDoctorByCodeOrName')
@@ -461,9 +461,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientPastAppointments(@Request() req,  @Query('patientId') patientId: Number, @Query('paginationNumber') paginationNumber: Number) {
-        this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(patientId)}`);
-        return this.calendarService.patientPastAppointments(patientId,paginationNumber);
+    patientPastAppointments(@Request() req,  @Query('limit') limit: Number, @Query('paginationNumber') paginationNumber: Number) {
+        this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(req.user.patientId)}`);
+        return this.calendarService.patientPastAppointments(req.user.patientId,paginationNumber,limit);
     }
 
     @Get('patient/upcomingAppointmentsList')
@@ -471,9 +471,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientUpcomingAppointments(@Request() req,  @Query('patientId') patientId: String, @Query('paginationNumber') paginationNumber: Number) {
-        this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(patientId)}`);
-        return this.calendarService.patientUpcomingAppointments(patientId,paginationNumber);
+    patientUpcomingAppointments(@Request() req,  @Query('limit') limit: String, @Query('paginationNumber') paginationNumber: Number) {
+        this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(req.user.patientId)}`);
+        return this.calendarService.patientUpcomingAppointments(req.user.patientId,paginationNumber,limit);
     }
 
     @Get('doctor/patientList')
@@ -676,11 +676,11 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string) {
+    reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string, @Query('paginationNumber') paginationNumber: number) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`admin reports Api -> Request data }`);
-        return this.calendarService.reports(req.user, accountKey);
+        return this.calendarService.reports(req.user, accountKey,paginationNumber);
     }
 
     @Get('patient/listOfDoctorsInHospital')
