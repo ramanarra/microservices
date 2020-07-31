@@ -406,7 +406,7 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"patientId":1,\n' +
-            '"doctorId":1,\n' +
+            '"doctorKey":"Doc_5"\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
@@ -419,9 +419,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
-        if(!req.body.doctorId){
-            console.log("Provide doctorId");
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorId"}
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
         } else if(!req.body.appointmentDate){
             console.log("Provide appointmentDate");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}

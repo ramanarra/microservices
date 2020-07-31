@@ -74,7 +74,7 @@ export class AppointmentService {
                 } else {
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
-                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
                     if(start > end){
                         return{
@@ -636,7 +636,7 @@ export class AppointmentService {
                 } else {
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
-                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
                     if(start > end){
                         return{
