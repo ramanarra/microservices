@@ -471,7 +471,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientUpcomingAppointments(@Request() req,  @Query('limit') limit: String, @Query('paginationNumber') paginationNumber: Number) {
+    patientUpcomingAppointments(@Request() req,  @Query('limit') limit: number, @Query('paginationNumber') paginationNumber: Number) {
         this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(req.user.patientId)}`);
         return this.calendarService.patientUpcomingAppointments(req.user.patientId,paginationNumber,limit);
     }
