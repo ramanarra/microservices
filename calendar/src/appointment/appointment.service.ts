@@ -1180,7 +1180,7 @@ export class AppointmentService {
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
-        if(!workSchedule.length){
+        if(!workSchedule[0].startTime){
             return [];
         } 
         let slots = [];

@@ -83,7 +83,8 @@ export class UserController {
         } else {
             return{
                 phone:patient.phone,
-                patientId:patient.patient_id
+                patientId:patient.patient_id,
+                accessToken:patient.accessToken
             } 
         }
         
