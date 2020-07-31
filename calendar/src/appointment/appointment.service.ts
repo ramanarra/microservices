@@ -180,8 +180,7 @@ export class AppointmentService {
 
     async doctor_List(user): Promise<any> {
         try {
-            //const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
-            const doctorList = await this.doctorRepository.query(queries.getDocListForPatient, [user.patientId]);
+            const doctorList = await this.appointmentRepository.query(queries.getDocListForPatient, [user.patientId]);
             let ids = [];
             doctorList.forEach(a => {
                 let flag = false;
@@ -207,7 +206,8 @@ export class AppointmentService {
                     lastName:list.last_name,
                     registrationNumber:list.registration_number,
                     fee:list.consultation_cost,
-                    location:list.city
+                    location:list.city,
+                    hospitalName:list.hospital_name
                 }
                 res.push(doc);
             }
@@ -930,8 +930,11 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = user.paginationNumber*user.limit;
+            let offset = (user.paginationNumber)*(user.limit);
             const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
+            if(!app.length){
+                return [];
+            }
             const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
             let appNumber = appNum.length;
             console.log(appNumber);
@@ -993,8 +996,11 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = user.paginationNumber*user.limit;
+            let offset = (user.paginationNumber)*(user.limit);
             const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
+            if(!app.length){
+                return [];
+            }
             const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date]);
             let appNumber = appNum.length;
             if (app.length) {
@@ -1174,7 +1180,7 @@ export class AppointmentService {
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
-        if(!workSchedule.startTime){
+        if(!workSchedule.length){
             return [];
         } 
         let slots = [];
@@ -1249,7 +1255,8 @@ export class AppointmentService {
             lastName:a.last_name,
             registrationNumber:a.registration_number,
             fee:a.consultation_cost,
-            location:a.city
+            location:a.city,
+            hospitalName:a.hospital_name
             }
             res.push(b);
         });
@@ -1269,7 +1276,8 @@ export class AppointmentService {
             location:account.city,
             fee:config.consultationCost,
             preConsultationHours:config.preconsultationHours,
-            preConsulationMinutes:config.preconsultationMins
+            preConsulationMinutes:config.preconsultationMins,
+            sessionTiming:config.consultationSessionTimings
         }
         return res;       
     }
