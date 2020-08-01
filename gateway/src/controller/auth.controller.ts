@@ -28,6 +28,7 @@ import {
 import { defaultMaxListeners } from 'stream';
 import {AuthGuard} from '@nestjs/passport';
 
+
 @Controller('api/auth')
 @UseFilters(AllExceptionsFilter)
 export class AuthController {
@@ -161,7 +162,9 @@ export class AuthController {
     @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async doctorList(@Request() req,@Response() res) {
-      return await this.userService.logOut(req.user);
+      //return await this.userService.logOut(req.user);
+      req.logOut();
+      return res.json({message: "sucessfully loggedout"})
     }
 
 }
