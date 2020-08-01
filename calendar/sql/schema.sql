@@ -1,4 +1,4 @@
---
+--To Create the dump file from PG-ADMIN use Format:"Plain", Enable:"Pre-data", "Data", "Post-data", "Use Column Inserts", "Use Insert Commands"
 -- PostgreSQL database dump
 --
 
