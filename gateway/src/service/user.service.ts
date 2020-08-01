@@ -82,5 +82,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
     }
 
+    public logOut(user : any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'auth_logout'}, user);
+    }
+
+
 
 }

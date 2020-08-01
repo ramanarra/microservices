@@ -7,8 +7,11 @@ import {
   Post,
   Get,
   Put,
+  UseGuards,
   UseFilters,
   Logger,
+  Request,
+  Response,
   ValidationPipe, UsePipes
 } from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
@@ -19,10 +22,11 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiUnauthorizedResponse,
-  ApiBody,
+  ApiBody, ApiBearerAuth,
   ApiResponse
 } from '@nestjs/swagger';
 import { defaultMaxListeners } from 'stream';
+import {AuthGuard} from '@nestjs/passport';
 
 @Controller('api/auth')
 @UseFilters(AllExceptionsFilter)
@@ -148,6 +152,16 @@ export class AuthController {
           message: "Provide valid phone"
         }
       }
+    }
+
+
+    @Get('logout')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async doctorList(@Request() req,@Response() res) {
+      return await this.userService.logOut(req.user);
     }
 
 }

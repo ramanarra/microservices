@@ -2430,3 +2430,6 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 
 ALTER TABLE public.account_details
     RENAME photo TO hospital_photo;
+
+ALTER TABLE public.account_details
+    ALTER COLUMN hospital_photo TYPE character varying(500) COLLATE pg_catalog."default";
