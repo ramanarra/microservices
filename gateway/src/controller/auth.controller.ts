@@ -27,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { defaultMaxListeners } from 'stream';
 import {AuthGuard} from '@nestjs/passport';
+import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
 
 
 @Controller('api/auth')
@@ -159,10 +160,9 @@ export class AuthController {
     @Get('logout')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
+    @ApiOkResponse({description: 'logOut API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async doctorList(@Request() req,@Response() res) {
-      //return await this.userService.logOut(req.user);
       req.logOut();
       return res.json({message: "sucessfully loggedout"})
     }

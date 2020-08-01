@@ -90,11 +90,5 @@ export class UserController {
         
     };
 
-    @MessagePattern({cmd: 'auth_logout'})
-    async logOut(user: any): Promise<any> {
-        const logOut = await this.userService.logOut(user);
-        return logOut;
-    }
-
 
 }
