@@ -1278,6 +1278,8 @@ export class AppointmentService {
         const config = await this.getDoctorConfigDetails(doctor.doctorKey);
         var res = {
             name:doctor.doctorName,
+            firstName:doctor.firstName,
+            lastName:doctor.lastName,
             speciality:doctor.speciality,
             mobileNo:doctor.number,
             hospitalName:account.hospitalName,
@@ -1285,6 +1287,7 @@ export class AppointmentService {
             fee:config.consultationCost,
             preConsultationHours:config.preconsultationHours,
             preConsulationMinutes:config.preconsultationMins,
+            photo:doctor.photo,
             sessionTiming:config.consultationSessionTimings
         }
         return res;       

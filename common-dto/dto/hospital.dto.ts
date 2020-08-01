@@ -14,7 +14,7 @@ export class HospitalDto {
     @IsOptional ()
     @IsEmail()
     supportEmail: string;
-    photo: string;
+    hospitalPhoto: string;
     @IsOptional ()
     @IsPhoneNumber('IN')
     phone: string;
