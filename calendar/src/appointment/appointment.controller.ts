@@ -32,7 +32,12 @@ export class AppointmentController {
             }
             appointmentDto.doctorId = docId.doctorId;
             appointmentDto.config = config; 
-        } 
+        }else{
+            const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+            const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.doctorKey);
+            appointmentDto.doctorId = docId.doctorId;
+            appointmentDto.config = config; 
+        }        
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
@@ -195,6 +200,9 @@ export class AppointmentController {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
     if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
+    }else{
+        const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+        appointmentDto.doctorId = docId.doctorId;
     }
     const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
     if(!doctor){
@@ -285,6 +293,8 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
+        const docId = await this.appointmentService.doctorDetails(patientDto.doctorKey);
+        patientDto.doctorId = docId.doctorId;
         const doctor = await this.appointmentService.doctor_Details(patientDto.doctorId);
         const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
         patientDto.configSession = config.consultationSessionTimings;
