@@ -7,8 +7,11 @@ import {
   Post,
   Get,
   Put,
+  UseGuards,
   UseFilters,
   Logger,
+  Request,
+  Response,
   ValidationPipe, UsePipes
 } from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
@@ -19,10 +22,13 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiUnauthorizedResponse,
-  ApiBody,
+  ApiBody, ApiBearerAuth,
   ApiResponse
 } from '@nestjs/swagger';
 import { defaultMaxListeners } from 'stream';
+import {AuthGuard} from '@nestjs/passport';
+import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
+
 
 @Controller('api/auth')
 @UseFilters(AllExceptionsFilter)
@@ -148,6 +154,17 @@ export class AuthController {
           message: "Provide valid phone"
         }
       }
+    }
+
+
+    @Get('logout')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'logOut API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async doctorList(@Request() req,@Response() res) {
+      req.logOut();
+      return res.json({message: "sucessfully loggedout"})
     }
 
 }

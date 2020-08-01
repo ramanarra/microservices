@@ -72,6 +72,7 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"patientId":1,\n' +
+            '"doctorKey":"Doc_5",\n' +
             '"startTime": "10:00",\n' +
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
