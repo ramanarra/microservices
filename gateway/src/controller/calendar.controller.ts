@@ -303,9 +303,6 @@ export class CalendarController {
         if(!req.body.appointmentId){
             console.log("Provide appointmentId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentId"}
-        } else if(!req.body.confirmation){
-            console.log("Confirmation necessary for cancellation");
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Confirmation necessary for cancellation"}
         }
         this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.appointmentCancel(appointmentDto, req.user);

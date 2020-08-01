@@ -732,6 +732,14 @@ export class AppointmentService {
                 }
             }
             var appoint = await this.appointmentRepository.findOne({id: appointmentDto.appointmentId});
+            if(appoint.createdBy === CONSTANT_MSG.ROLES.DOCTOR && appoint.paymentOption === 'directPayment'){
+                if(!appointmentDto.confirmation){
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.CONFIRMATION_REQUIRED
+                    }
+                }
+            }
             if (appoint.isCancel == true) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
@@ -1270,6 +1278,8 @@ export class AppointmentService {
         const config = await this.getDoctorConfigDetails(doctor.doctorKey);
         var res = {
             name:doctor.doctorName,
+            firstName:doctor.firstName,
+            lastName:doctor.lastName,
             speciality:doctor.speciality,
             mobileNo:doctor.number,
             hospitalName:account.hospitalName,
@@ -1277,6 +1287,7 @@ export class AppointmentService {
             fee:config.consultationCost,
             preConsultationHours:config.preconsultationHours,
             preConsulationMinutes:config.preconsultationMins,
+            photo:doctor.photo,
             sessionTiming:config.consultationSessionTimings
         }
         return res;       

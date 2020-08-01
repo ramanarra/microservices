@@ -54,8 +54,8 @@ export class AccountDetails extends BaseEntity{
     supportEmail : string;
 
     @Column({
-        name : 'photo'
+        name : 'hospital_photo'
     })
-    photo : string;
+    hospitalPhoto : string;
 
 }

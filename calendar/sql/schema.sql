@@ -2428,3 +2428,5 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
+ALTER TABLE public.account_details
+    RENAME photo TO hospital_photo;
