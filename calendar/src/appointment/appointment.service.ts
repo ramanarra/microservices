@@ -732,6 +732,14 @@ export class AppointmentService {
                 }
             }
             var appoint = await this.appointmentRepository.findOne({id: appointmentDto.appointmentId});
+            if(appoint.createdBy === CONSTANT_MSG.ROLES.DOCTOR && appoint.paymentOption === 'directPayment'){
+                if(!appointmentDto.confirmation){
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.CONFIRMATION_REQUIRED
+                    }
+                }
+            }
             if (appoint.isCancel == true) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
