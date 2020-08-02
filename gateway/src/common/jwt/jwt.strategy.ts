@@ -18,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
 
+
     // async validate(payload : any) : Promise<UserDto>{
     //     console.log("JWT Payload >> "+ JSON.stringify(payload));
     //     const user : UserDto = await this.userService.findUserByEmail(payload.email).toPromise();
@@ -28,7 +29,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // }
 
     async validate(payload : any) : Promise<any>{
-        console.log("JWT Payload >> "+ JSON.stringify(payload));
         if(payload.permission == "CUSTOMER"){
             const patient : PatientDto = await this.userService.findUserByPhone(payload.phone).toPromise();
             if(!patient){
@@ -42,6 +42,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
         return payload;
     }
+
+
+
+
+
+
 
     // async validate(patientload : JwtPatientLoad) : Promise<PatientDto>{
     //     console.log("JWT Patientload >> "+ JSON.stringify(patientload));
