@@ -1697,3 +1697,48 @@ ALTER TABLE ONLY public.work_schedule_interval
 -- PostgreSQL database dump complete
 --
 
+-- Table: public.openvidu_session
+
+-- DROP TABLE public.openvidu_session;
+
+CREATE TABLE public.openvidu_session
+(
+    openvidu_session_id integer NOT NULL DEFAULT nextval('openvidu_session_openvidu_session_id_seq'::regclass),
+    doctor_key character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    session_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    session_id character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT openvidu_session_pkey PRIMARY KEY (openvidu_session_id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.openvidu_session
+    OWNER to postgres;
+
+
+-- Table: public.openvidu_session_token
+
+-- DROP TABLE public.openvidu_session_token;
+
+CREATE TABLE public.openvidu_session_token
+(
+    openvidu_session_token_id integer NOT NULL DEFAULT nextval('openvidu_session_token_openvidu_session_token_id_seq'::regclass),
+    openvidu_session_id bigint NOT NULL,
+    token text COLLATE pg_catalog."default" NOT NULL,
+    doctor_id bigint,
+    patient_id bigint,
+    CONSTRAINT openvidu_session_token_pkey PRIMARY KEY (openvidu_session_token_id),
+    CONSTRAINT openvidu_session_id FOREIGN KEY (openvidu_session_id)
+        REFERENCES public.openvidu_session (openvidu_session_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.openvidu_session_token
+    OWNER to postgres;

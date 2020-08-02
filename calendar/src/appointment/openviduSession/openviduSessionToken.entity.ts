@@ -1,6 +1,6 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'typeorm';
 
-@Entity()
+@Entity({name : "openvidu_session_token"})
 export class OpenViduSessionToken extends BaseEntity{
 
     @PrimaryGeneratedColumn({
@@ -21,10 +21,10 @@ export class OpenViduSessionToken extends BaseEntity{
     @Column({
         name : 'patient_id'
     })
-    patientId : string;
+    patientId : number;
 
     @Column({
         name : 'doctor_id'
     })
-    doctorId : string;
+    doctorId : number;
 }

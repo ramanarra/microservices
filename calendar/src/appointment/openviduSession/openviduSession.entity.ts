@@ -1,6 +1,6 @@
 import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'typeorm';
 
-@Entity()
+@Entity({name : "openvidu_session"})
 export class OpenViduSession extends BaseEntity{
 
     @PrimaryGeneratedColumn({

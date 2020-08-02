@@ -3,6 +3,8 @@ import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
 import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
+import { VideoService } from './video.service';
+import { PatientDetailsRepository } from './patientDetails/patientDetails.repository';
 
 
 @Controller('appointment')
@@ -10,7 +12,9 @@ export class AppointmentController {
 
     private logger = new Logger('AppointmentController');
 
-    constructor(private readonly appointmentService: AppointmentService) {
+    constructor(private readonly appointmentService: AppointmentService, 
+        private readonly videoService : VideoService,
+        private patientDetailsRepository : PatientDetailsRepository) {
 
     }
 
@@ -398,6 +402,83 @@ export class AppointmentController {
             }
         }
     }
+
+    @MessagePattern({cmd: 'video_doctor_session_create'})
+    async videoDoctorSessionCreate(doctorKey: string): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(doctorKey);
+        if(doc){
+            let tokenResponseDetails = await this.videoService.createDoctorSession(doc);
+            return tokenResponseDetails;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'video_patient_create_token_by_doctor'})
+    async videoDoctorCreateTokenForPatient(docPatientDetail): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
+        const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
+        if(doc && pat){
+            let tokenResponseDetails = await this.videoService.createPatientTokenByDoctor(doc, pat);
+            return tokenResponseDetails;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'video_get_patient_token_for_doctor'})
+    async getPatientTokenForDoctor(docPatientDetail): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
+        const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
+        if(doc && pat){
+            let tokenResponseDetails = await this.videoService.getPatientToken(doc.doctorId, pat.patientId);
+            return tokenResponseDetails;
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+       
+    }
+
+    @MessagePattern({cmd: 'video_remove_patient_token_by_doctor'})
+    async removePatientTokenByDoctor(docPatientDetail): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
+        const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
+        if(doc && pat){
+            await this.videoService.removePatientToken(doc, pat.patientId);
+        }else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'video_remove_session_token_by_doctor'})
+    async removeSessionAndTokenByDoctor(doctorKey): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(doctorKey);
+        if(doc){
+            await this.videoService.removeSessionAndTokenByDoctor(doc);
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        
+    }
+
+    
+
+
 
 
 }

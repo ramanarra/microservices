@@ -14,9 +14,23 @@ import { APP_GUARD } from '@nestjs/core';
 import { CalendarController } from './controller/calendar.controller';
 import { CalendarService } from './service/calendar.service';
 import { HealthCheckService } from './service/health-check.service';
+import { VideoService } from './service/video.service';
+import { VideoGateway } from './gateway/video.gateway';
+import { JwtModule } from '@nestjs/jwt';
+import config from 'config';
+import { SharedModule } from './app/shared/shared.module';
 
+const jwtConfig = config.get('JWT'); 
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: "jwt" })],
+  imports: [PassportModule.register({ defaultStrategy: "jwt" }), 
+  JwtModule.register({
+    secret : jwtConfig.secret,
+    signOptions : {
+      expiresIn : jwtConfig.expiresIn
+    }
+  }),
+  SharedModule
+],
   controllers: [AppController, AuthController, UserController, ChatController, CalendarController],
   providers: [AppService, UserService, CalendarService,
     {
@@ -34,7 +48,9 @@ import { HealthCheckService } from './service/health-check.service';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    HealthCheckService
+    HealthCheckService,
+    VideoService,
+    VideoGateway
   ],
 })
 export class AppModule { }

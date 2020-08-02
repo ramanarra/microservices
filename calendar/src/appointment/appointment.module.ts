@@ -18,6 +18,8 @@ import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repos
 import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+import { VideoService } from './video.service';
+import { OpenViduService } from './open-vidu.service';
 
 @Module({
   imports: [
@@ -26,6 +28,6 @@ import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedu
       DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository, OpenViduSessionRepository,OpenViduSessionTokenRepository])
   ],
   controllers: [AppointmentController],
-  providers: [AppointmentService]
+  providers: [AppointmentService, VideoService, OpenViduService]
 })
 export class AppointmentModule { }
