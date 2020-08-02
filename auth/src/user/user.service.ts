@@ -222,16 +222,6 @@ export class UserService {
         return bcrypt.hash(password, salt);
     }
 
-    public async logOut(user: any): Promise<any> {
-        user.logOut();
-     // res.redirect('/');
-      return {
-        statusCode: HttpStatus.OK,
-        message:'Logout successfully'
-      }
-    }
-
-
 
 
 }

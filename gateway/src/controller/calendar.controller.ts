@@ -628,7 +628,9 @@ export class CalendarController {
                     patientId:patient.patientId,
                     appointmentDate:patientDto.appointmentDate,
                     startTime:patientDto.startTime,
-                    endTime:patientDto.endTime
+                    endTime:patientDto.endTime,
+                    paymentOption:patientDto.paymentOption,
+                    consultationMode:patientDto.consultationMode
                 }
                
                 appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
