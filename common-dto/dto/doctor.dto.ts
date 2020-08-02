@@ -16,4 +16,5 @@ export class DoctorDto {
     doctorExperience: number;
     speciality: string;
     registrationNumber:string;  
+    photo:string;
   }

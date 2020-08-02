@@ -3,6 +3,7 @@ import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
 import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
+//import {DoctorService} from './doctor/doctor.service';
 
 
 @Controller('appointment')
@@ -10,7 +11,9 @@ export class AppointmentController {
 
     private logger = new Logger('AppointmentController');
 
-    constructor(private readonly appointmentService: AppointmentService) {
+    constructor(private readonly appointmentService: AppointmentService
+       // ,private readonly doctorService: DoctorService
+        ) {
 
     }
 
@@ -29,7 +32,12 @@ export class AppointmentController {
             }
             appointmentDto.doctorId = docId.doctorId;
             appointmentDto.config = config; 
-        } 
+        }else{
+            const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+            const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.doctorKey);
+            appointmentDto.doctorId = docId.doctorId;
+            appointmentDto.config = config; 
+        }        
         const appointment = await this.appointmentService.createAppointment(appointmentDto);
         return appointment;
     }
@@ -49,7 +57,7 @@ export class AppointmentController {
             }
 
         }else{
-            const doctor = await this.appointmentService.doctor_List(user.account_key);
+            const doctor = await this.appointmentService.doctor_lists(user.account_key);
               // add static values for temp
               doctor.forEach(v => {
                 v.fees = 5000;
@@ -192,6 +200,9 @@ export class AppointmentController {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
     if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
+    }else{
+        const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+        appointmentDto.doctorId = docId.doctorId;
     }
     const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
     if(!doctor){
@@ -208,6 +219,7 @@ export class AppointmentController {
     }
     const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
     appointmentDto.configSession = config.consultationSessionTimings;
+    appointmentDto.config = config;
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
     return appointment;
     }
@@ -257,7 +269,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'doctor_list_patients'})
     async doctorListForPatients(user: any): Promise<any> {
-        const doctor = await this.appointmentService.doctor_List(user.accountKey);
+        const doctor = await this.appointmentService.doctor_List(user);
         return doctor;
     }
 
@@ -281,16 +293,19 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
+        const docId = await this.appointmentService.doctorDetails(patientDto.doctorKey);
+        patientDto.doctorId = docId.doctorId;
         const doctor = await this.appointmentService.doctor_Details(patientDto.doctorId);
         const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
         patientDto.configSession = config.consultationSessionTimings;
+        patientDto.config = config;
         const patient = await this.appointmentService.createAppointment(patientDto);
         return patient;
     }
 
     @MessagePattern({cmd: 'patient_view_appointment'})
-    async viewAppointmentSlotsForPatient(doctor: any): Promise<any> {
-        const appointment = await this.appointmentService.viewAppointmentSlotsForPatient(doctor);
+    async viewAppointmentSlotsForPatient(details: any): Promise<any> {
+        const appointment = await this.appointmentService.availableSlots(details);
         return appointment;
     }
 
@@ -389,7 +404,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'reports_list'})
     async reports(user: any): Promise<any> {
         if(user.account_key == user.accountKey){
-           const reports = await this.appointmentService.reports(user.accountKey);
+           const reports = await this.appointmentService.reports(user.accountKey,user.paginationNumber);
            return reports;  
         }else{
             return {
@@ -398,6 +413,19 @@ export class AppointmentController {
             }
         }
     }
+
+    @MessagePattern({cmd: 'list_of_doctors'})
+    async listOfDoctorsInHospital(user: any): Promise<any> {
+        const doctors = await this.appointmentService.listOfDoctorsInHospital(user.accountKey);
+        return doctors;  
+    }
+
+    @MessagePattern({cmd: 'view_doctor_details'})
+    async viewDoctorDetails(user: any): Promise<any> {
+        const doctors = await this.appointmentService.viewDoctor(user);
+        return doctors;  
+    }
+
 
 
 }

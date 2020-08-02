@@ -78,10 +78,13 @@ export class UserController {
         const patient = await this.userService.patientRegistration(patientDto);
         if(patient.message){
             return patient;
+        } else if(patient.update){
+            return patient
         } else {
             return{
                 phone:patient.phone,
-                patientId:patient.patient_id
+                patientId:patient.patient_id,
+                accessToken:patient.accessToken
             } 
         }
         

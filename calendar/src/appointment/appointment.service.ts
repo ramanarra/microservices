@@ -33,7 +33,7 @@ import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.reposito
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
 import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
-
+import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 
 var async = require('async');
 
@@ -53,7 +53,8 @@ export class AppointmentService {
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
-        private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository
+        private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
+        private appointmentDocConfigRepository: AppointmentDocConfigRepository
     ) {
     }
 
@@ -71,9 +72,35 @@ export class AppointmentService {
                         message: CONSTANT_MSG.TIME_OVERLAP
                     }
                 } else {
+                    // let user = {
+                    //     doctorKey:appointmentDto.doctorKey,
+                    //     appointmentDate:appointmentDto.appointmentDate
+                    // }
+                    // let availableSlot = await this.availableSlots(user);
+                    // if(!availableSlot.length){
+                    //     return{
+                    //         statusCode:HttpStatus.BAD_REQUEST,
+                    //         message:CONSTANT_MSG.NO_WORK_SCHEDULE
+                    //     }
+                    // }else{
+                    //     let flag = false;
+                    //     let x:any;
+                    //     for(x in availableSlot){
+                    //         if(x.start == appointmentDto.startTime && x.end == appointmentDto.endTime){
+                    //             flag = true;
+                    //         }
+                    //     }
+                    //     if(flag == false){
+                    //         return{
+                    //             statusCode:HttpStatus.BAD_REQUEST,
+                    //             message:CONSTANT_MSG.INVALID_TIMINGS
+                    //         }
+                    //     }
+                    // }
+                    
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
-                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
                     if(start > end){
                         return{
@@ -89,10 +116,30 @@ export class AppointmentService {
                     }
                     
                     // create appointment on existing date old records
-                    return await this.appointmentRepository.createAppointment(appointmentDto);
+                    const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
+                    if(!appoint.message){
+                        const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                        console.log(appDocConfig);
+                        return  {
+                            appointment:appoint,
+                            appointmentDocConfig:appDocConfig
+                        }  
+                    }else {
+                        return appoint;
+                    }
                 }
             }
-            return await this.appointmentRepository.createAppointment(appointmentDto);
+            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+            if(!appoint.message){
+                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                console.log(appDocConfig);
+                return  {
+                    appointment:appoint,
+                    appointmentDocConfig:appDocConfig
+                } 
+            }else {
+                return appoint;
+            }
         } catch (e) {
             console.log(e);
             return {
@@ -119,12 +166,79 @@ export class AppointmentService {
         return await this.doctorRepository.findOne({doctorId: doctorId});
     }
 
-
-    async doctor_List(accountKey): Promise<any> {
+    async doctor_lists(accountKey): Promise<any> {
         try {
-            const doctorList = await this.doctorRepository.find({accountKey: accountKey});
+            const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
+            let res=[];
+            for(let list of doctorList){
+                var doc={
+                    doctorId:list.doctorId,
+                    accountkey:list.account_key,
+                    doctorKey:list.doctor_key,
+                    speciality:list.speciality,
+                    photo:list.photo,
+                    signature:list.signature,
+                    number:list.number,
+                    firstName:list.first_name,
+                    lastName:list.last_name,
+                    registrationNumber:list.registration_number,
+                    fee:list.consultation_cost,
+                    location:list.city
+                }
+                res.push(doc);
+            }
             if (doctorList.length) {
-                return doctorList;
+                return res;
+            } else {
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
+            }
+        } catch (e) {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+
+    async doctor_List(user): Promise<any> {
+        try {
+            const doctorList = await this.appointmentRepository.query(queries.getDocListForPatient, [user.patientId]);
+            let ids = [];
+            doctorList.forEach(a => {
+                let flag = false;
+                ids.forEach(i => {
+                    if(i.doctorId == a.doctorId)
+                        flag = true;
+                });
+                if(flag == false){
+                    ids.push(a)
+                }              
+            });
+            let res=[];
+            for(let list of ids){
+                var doc={
+                    doctorId:list.doctorId,
+                    accountkey:list.account_key,
+                    doctorKey:list.doctor_key,
+                    speciality:list.speciality,
+                    photo:list.photo,
+                    signature:list.signature,
+                    number:list.number,
+                    firstName:list.first_name,
+                    lastName:list.last_name,
+                    registrationNumber:list.registration_number,
+                    fee:list.consultation_cost,
+                    location:list.city,
+                    hospitalName:list.hospital_name
+                }
+                res.push(doc);
+            }
+            if (doctorList.length) {
+                return res;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -357,7 +471,9 @@ export class AppointmentService {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let page: number = user.paginationNumber;
-            var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
+            var date:any = new Date();
+            var startDate:any = date;
+          //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
             let possibleNextAppointments = await this.appointmentRepository.query(queries.getAppointByDocId, [docId, startDate])
             let doctorWorkSchedule = await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleIntervalAndDay, [user.doctorKey]);
             if (doctorWorkSchedule && doctorWorkSchedule.length) {
@@ -394,7 +510,7 @@ export class AppointmentService {
                 let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
-                while (appointmentSlots.length <= 6) {  // run while loop to get minimum 7  days of appointment slots
+                while (appointmentSlots.length <= page*7+7) {  // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
                     let dayOfWeek = day.getDay();
                     let workScheduleDayPresentOrNot = false;
@@ -438,7 +554,8 @@ export class AppointmentService {
                             return 0;
                         })
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
-                        sortedWorkScheduleTimeInterval.forEach(v => {
+                        //sortedWorkScheduleTimeInterval.forEach(v => {
+                        for(let v of sortedWorkScheduleTimeInterval){
                             let intervalEndTime = v.endTime;
                             let intervalEnd = false;
                             let slotStartTime = v.startTime;
@@ -472,23 +589,44 @@ export class AppointmentService {
                                     }
                                 })
                                 if (!slotPresentOrNot.length) { // if no appointment present on the slot timing, then push the free slots
-                                    slotObject.slots.push({ // push free slot obj
-                                        startTime: slotStartTime,
-                                        endTime: slotEndTime,
-                                        slotType: 'Free',
-                                        slotTiming: consultationSessionTiming,
-                                        preconsultationHours:preconsultationHours,
-                                        preconsultationMins:preconsultationMins
-                                    })
+                                    let dto = {
+                                        startTime : slotStartTime,
+                                        endTime :slotEndTime,
+                                    }
+                                    let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
+                                    var time = date.getHours() + ":" + date.getMinutes();
+                                    var timeInMS = Helper.getTimeInMilliSeconds(time);
+                                    var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
+                                    if(!isOverLapping){
+                                        slotObject.slots.push({ // push free slot obj
+                                            startTime: slotStartTime,
+                                            endTime: slotEndTime,
+                                            slotType: 'Free',
+                                            slotTiming: consultationSessionTiming,
+                                            preconsultationHours:preconsultationHours,
+                                            preconsultationMins:preconsultationMins
+                                        })
+                                    }
+                                   
                                 }
                                 slotStartTime = slotEndTime; // update the next slot start time
                             }
-                        })
+                    //    })
+                        }
                         appointmentSlots.push(slotObject);
                     }
                     dayOfWeekCount++; // increase to next  Day
                 }
-                return appointmentSlots;
+                var res=[];
+                var count =0;
+                appointmentSlots.forEach((e,iterationNumber) => {
+                    if( page*7 <= iterationNumber && count<7){
+                        res.push(e);
+                        count++;
+                    }
+                });
+                return res;
+                //return appointmentSlots;
             } else {
                 console.log("Error in appointmentSlotsView api 1")
                 return {
@@ -506,87 +644,6 @@ export class AppointmentService {
     }
 
 
-    async old2appointmentSlotsView(user: any): Promise<any> {
-        try {
-            const doc = await this.doctorDetails(user.doctorKey);
-            var docId = doc.doctorId;
-            let d = new Date();
-            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            var x: number = user.paginationNumber;
-            var date1 = new Date(Date.now() + (x * 7 * 24 * 60 * 60 * 1000));
-            var last = new Date(date1.getTime() + (7 * 24 * 60 * 60 * 1000));
-            const app = await this.appointmentRepository.query(queries.getPaginationAppList, [docId, date1, last]);
-            const config = await this.doctorConfigRepository.findOne({doctorKey: doc.doctorKey});
-            let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-            console.log("====testing", consultSession)
-            let schDay = await this.docConfigScheduleDayRepository.query(queries.getWorkSchedule, [docId]);
-
-            var Sunday = [];
-            var Monday = [];
-            var Tuesday = [];
-            var Wednesday = [];
-            var Thursday = [];
-            var Friday = [];
-            var Saturday = [];
-            schDay.forEach(e => {
-                if (e.dayOfWeek == 'Sunday') {
-                    Sunday.push(e);
-                } else if (e.dayOfWeek == 'Monday') {
-                    Monday.push(e);
-                } else if (e.dayOfWeek == 'Tuesday') {
-                    Tuesday.push(e);
-                } else if (e.dayOfWeek == 'Wednesday') {
-                    Wednesday.push(e);
-                } else if (e.dayOfWeek == 'Thursday') {
-                    Thursday.push(e);
-                } else if (e.dayOfWeek == 'Friday') {
-                    Friday.push(e);
-                } else if (e.dayOfWeek == 'Saturday') {
-                    Saturday.push(e);
-                }
-            });
-
-
-            var sundaySlots = [], mondaySlots = [], tuesdaySlots = [], wednesdaySlots = [], thursdaySlots = [],
-                fridaySlots = [], saturdaySlots = [];
-            let con = config.consultationSessionTimings;
-            await this.freeSlots(Sunday, sundaySlots, consultSession, 'Sunday', con);
-            await this.freeSlots(Monday, mondaySlots, consultSession, 'Monday', con);
-            await this.freeSlots(Tuesday, tuesdaySlots, consultSession, 'Tuesday', con);
-            await this.freeSlots(Wednesday, wednesdaySlots, consultSession, 'Wednesday', con);
-            await this.freeSlots(Thursday, thursdaySlots, consultSession, 'Thursday', con);
-            await this.freeSlots(Friday, fridaySlots, consultSession, 'Friday', con);
-            await this.freeSlots(Saturday, saturdaySlots, consultSession, 'Saturday', con);
-            var daysOfWeek = [];
-            daysOfWeek.push(sundaySlots);
-            daysOfWeek.push(mondaySlots);
-            daysOfWeek.push(tuesdaySlots);
-            daysOfWeek.push(wednesdaySlots);
-            daysOfWeek.push(thursdaySlots);
-            daysOfWeek.push(fridaySlots);
-            daysOfWeek.push(saturdaySlots);
-            var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            app.forEach(a => {
-                let date = a.appointment_date;
-                var d = new Date(date);
-                var d1 = d.getDay();
-                var dayName = days[d.getDay()];
-                daysOfWeek[d1].forEach((week, iterationNumber) => {
-                    if (week.start == a.startTime) {
-                        daysOfWeek[d1][iterationNumber] = a;
-                    }
-                })
-            });
-            console.log(daysOfWeek);
-            return (daysOfWeek);
-        } catch (e) {
-            console.log(e);
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-            }
-        }
-    }
 
 
     async appointmentReschedule(appointmentDto: any): Promise<any> {
@@ -605,7 +662,7 @@ export class AppointmentService {
                 } else {
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
-                    let config = Helper.getMinInMilliSeconds(appointmentDto.configSession);
+                    let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
                     if(start > end){
                         return{
@@ -625,14 +682,34 @@ export class AppointmentService {
                         return isCancel;
                     } else {
                         // create appointment on existing date old records
-                        return await this.appointmentRepository.createAppointment(appointmentDto);
+                        const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                        if(!appoint.message){
+                            const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                            console.log(appDocConfig);
+                            return  {
+                                appointment:appoint,
+                                appointmentDocConfig:appDocConfig
+                            } 
+                        }else {
+                            return appoint;
+                        }
                     }
                     
                 }
 
             }
 
-            return await this.appointmentRepository.createAppointment(appointmentDto);
+            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+            if(!appoint.message){
+                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                console.log(appDocConfig);
+                return  {
+                    appointment:appoint,
+                    appointmentDocConfig:appDocConfig
+                } 
+            }else {
+                return appoint;
+            }
         } catch (e) {
             console.log(e);
             return {
@@ -645,8 +722,11 @@ export class AppointmentService {
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
+            console.log(appointmentDetails);
             const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
+            console.log(pat);
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            console.log(pay);
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
@@ -678,6 +758,14 @@ export class AppointmentService {
                 }
             }
             var appoint = await this.appointmentRepository.findOne({id: appointmentDto.appointmentId});
+            if(appoint.createdBy === CONSTANT_MSG.ROLES.DOCTOR && appoint.paymentOption === 'directPayment'){
+                if(!appointmentDto.confirmation){
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.CONFIRMATION_REQUIRED
+                    }
+                }
+            }
             if (appoint.isCancel == true) {
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
@@ -750,19 +838,12 @@ export class AppointmentService {
 
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
-            const name = await this.doctorRepository.findOne({doctorName: codeOrName});
-            if (name) {
-                return name;
-            } else {
-                const code = await this.doctorRepository.findOne({registrationNumber: codeOrName});
-                if (code) {
-                    return code;
-                } else {
-                    return {
-                        statusCode: HttpStatus.NO_CONTENT,
-                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
-                    }
-                }
+          //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
+            const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName])
+            const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
+            return {
+                doctors:name,
+                hospitals:hospital
             }
         } catch (e) {
             console.log(e);
@@ -776,15 +857,42 @@ export class AppointmentService {
 
     async patientDetailsEdit(patientDto: any): Promise<any> {
         try {
-            const patient = await this.patientDetailsRepository.findOne({id: patientDto.patientId});
+            const patient = await this.patientDetailsRepository.findOne({patientId: patientDto.patientId});
             if (patientDto.phone) {
                 let isPhone = await this.isPhoneExists(patientDto.phone);
-                if (isPhone) {
-                    //return error message
-                    return {
-                        statusCode: HttpStatus.NOT_FOUND,
-                        message: CONSTANT_MSG.PHONE_EXISTS
+                if (isPhone.isPhone){
+                    if (isPhone.patientDetails.patientId == patientDto.patientId){
+                        if (!patient) {
+                            return {
+                                statusCode: HttpStatus.NO_CONTENT,
+                                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                            }
+                        } else {
+                            var condition = {
+                                patientId: patientDto.patientId
+                            }
+                            var values: any = patientDto;
+                            var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
+                            if (updatePatientDetails.affected) {
+                                return {
+                                    statusCode: HttpStatus.OK,
+                                    message: CONSTANT_MSG.UPDATE_OK
+                                }
+                            } else {
+                                return {
+                                    statusCode: HttpStatus.NOT_MODIFIED,
+                                    message: CONSTANT_MSG.UPDATE_FAILED
+                                }
+                            }
+                        }
+                    }else{
+                         //return error message
+                        return {
+                            statusCode: HttpStatus.NOT_FOUND,
+                            message: CONSTANT_MSG.PHONE_EXISTS
+                        }
                     }
+                   
                 }
             }
             if (!patient) {
@@ -793,11 +901,11 @@ export class AppointmentService {
                     message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
             } else {
-                var condition = {
+                var condition1 = {
                     id: patientDto.patientId
                 }
                 var values: any = patientDto;
-                var updatePatientDetails = await this.patientDetailsRepository.update(condition, values);
+                var updatePatientDetails = await this.patientDetailsRepository.update(condition1, values);
                 if (updatePatientDetails.affected) {
                     return {
                         statusCode: HttpStatus.OK,
@@ -856,8 +964,14 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = user.paginationNumber*10;
-            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date,offset]);
+            let offset = (user.paginationNumber)*(user.limit);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
+            if(!app.length){
+                return [];
+            }
+            const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
+            let appNumber = appNum.length;
+            console.log(appNumber);
             if (app.length) {
                 var appList: any = [];
                 for(let appointmentList of app){
@@ -893,7 +1007,11 @@ export class AppointmentService {
                         appList.push(res);
                     }
                 }
-                return appList;
+                let result={
+                    totalAppointments:appNumber,
+                    appointments:appList
+                }
+                return result;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -912,8 +1030,13 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = user.paginationNumber*10;
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,offset]);
+            let offset = (user.paginationNumber)*(user.limit);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
+            if(!app.length){
+                return [];
+            }
+            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date]);
+            let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
                 for(let appointmentList of app){
@@ -967,7 +1090,11 @@ export class AppointmentService {
                         appList.push(res);
                     }
                 }
-                return appList;
+                let result={
+                    totalAppointments:appNumber,
+                    appointments:appList
+                }
+                return result;
             } else {
                 return {
                     statusCode: HttpStatus.NO_CONTENT,
@@ -998,7 +1125,7 @@ export class AppointmentService {
         let patientList = [];
         for(let x of ids){
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
-            patientList.push(patient);
+            patientList.push(patient[0]);
         }
         return patientList;
     }
@@ -1084,15 +1211,20 @@ export class AppointmentService {
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
         let dt = new Date(user.appointmentDate);
+        //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
+        if(!workSchedule[0].startTime){
+            return [];
+        } 
         let slots = [];
         let slotsView = [];
         let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
         for(let worksched of workSchedule){
             let start = Helper.getTimeInMilliSeconds(worksched.startTime);
             let end = Helper.getTimeInMilliSeconds(worksched.endTime);
-            while(start < end){
+            let end1 = start + consultSession;
+            while(start < end && end1 <= end){
                 let res = {
                     start:Helper.getTimeinHrsMins(start),
                     end:Helper.getTimeinHrsMins(start + consultSession),
@@ -1101,9 +1233,14 @@ export class AppointmentService {
                 if(app.length){
                     for(let appointment of app){
                         flag = false;
-                        if(appointment.startTime == Helper.getTimeinHrsMins(start)){
+                        let dto={
+                            startTime :Helper.getTimeinHrsMins(start),
+                            endTime :Helper.getTimeinHrsMins(start + consultSession)
+                        }
+                        let isOverLapping = await this.findTimeOverlaping(app, dto);
+                        if((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping){
                             flag = true;
-                            end;
+                            break;
                         }
                     }
                     if(flag == false){
@@ -1113,6 +1250,7 @@ export class AppointmentService {
                     slotsView.push(res);
                 }
                 start = start + consultSession;
+                end1 = start + consultSession;
                 slots.push(res);
             }
         }
@@ -1123,16 +1261,64 @@ export class AppointmentService {
         const app = await  this.appointmentRepository.query(queries.getAppListForPatient,[patientId]);
         const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
         let res = {
-            patientDetails:patient,
+            patientDetails:patient[0],
             appointments:app
         }
         return res;
     }
 
-    async reports(accountKey:any): Promise<any> {
-        const app = await  this.appointmentRepository.query(queries.getReports,[accountKey]);
+    async reports(accountKey:any,paginationNumber:any): Promise<any> {
+        let offset = paginationNumber*10;
+        const app = await  this.appointmentRepository.query(queries.getReports,[accountKey,offset]);
         return app;
     }
+
+    async listOfDoctorsInHospital(accountKey:any): Promise<any> {
+        const app = await  this.doctorRepository.query(queries.getDocListDetails,[accountKey]);
+        let res =[];
+        app.forEach(a => {
+           let b = {
+            doctorId:a.doctorId,
+            accountkey:a.account_key,
+            doctorKey:a.doctor_key,
+            speciality:a.speciality,
+            photo:a.photo,
+            signature:a.signature,
+            number:a.number,
+            firstName:a.first_name,
+            lastName:a.last_name,
+            registrationNumber:a.registration_number,
+            fee:a.consultation_cost,
+            location:a.city,
+            hospitalName:a.hospital_name
+            }
+            res.push(b);
+        });
+        
+        return res;
+    }
+
+    async viewDoctor(details: any): Promise<any> {
+        const doctor = await this.doctorDetails(details.doctorKey);
+        const account = await this.accountDetails(doctor.accountKey);
+        const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+        var res = {
+            name:doctor.doctorName,
+            firstName:doctor.firstName,
+            lastName:doctor.lastName,
+            speciality:doctor.speciality,
+            mobileNo:doctor.number,
+            hospitalName:account.hospitalName,
+            location:account.city,
+            fee:config.consultationCost,
+            preConsultationHours:config.preconsultationHours,
+            preConsulationMinutes:config.preconsultationMins,
+            photo:doctor.photo,
+            sessionTiming:config.consultationSessionTimings
+        }
+        return res;       
+    }
+
 
 
     // common functions below===============================================================
@@ -1193,33 +1379,10 @@ export class AppointmentService {
         if (number) {
             isPhone = true;
         }
-        return isPhone;
+        return {isPhone:isPhone,patientDetails:number};
     }
 
-    async freeSlots(a, b, c, e, f): Promise<any> {
-        if (a.length) {
-            a.forEach(d => {
-                if (d.startTime) {
-                    let start = Helper.getTimeInMilliSeconds(d.startTime);
-                    let end = Helper.getTimeInMilliSeconds(d.endTime);
-                    while (start < end) {
-                        let strt = Helper.getTimeinHrsMins(Number(start));
-                        let last = Helper.getTimeinHrsMins(Number(end));
-                        let day = {
-                            slotType: 'Free Slot',
-                            start: strt,
-                            end: last,
-                            sessiontime: f,
-                            day: e
-                        }
-                        start = start + c;
-                        b.push(day);
-                    }
-                }
-            })
-        }
-    }
-
+    
     async isWorkScheduleAvailable(day, workScheduleObj): Promise<any> {
         return workScheduleObj[day].length >= 1 ? true : false;
     }

@@ -22,6 +22,7 @@ export class PatientRepository extends Repository<Patient> {
             patient.salt = salt
         }        
         patient.phone = phone;
+        patient.createdBy = patientDto.createdBy;
 
         try {
             return await patient.save();

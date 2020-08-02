@@ -17,11 +17,13 @@ export const CONSTANT_MSG = {
     PHONE_EXISTS:"Phone number already exists",
     TIME_OVERLAP:'Time Overlapping with previous Time Interval',
     APPOINT_ALREADY_CANCELLED:'Appointment already Cancelled',
+    CONFIRMATION_REQUIRED:'Confirmation Required',
     NO_PERMISSION:'No Permission',
     INVALID_PHONE:'Invalid Phone',
     INVALID_PASSWORD:'Invalid Password',
     END_TIME_MISMATCHING:'End time is mismatching with respect to doctor session timing',
     INVALID_TIMINGS:'start time should be less than endTime',
+    NO_WORK_SCHEDULE:'Doctor has no workSchedule on this Date',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

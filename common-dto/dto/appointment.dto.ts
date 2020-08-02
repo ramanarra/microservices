@@ -26,4 +26,7 @@ export class AppointmentDto {
   createdId : number;
   cancelledBy : string;
   cancelledId : number;
+  paymentOption:string;
+  consultationMode:string;
+  confirmation:boolean;
 }
