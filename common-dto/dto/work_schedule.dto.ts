@@ -1,4 +1,4 @@
-import {IsEmail,IsNumber,IsPhoneNumber,IsOptional, IsIn } from 'class-validator';
+import {IsEmail,IsNumber,IsPhoneNumber,IsOptional, IsIn, IsMilitaryTime } from 'class-validator';
 export class WorkScheduleDto {
     @IsOptional()
     @IsNumber()
@@ -7,6 +7,8 @@ export class WorkScheduleDto {
     @IsNumber()
     doctorId: number;
     date: Date;
+    @IsOptional()
+    @IsMilitaryTime()
     startTime:string;
     endTime:string;
     doctorKey:string;

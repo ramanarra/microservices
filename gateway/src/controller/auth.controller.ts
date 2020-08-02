@@ -7,8 +7,11 @@ import {
   Post,
   Get,
   Put,
+  UseGuards,
   UseFilters,
   Logger,
+  Request,
+  Response,
   ValidationPipe, UsePipes
 } from '@nestjs/common';
 import { UserService } from 'src/service/user.service';
@@ -19,10 +22,13 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiUnauthorizedResponse,
-  ApiBody,
+  ApiBody, ApiBearerAuth,
   ApiResponse
 } from '@nestjs/swagger';
 import { defaultMaxListeners } from 'stream';
+import {AuthGuard} from '@nestjs/passport';
+import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
+
 
 @Controller('api/auth')
 @UseFilters(AllExceptionsFilter)
@@ -81,7 +87,6 @@ export class AuthController {
           '"dateOfBirth":"DOB", \n' +
           '"landmark":"landmark", \n' +
           '"country":"country", \n' +
-          '"name":"name", \n' +
           '"address":"address", \n' +
           '"state":"state", \n' +
           '"pincode":"12346", \n' +
@@ -95,10 +100,40 @@ export class AuthController {
     async patientRegistration(@Body() patientDto : PatientDto) {
       if(patientDto.phone && patientDto.phone.length == 10){
         if(patientDto.password){
-          this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(patientDto)}`);
-          const patient = await this.userService.patientRegistration(patientDto);
+          let regDto:any ={
+            phone:patientDto.phone,
+            password:patientDto.password,
+            createdBy:CONSTANT_MSG.ROLES.PATIENT
+          }
+          this.logger.log(`Patient Registration  Api -> Request data ${JSON.stringify(regDto)}`);
+          const patient = await this.userService.patientRegistration(regDto);
           if(patient.message){
             return patient;
+          }else if(patient.update){
+              patientDto.patientId = patient.patientId;
+              let patDto:any = {
+                phone:patientDto.phone,
+                email:patientDto.email,
+                patientId:patient.patientId,
+                firstName:patientDto.firstName,
+                lastName:patientDto.lastName,
+                name:patientDto.firstName+" "+patientDto.lastName,
+                dateOfBirth:patientDto.dateOfBirth,
+                landmark:patientDto.landmark,
+                country:patientDto.country,
+                address:patientDto.address,
+                state:patientDto.state,
+                pincode:patientDto.pincode,
+                alternateContact:patientDto.alternateContact,
+                age:patientDto.age,
+                photo:patientDto.photo
+
+              }
+              const details = await this.calendarService.patientDetailsEdit(patDto);
+              return {
+                patient:patient,
+                details:details
+              }
           }else {
             const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
             return {
@@ -119,6 +154,17 @@ export class AuthController {
           message: "Provide valid phone"
         }
       }
+    }
+
+
+    @Get('logout')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiOkResponse({description: 'logOut API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async doctorList(@Request() req,@Response() res) {
+      req.logOut();
+      return res.json({message: "sucessfully loggedout"})
     }
 
 }

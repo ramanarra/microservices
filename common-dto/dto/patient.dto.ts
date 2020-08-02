@@ -33,4 +33,6 @@ export class PatientDto {
     appointmentDate:Date;
     startTime:string;
     endTime:string;
+    createdBy:string;
+    salt:string;
 }

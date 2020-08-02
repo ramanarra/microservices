@@ -12,6 +12,7 @@ import {PermissionRepository} from "./permissions/permission.repository";
 import {queries} from "../config/query";
 import {UserRoleRepository} from './user_role.repository';
 import {PatientRepository} from './patient.repository';
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService {
@@ -151,13 +152,32 @@ export class UserService {
     async patientRegistration(patientDto: PatientDto): Promise<any> {
         try {
             const pat = await this.findByPhone(patientDto.phone);
-        if(pat){
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.ALREADY_PRESENT
+            if(pat){
+                if(pat.createdBy == CONSTANT_MSG.ROLES.DOCTOR  && pat.password == null){
+                    const update = await this.patientRegistrationUpdate(patientDto);
+                    return {
+                        update: "updated password",
+                        patientId:pat.patient_id
+                    }
+                } else{
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.ALREADY_PRESENT
+                    }
+                }
             }
-        }
-        return await this.patientRepository.patientRegistration(patientDto);
+            
+            const user = await this.patientRepository.patientRegistration(patientDto);
+            const jwtUserInfo: JwtPatientLoad = {
+                phone: user.phone,
+                patientId: user.patient_id,
+                permission: 'CUSTOMER'
+            };
+            console.log("=======jwtUserInfo", jwtUserInfo)
+            const accessToken = this.jwtService.sign(jwtUserInfo);
+            user.accessToken = accessToken;
+            user.permission = 'CUSTOMER';
+            return user;
         } catch (e) {
 	        console.log(e);
             return {
@@ -167,6 +187,40 @@ export class UserService {
         }
     }
 
+
+    async patientRegistrationUpdate(patientDto: PatientDto): Promise<any> {
+        try {
+            const { name, phone, password} = patientDto;
+            const salt = await bcrypt.genSalt();       
+            patientDto.password = await this.hashPassword(password, salt);
+            patientDto.salt = salt            
+            var condition = {
+                phone: patientDto.phone
+            }
+            var values: any = patientDto;
+            var updateDoctorConfig = await this.patientRepository.update(condition, values);
+            if (updateDoctorConfig.affected) {
+                return {
+                    updated:patientDto.password,
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_MODIFIED,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+    private async hashPassword(password: string, salt : string): Promise<string> {
+        return bcrypt.hash(password, salt);
+    }
 
 
 

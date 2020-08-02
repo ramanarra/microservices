@@ -1,4 +1,3 @@
-import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthController } from './controller/auth.controller';
@@ -19,6 +18,14 @@ import { VideoGateway } from './gateway/video.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import config from 'config';
 import { SharedModule } from './app/shared/shared.module';
+import {
+    Logger,
+    MiddlewareConsumer,
+    Module,
+    NestMiddleware,
+    NestModule
+} from '@nestjs/common';
+
 
 const jwtConfig = config.get('JWT'); 
 @Module({
@@ -53,4 +60,25 @@ const jwtConfig = config.get('JWT');
     VideoGateway
   ],
 })
-export class AppModule { }
+
+
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(LoggerMiddleware)
+            .forRoutes('*');
+    }
+}
+
+
+class LoggerMiddleware implements NestMiddleware {
+    private logger: Logger;
+    use(req: Request, res: Response, next: Function,) {
+        this.logger = new Logger('AppModule');
+        console.log("Request Url--> ", req['originalUrl'])
+        this.logger.log('Request Url--> ', req['originalUrl'])
+        next();
+    }
+}
+
+

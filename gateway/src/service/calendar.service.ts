@@ -103,8 +103,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public doctorListForPatients(user: any,accountKey:any): Observable<any> {
-        user.accountKey = accountKey;
+    public doctorListForPatients(user: any): Observable<any> {
         return this.redisClient.send({cmd: 'doctor_list_patients'},user);
     }
 
@@ -121,8 +120,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientDetailsEdit(patientDto : any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_details_edit'}, patientDto);
+    public patientDetailsEdit(patientDto : any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'patient_details_edit'}, patientDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -132,25 +131,30 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
     @UseFilters(AllClientServiceException)
     public viewAppointmentSlotsForPatient(doctorKey : any, appointmentDate : any) : Observable <any> {
-        doctorKey.appointmentDate = appointmentDate;
-        return this.redisClient.send({ cmd : 'patient_view_appointment'}, doctorKey);
+        let details={
+            doctorKey:doctorKey,
+            appointmentDate:appointmentDate
+        }
+        return this.redisClient.send({ cmd : 'patient_view_appointment'}, details);
     }
 
     @UseFilters(AllClientServiceException)
-    public patientPastAppointments(patientId:any,paginationNumber:any) : Observable <any> {
+    public patientPastAppointments(patientId:any,paginationNumber:any,limit:any) : Observable <any> {
         let user = {
             patientId:patientId,
-            paginationNumber:paginationNumber
+            paginationNumber:paginationNumber,
+            limit:limit
         }
         return this.redisClient.send({ cmd : 'patient_past_appointments'},user);
     }
 
     
     @UseFilters(AllClientServiceException)
-    public patientUpcomingAppointments(patientId:any,paginationNumber) : Observable <any> {
+    public patientUpcomingAppointments(patientId:any,paginationNumber,limit:any) : Observable <any> {
         let user = {
             patientId:patientId,
-            paginationNumber:paginationNumber
+            paginationNumber:paginationNumber,
+            limit:limit
         }
         return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user);
     }
@@ -202,9 +206,22 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public reports(user:any, accountKey:any) : Observable <any> {
+    public reports(user:any, accountKey:any,paginationNumber:any) : Observable <any> {
         user.accountKey = accountKey;
+        user.paginationNumber=paginationNumber;
         return this.redisClient.send({ cmd : 'reports_list'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public listOfDoctorsInHospital(user:any, accountKey:any) : Observable <any> {
+        user.accountKey = accountKey;
+        return this.redisClient.send({ cmd : 'list_of_doctors'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public viewDoctorDetails(user:any, doctorKey:any) : Observable <any> {
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'view_doctor_details'},user);
     }
 
 

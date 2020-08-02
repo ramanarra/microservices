@@ -4,11 +4,6 @@ import { ConflictException, InternalServerErrorException, Logger } from "@nestjs
 import { Appointment } from "./appointment.entity";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG} from  "common-dto";
-import { Doctor } from "./doctor/doctor.entity";
-import { DocConfigScheduleInterval } from "./docConfigScheduleInterval/docConfigScheduleInterval.entity";
-import { DocConfigScheduleDay } from "./docConfigScheduleDay/docConfigScheduleDay.entity";
-import { DocConfigScheduleDayRepository } from "./docConfigScheduleDay/docConfigScheduleDay.repository";
-import { DocConfigScheduleIntervalRepository } from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import { AppointmentDocConfig } from "./appointmentDocConfig/appointmentDocConfig.entity";
@@ -19,7 +14,8 @@ import { AppointmentDocConfig } from "./appointmentDocConfig/appointmentDocConfi
 export class AppointmentRepository extends Repository<Appointment> {
     //constructor AppointmentRepository(appointmentDocConfigRepository: AppointmentDocConfigRepository, appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository): AppointmentRepository
 
-    private logger = new Logger('AppointmentRepository');private appointmentDocConfigRepository:AppointmentDocConfigRepository;
+    private logger = new Logger('AppointmentRepository');
+    private appointmentDocConfigRepository:AppointmentDocConfigRepository;
     private appointmentCancelRescheduleRepository:AppointmentCancelRescheduleRepository;
     async createAppointment(appointmentDto: any): Promise<any> {
 
@@ -48,6 +44,9 @@ export class AppointmentRepository extends Repository<Appointment> {
             const app =  await appointment.save();  
             const pay = new PaymentDetails();
             pay.appointmentId = app.id;
+            if(app.createdBy == CONSTANT_MSG.ROLES.PATIENT){
+                pay.isPaid = true;
+            }
             const payment = await pay.save();
             appointmentDto.appointmentId = app.id;
            // const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
