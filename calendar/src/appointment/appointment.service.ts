@@ -72,6 +72,32 @@ export class AppointmentService {
                         message: CONSTANT_MSG.TIME_OVERLAP
                     }
                 } else {
+                    // let user = {
+                    //     doctorKey:appointmentDto.doctorKey,
+                    //     appointmentDate:appointmentDto.appointmentDate
+                    // }
+                    // let availableSlot = await this.availableSlots(user);
+                    // if(!availableSlot.length){
+                    //     return{
+                    //         statusCode:HttpStatus.BAD_REQUEST,
+                    //         message:CONSTANT_MSG.NO_WORK_SCHEDULE
+                    //     }
+                    // }else{
+                    //     let flag = false;
+                    //     let x:any;
+                    //     for(x in availableSlot){
+                    //         if(x.start == appointmentDto.startTime && x.end == appointmentDto.endTime){
+                    //             flag = true;
+                    //         }
+                    //     }
+                    //     if(flag == false){
+                    //         return{
+                    //             statusCode:HttpStatus.BAD_REQUEST,
+                    //             message:CONSTANT_MSG.INVALID_TIMINGS
+                    //         }
+                    //     }
+                    // }
+                    
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
                     let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
@@ -813,8 +839,8 @@ export class AppointmentService {
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
           //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
-            const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName+'%'])
-            const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName+'%'])
+            const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName])
+            const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
             return {
                 doctors:name,
                 hospitals:hospital
