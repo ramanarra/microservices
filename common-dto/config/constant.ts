@@ -23,6 +23,7 @@ export const CONSTANT_MSG = {
     INVALID_PASSWORD:'Invalid Password',
     END_TIME_MISMATCHING:'End time is mismatching with respect to doctor session timing',
     INVALID_TIMINGS:'start time should be less than endTime',
+    NO_WORK_SCHEDULE:'Doctor has no workSchedule on this Date',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',
