@@ -2,8 +2,9 @@ import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
-import * as config from 'config';
+import config from 'config';
 import { AllExceptionsFilter } from './common/filter/all-exceptions.filter';
+import { initAdapters } from './adapters.init';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');
@@ -24,7 +25,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-
+  initAdapters(app);
   await app.listen(serverConfig.port);
   logger.log(`Gateway Application is started on ${serverConfig.port}`)
 }
