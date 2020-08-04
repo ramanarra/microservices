@@ -1454,36 +1454,6 @@ export class AppointmentService {
         return isOverLapping;
     }
 
-    async findTimeOverlapingForAppointments2(doctorScheduledDays, scheduleTimeInterval): Promise<any> {
-        // validate with previous data
-        let starTime = scheduleTimeInterval.startTime;
-        let endTime = scheduleTimeInterval.endTime;
-        let isOverLapping = false;
-        let booked =[];
-        // convert starttime into milliseconds
-        let startTimeMilliSeconds = Helper.getTimeInMilliSeconds(starTime);
-        let endTimeMilliSeconds = Helper.getTimeInMilliSeconds(endTime);
-        // compare the startTime in any previous records, if start time or endTime comes between previous time interval
-        doctorScheduledDays.forEach(v => {
-            let vstartTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.startTime);
-            let vEndTimeMilliSeconds = Helper.getTimeInMilliSeconds(v.endTime);
-            if (startTimeMilliSeconds >= vstartTimeMilliSeconds && startTimeMilliSeconds < vEndTimeMilliSeconds) {
-                booked.push(v);
-                isOverLapping = true;
-            } else if (endTimeMilliSeconds <= vEndTimeMilliSeconds && endTimeMilliSeconds > vstartTimeMilliSeconds) {
-                booked.push(v);
-                isOverLapping = true;
-            } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
-                booked.push(v);
-                isOverLapping = true;
-            }
-            if(v.is_cancel == true){
-                isOverLapping = false;
-            }
-        })
-        return booked;
-    }
-
 
     async isPhoneExists(phone): Promise<any> {
         let isPhone = false;
