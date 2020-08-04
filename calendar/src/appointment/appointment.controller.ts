@@ -3,6 +3,8 @@ import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
 import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
+import {Helper} from "../utility/helper";
+import { of } from 'rxjs';
 //import {DoctorService} from './doctor/doctor.service';
 
 
@@ -47,9 +49,35 @@ export class AppointmentController {
         const account = await this.appointmentService.accountDetails(user.account_key);
         if (user.role == CONSTANT_MSG.ROLES.DOCTOR) {
             var docKey = await this.appointmentService.doctorDetails(user.doctor_key);
-            docKey.fees = 5000;
-            docKey.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
-            docKey.todaysAvailabilitySeats = 12;
+            var config = await this.appointmentService.getDoctorConfigDetails(user.doctor_key);
+            docKey.fees = config.consultationCost;
+            let app =[];
+            //let slots = [];
+            var date:any = new Date();
+            var seconds = date.getSeconds();
+            var minutes = date.getMinutes();
+            var hour = date.getHours();
+            var time = hour+":"+minutes;
+            var timeMilli = Helper.getTimeInMilliSeconds(time);
+            var appointment = await this.appointmentService.todayAppointments(docKey.doctorId,date)  
+            let i:any;         
+            for(i of appointment){
+                let end =Helper.getTimeInMilliSeconds(i.endTime);
+                if(timeMilli<end){
+                    app.push(i.startTime);
+                }
+            }
+            let app1=[]
+                for(i=0;i<4;i++){
+                    app1.push(app[i]);
+                }
+            docKey.todaysAppointment = app1;
+            let dto = {
+                doctorKey:user.doctor_key,
+                appointmentDate:date
+            }
+            var available = await this.appointmentService.availableSlots(dto);
+            docKey.todaysAvailabilitySeats = available.length;
             return {
                 statusCode: HttpStatus.OK,
                 accountDetails: account,
@@ -59,11 +87,38 @@ export class AppointmentController {
         }else{
             const doctor = await this.appointmentService.doctor_lists(user.account_key);
               // add static values for temp
-              doctor.forEach(v => {
-                v.fees = 5000;
-                v.todaysAppointment = ['4.00pm', '4.15pm', '4.30pm'];
-                v.todaysAvailabilitySeats = 12;
-            })
+              for(let v of doctor){
+             // doctor.forEach(v => {
+                var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
+                v.fees = config.consultationCost;
+                let app =[];
+                //let slots = [];
+                var date:any = new Date();
+                var seconds = date.getSeconds();
+                var minutes = date.getMinutes();
+                var hour = date.getHours();
+                var time = hour+":"+minutes;
+                var timeMilli = Helper.getTimeInMilliSeconds(time);
+                var appointment = await this.appointmentService.todayAppointments(v.doctorId,date)  
+                let i:any;         
+                for(i of appointment){
+                    let end =Helper.getTimeInMilliSeconds(i.endTime);
+                    if(timeMilli<end){
+                        app.push(i.startTime);
+                    }
+                }
+                let app1=[]
+                for(i=0;i<4;i++){
+                    app1.push(app[i]);
+                }
+                v.todaysAppointment = app1;
+                let dto = {
+                    doctorKey:v.doctorKey,
+                    appointmentDate:date
+                }
+                var available = await this.appointmentService.availableSlots(dto);
+                v.todaysAvailabilitySeats = available.length;
+            }
             return {
                 statusCode: HttpStatus.OK,
                 accountDetails: account,
