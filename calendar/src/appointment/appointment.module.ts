@@ -14,8 +14,13 @@ import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.reposito
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
 import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
+import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repository";
+import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+
+import { VideoService } from './video.service';
+import { OpenViduService } from './open-vidu.service';
 // import { DoctorController } from './doctor/doctor.controller';
 // import { DoctorService } from './doctor/doctor.service';
 
@@ -23,10 +28,10 @@ import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedu
   imports: [
     TypeOrmModule.forFeature([AppointmentRepository,DoctorRepository, AccountDetailsRepository,
       DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
-      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,
-      PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository])
+      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository, OpenViduSessionRepository,OpenViduSessionTokenRepository])
+
   ],
   controllers: [AppointmentController],
-  providers: [AppointmentService]
+  providers: [AppointmentService, VideoService, OpenViduService]
 })
 export class AppointmentModule { }
