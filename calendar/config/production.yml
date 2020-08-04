@@ -10,3 +10,6 @@ database :
   port : 5432
   synchronize : false
   
+openVidu:
+  urlOpenViduServer : "https://devideo.virujh.com/dashboard"
+  secret : "Virujh#123"
