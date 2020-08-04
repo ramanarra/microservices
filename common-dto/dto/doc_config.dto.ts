@@ -67,4 +67,9 @@ export class DocConfigDto {
     isActive: boolean;
     createdOn: Date;
     modifiedOn: Date;
+    @IsNumber()
+    @IsOptional()
+    @Min(10)
+    @Max(60)
+    consultationSessionTimings:number;
 }

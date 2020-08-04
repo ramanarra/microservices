@@ -174,7 +174,8 @@ export class CalendarController {
             '"rescheduleMins": 15, \n' +
             '"autoCancelDays": 1, \n' +
             '"autoCancelHours": 3 ,\n' +
-            '"autoCancelMins": 15 \n' +
+            '"autoCancelMins": 15 ,\n' +
+            '"consultationSessionTimings": 10 \n' +
             '}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
