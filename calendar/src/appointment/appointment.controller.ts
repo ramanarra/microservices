@@ -92,13 +92,10 @@ export class AppointmentController {
             const doctor = await this.appointmentService.doctor_lists(user.account_key);
               // add static values for temp
               for(let v of doctor){
-             // doctor.forEach(v => {
                 var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
                 v.fees = config.consultationCost;
                 let app =[];
-                //let slots = [];
                 var date:any = new Date();
-                var seconds = date.getSeconds();
                 var minutes = date.getMinutes();
                 var hour = date.getHours();
                 var time = hour+":"+minutes;
