@@ -26,20 +26,20 @@ export class VideoService {
     }
 
     @UseFilters(AllClientServiceException)
-    public createTokenForPatientByDoctor(doctor_key : string, patientId : string) : Promise <any> {
-        let reqData = {doctorKey : doctor_key, patientId : patientId};
+    public createTokenForPatientByDoctor(doctor_key : string, appointmentId : string) : Promise <any> {
+        let reqData = {doctorKey : doctor_key, appointmentId : appointmentId};
         return this.redisClient.send({ cmd : 'video_patient_create_token_by_doctor'}, reqData).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
-    public getPatientTokenForDoctor(doctor_key : string, patientId : string) : Promise <any> {
-        let reqData = {doctorKey : doctor_key, patientId : patientId};
+    public getPatientTokenForDoctor(appointmentId : string, patientId : string) : Promise <any> {
+        let reqData = {appointmentId : appointmentId, patientId : patientId};
         return this.redisClient.send({ cmd : 'video_get_patient_token_for_doctor'}, reqData).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
-    public removePatientTokenByDoctor(doctor_key : string, patientId : string) : Promise <any> {
-        let reqData = {doctorKey : doctor_key, patientId : patientId};
+    public removePatientTokenByDoctor(doctor_key : string, appointmentId : string) : Promise <any> {
+        let reqData = {doctorKey : doctor_key, appointmentId : appointmentId};
         return this.redisClient.send({ cmd : 'video_remove_patient_token_by_doctor'}, reqData).toPromise();
     }
 
