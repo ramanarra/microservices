@@ -267,6 +267,27 @@ export class AppointmentService {
         return await this.doctorConfigRepository.findOne({doctorKey: doctorKey});
     }
 
+    async todayAppointments(doctorId,date): Promise<any> {
+        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [date,doctorId]);
+        let apps: any= appointments;
+        apps = apps.sort((val1, val2) => {
+            let val1IntervalStartTime = val1.startTime;
+            let val2IntervalStartTime = val2.startTime;
+            val1IntervalStartTime = val1IntervalStartTime.split(':');
+            val1IntervalStartTime = val1IntervalStartTime[0];
+            val2IntervalStartTime = val2IntervalStartTime.split(':');
+            val2IntervalStartTime = val2IntervalStartTime[0];
+            if (val1IntervalStartTime < val2IntervalStartTime) {
+                return -1;
+            } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                return 1;
+            }
+            return 0;
+        })
+        console.log(apps);
+        return appointments;
+    }
+
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
         try {
             // update the doctorConfig details
@@ -553,6 +574,11 @@ export class AppointmentService {
                             }
                             return 0;
                         })
+                        var seconds = date.getSeconds();
+                        var minutes = date.getMinutes();
+                        var hour = date.getHours();
+                        var time = hour+":"+minutes;
+                        var timeMilli = Helper.getTimeInMilliSeconds(time);
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
                         //sortedWorkScheduleTimeInterval.forEach(v => {
                         for(let v of sortedWorkScheduleTimeInterval){
@@ -576,14 +602,34 @@ export class AppointmentService {
                                 })
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
                                     let startTimeInMilliSec = Helper.getTimeInMilliSeconds(v.startTime);
+                                    let endTimeInMilliSec = Helper.getTimeInMilliSeconds(v.endTime);
                                     let slotStartTimeInMilliSec = Helper.getTimeInMilliSeconds(slotStartTime);
-                                    if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
-                                        v.slotType = 'Booked';
-                                        v.preconsultationHours = preconsultationHours;
-                                        v.preconsultationMins = preconsultationMins;
-                                       // v.slotTiming = consultationSessionTiming;
-                                        slotObject.slots.push(v)
-                                        return true;
+                                    let slotEndTimeInMilliSec = Helper.getTimeInMilliSeconds(slotEndTime);
+                                    if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
+                                   // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
+                                        let daydate = Helper.getDayMonthYearFromDate(v.appointment_date );
+                                        let datedate = Helper.getDayMonthYearFromDate(date);
+                                        if(daydate == datedate){
+                                            // if(v.appointmentDate == date){
+                                            if(timeMilli < endTimeInMilliSec){
+                                                v.slotType = 'Booked';
+                                                v.preconsultationHours = preconsultationHours;
+                                                v.preconsultationMins = preconsultationMins;
+                                               // v.slotTiming = consultationSessionTiming;
+                                                slotObject.slots.push(v)
+                                                return true;
+                                            }else {
+                                                return false;
+                                            }
+
+                                        }else{
+                                            v.slotType = 'Booked';
+                                            v.preconsultationHours = preconsultationHours;
+                                            v.preconsultationMins = preconsultationMins;
+                                        // v.slotTiming = consultationSessionTiming;
+                                            slotObject.slots.push(v)
+                                            return true;
+                                        }                                        
                                     } else {
                                         return false;
                                     }
@@ -598,14 +644,33 @@ export class AppointmentService {
                                     var timeInMS = Helper.getTimeInMilliSeconds(time);
                                     var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
                                     if(!isOverLapping){
-                                        slotObject.slots.push({ // push free slot obj
-                                            startTime: slotStartTime,
-                                            endTime: slotEndTime,
-                                            slotType: 'Free',
-                                            slotTiming: consultationSessionTiming,
-                                            preconsultationHours:preconsultationHours,
-                                            preconsultationMins:preconsultationMins
-                                        })
+                                        let daydate = Helper.getDayMonthYearFromDate(day);
+                                        let datedate = Helper.getDayMonthYearFromDate(date);
+                                        if(daydate === datedate){
+                                            if(timeMilli < slotEnd){
+                                                slotObject.slots.push({ // push free slot obj
+                                                    startTime: slotStartTime,
+                                                    endTime: slotEndTime,
+                                                    slotType: 'Free',
+                                                    slotTiming: consultationSessionTiming,
+                                                    preconsultationHours:preconsultationHours,
+                                                    preconsultationMins:preconsultationMins
+                                                })
+                                            }else{
+                                                slotStartTime = slotEndTime;
+                                                continue
+                                            }
+                                        }else{
+                                            slotObject.slots.push({ // push free slot obj
+                                                startTime: slotStartTime,
+                                                endTime: slotEndTime,
+                                                slotType: 'Free',
+                                                slotTiming: consultationSessionTiming,
+                                                preconsultationHours:preconsultationHours,
+                                                preconsultationMins:preconsultationMins
+                                            })
+                                        }
+                                       
                                     }
                                    
                                 }
@@ -1254,6 +1319,23 @@ export class AppointmentService {
                 slots.push(res);
             }
         }
+        let date = new Date();
+        var time = date.getHours() + ":" + date.getMinutes();
+        var timeMilli = Helper.getTimeInMilliSeconds(time);
+        let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
+        let datedate = Helper.getDayMonthYearFromDate(date);
+        let i:any;
+        let resSlots=[];
+        if(daydate == datedate){
+            for(i of slotsView){
+                let end =Helper.getTimeInMilliSeconds(i.end);
+                if(timeMilli<end){
+                    resSlots.push(i.start);
+                }
+            }
+            return resSlots;
+        }
+       
         return slotsView;
     }
 
