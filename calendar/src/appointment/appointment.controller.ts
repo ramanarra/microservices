@@ -92,13 +92,10 @@ export class AppointmentController {
             const doctor = await this.appointmentService.doctor_lists(user.account_key);
               // add static values for temp
               for(let v of doctor){
-             // doctor.forEach(v => {
                 var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
                 v.fees = config.consultationCost;
                 let app =[];
-                //let slots = [];
                 var date:any = new Date();
-                var seconds = date.getSeconds();
                 var minutes = date.getMinutes();
                 var hour = date.getHours();
                 var time = hour+":"+minutes;
@@ -490,8 +487,9 @@ export class AppointmentController {
     @MessagePattern({cmd: 'video_patient_create_token_by_doctor'})
     async videoDoctorCreateTokenForPatient(docPatientDetail): Promise<any> {
         const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
-        const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
-        if(doc && pat){
+        const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
+        const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
+        if(doc.doctorId==app.appointmentDetails.doctorId){
             let tokenResponseDetails = await this.videoService.createPatientTokenByDoctor(doc, pat);
             return tokenResponseDetails;
         }else {
@@ -504,9 +502,10 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'video_get_patient_token_for_doctor'})
     async getPatientTokenForDoctor(docPatientDetail): Promise<any> {
-        const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
+        const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
+        const doc = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
         const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
-        if(doc && pat){
+        if(docPatientDetail.patientId == app.appointmentDetails.patientId){
             let tokenResponseDetails = await this.videoService.getPatientToken(doc.doctorId, pat.patientId);
             return tokenResponseDetails;
         }else {
@@ -521,8 +520,9 @@ export class AppointmentController {
     @MessagePattern({cmd: 'video_remove_patient_token_by_doctor'})
     async removePatientTokenByDoctor(docPatientDetail): Promise<any> {
         const doc = await this.appointmentService.doctorDetails(docPatientDetail.doctorKey);
-        const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
-        if(doc && pat){
+        const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
+        const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
+        if(doc.doctorId==app.appointmentDetails.doctorId){
             await this.videoService.removePatientToken(doc, pat.patientId);
         }else {
             return {

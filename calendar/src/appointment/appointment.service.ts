@@ -281,8 +281,9 @@ export class AppointmentService {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
                 return 1;
+            }else{
+                return 0;
             }
-            return 0;
         })
         console.log(apps);
         return appointments;
@@ -600,12 +601,14 @@ export class AppointmentService {
                                     let compareDate = Helper.getDayMonthYearFromDate(day);
                                     return appDate === compareDate;
                                 })
+                                console.log(appointmentPresentOnThisDate);
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
                                     let startTimeInMilliSec = Helper.getTimeInMilliSeconds(v.startTime);
                                     let endTimeInMilliSec = Helper.getTimeInMilliSeconds(v.endTime);
                                     let slotStartTimeInMilliSec = Helper.getTimeInMilliSeconds(slotStartTime);
                                     let slotEndTimeInMilliSec = Helper.getTimeInMilliSeconds(slotEndTime);
-                                    if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
+                                    // if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
+                                    if(((startTimeInMilliSec<=slotStartTimeInMilliSec && endTimeInMilliSec <= slotEndTimeInMilliSec && slotStartTimeInMilliSec>=startTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec  ) || ( slotStartTimeInMilliSec <= startTimeInMilliSec &&  slotEndTimeInMilliSec <= endTimeInMilliSec && startTimeInMilliSec > slotEndTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec )|| ( startTimeInMilliSec <= slotStartTimeInMilliSec  &&  slotEndTimeInMilliSec <= endTimeInMilliSec)|| ( slotStartTimeInMilliSec >= startTimeInMilliSec &&  slotEndTimeInMilliSec <= endTimeInMilliSec)) && (!v.is_cancel)) {
                                    // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
                                         let daydate = Helper.getDayMonthYearFromDate(v.appointment_date );
                                         let datedate = Helper.getDayMonthYearFromDate(date);
@@ -615,9 +618,19 @@ export class AppointmentService {
                                                 v.slotType = 'Booked';
                                                 v.preconsultationHours = preconsultationHours;
                                                 v.preconsultationMins = preconsultationMins;
-                                               // v.slotTiming = consultationSessionTiming;
-                                                slotObject.slots.push(v)
-                                                return true;
+                                                // v.slotTiming = consultationSessionTiming;
+                                                let flag = false;
+                                                for(let i of slotObject.slots){
+                                                    if(i.id == v.id){
+                                                        flag = true;
+                                                    }
+                                                }
+                                                if(flag == false){
+                                                    slotObject.slots.push(v)
+                                                    return true;
+                                                }
+                                                //slotObject.slots.push(v)
+                                                //return true;
                                             }else {
                                                 return false;
                                             }
@@ -626,9 +639,19 @@ export class AppointmentService {
                                             v.slotType = 'Booked';
                                             v.preconsultationHours = preconsultationHours;
                                             v.preconsultationMins = preconsultationMins;
-                                        // v.slotTiming = consultationSessionTiming;
-                                            slotObject.slots.push(v)
-                                            return true;
+                                            // v.slotTiming = consultationSessionTiming;
+                                            let flag = false;
+                                            for(let i of slotObject.slots){
+                                                if(i.id == v.id){
+                                                    flag = true;
+                                                }
+                                            }
+                                            if(flag == false){
+                                                slotObject.slots.push(v)
+                                                return true;
+                                            }
+                                            // slotObject.slots.push(v)
+                                            // return true;
                                         }                                        
                                     } else {
                                         return false;
