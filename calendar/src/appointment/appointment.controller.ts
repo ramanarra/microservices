@@ -568,7 +568,7 @@ export class AppointmentController {
             var hour = date.getHours();
             var time = hour+":"+minutes;
             var timeMilli = Helper.getTimeInMilliSeconds(time);
-            var appointment = await this.appointmentService.todayAppointments(doc.doctorId,date)
+            var appointment = await this.appointmentService.todayAppointmentsForDoctor(doc.doctorId,date)
             let i:any;
             for(i of appointment){
                 let end =Helper.getTimeInMilliSeconds(i.endTime);
