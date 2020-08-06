@@ -289,6 +289,28 @@ export class AppointmentService {
         return appointments;
     }
 
+    async todayAppointmentsForDoctor(doctorId,date): Promise<any> {
+        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date,doctorId]);
+        let apps: any= appointments;
+        console.log("appointments <<< " + appointments);
+        apps = apps.sort((val1, val2) => {
+            let val1IntervalStartTime = val1.startTime;
+            let val2IntervalStartTime = val2.startTime;
+            val1IntervalStartTime = val1IntervalStartTime.split(':');
+            val1IntervalStartTime = val1IntervalStartTime[0];
+            val2IntervalStartTime = val2IntervalStartTime.split(':');
+            val2IntervalStartTime = val2IntervalStartTime[0];
+            if (val1IntervalStartTime < val2IntervalStartTime) {
+                return -1;
+            } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                return 1;
+            }else{
+                return 0;
+            }
+        })
+        return appointments;
+    }
+
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
         try {
             // update the doctorConfig details
