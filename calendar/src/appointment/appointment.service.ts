@@ -285,7 +285,6 @@ export class AppointmentService {
                 return 0;
             }
         })
-        console.log(apps);
         return appointments;
     }
 

@@ -48,5 +48,10 @@ export class VideoService {
         return this.redisClient.send({ cmd : 'video_remove_session_token_by_doctor'}, doctor_key).toPromise();
     }
 
+    @UseFilters(AllClientServiceException)
+    public getDoctorAppointments(doctorKey : string) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_doctor_appointments'}, doctorKey).toPromise();
+    }
+
 
 }

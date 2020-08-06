@@ -48,7 +48,7 @@ export class VideoGateway {
 
   @SubscribeMessage('getPatientTokenForDoctor')
   async getPatientToken(client: AuthenticatedSocket, appointmentId : string) {
-    this.logger.log(`Socket request get patient token for Doctor from  PatientId => ${client.auth.data.patientId} and doc-key => ${doctorKey}`);
+    this.logger.log(`Socket request get patient token for Doctor from  PatientId => ${client.auth.data.patientId} and doc-key => ${appointmentId}`);
     const response : any = await this.videoService.getPatientTokenForDoctor(appointmentId, client.auth.data.patientId);
     client.emit("videoTokenForPatient", response);
   }
@@ -67,6 +67,13 @@ export class VideoGateway {
   async removeSessionAndTokenByDoctor(client: AuthenticatedSocket, data : string) {
     this.logger.log(`Socket request remove Session And Token By Doctor from Doc-key => ${client.auth.data.doctor_key}` );
     await this.videoService.removeSessionAndTokenByDoctor(client.auth.data.doctor_key);
+  }
+
+  @SubscribeMessage('getAppointmentListForDoctor')
+  async getDoctorAppointments(client: AuthenticatedSocket) {
+    this.logger.log(`Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctorKey}`);
+    const response : any = await this.videoService.getDoctorAppointments(client.auth.data.doctorKey);
+    client.emit("getDoctorAppointments", response);
   }
 
 }

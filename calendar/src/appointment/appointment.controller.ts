@@ -72,9 +72,14 @@ export class AppointmentController {
                 }
             }
             let app1=[]
+            if(app.length>3){
                 for(i=0;i<4;i++){
                     app1.push(app[i]);
                 }
+            }else{
+                app1=app;
+            }
+                
             docKey.todaysAppointment = app1;
             let dto = {
                 doctorKey:user.doctor_key,
@@ -537,6 +542,43 @@ export class AppointmentController {
         const doc = await this.appointmentService.doctorDetails(doctorKey);
         if(doc){
             await this.videoService.removeSessionAndTokenByDoctor(doc);
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+
+    }
+
+    @MessagePattern({cmd: 'get_doctor_appointments'})
+    async getDoctorAppointments(doctorKey): Promise<any> {       
+        const doc = await this.appointmentService.doctorDetails(doctorKey);
+        if(doc){
+            let app =[];
+            var date:any = new Date();
+            var seconds = date.getSeconds();
+            var minutes = date.getMinutes();
+            var hour = date.getHours();
+            var time = hour+":"+minutes;
+            var timeMilli = Helper.getTimeInMilliSeconds(time);
+            var appointment = await this.appointmentService.todayAppointments(doc.doctorId,date)
+            let i:any;
+            for(i of appointment){
+                let end =Helper.getTimeInMilliSeconds(i.endTime);
+                if(timeMilli<end){
+                    app.push(i);
+                }
+            }
+            let app1=[];
+            if(app1.length>=29){
+                for(i=0;i<30;i++){
+                    app1.push(app[i]);
+                }
+            }else{
+                app1=app;
+            }
+            return app1;
         } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
