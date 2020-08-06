@@ -270,6 +270,7 @@ export class AppointmentService {
     async todayAppointments(doctorId,date): Promise<any> {
         const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [date,doctorId]);
         let apps: any= appointments;
+        console.log("appointments <<< " + appointments);
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;

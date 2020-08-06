@@ -528,7 +528,13 @@ export class AppointmentController {
         const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
         const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
         if(doc.doctorId==app.appointmentDetails.doctorId){
-            await this.videoService.removePatientToken(doc, pat.patientId);
+            const res=await this.videoService.removePatientToken(doc, pat.patientId);
+            const patient=pat.patientId;
+            let result={
+                response: res,
+                patient:patient
+            }
+            return result;
         }else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,

@@ -38,9 +38,10 @@ export class VideoGateway {
 
   @SubscribeMessage('createTokenForPatientByDoctor')
   async createTokenForPatientByDoctor(client: AuthenticatedSocket, appointmentId : string) {
-    this.logger.log(`Socket request for create Token for Patient from Doc-key => ${client.auth.data.doctor_key} and PatientId => ${appointmentId}` );
+    this.logger.log(`Socket request for create Token for Patient from Doc-key => ${client.auth.data.doctor_key} and appointmentId => ${appointmentId}` );
     const response : any = await this.videoService.createTokenForPatientByDoctor(client.auth.data.doctor_key, appointmentId);
-    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+appointmentId);
+    console.log("response >>" + JSON.stringify(response));
+    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
     patientSocketList.forEach( (val : Socket) => {
       val.emit("videoTokenForPatient", response);
     });
@@ -56,8 +57,9 @@ export class VideoGateway {
   @SubscribeMessage('removePatientTokenByDoctor')
   async removePatientTokenByDoctor(client: AuthenticatedSocket, appointmentId : string) {
     this.logger.log(`Socket request remove Patient Token By Doctor from Doc-key => ${client.auth.data.doctor_key} and PatientId => ${appointmentId}` );
-    await this.videoService.removePatientTokenByDoctor(client.auth.data.doctor_key, appointmentId);
-    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+appointmentId);
+    const response:any = await this.videoService.removePatientTokenByDoctor(client.auth.data.doctor_key, appointmentId);
+    console.log("response >>" + JSON.stringify(response));
+    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
     patientSocketList.forEach( (val : Socket) => {
       val.emit("videoTokenRemoved", {isRemoved : true});
     });
@@ -71,8 +73,8 @@ export class VideoGateway {
 
   @SubscribeMessage('getAppointmentListForDoctor')
   async getDoctorAppointments(client: AuthenticatedSocket) {
-    this.logger.log(`Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctorKey}`);
-    const response : any = await this.videoService.getDoctorAppointments(client.auth.data.doctorKey);
+    this.logger.log(`Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key}`);
+    const response : any = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
     client.emit("getDoctorAppointments", response);
   }
 
