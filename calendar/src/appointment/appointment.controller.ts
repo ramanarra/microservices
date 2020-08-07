@@ -48,7 +48,7 @@ export class AppointmentController {
         const pat = await this.appointmentService.getPatientDetails(appointmentDto.patientId); 
         const account = await this.appointmentService.accountDetails(doctorId.accountKey);  
         const appointment = await this.appointmentService.createAppointment(appointmentDto);       
-        if(appointment){
+        if(!appointment.message){
             let data={
                 email:pat.email,
                 appointmentId:appointment.appointment.appointmentdetails.id,

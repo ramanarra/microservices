@@ -78,7 +78,7 @@ export class CalendarController {
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
             '"paymentOption":"directPayment", \n' +
-            '"confirmation":'+
+            '"confirmation":false,\n'+
             '"consultationMode":"online" \n' +
             '}'
     })
@@ -418,6 +418,7 @@ export class CalendarController {
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
             '"paymentOption":"directPayment", \n' +
+            '"confirmation":false,\n'+
             '"consultationMode":"online" \n' +
             '}'
     })

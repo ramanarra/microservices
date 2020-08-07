@@ -98,7 +98,6 @@ export class AppointmentService {
                     //             message:CONSTANT_MSG.INVALID_TIMINGS
                     //         }
                     //     }
-                    // }
                     
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
@@ -117,7 +116,7 @@ export class AppointmentService {
                         }
                     }
                     const exist=await this.appointmentRepository.query(queries.getExistAppointment,[appointmentDto.doctorId,appointmentDto.patientId,appointmentDto.appointmentDate])
-                    if(exist.length && appointmentDto.confirmation){
+                    if(exist.length && !appointmentDto.confirmation){
                         return{
                             statusCode:HttpStatus.EXPECTATION_FAILED,
                             message:CONSTANT_MSG.APPOINT_ALREADY_PRESENT
