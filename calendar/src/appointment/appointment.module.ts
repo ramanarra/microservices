@@ -18,6 +18,7 @@ import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repos
 import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+import {Email} from "common-dto"
 
 import { VideoService } from './video.service';
 import { OpenViduService } from './open-vidu.service';
@@ -28,10 +29,12 @@ import { OpenViduService } from './open-vidu.service';
   imports: [
     TypeOrmModule.forFeature([AppointmentRepository,DoctorRepository, AccountDetailsRepository,
       DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
-      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository, OpenViduSessionRepository,OpenViduSessionTokenRepository])
+      DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,
+      PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository,
+      OpenViduSessionRepository,OpenViduSessionTokenRepository])
 
   ],
   controllers: [AppointmentController],
-  providers: [AppointmentService, VideoService, OpenViduService]
+  providers: [AppointmentService, VideoService, OpenViduService,Email]
 })
 export class AppointmentModule { }

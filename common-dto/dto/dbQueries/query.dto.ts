@@ -37,4 +37,5 @@ export const queries = {
     getDocListForPatient: 'SELECT * from  appointment a join doctor d on a."doctorId"= d."doctorId" join doc_config dc on dc."doctor_key"=d."doctor_key" join account_details ad on ad."account_key" = d."account_key" where a."patient_id" = $1',
     getPastAppointments:'SELECT * from appointment where "patient_id" = $1 and "appointment_date" <= $2 and "is_cancel"=false',
     getUpcomingAppointments:'SELECT * from appointment where "patient_id" = $1 and "appointment_date" >= $2 and "is_cancel"=false',
+    getExistAppointment:'SELECT * from appointment where "doctorId"=$1 AND "patient_id"=$2 AND "appointment_date"=$3'
 }
