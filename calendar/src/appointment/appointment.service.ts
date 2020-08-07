@@ -1375,7 +1375,7 @@ export class AppointmentService {
             for(i of slotsView){
                 let end =Helper.getTimeInMilliSeconds(i.end);
                 if(timeMilli<end){
-                    resSlots.push(i.start);
+                    resSlots.push(i);
                 }
             }
             return resSlots;
