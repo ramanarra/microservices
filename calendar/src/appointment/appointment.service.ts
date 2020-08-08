@@ -1318,7 +1318,9 @@ export class AppointmentService {
             startTime:app.appointmentDetails.startTime,
             endTime:app.appointmentDetails.endTime,
             preConsultationHours:config.preconsultationHours,
-            preConsulationMinutes:config.preconsultationMins
+            preConsulationMinutes:config.preconsultationMins,
+            doctorId:doctor.doctorId,
+            patientId:app.appointmentDetails.patientId
         }
         return res;
         
