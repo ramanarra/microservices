@@ -643,4 +643,61 @@ export class AppointmentController {
         return doctors;  
     }
 
+    @MessagePattern({cmd: 'patient_appointment_cancel'})
+    async patientAppointmentCancel(appointmentDto: any): Promise<any> {
+        const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId);
+        if(app.message){
+            return{
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+        const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+        if(!doctor)
+            return{
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
+            return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+        const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+        let canDays=config.cancellationDays;
+        let canTime= config.cancellationHours+":"+config.cancellationMins;
+        let date = new Date();
+        var minutes = date.getMinutes();
+        var hour = date.getHours();
+        var time = hour+":"+minutes;
+        var timeMilli = Helper.getTimeInMilliSeconds(time);
+        let appDate=app.appointmentDetails.appointmentDate;
+        let appStart = app.appointmentDetails.startTime;
+        let appMilli = Helper.getTimeInMilliSeconds(appStart);
+        let diffDate = appDate;
+        diffDate.setDate(diffDate.getDate() - canDays);
+        let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
+        if(date < diffDate){
+            const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+            return appointment;
+        }else if(date == diffDate){
+            if(timeMilli < diffTime){
+                const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+                return appointment;
+            }else{
+                return{
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.CANCEL_EXCEEDS
+                }
+            }
+        }else{
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.CANCEL_EXCEEDS
+            }
+        }
+    }
+
+
 }

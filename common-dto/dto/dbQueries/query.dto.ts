@@ -35,7 +35,7 @@ export const queries = {
     getDoctorByName:'SELECT d."doctorId", d."account_key" as "accountKey", d."doctor_key" as "doctorKey", d."speciality", d."photo",d."signature",d."number",d."first_name" as "firstName", d."last_name" as "lastName", d."registration_number" as "registrationNumber", config."consultation_cost" as fee , config."consultationSessionTimings" as sessionTiming, ac."city" as location, ac."hospital_name" as "hospitalName" FROM doctor d left join doc_config config on config."doctor_key"=d."doctor_key" left join account_details ac on ac."account_key"=d."account_key" WHERE doctor_name ~* $1 or registration_number ~* $1',
     getHospitalByName:'select "hospital_name" as "hospitalName", "phone" as "number", "city" as location, "account_key" as "accountKey" ,"hospital_photo" as photo from account_details WHERE hospital_name ~* $1',
     getDocListForPatient: 'SELECT * from  appointment a join doctor d on a."doctorId"= d."doctorId" join doc_config dc on dc."doctor_key"=d."doctor_key" join account_details ad on ad."account_key" = d."account_key" where a."patient_id" = $1',
-    getPastAppointments:'SELECT * from appointment where "patient_id" = $1 and "appointment_date" <= $2 and "is_cancel"=false',
-    getUpcomingAppointments:'SELECT * from appointment where "patient_id" = $1 and "appointment_date" >= $2 and "is_cancel"=false',
-    getExistAppointment:'SELECT * from appointment where "doctorId"=$1 AND "patient_id"=$2 AND "appointment_date"=$3'
+    getPastAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "is_cancel"=false',
+    getUpcomingAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND "is_cancel"=false',
+    getExistAppointment:'SELECT * FROM appointment WHERE "doctorId"=$1 AND "patient_id"=$2 AND "appointment_date"=$3'
 }

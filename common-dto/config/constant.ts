@@ -25,6 +25,8 @@ export const CONSTANT_MSG = {
     INVALID_TIMINGS:'Start time should be less than End time',
     NO_WORK_SCHEDULE:'Doctor has no work schedule on this date',
     MAIL_OK:'Mail sent successfully',
+    MAIL_ERROR : 'Failure to send mail',
+    CANCEL_EXCEEDS : 'Cancellation is not possible; posting date exceeds limit of days for cancellation',
     APPOINT_ALREADY_PRESENT:'Appointment already present on this date',
     ROLES:{
         DOCTOR:'DOCTOR',
