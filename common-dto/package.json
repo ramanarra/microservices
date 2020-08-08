@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@nestjs-modules/mailer": "^1.5.1",
+    "@nestjs/common": "^7.0.0",
     "@types/nodemailer": "^6.4.0",
     "class-validator": "^0.12.2",
     "handlebars": "^4.7.6",
