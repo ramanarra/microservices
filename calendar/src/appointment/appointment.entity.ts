@@ -80,6 +80,16 @@ export class Appointment extends BaseEntity{
     @Column({
         name : 'consultationmode'
     })
-    consultationMode : string;  
+    consultationMode : string; 
+    
+    @Column({
+        name : 'status'
+    })
+    status : string; 
+
+    @Column({
+        name : 'createdTime'
+    })
+    createdTime : Date; 
 
 }

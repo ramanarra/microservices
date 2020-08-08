@@ -53,6 +53,7 @@ import {accountUsersAppointmentWrite} from "../common/decorator/accountUsersAppo
 import {accountSettingsRead} from "../common/decorator/accountSettingsRead.decorator";
 import {accountSettingsWrite} from "../common/decorator/accountSettingsWrite.decorator";
 import {reports} from "../common/decorator/reports.decorator";
+import {patient} from "../common/decorator/patientPermission.decorator";
 import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 
@@ -77,6 +78,7 @@ export class CalendarController {
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
             '"paymentOption":"directPayment", \n' +
+            '"confirmation":false,\n'+
             '"consultationMode":"online" \n' +
             '}'
     })
@@ -350,7 +352,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorListForPatients(@Request() req) {
+    doctorListForPatients(@patient() check:boolean, @Request() req) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(req.user)}`);
         return this.calendarService.doctorListForPatients(req.user);
     }
@@ -361,7 +365,9 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiBody({type: DoctorDto})
-    findDoctorByCodeOrName(@Request() req, @Body() codeOrName: DoctorDto) {
+    findDoctorByCodeOrName(@patient() check:boolean, @Request() req, @Body() codeOrName: DoctorDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         if(!req.body.codeOrName){
             console.log("Provide codeOrName");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide codeOrName"}
@@ -389,7 +395,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
-    patientDetailsEdit(@Request() req, @Body() patientDto: PatientDto) {
+    patientDetailsEdit(@patient() check:boolean, @Request() req, @Body() patientDto: PatientDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         if(!req.body.patientId){
             console.log("Provide patientId");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide patientId"}
@@ -410,6 +418,7 @@ export class CalendarController {
             '"endTime": "11:00",\n' +
             '"appointmentDate": "2020-06-12", \n' +
             '"paymentOption":"directPayment", \n' +
+            '"confirmation":false,\n'+
             '"consultationMode":"online" \n' +
             '}'
     })
@@ -417,7 +426,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
-    patientBookAppointment(@Request() req, @Body() patientDto: AppointmentDto) {
+    patientBookAppointment(@patient() check:boolean, @Request() req, @Body() patientDto: AppointmentDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         if(!req.body.doctorKey){
             console.log("Provide doctorKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
@@ -450,7 +461,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    viewAppointmentSlotsForPatient(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
+    viewAppointmentSlotsForPatient(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorKey)}`);
         return this.calendarService.viewAppointmentSlotsForPatient(doctorKey, appointmentDate);
     }
@@ -460,7 +473,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientPastAppointments(@Request() req,  @Query('limit') limit: Number, @Query('paginationNumber') paginationNumber: Number) {
+    patientPastAppointments(@patient() check:boolean, @Request() req,  @Query('limit') limit: Number, @Query('paginationNumber') paginationNumber: Number) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Past Appointment Api -> Request data ${JSON.stringify(req.user.patientId)}`);
         return this.calendarService.patientPastAppointments(req.user.patientId,paginationNumber,limit);
     }
@@ -470,7 +485,9 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    patientUpcomingAppointments(@Request() req,  @Query('limit') limit: number, @Query('paginationNumber') paginationNumber: Number) {
+    patientUpcomingAppointments(@patient() check:boolean, @Request() req,  @Query('limit') limit: number, @Query('paginationNumber') paginationNumber: Number) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`Upcoming Appointment Api -> Request data ${JSON.stringify(req.user.patientId)}`);
         return this.calendarService.patientUpcomingAppointments(req.user.patientId,paginationNumber,limit);
     }
@@ -536,7 +553,9 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    doctorDetails(@Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
+    doctorDetails(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         if(!doctorKey){
             console.log("Provide doctorKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
@@ -689,7 +708,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    listOfDoctorsInHospital(@Request() req, @Query('accountKey') accountKey: string) {
+    listOfDoctorsInHospital(@patient() check:boolean, @Request() req, @Query('accountKey') accountKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`listOfDoctorsInHospital Api -> Request data }`);
         return this.calendarService.listOfDoctorsInHospital(req.user, accountKey);
     }
@@ -699,7 +720,9 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    viewDoctorDetails(@Request() req, @Query('doctorKey') doctorKey: string) {
+    viewDoctorDetails(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         this.logger.log(`viewDoctorDetails Api -> Request data }`);
         return this.calendarService.viewDoctorDetails(req.user, doctorKey);
     }

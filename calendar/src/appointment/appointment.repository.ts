@@ -32,6 +32,7 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.isCancel= false;
         appointment.paymentOption = appointmentDto.paymentOption;
         appointment.consultationMode = appointmentDto.consultationMode;
+        appointment.createdTime = new Date();
         if(appointmentDto.user){
             appointment.createdBy = appointmentDto.user.role;
             appointment.createdId = appointmentDto.user.userId;

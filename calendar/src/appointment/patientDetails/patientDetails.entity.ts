@@ -90,4 +90,14 @@ export class PatientDetails extends BaseEntity{
     })
     age : number;
 
+    @Column({
+        name : 'live_status'
+    })
+    liveStatus : string;
+
+    @Column({
+        name : 'last_active'
+    })
+    lastActive : Date;
+
 }

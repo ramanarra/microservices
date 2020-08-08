@@ -1,7 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {CONSTANT_MSG, queries, DoctorDto} from 'common-dto';
+import {CONSTANT_MSG, queries, DoctorDto, DocConfigDto} from 'common-dto';
 import {PatientDto} from 'common-dto';
 import {Helper} from "../utility/helper";
 import { of } from 'rxjs';
@@ -26,6 +26,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'calendar_appointment_create'})
     async createAppointment(appointmentDto: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
+        const doctorId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
         if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
             const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.user.doctor_key);
@@ -39,12 +40,30 @@ export class AppointmentController {
             appointmentDto.doctorId = docId.doctorId;
             appointmentDto.config = config; 
         }else{
-            const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+            
             const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.doctorKey);
-            appointmentDto.doctorId = docId.doctorId;
+            appointmentDto.doctorId = doctorId.doctorId;
             appointmentDto.config = config; 
-        }        
-        const appointment = await this.appointmentService.createAppointment(appointmentDto);
+        }    
+        const pat = await this.appointmentService.getPatientDetails(appointmentDto.patientId); 
+        const account = await this.appointmentService.accountDetails(doctorId.accountKey);  
+        const appointment = await this.appointmentService.createAppointment(appointmentDto);       
+        if(!appointment.message){
+            let data={
+                email:pat.email,
+                appointmentId:appointment.appointment.appointmentdetails.id,
+                patientFirstName:pat.firstName,
+                patientLastName:pat.lastName,
+                doctorFirstName:doctorId.firstName ,
+                doctorLastName:doctorId.lastName ,
+                hospital: account.hospitalName,
+                appointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
+                startTime:appointment.appointment.appointmentdetails.startTime,
+                endTime:appointment.appointment.appointmentdetails.endTime,
+                role:appointment.appointment.appointmentdetails.createdBy,
+            }
+            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+        }
         return appointment;
     }
 
@@ -360,8 +379,26 @@ export class AppointmentController {
         const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
         patientDto.configSession = config.consultationSessionTimings;
         patientDto.config = config;
-        const patient = await this.appointmentService.createAppointment(patientDto);
-        return patient;
+        const app = await this.appointmentService.createAppointment(patientDto);
+        const pat = await this.appointmentService.getPatientDetails(patientDto.patientId); 
+        const account = await this.appointmentService.accountDetails(docId.accountKey); 
+        if(app){
+            let data={
+                email:doctor.email,
+                appointmentId:app.appointment.appointmentdetails.id,
+                patientFirstName:pat.firstName,
+                patientLastName:pat.lastName,
+                doctorFirstName:doctor.firstName ,
+                doctorLastName:doctor.lastName ,
+                hospital: account.hospitalName,
+                appointmentDate:app.appointment.appointmentdetails.appointmentDate,
+                startTime:app.appointment.appointmentdetails.startTime,
+                endTime:app.appointment.appointmentdetails.endTime,
+                role:app.appointment.appointmentdetails.createdBy,
+            }
+            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+        }
+        return app;
     }
 
     @MessagePattern({cmd: 'patient_view_appointment'})

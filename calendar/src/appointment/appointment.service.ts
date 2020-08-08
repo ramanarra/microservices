@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto
+    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto,Email
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -54,7 +54,9 @@ export class AppointmentService {
         private patientDetailsRepository: PatientDetailsRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
-        private appointmentDocConfigRepository: AppointmentDocConfigRepository
+        private appointmentDocConfigRepository: AppointmentDocConfigRepository,
+        private email: Email
+
     ) {
     }
 
@@ -96,7 +98,6 @@ export class AppointmentService {
                     //             message:CONSTANT_MSG.INVALID_TIMINGS
                     //         }
                     //     }
-                    // }
                     
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
@@ -114,18 +115,26 @@ export class AppointmentService {
                             message:CONSTANT_MSG.END_TIME_MISMATCHING
                         }
                     }
-                    
-                    // create appointment on existing date old records
-                    const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
-                    if(!appoint.message){
-                        const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                        console.log(appDocConfig);
-                        return  {
-                            appointment:appoint,
-                            appointmentDocConfig:appDocConfig
-                        }  
-                    }else {
-                        return appoint;
+                    const exist=await this.appointmentRepository.query(queries.getExistAppointment,[appointmentDto.doctorId,appointmentDto.patientId,appointmentDto.appointmentDate])
+                    if(exist.length && !appointmentDto.confirmation){
+                        return{
+                            statusCode:HttpStatus.EXPECTATION_FAILED,
+                            message:CONSTANT_MSG.APPOINT_ALREADY_PRESENT
+                        }
+                    }else{   
+                        // create appointment on existing date old records                   
+                        const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
+                        if(!appoint.message){
+                            const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                            console.log(appDocConfig);
+                            return  {
+                                appointment:appoint,
+                                appointmentDocConfig:appDocConfig
+                            }  
+                        }else {
+                            return appoint;
+                        }
+
                     }
                 }
             }
@@ -1446,6 +1455,11 @@ export class AppointmentService {
         return res;       
     }
 
+    async getPatientDetails(patientId:any){
+        const patient = await this.patientDetailsRepository.findOne({patientId:patientId});
+        return patient;
+    }
+
 
 
     // common functions below===============================================================
@@ -1513,6 +1527,64 @@ export class AppointmentService {
     async isWorkScheduleAvailable(day, workScheduleObj): Promise<any> {
         return workScheduleObj[day].length >= 1 ? true : false;
     }
+
+    async sendAppCreatedEmail(req) {
+
+        var email = req.email;
+        var doctorFirstName = req.doctorFirstName;
+        var doctorLastName = req.doctorLastName;
+        var patientFirstName = req.patientFirstName;
+        var patientLastName = req.patientLastName;
+        var hospital = req.hospital;
+        var startTime = req.startTime;
+        var endTime = req.endTime;
+        var role = req.role;
+        var appointmentId = req.appointmentId;
+        var appointmentDate = req.appointmentDate;
+
+         const params:any = {};
+
+         params.subject = 'Appointment Created';
+         params.recipient = email;
+         params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>\
+             <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Created By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  ';        //sending Mail to user
+
+        params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
+        params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
+        params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
+        params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
+        params.template = params.template.replace(/{email}/gi, email);
+        params.template = params.template.replace(/{hospital}/gi, hospital);
+        params.template = params.template.replace(/{startTime}/gi, startTime);
+        params.template = params.template.replace(/{endTime}/gi, endTime);
+        params.template = params.template.replace(/{role}/gi, role);
+        params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+        params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
+        try{
+            const sendMail = await this.email.sendEmail(params);
+            return{
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.MAIL_OK
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+        
+}
+
 
 
 }
