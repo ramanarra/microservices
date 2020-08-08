@@ -728,21 +728,5 @@ export class CalendarController {
     }
 
 
-    // @Get('doctor/personalSettingsView')
-    // @ApiBearerAuth('JWT')
-    // @UseGuards(AuthGuard())
-    // @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
-    // @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    // doctorView(@selfUserSettingRead() check:boolean,@accountUsersSettingsRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
-    //     if (!check && !check2)
-    //         return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-    //     if(!doctorKey){
-    //         console.log("Provide doctorKey");
-    //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
-    //     }
-    //     this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorKey)}`);
-    //     return this.calendarService.doctorView(req.user,doctorKey);
-    // }
-
 
 }

@@ -1540,6 +1540,7 @@ export class AppointmentService {
         var endTime = req.endTime;
         var role = req.role;
         var appointmentId = req.appointmentId;
+        var appointmentDate = req.appointmentDate;
 
          const params:any = {};
 
@@ -1551,6 +1552,7 @@ export class AppointmentService {
 <div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
@@ -1566,6 +1568,7 @@ export class AppointmentService {
         params.template = params.template.replace(/{endTime}/gi, endTime);
         params.template = params.template.replace(/{role}/gi, role);
         params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+        params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
         try{
             const sendMail = await this.email.sendEmail(params);
             return{

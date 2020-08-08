@@ -31,6 +31,10 @@ export class Email {
         transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
                 console.log(error);
+                return{
+                    statusCode:'501',
+                    message:'Error in mail sending'
+                }
             } else {
               return 1;
             }

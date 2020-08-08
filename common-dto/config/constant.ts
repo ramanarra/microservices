@@ -24,7 +24,7 @@ export const CONSTANT_MSG = {
     END_TIME_MISMATCHING:'End time is mismatching with respect to doctor session timing',
     INVALID_TIMINGS:'start time should be less than endTime',
     NO_WORK_SCHEDULE:'Doctor has no workSchedule on this Date',
-    MAIL_OK:'Mail sended successfully',
+    MAIL_OK:'Mail sent successfully',
     APPOINT_ALREADY_PRESENT:'Appointment already present on this date',
     ROLES:{
         DOCTOR:'DOCTOR',
