@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import { CONSTANT_MSG } from '../config';
-import {HttpStatus} from './../../calendar/node_modules/@nestjs/common/enums/http-status.enum';
+import {HttpStatus} from '@nestjs/common';
 export class Email {
     sendEmail (params:any) {
         var smtpUser = "dharani@softsuave.com";
