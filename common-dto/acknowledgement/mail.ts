@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import { CONSTANT_MSG } from '../config';
-import {HttpStatus} from '@nestjs/common';
+// import {HttpStatus} from '@nestjs/common';
 export class Email {
     sendEmail (params:any) {
         var smtpUser = "dharani@softsuave.com";
@@ -34,12 +34,12 @@ export class Email {
             if (error) {
                 console.log(error);
                 return{
-                    statusCode:HttpStatus.NOT_IMPLEMENTED,
+                    statusCode:501,
                     message: CONSTANT_MSG.MAIL_ERROR
                 }
             } else {
                 return{
-                    statusCode:HttpStatus.OK,
+                    statusCode:200,
                     message: CONSTANT_MSG.MAIL_OK
                 }
             }
