@@ -643,4 +643,45 @@ export class AppointmentController {
         return doctors;  
     }
 
+    @MessagePattern({cmd: 'patient_appointment_cancel'})
+    async patientAppointmentCancel(appointmentDto: any): Promise<any> {
+    const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId);
+    if(app.message){
+        return{
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        }
+    }
+    const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+    const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+    let canDays=config.cancellationDays;
+    let canTime= config.cancellationHours+":"+config.cancellationMins;
+    let date = new Date();
+    let appDate=app.appointmentDetails.appointmentDate;
+    let appStart = app.appointmentDetails.startTime;
+    // let diffDate = 
+    // if(config.isPatientCancellationAllowed){
+    //   //  adsfa;
+    // }else{
+    //     return{
+    //         statusCode: HttpStatus.NO_CONTENT,
+    //         message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+    //     }
+    // }
+    if(!doctor)
+        return{
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+        }
+    if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
+        return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: CONSTANT_MSG.INVALID_REQUEST
+        }
+    }
+    const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+    return appointment;
+    }
+
+
 }

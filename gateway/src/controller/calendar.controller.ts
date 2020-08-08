@@ -727,6 +727,23 @@ export class CalendarController {
         return this.calendarService.viewDoctorDetails(req.user, doctorKey);
     }
 
+    @Post('patient/appointmentCancel')
+    @ApiOkResponse({description: 'Appointment Cancel'})
+    @ApiUnauthorizedResponse({description: 'request body example:   {"appointmentId": 28}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: AppointmentDto})
+    appointmentCancelByPatient(@patient() check:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(!req.body.appointmentId){
+            console.log("Provide appointmentId");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentId"}
+        }
+        this.logger.log(`Patient Appointment cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
+        return this.calendarService.patientAppointmentCancel(appointmentDto, req.user);
+    }
+
 
 
 }
