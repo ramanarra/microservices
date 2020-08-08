@@ -122,7 +122,7 @@ export class AppointmentService {
                             message:CONSTANT_MSG.APPOINT_ALREADY_PRESENT
                         }
                     }else{   
-                        // create appointment on existing date old reccrds                   
+                        // create appointment on existing date old records                   
                         const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
                         if(!appoint.message){
                             const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
