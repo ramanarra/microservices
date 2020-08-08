@@ -23,7 +23,8 @@ import {
   ApiOkResponse,
   ApiUnauthorizedResponse,
   ApiBody, ApiBearerAuth,
-  ApiResponse
+  ApiResponse,
+  ApiTags
 } from '@nestjs/swagger';
 import { defaultMaxListeners } from 'stream';
 import {AuthGuard} from '@nestjs/passport';
@@ -45,6 +46,7 @@ export class AuthController {
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
+    @ApiTags('Doctors')
     doctorsLogin(@Body() userDto : UserDto) {
       if(!userDto.email){
         console.log("Provide email");
@@ -65,6 +67,7 @@ export class AuthController {
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
+    @ApiTags('Patient')
     patientLogin(@Body() patientDto : PatientDto) {
       if(!patientDto.phone || !(patientDto.phone.length == 10)){
         console.log("Provide Valid Phone");
@@ -96,6 +99,7 @@ export class AuthController {
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
+    @ApiTags('Patient')
     @UsePipes(new ValidationPipe({ transform: true }))
     async patientRegistration(@Body() patientDto : PatientDto) {
       if(patientDto.phone && patientDto.phone.length == 10){

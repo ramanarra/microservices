@@ -23,7 +23,8 @@ import {
     ApiBody,
     ApiBearerAuth,
     ApiCreatedResponse,
-    ApiBadRequestResponse
+    ApiBadRequestResponse,
+    ApiTags
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Roles} from 'src/common/decorator/roles.decorator';
@@ -87,6 +88,7 @@ export class CalendarController {
     @ApiBody({type: AppointmentDto})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @Roles('admin')
     createAppointment(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
         if (!check && !check2)
@@ -118,6 +120,7 @@ export class CalendarController {
     @Get('doctor/list')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request Query example:  if login as DOCTOR, Key is doctorKey example: Doc_5 , else Key is accountKey example:Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorList(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req) {
@@ -131,6 +134,7 @@ export class CalendarController {
     @Get('doctor/personalSettingsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorView(@selfUserSettingRead() check:boolean,@accountUsersSettingsRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
@@ -148,6 +152,7 @@ export class CalendarController {
     @Get('doctor/configCancelRescheduleView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'Cancel &  Reschedule View'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorCanReschView(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req , @Query('doctorKey') doctorKey: String) {
@@ -183,6 +188,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: DocConfigDto})
     doctorConfigUpdate(@selfUserSettingWrite() check: boolean, @accountUsersSettingsWrite() check2: boolean, @Request() req, @Body() docConfigDto: DocConfigDto) {
         if (!check && !check2)
@@ -198,6 +204,7 @@ export class CalendarController {
     @Post('doctor/workScheduleEdit')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
             '"doctorKey":"Doc_5",\n' +
@@ -230,6 +237,7 @@ export class CalendarController {
     @Get('doctor/workScheduleView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     workScheduleView(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req, @Query('doctorKey') doctorKey: String) {
@@ -242,6 +250,7 @@ export class CalendarController {
     @Get('doctor/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request body example:  Doc_5, 0 (default value)'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     appointmentSlotsView(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('paginationNumber') paginationNumber: number) {
@@ -264,6 +273,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: AppointmentDto})
     appointmentReschedule(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
         if (!check && !check2)
@@ -300,6 +310,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'request body example:   {"appointmentId": 28,"confirmation":true}'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: AppointmentDto})
     appointmentCancel(@selfAppointmentWrite() check:boolean,@accountUsersAppointmentWrite() check2:boolean, @Request() req, @Body() appointmentDto: AppointmentDto) {
         if (!check && !check2)
@@ -317,6 +328,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({})
     patientSearch(@Request() req, @Body() patientDto: string) {
         if(req.body.phone){
@@ -350,6 +362,7 @@ export class CalendarController {
     @Get('patient/doctorList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request body example:  Acc_1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorListForPatients(@patient() check:boolean, @Request() req) {
@@ -364,6 +377,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiBody({type: DoctorDto})
     findDoctorByCodeOrName(@patient() check:boolean, @Request() req, @Body() codeOrName: DoctorDto) {
         if (!check)
@@ -393,6 +407,7 @@ export class CalendarController {
     })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientDetailsEdit(@patient() check:boolean, @Request() req, @Body() patientDto: PatientDto) {
@@ -424,6 +439,7 @@ export class CalendarController {
     })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBody({type: PatientDto})
     patientBookAppointment(@patient() check:boolean, @Request() req, @Body() patientDto: AppointmentDto) {
@@ -459,6 +475,7 @@ export class CalendarController {
     @Get('patient/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     viewAppointmentSlotsForPatient(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
@@ -471,6 +488,7 @@ export class CalendarController {
     @Get('patient/pastAppointmentsList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     patientPastAppointments(@patient() check:boolean, @Request() req,  @Query('limit') limit: Number, @Query('paginationNumber') paginationNumber: Number) {
@@ -483,6 +501,7 @@ export class CalendarController {
     @Get('patient/upcomingAppointmentsList')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiOkResponse({description: 'request body example:  1'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     patientUpcomingAppointments(@patient() check:boolean, @Request() req,  @Query('limit') limit: number, @Query('paginationNumber') paginationNumber: Number) {
@@ -497,6 +516,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     patientList(@Request() req,  @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
         return this.calendarService.patientList(doctorKey);
@@ -505,6 +525,7 @@ export class CalendarController {
     @Post('doctor/personalSettingsEdit')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: DoctorDto})
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -522,6 +543,7 @@ export class CalendarController {
     @Get('doctor/hospitaldetailsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: ' '})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     hospitaldetailsView(@accountSettingsRead() check: boolean, @Request() req , @Query('accountKey') accountKey: String) {
@@ -534,6 +556,7 @@ export class CalendarController {
     @Post('doctor/hospitaldetailsEdit')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: DoctorDto})
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
@@ -552,6 +575,7 @@ export class CalendarController {
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     doctorDetails(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
         if (!check)
@@ -567,6 +591,7 @@ export class CalendarController {
     @Get('doctor/availableSlots')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiOkResponse({description: 'request body example:  Doc_5'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     availableSlots(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: string) {
@@ -580,6 +605,7 @@ export class CalendarController {
     @Post('doctor/creatingAppointmetAlongWithRegisteringPatient')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     @ApiBody({type: AppointmentDto})
     @ApiOkResponse({description: 'requestBody example :   {\n' +
                                             '"phone":"99999999999",\n' +
@@ -684,6 +710,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
     patientDetails(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number,  @Query('doctorKey') doctorKey: string) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -696,6 +723,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Admin')
     reports(@Request() req, @reports() check:boolean,  @Query('accountKey') accountKey: string, @Query('paginationNumber') paginationNumber: number) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -708,6 +736,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     listOfDoctorsInHospital(@patient() check:boolean, @Request() req, @Query('accountKey') accountKey: string) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -720,6 +749,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
+    @ApiTags('Patient')
     viewDoctorDetails(@patient() check:boolean, @Request() req, @Query('doctorKey') doctorKey: string) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
