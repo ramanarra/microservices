@@ -1587,6 +1587,23 @@ export class AppointmentService {
         
 }
 
+    async updateDoctorAndPatientStatus(role : string, id : string, status : string){
+        
+        if(role === CONSTANT_MSG.ROLES.DOCTOR){
+            const doc = await this.doctorRepository.findOne({doctorKey: id});
+            if(doc){
+                doc.liveStatus = status;
+                await this.doctorRepository.save(doc)
+            }
+        } else if (role === CONSTANT_MSG.ROLES.PATIENT){
+            const patient = await this.patientDetailsRepository.findOne({patientId : Number(id)});
+            if(patient){
+                patient.liveStatus = status;
+                await this.patientDetailsRepository.save(patient);
+            }
 
+        }
+
+    }
 
 }
