@@ -592,7 +592,7 @@ export class AppointmentController {
         const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
         const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
         if(doc.doctorId==app.appointmentDetails.doctorId){
-            const res=await this.videoService.removePatientToken(doc, pat.patientId);
+            const res=await this.videoService.removePatientToken(doc, pat.patientId, docPatientDetail.appointmentId);
             const patient=pat.patientId;
             let result={
                 response: res,
@@ -771,5 +771,96 @@ export class AppointmentController {
         
     }
 
+    @MessagePattern({cmd: 'details_of_patient'})
+    async detailsOfPatient(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const patient = await this.appointmentService.detailsOfPatient(user.patientId);
+            return patient;  
+        }
+    }
+
+    @MessagePattern({cmd: 'patient_upcoming_app_list'})
+    async patientUpcomingAppList(user:any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.patientDto.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.patientDto.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doctor.accountKey)){
+            const appointment = await this.appointmentService.patientUpcomingAppointmentsForDoctor(user);
+            return appointment;
+        }
+        
+    }
+
+    @MessagePattern({cmd: 'patient_past_app_list'})
+    async patientPastAppList(user:any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.patientDto.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.patientDto.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doctor.accountKey)){
+            const appointment = await this.appointmentService.patientPastAppointmentsForDoctor(user);
+            return appointment;
+        }
+        
+    }
+
+    @MessagePattern({cmd: 'update_patient_online'})
+    async updatePatOnline(patientId:any): Promise<any> {
+        return await this. appointmentService.updatePatOnline(patientId);
+        
+    }
+
+    @MessagePattern({cmd: 'update_doctor_online'})
+    async updateDocOnline(doctorKey:any): Promise<any> {
+        return await this. appointmentService.updateDocOnline(doctorKey);       
+    }
+
+    
+    @MessagePattern({cmd: 'doc_patient_general_search'})
+    async patientGeneralSearch(user: any): Promise<any> {
+        const doctor =await this.appointmentService.doctorDetails(user.doctorKey);
+        const patient = await this.appointmentService.patientGeneralSearch(user.patientSearch,doctor.doctorId);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'patient_appointment_reschedule'})
+    async patientAppointmentReschedule(appointmentDto: any): Promise<any> {
+        const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+        const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
+        if(app.patientId == appointmentDto.user.patientId){
+            if(config.isPatientRescheduleAllowed){
+                let canDays=config.rescheduleDays;
+                let canTime= config.rescheduleDays+":"+config.rescheduleDays;
+                let date = new Date();
+                var minutes = date.getMinutes();
+                var hour = date.getHours();
+                var time = hour+":"+minutes;
+                var timeMilli = Helper.getTimeInMilliSeconds(time);
+                let appDate=app.appointmentDetails.appointmentDate;
+                let appStart = app.appointmentDetails.startTime;
+                let appMilli = Helper.getTimeInMilliSeconds(appStart);
+                let diffDate = appDate;
+                diffDate.setDate(diffDate.getDate() - canDays);
+                let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
+                if(date<diffDate){
+                    const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+                    return appointment;
+                }else if(date == diffDate){
+                    if(date == diffDate){
+                        const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+                        return appointment;
+                    }
+
+                }
+
+            }else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.RESCHED_NOT_ALLOWED
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
 
 }

@@ -60,14 +60,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send( { cmd: 'auth_doctor_view' }, doctorDto);
     }
 
-    public doctorsLogin(userDto: UserDto): Observable<any> {
-        const doc = this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto);
-        return doc;
+    public doctorsLogin(userDto: UserDto): Promise <any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto).toPromise();
     }
 
     
-    public patientLogin(patientDto: PatientDto): Observable<any> {
-        return this.redisClient.send( { cmd: 'auth_patient_login' }, patientDto);
+    public patientLogin(patientDto: PatientDto): Promise<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_login' }, patientDto).toPromise();
     }
 
     public patientRegistration(patientDto: any):Promise<any> {
