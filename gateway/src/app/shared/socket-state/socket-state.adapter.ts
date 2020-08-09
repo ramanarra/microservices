@@ -5,6 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { RedisPropagatorService } from '@app/shared/redis-propagator/redis-propagator.service';
 
 import { SocketStateService } from './socket-state.service';
+import { UserService } from '@src/service/user.service';
+import {CONSTANT_MSG} from 'common-dto';
 
 interface TokenPayload {
   readonly userId: string;
@@ -21,7 +23,8 @@ export class SocketStateAdapter extends IoAdapter implements WebSocketAdapter {
     private readonly app: INestApplicationContext,
     private readonly socketStateService: SocketStateService,
     private readonly redisPropagatorService: RedisPropagatorService,
-    private readonly jwtService : JwtService
+    private readonly jwtService : JwtService,
+    private readonly userService : UserService
   ) {
     super(app);
   }
@@ -67,13 +70,34 @@ export class SocketStateAdapter extends IoAdapter implements WebSocketAdapter {
     server.on('connection', (socket: AuthenticatedSocket) => {
       if (socket.auth) {
         this.socketStateService.add(socket.auth.userId, socket);
+        console.log("connection >> " +  socket.auth.userId);
+        var socketList = this.socketStateService.get(socket.auth.userId);
+        console.log("Connection count ");
+        console.log(socketList.length);
+        this.updateDoctorAndPatient(socket.auth.data, CONSTANT_MSG.LIVE_STATUS.ONLINE);
         socket.on('disconnect', () => {
           this.socketStateService.remove(socket.auth.userId, socket);
-
+          socketList = this.socketStateService.get(socket.auth.userId);
+          console.log("disconnect >> " +  socket.auth.userId);
+          console.log("Disconnect count ");
+          console.log(socketList.length);
+          if(socketList.length === 0){
+            this.updateDoctorAndPatient(socket.auth.data, CONSTANT_MSG.LIVE_STATUS.OFFLINE);
+          }
           socket.removeAllListeners('disconnect');
         });
       }
       callback(socket);
     });
   }
+
+  public async updateDoctorAndPatient(userInfo, status){
+    if(userInfo.permission === "CUSTOMER"){
+      this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.PATIENT, userInfo.patientId, status);
+    }else {
+      this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.DOCTOR, userInfo.doctor_key, status);
+    }
+  }
+
+  
 }

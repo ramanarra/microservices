@@ -5,6 +5,8 @@ import { Socket, Server } from 'socket.io';
 import { VideoService } from '@src/service/video.service';
 import socketio from 'socket.io';
 import { SocketStateService } from '@app/shared/socket-state/socket-state.service';
+import { CONSTANT_MSG } from 'common-dto';
+import { UserService } from '@src/service/user.service';
 
 interface TokenPayload {
   readonly userId: string;
@@ -24,7 +26,8 @@ export class VideoGateway {
 
   private logger = new Logger('VideoGateway');
 
-  constructor(private readonly videoService : VideoService, private readonly socketStateService : SocketStateService){
+  constructor(private readonly videoService : VideoService, private readonly socketStateService : SocketStateService,
+    private readonly userService : UserService){
 
   }
 
@@ -77,5 +80,19 @@ export class VideoGateway {
     const response : any = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
     client.emit("getDoctorAppointments", response);
   }
+
+  @SubscribeMessage('updateLiveStatusOfUser')
+  async updateLiveStatus(client: AuthenticatedSocket, data : {status : string}) {
+   let userInfo = client.auth.data;
+    if(userInfo.permission === "CUSTOMER"){
+      this.logger.log(`Socket request update live status for ${CONSTANT_MSG.ROLES.PATIENT} => ${userInfo.patientId} and status => ${data.status}`);
+      this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.PATIENT, userInfo.patientId, data.status);
+    }else {
+      this.logger.log(`Socket request update live status for ${CONSTANT_MSG.ROLES.DOCTOR} => ${userInfo.doctor_key} and status => ${data.status}`);
+      this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.DOCTOR, userInfo.doctor_key, data.status);
+    }
+  }
+
+
 
 }

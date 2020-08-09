@@ -2488,7 +2488,12 @@ ALTER TABLE public.appointment
 ADD COLUMN "createdTime" timestamp without time zone;
 
 CREATE TYPE live_statuses AS ENUM ('offline','online', 'videoSessionReady', 'inSession'); 
-ALTER TABLE patient_details ADD live_status live_statuses default 'online';
+ALTER TABLE patient_details ADD live_status live_statuses default 'offline';
 
 ALTER TABLE public.patient_details
+ADD COLUMN last_active timestamp without time zone;
+
+ALTER TABLE doctor ADD live_status live_statuses default 'offline';
+
+ALTER TABLE public.doctor
 ADD COLUMN last_active timestamp without time zone;
