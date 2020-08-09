@@ -133,8 +133,12 @@ export class AppointmentController {
                     }
                 }
                 let app1=[]
-                for(i=0;i<4;i++){
-                    app1.push(app[i]);
+                if(app.length>3){
+                    for(i=0;i<4;i++){
+                        app1.push(app[i]);
+                    }
+                }else{
+                    app1=app;
                 }
                 v.todaysAppointment = app1;
                 let dto = {
