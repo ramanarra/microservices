@@ -1462,6 +1462,10 @@ export class AppointmentService {
         return patient;
     }
 
+    async getAppDoctorConfigDetails(appointmentId): Promise<any> {
+        return await this.appointmentDocConfigRepository.findOne({appointmentId: appointmentId});
+    }
+
 
 
     // common functions below===============================================================
@@ -1587,8 +1591,69 @@ export class AppointmentService {
         
 }
 
+async sendAppCancelledEmail(req) {
+
+    var email = req.email;
+    var doctorFirstName = req.doctorFirstName;
+    var doctorLastName = req.doctorLastName;
+    var patientFirstName = req.patientFirstName;
+    var patientLastName = req.patientLastName;
+    var hospital = req.hospital;
+    var startTime = req.startTime;
+    var endTime = req.endTime;
+    var role = req.role;
+    var appointmentId = req.appointmentId;
+    var appointmentDate = req.appointmentDate;
+    var cancelledOn = req.cancelledOn;
+
+     const params:any = {};
+
+     params.subject = 'Appointment Cancelled';
+     params.recipient = email;
+     params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>\
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Cancelled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Cancelled On</div><div style="display: inline-block;">: {cancelledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  ';        //sending Mail to user
+
+    params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
+    params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
+    params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
+    params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
+    params.template = params.template.replace(/{email}/gi, email);
+    params.template = params.template.replace(/{hospital}/gi, hospital);
+    params.template = params.template.replace(/{startTime}/gi, startTime);
+    params.template = params.template.replace(/{endTime}/gi, endTime);
+    params.template = params.template.replace(/{role}/gi, role);
+    params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+    params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
+    params.template = params.template.replace(/{cancelledOn}/gi, cancelledOn);
+
+    try{
+        const sendMail = await this.email.sendEmail(params);
+        return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.MAIL_OK
+        }
+    } catch (e) {
+        console.log(e);
+        return {
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.DB_ERROR
+        }
+    }
+
+}
+
     async updateDoctorAndPatientStatus(role : string, id : string, status : string){
-        
+
         if(role === CONSTANT_MSG.ROLES.DOCTOR){
             const doc = await this.doctorRepository.findOne({doctorKey: id});
             if(doc){
@@ -1605,5 +1670,6 @@ export class AppointmentService {
         }
 
     }
+
 
 }

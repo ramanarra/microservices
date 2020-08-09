@@ -28,6 +28,7 @@ export const CONSTANT_MSG = {
     MAIL_ERROR : 'Failure to send mail',
     CANCEL_EXCEEDS : 'Cancellation is not possible; posting date exceeds limit of days for cancellation',
     APPOINT_ALREADY_PRESENT:'Appointment already present on this date',
+    CANCEL_NOT_ALLOWED:'Patient is not allowed to cancel this appointment',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

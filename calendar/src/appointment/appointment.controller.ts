@@ -133,8 +133,12 @@ export class AppointmentController {
                     }
                 }
                 let app1=[]
-                for(i=0;i<4;i++){
-                    app1.push(app[i]);
+                if(app.length>3){
+                    for(i=0;i<4;i++){
+                        app1.push(app[i]);
+                    }
+                }else{
+                    app1=app;
                 }
                 v.todaysAppointment = app1;
                 let dto = {
@@ -325,7 +329,27 @@ export class AppointmentController {
         message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
+    let date = new Date();
     const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+    const pat = await this.appointmentService.getPatientDetails(appointmentDto.patientId); 
+    const account = await this.appointmentService.accountDetails(doctor.accountKey);  
+    if(appointment.statusCode==HttpStatus.OK){
+        let data={
+            email:pat.email,
+            appointmentId:app.appointment.appointmentdetails.id,
+            patientFirstName:pat.firstName,
+            patientLastName:pat.lastName,
+            doctorFirstName:doctor.firstName ,
+            doctorLastName:doctor.lastName ,
+            hospital: account.hospitalName,
+            appointmentDate:app.appointment.appointmentdetails.appointmentDate,
+            startTime:app.appointment.appointmentdetails.startTime,
+            endTime:app.appointment.appointmentdetails.endTime,
+            role:appointmentDto.user.role,
+            cancelledOn:date
+        }
+        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+    }
     return appointment;
     }
 
@@ -380,6 +404,9 @@ export class AppointmentController {
         patientDto.configSession = config.consultationSessionTimings;
         patientDto.config = config;
         const app = await this.appointmentService.createAppointment(patientDto);
+        if(app.message){
+            return app;
+        }
         const pat = await this.appointmentService.getPatientDetails(patientDto.patientId); 
         const account = await this.appointmentService.accountDetails(docId.accountKey); 
         if(app){
@@ -653,6 +680,8 @@ export class AppointmentController {
             }
         }
         const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+        const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
+        const account = await this.appointmentService.accountDetails(doctor.accountKey);  
         if(!doctor)
             return{
                 statusCode: HttpStatus.NO_CONTENT,
@@ -664,39 +693,82 @@ export class AppointmentController {
             message: CONSTANT_MSG.INVALID_REQUEST
             }
         }
-        const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
-        let canDays=config.cancellationDays;
-        let canTime= config.cancellationHours+":"+config.cancellationMins;
-        let date = new Date();
-        var minutes = date.getMinutes();
-        var hour = date.getHours();
-        var time = hour+":"+minutes;
-        var timeMilli = Helper.getTimeInMilliSeconds(time);
-        let appDate=app.appointmentDetails.appointmentDate;
-        let appStart = app.appointmentDetails.startTime;
-        let appMilli = Helper.getTimeInMilliSeconds(appStart);
-        let diffDate = appDate;
-        diffDate.setDate(diffDate.getDate() - canDays);
-        let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
-        if(date < diffDate){
-            const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
-            return appointment;
-        }else if(date == diffDate){
-            if(timeMilli < diffTime){
+        const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
+        if(config.isPatientCancellationAllowed){
+            let canDays=config.cancellationDays;
+            let canTime= config.cancellationHours+":"+config.cancellationMins;
+            let date = new Date();
+            var minutes = date.getMinutes();
+            var hour = date.getHours();
+            var time = hour+":"+minutes;
+            var timeMilli = Helper.getTimeInMilliSeconds(time);
+            let appDate=app.appointmentDetails.appointmentDate;
+            let appStart = app.appointmentDetails.startTime;
+            let appMilli = Helper.getTimeInMilliSeconds(appStart);
+            let diffDate = appDate;
+            diffDate.setDate(diffDate.getDate() - canDays);
+            let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
+            if(date < diffDate){
                 const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+                if(appointment.statusCode==HttpStatus.OK){
+                    let data={
+                        email:doctor.email,
+                        appointmentId:app.appointmentDetails.id,
+                        patientFirstName:pat.firstName,
+                        patientLastName:pat.lastName,
+                        doctorFirstName:doctor.firstName ,
+                        doctorLastName:doctor.lastName ,
+                        hospital: account.hospitalName,
+                        appointmentDate:app.appointmentDetails.appointmentDate,
+                        startTime:app.appointmentDetails.startTime,
+                        endTime:app.appointmentDetails.endTime,
+                        role:CONSTANT_MSG.ROLES.PATIENT,
+                        cancelledOn:date
+                    }
+                    const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                }
                 return appointment;
+            }else if(date == diffDate){
+                if(timeMilli < diffTime){
+                    const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
+                    if(!appointment.message){
+                        let data={
+                            email:doctor.email,
+                            appointmentId:app.appointmentDetails.id,
+                            patientFirstName:pat.firstName,
+                            patientLastName:pat.lastName,
+                            doctorFirstName:doctor.firstName ,
+                            doctorLastName:doctor.lastName ,
+                            hospital: account.hospitalName,
+                            appointmentDate:app.appointmentDetails.appointmentDate,
+                            startTime:app.appointmentDetails.startTime,
+                            endTime:app.appointmentDetails.endTime,
+                            role:CONSTANT_MSG.ROLES.PATIENT,
+                            cancelledOn:date
+                        }
+                        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                    }
+                    return appointment;
+                }else{
+                    return{
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.CANCEL_EXCEEDS
+                    }
+                }
             }else{
                 return{
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: CONSTANT_MSG.CANCEL_EXCEEDS
                 }
             }
+
         }else{
             return{
                 statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.CANCEL_EXCEEDS
+                message: CONSTANT_MSG.CANCEL_NOT_ALLOWED
             }
         }
+        
     }
 
 
