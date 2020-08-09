@@ -34,5 +34,16 @@ export const CONSTANT_MSG = {
         ADMIN:'ADMIN',
         DOC_ASSISTANT:'DOC_ASSISTANT',
         PATIENT:'PATIENT'
+    },
+    LIVE_STATUS: {
+        OFFLINE : "offline",
+        ONLINE : "online",
+        VIDEO_SESSION_READY : "videoSessionReady",
+        IN_SESSION : "inSession"
+    },
+    APPOINTMENT_STATUS : {
+        COMPLETED : "completed",
+        PAUSED : "paused",
+        NOT_COMPLETED : "notCompleted"
     }
 }

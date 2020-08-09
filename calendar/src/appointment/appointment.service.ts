@@ -1635,7 +1635,7 @@ async sendAppCancelledEmail(req) {
     params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
     params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
     params.template = params.template.replace(/{cancelledOn}/gi, cancelledOn);
-    
+
     try{
         const sendMail = await this.email.sendEmail(params);
         return{
@@ -1649,10 +1649,27 @@ async sendAppCancelledEmail(req) {
             message: CONSTANT_MSG.DB_ERROR
         }
     }
-    
+
 }
 
+    async updateDoctorAndPatientStatus(role : string, id : string, status : string){
 
+        if(role === CONSTANT_MSG.ROLES.DOCTOR){
+            const doc = await this.doctorRepository.findOne({doctorKey: id});
+            if(doc){
+                doc.liveStatus = status;
+                await this.doctorRepository.save(doc)
+            }
+        } else if (role === CONSTANT_MSG.ROLES.PATIENT){
+            const patient = await this.patientDetailsRepository.findOne({patientId : Number(id)});
+            if(patient){
+                patient.liveStatus = status;
+                await this.patientDetailsRepository.save(patient);
+            }
+
+        }
+
+    }
 
 
 }

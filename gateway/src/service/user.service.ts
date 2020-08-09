@@ -82,5 +82,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'auth_patient_find_by_phone'}, phone);
     }
 
+    public updateDoctorAndPatient(role : string, id : string, status : string) {
+        let userInfo = {
+            role : role,
+            id : id,
+            status : status
+        }
+        return this.redisClient.send({ cmd : 'update_patient_doctor_live_status'}, userInfo).toPromise();
+    }
+
 
 }

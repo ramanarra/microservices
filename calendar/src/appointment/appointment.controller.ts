@@ -772,4 +772,10 @@ export class AppointmentController {
     }
 
 
+    @MessagePattern({cmd : 'update_patient_doctor_live_status'})
+    async updatePatientDoctorLiveStatus(userIfo : any){
+        this.appointmentService.updateDoctorAndPatientStatus(userIfo.role, userIfo.id, userIfo.status);
+    }
+
+
 }

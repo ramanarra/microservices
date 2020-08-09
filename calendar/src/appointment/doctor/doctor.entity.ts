@@ -74,5 +74,15 @@ export class Doctor extends BaseEntity{
         name : 'email'
     })
     email : string;
+    
+    @Column({
+        name : 'live_status'
+    })
+    liveStatus : string;
+
+    @Column({
+        name : 'last_active'
+    })
+    lastActive : Date;
 
 }

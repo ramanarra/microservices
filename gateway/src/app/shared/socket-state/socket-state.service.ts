@@ -39,9 +39,7 @@ export class SocketStateService {
 
   public getAll(): Socket[] {
     const all = [];
-    console.log(this.socketState);
     this.socketState.forEach(sockets => all.push(sockets));
-
     return all
   }
 }
