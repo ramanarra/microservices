@@ -84,9 +84,4 @@ export class Doctor extends BaseEntity{
         name : 'last_active'
     })
     lastActive : Date;
-
-    @Column({
-        name : 'live_status'
-    })
-    liveStatus : string;
 }
