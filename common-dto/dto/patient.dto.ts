@@ -35,4 +35,5 @@ export class PatientDto {
     endTime:string;
     createdBy:string;
     salt:string;
+    paginationNumber:number;
 }

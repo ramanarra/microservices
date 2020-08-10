@@ -230,4 +230,47 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({cmd: 'patient_appointment_cancel'},appointmentDto);
     }
 
+    @UseFilters(AllClientServiceException)
+    public detailsOfPatient(user:any, patientId:any,doctorKey:any) : Observable <any> {
+        user.patientId = patientId;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'details_of_patient'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientUpcomingAppList(user:any, patientDto:any) : Observable <any> {
+        user.patientDto = patientDto;
+        return this.redisClient.send({ cmd : 'patient_upcoming_app_list'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientPastAppList(user:any, patientDto:any) : Observable <any> {
+        user.patientDto = patientDto;
+        return this.redisClient.send({ cmd : 'patient_past_app_list'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public updatePatOnline(patientId:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_patient_online'},patientId).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public updateDocOnline(doctorKey:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_doctor_online'},doctorKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientGeneralSearch(user:any, patientSearch: any,doctorKey:any): Observable<any> {
+        user.patientSearch = patientSearch;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({cmd: 'doc_patient_general_search'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public patientAppointmentReschedule(appointmentDto: any,user:any): Observable<any> {
+        appointmentDto.user = user;
+        return this.redisClient.send({cmd: 'patient_appointment_reschedule'},appointmentDto);
+    }
+
+
 }

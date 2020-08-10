@@ -47,7 +47,7 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     @ApiTags('Doctors')
-    doctorsLogin(@Body() userDto : UserDto) {
+    async doctorsLogin(@Body() userDto : UserDto) {
       if(!userDto.email){
         console.log("Provide email");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
@@ -56,7 +56,10 @@ export class AuthController {
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
-      const doc = this.userService.doctorsLogin(userDto);
+      const doc:any =await this.userService.doctorsLogin(userDto);
+      if(doc.role == CONSTANT_MSG.ROLES.DOCTOR){
+        const status = await this.calendarService.updateDocOnline(doc.doctorKey);
+      }
       return doc;
     }
 
@@ -68,7 +71,7 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })
     @ApiTags('Patient')
-    patientLogin(@Body() patientDto : PatientDto) {
+    async patientLogin(@Body() patientDto : PatientDto) {
       if(!patientDto.phone || !(patientDto.phone.length == 10)){
         console.log("Provide Valid Phone");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide Valid Phone"}
@@ -77,7 +80,11 @@ export class AuthController {
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }
       this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
-      return this.userService.patientLogin(patientDto);
+      const patient = await this.userService.patientLogin(patientDto);
+      if(patient.patientId){
+        const status = await this.calendarService.updatePatOnline(patient.patientId);
+      }     
+      return patient;
     }
 
     @Post('patientRegistration')
@@ -140,6 +147,7 @@ export class AuthController {
               }
           }else {
             const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
+            const status = await this.calendarService.updatePatOnline(patient.patientId);
             return {
               patient:patient,
               details:details

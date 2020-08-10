@@ -8,13 +8,15 @@ import { PatientDetails } from './patientDetails/patientDetails.entity';
 import { CONSTANT_MSG } from 'common-dto';
 import { OpenViduSession } from './openviduSession/openviduSession.entity';
 import { OpenViduSessionToken } from './openviduSession/openviduSessionToken.entity';
+import {AppointmentRepository} from './appointment.repository';
 
 
 @Injectable()
 export class VideoService {
 
     constructor(private openViduSessionTokenRepository : OpenViduSessionTokenRepository, 
-        private openViduSessionRepo : OpenViduSessionRepository, private openViduService : OpenViduService){
+        private openViduSessionRepo : OpenViduSessionRepository, private openViduService : OpenViduService,
+        private appointmentRepository:AppointmentRepository){
 
     }
 
@@ -106,7 +108,7 @@ export class VideoService {
     }
 
 
-    async removePatientToken(doc : Doctor, patientId : number) : Promise<void> {
+    async removePatientToken(doc : Doctor, patientId : number, appointmentId : number) : Promise<void> {
 
         const openViduSession : OpenViduSession =  await this.openViduSessionRepo.findOne({doctorKey : doc.doctorKey});
         const openViduSessionToken : OpenViduSessionToken =  await this.openViduSessionTokenRepository.findOne({ where: {
@@ -115,7 +117,15 @@ export class VideoService {
         }});
         if(openViduSessionToken) {
             this.openViduSessionTokenRepository.remove(openViduSessionToken);
-            await this.openViduService.removeTokenFromSession(openViduSession.sessionId, openViduSessionToken.token)
+            await this.openViduService.removeTokenFromSession(openViduSession.sessionId, openViduSessionToken.token);
+            var condition: any = {
+                appointmentId: appointmentId
+            }
+            let dto={
+                status:'paused'
+            }
+            var values: any = dto;
+            var updateAppStatus = await this.appointmentRepository.update( condition, values);
         }
     }
 

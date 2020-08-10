@@ -29,6 +29,7 @@ export const CONSTANT_MSG = {
     CANCEL_EXCEEDS : 'Cancellation is not possible; posting date exceeds limit of days for cancellation',
     APPOINT_ALREADY_PRESENT:'Appointment already present on this date',
     CANCEL_NOT_ALLOWED:'Patient is not allowed to cancel this appointment',
+    RESCHED_NOT_ALLOWED:'Patient is not allowed to reschedule this appointment',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

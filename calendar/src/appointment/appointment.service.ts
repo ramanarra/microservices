@@ -299,7 +299,7 @@ export class AppointmentService {
     }
 
     async todayAppointmentsForDoctor(doctorId,date): Promise<any> {
-        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date,doctorId]);
+        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date,doctorId,'notCompleted','paused','online']);
         let apps: any= appointments;
         console.log("appointments <<< " + appointments);
         apps = apps.sort((val1, val2) => {
@@ -1465,6 +1465,98 @@ export class AppointmentService {
     async getAppDoctorConfigDetails(appointmentId): Promise<any> {
         return await this.appointmentDocConfigRepository.findOne({appointmentId: appointmentId});
     }
+
+    async detailsOfPatient(patientId:any): Promise<any> {
+        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
+        let patientDetails=patient[0];
+        patientDetails["description"]="";
+        patientDetails["allergiesList"]=[];
+        return patientDetails;
+    }
+    
+    async patientUpcomingAppointmentsForDoctor(user:any): Promise<any> {
+        const doc=await this.doctorDetails(user.patientDto.doctorKey);
+        const d:Date = new Date();
+        var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        if(user.patientDto.paginationNumber){           
+            let offset = (user.paginationNumber)*(10);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date,offset,doc.doctorId,'notCompleted','paused']);
+            return app;
+        }else{
+            const app = await this.appointmentRepository.query(queries.getAppDoctorList,[doc.doctorId,user.patientDto.patientId,date,'notCompleted','paused'])
+            return app;
+        }
+    }
+
+    async patientPastAppointmentsForDoctor(user:any): Promise<any> {
+        const doc=await this.doctorDetails(user.patientDto.doctorKey);
+        const d:Date = new Date();
+        var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        if(user.patientDto.paginationNumber){           
+            let offset = (user.paginationNumber)*(10);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsForPatient, [user.patientDto.patientId, date,offset,doc.doctorId,'completed']);
+            return app;
+        }else{
+            const app = await this.appointmentRepository.query(queries.getPastAppDoctorList,[doc.doctorId,user.patientDto.patientId,date,'completed'])
+            return app;
+        }
+    }
+
+    async updatePatOnline(patientId): Promise<any> {
+        var condition: any = {
+            patientId: patientId
+        }
+        let dto={
+            liveStatus:'online'
+        }
+        var values: any = dto;
+        return await this.patientDetailsRepository.update( condition, values);
+    }
+
+    async updateDocOnline(doctorKey): Promise<any> {
+        var condition: any = {
+            doctorKey: doctorKey
+        }
+        let dto={
+            liveStatus:'online'
+        }
+        var values: any = dto;
+        return await this.doctorRepository.update( condition, values);
+    }
+
+
+    async patientGeneralSearch(patientSearch:any, doctorId: any): Promise<any> {
+        try {
+            const app = await  this.appointmentRepository.query(queries.getPatientDoctorApps,[doctorId,patientSearch]);
+            let ids = [];
+            app.forEach(a => {
+                let flag = false;
+                ids.forEach(i => {
+                    if(i.patient_id == a.patient_id)
+                        flag = true;
+                });
+                if(flag == false){
+                    ids.push(a)
+                }              
+            });
+            return ids;
+            // let patientList = [];
+            // for(let x of ids){
+            //     const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+            //     patientList.push(patient[0]);
+            // }
+            // return patientList;
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+            }
+        }
+
+    }
+
+
 
 
 
