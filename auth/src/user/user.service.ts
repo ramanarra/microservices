@@ -131,12 +131,14 @@ export class UserService {
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id,
-                permission: 'CUSTOMER'
+                permission: 'CUSTOMER',
+                role:CONSTANT_MSG.ROLES.PATIENT
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
             user.accessToken = accessToken;
             user.permission = 'CUSTOMER';
+            user.role=CONSTANT_MSG.ROLES.PATIENT;
             return user;
         } catch (e) {
             console.log(e);
@@ -171,7 +173,8 @@ export class UserService {
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id,
-                permission: 'CUSTOMER'
+                permission: 'CUSTOMER',
+                role:CONSTANT_MSG.ROLES.PATIENT
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);

@@ -26,21 +26,21 @@ export class AppointmentController {
     @MessagePattern({cmd: 'calendar_appointment_create'})
     async createAppointment(appointmentDto: any): Promise<any> {
         this.logger.log("appointmentDetails >>> " + appointmentDto);
-        const doctorId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
+        let doctorId;
         if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-            const docId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
+            doctorId = await this.appointmentService.doctorDetails(appointmentDto.user.doctor_key);
             const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.user.doctor_key);
             appointmentDto.configSession = config.consultationSessionTimings;
-            if(!docId){
+            if(!doctorId){
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
                     message:  CONSTANT_MSG.CONTENT_NOT_AVAILABLE
                 }
             }
-            appointmentDto.doctorId = docId.doctorId;
+            appointmentDto.doctorId = doctorId.doctorId;
             appointmentDto.config = config; 
-        }else{
-            
+        }else{  
+            doctorId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);         
             const config = await this.appointmentService.getDoctorConfigDetails(appointmentDto.doctorKey);
             appointmentDto.doctorId = doctorId.doctorId;
             appointmentDto.config = config; 
@@ -806,9 +806,20 @@ export class AppointmentController {
         
     }
 
+    @MessagePattern({cmd: 'update_patient_offline'})
+    async updatePatOffline(patientId:any): Promise<any> {
+        return await this. appointmentService.updatePatOffline(patientId);
+        
+    }
+
     @MessagePattern({cmd: 'update_doctor_online'})
     async updateDocOnline(doctorKey:any): Promise<any> {
         return await this. appointmentService.updateDocOnline(doctorKey);       
+    }
+
+    @MessagePattern({cmd: 'update_doctor_offline'})
+    async updateDocOffline(doctorKey:any): Promise<any> {
+        return await this. appointmentService.updateDocOffline(doctorKey);       
     }
 
     

@@ -1583,12 +1583,34 @@ export class AppointmentService {
         return await this.patientDetailsRepository.update( condition, values);
     }
 
+    async updatePatOffline(patientId): Promise<any> {
+        var condition: any = {
+            patientId: patientId
+        }
+        let dto={
+            liveStatus:'offline'
+        }
+        var values: any = dto;
+        return await this.patientDetailsRepository.update( condition, values);
+    }
+
     async updateDocOnline(doctorKey): Promise<any> {
         var condition: any = {
             doctorKey: doctorKey
         }
         let dto={
             liveStatus:'online'
+        }
+        var values: any = dto;
+        return await this.doctorRepository.update( condition, values);
+    }
+
+    async updateDocOffline(doctorKey): Promise<any> {
+        var condition: any = {
+            doctorKey: doctorKey
+        }
+        let dto={
+            liveStatus:'offline'
         }
         var values: any = dto;
         return await this.doctorRepository.update( condition, values);
