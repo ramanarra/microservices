@@ -728,6 +728,20 @@ export class AppointmentService {
                                     }
                                    
                                 }
+                                 
+                                slotObject.slots = slotObject.slots.sort((val1, val2) => {
+                                    let val1IntervalStartTime = val1.startTime;
+                                    let val2IntervalStartTime = val2.startTime;
+                                    val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+                                    val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+                                    if (val1IntervalStartTime < val2IntervalStartTime) {
+                                        return -1;
+                                    } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                                        return 1;
+                                    }else{
+                                        return 0;
+                                    }
+                                })
                                 slotStartTime = slotEndTime; // update the next slot start time
                             }
                     //    })
