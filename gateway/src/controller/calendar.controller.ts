@@ -502,7 +502,7 @@ export class CalendarController {
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiTags('Patient')
+    @ApiTags('Doctors')
     patientList(@Request() req,  @Query('doctorKey') doctorKey: String) {
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
         return this.calendarService.patientList(doctorKey);

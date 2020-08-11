@@ -1309,7 +1309,29 @@ export class AppointmentService {
         const account = await this.accountDetails(doctor.accountKey);
         const app = await this.appointmentDetails(details.appointmentId);
         const config = await this.getDoctorConfigDetails(doctor.doctorKey);
-            var res = {
+        let preHours;
+        let preMins;
+        let canDays;
+        let canHours;
+        let canMins;
+        let reschDays;
+        let reschHours;
+        let reschMins;
+        if(config.isPreconsultationAllowed){
+            preHours=config.preconsultationHours;
+            preMins = config.preconsultationMins;
+        }
+        if(config.isPatientCancellationAllowed){
+            canDays= config.cancellationDays;
+            canHours = config.cancellationHours;
+            canMins=config.cancellationMins;
+        }
+        if(config.isPatientRescheduleAllowed){
+            reschDays=config.rescheduleDays;
+            reschHours=config.rescheduleHours;
+            reschMins=config.rescheduleMins;
+        }
+        var res = {
             email:doctor.email,
             mobileNo:doctor.number,
             hospitalName:account.hospitalName,
@@ -1317,8 +1339,14 @@ export class AppointmentService {
             appointmentDate:app.appointmentDetails.appointmentDate,
             startTime:app.appointmentDetails.startTime,
             endTime:app.appointmentDetails.endTime,
-            preConsultationHours:config.preconsultationHours,
-            preConsulationMinutes:config.preconsultationMins,
+            preConsultationHours:preHours,
+            preConsulationMinutes:preMins,
+            cancellationDays:canDays,
+            cancellationHours:canHours,
+            cancellationMins:canMins,
+            rescheduleDays:reschDays,
+            rescheduleHours:reschHours,
+            rescheduleMins:reschMins,
             doctorId:doctor.doctorId,
             patientId:app.appointmentDetails.patientId
         }
@@ -1440,6 +1468,28 @@ export class AppointmentService {
         const doctor = await this.doctorDetails(details.doctorKey);
         const account = await this.accountDetails(doctor.accountKey);
         const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+        let preHours;
+        let preMins;
+        let canDays;
+        let canHours;
+        let canMins;
+        let reschDays;
+        let reschHours;
+        let reschMins;
+        if(config.isPreconsultationAllowed){
+            preHours=config.preconsultationHours;
+            preMins = config.preconsultationMins;
+        }
+        if(config.isPatientCancellationAllowed){
+            canDays= config.cancellationDays;
+            canHours = config.cancellationHours;
+            canMins=config.cancellationMins;
+        }
+        if(config.isPatientRescheduleAllowed){
+            reschDays=config.rescheduleDays;
+            reschHours=config.rescheduleHours;
+            reschMins=config.rescheduleMins;
+        }
         var res = {
             name:doctor.doctorName,
             firstName:doctor.firstName,
@@ -1449,8 +1499,14 @@ export class AppointmentService {
             hospitalName:account.hospitalName,
             location:account.city,
             fee:config.consultationCost,
-            preConsultationHours:config.preconsultationHours,
-            preConsulationMinutes:config.preconsultationMins,
+            preConsultationHours: preHours,
+            preConsulationMinutes:preMins,
+            cancellationHours:canHours,
+            cancellationDays:canDays,
+            cancellationMins:canMins,
+            rescheduleDays:reschDays,
+            rescheduleHours:reschHours,
+            rescheduleMins:reschMins,
             photo:doctor.photo,
             sessionTiming:config.consultationSessionTimings
         }
@@ -1540,12 +1596,6 @@ export class AppointmentService {
                 }              
             });
             return ids;
-            // let patientList = [];
-            // for(let x of ids){
-            //     const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
-            //     patientList.push(patient[0]);
-            // }
-            // return patientList;
         } catch (e) {
             console.log(e);
             return {
