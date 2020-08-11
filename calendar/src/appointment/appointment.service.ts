@@ -783,7 +783,7 @@ export class AppointmentService {
         try {
 
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
-            if (app) {
+            if (app.length) {
                 // // validate with previous data
                 let isOverLapping = await this.findTimeOverlapingForAppointments(app, appointmentDto);
                 if (isOverLapping) {
@@ -811,7 +811,7 @@ export class AppointmentService {
                     }
                     //cancelling current appointment
                     var isCancel = await this.appointmentCancel(appointmentDto);
-                    if (isCancel.message == CONSTANT_MSG.APPOINT_ALREADY_CANCELLED) {
+                    if (isCancel.statusCode != HttpStatus.OK) {
                         return isCancel;
                     } else {
                         // create appointment on existing date old records
