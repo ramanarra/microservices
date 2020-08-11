@@ -831,18 +831,23 @@ export class AppointmentService {
                 }
 
             }
-
-            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-            if(!appoint.message){
-                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                console.log(appDocConfig);
-                return  {
-                    appointment:appoint,
-                    appointmentDocConfig:appDocConfig
-                } 
-            }else {
-                return appoint;
-            }
+            //cancelling current appointment
+            var isCancel = await this.appointmentCancel(appointmentDto);
+            if (isCancel.statusCode != HttpStatus.OK) {
+                return isCancel;
+            } else{
+                const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                if(!appoint.message){
+                    const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                    console.log(appDocConfig);
+                    return  {
+                        appointment:appoint,
+                        appointmentDocConfig:appDocConfig
+                    } 
+                }else {
+                    return appoint;
+                }
+            }            
         } catch (e) {
             console.log(e);
             return {
