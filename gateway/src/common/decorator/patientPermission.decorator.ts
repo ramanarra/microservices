@@ -3,7 +3,7 @@ import {createParamDecorator, ExecutionContext, UnauthorizedException} from "@ne
 export const patient = createParamDecorator(
     (data: string, ctx: ExecutionContext) => {
         const request = ctx.switchToHttp().getRequest();
-        const permissions = request.user.permissions;
+        const permissions = request.user.permission;
         return permissions.indexOf('CUSTOMER') >= 0 ? true : false;
     }
 );
