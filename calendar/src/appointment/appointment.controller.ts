@@ -323,7 +323,7 @@ export class AppointmentController {
             statusCode: HttpStatus.NO_CONTENT,
             message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
         }
-    if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== app.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
+    if ((appointmentDto.user.role == CONSTANT_MSG.ROLES.PATIENT && (appointmentDto.user.patient_id !== app.appointmentDetails.patientId))||(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && appointmentDto.user.doctor_key!==doctor.doctorKey)||((appointmentDto.user.role == CONSTANT_MSG.ROLES.ADMIN||appointmentDto.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && (appointmentDto.user.account_key!==doctor.accountKey))) {
         return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: CONSTANT_MSG.INVALID_REQUEST
@@ -331,20 +331,20 @@ export class AppointmentController {
     }
     let date = new Date();
     const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
-    const pat = await this.appointmentService.getPatientDetails(appointmentDto.patientId); 
+    const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
     const account = await this.appointmentService.accountDetails(doctor.accountKey);  
     if(appointment.statusCode==HttpStatus.OK){
         let data={
             email:pat.email,
-            appointmentId:app.appointment.appointmentdetails.id,
+            appointmentId:app.appointmentDetails.id,
             patientFirstName:pat.firstName,
             patientLastName:pat.lastName,
             doctorFirstName:doctor.firstName ,
             doctorLastName:doctor.lastName ,
             hospital: account.hospitalName,
-            appointmentDate:app.appointment.appointmentdetails.appointmentDate,
-            startTime:app.appointment.appointmentdetails.startTime,
-            endTime:app.appointment.appointmentdetails.endTime,
+            appointmentDate:app.appointmentDetails.appointmentDate,
+            startTime:app.appointmentDetails.startTime,
+            endTime:app.appointmentDetails.endTime,
             role:appointmentDto.user.role,
             cancelledOn:date
         }
