@@ -2,7 +2,8 @@ export interface JwtPatientLoad {
     // email : string,
     phone : string,
     patientId : number,
-    permission:string
+    permission:string,
+    role:string
     // password : string,
     // landmark : string,
     // country: string,

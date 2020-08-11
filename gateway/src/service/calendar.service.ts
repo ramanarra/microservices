@@ -255,8 +255,18 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public updatePatOffline(patientId:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_patient_offline'},patientId).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public updateDocOnline(doctorKey:any) : Promise <any> {
         return this.redisClient.send({ cmd : 'update_doctor_online'},doctorKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public updateDocOffline(doctorKey:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_doctor_offline'},doctorKey).toPromise();
     }
 
     @UseFilters(AllClientServiceException)

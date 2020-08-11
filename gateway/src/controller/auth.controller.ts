@@ -174,7 +174,12 @@ export class AuthController {
     @UseGuards(AuthGuard())
     @ApiOkResponse({description: 'logOut API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    async doctorList(@Request() req,@Response() res) {
+    async logOut(@Request() req,@Response() res) {
+      if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+        const status = await this.calendarService.updateDocOffline(req.user.doctor_key);
+      }else if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
+        const status = await this.calendarService.updatePatOffline(req.user.patientId);
+      }
       req.logOut();
       return res.json({message: "sucessfully loggedout"})
     }
