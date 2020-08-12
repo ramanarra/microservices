@@ -10,7 +10,7 @@ export class ConfigService {
       this.envConfig = {};
       this.envConfig.redisService = {
           options: {
-              url: 'redis://localhost:6379',
+              url: 'redis://virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com:6379',
             },
         transport: Transport.REDIS
       };
