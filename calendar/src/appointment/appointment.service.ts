@@ -1436,9 +1436,34 @@ export class AppointmentService {
                     resSlots.push(i);
                 }
             }
+            resSlots = resSlots.sort((val1, val2) => {
+                let val1IntervalStartTime = val1.start;
+                let val2IntervalStartTime = val2.start;
+                val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+                val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+                if (val1IntervalStartTime < val2IntervalStartTime) {
+                    return -1;
+                } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                    return 1;
+                }else{
+                    return 0;
+                }
+            })
             return resSlots;
         }
-       
+        slotsView = slotsView.sort((val1, val2) => {
+            let val1IntervalStartTime = val1.start;
+            let val2IntervalStartTime = val2.start;
+            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+            if (val1IntervalStartTime < val2IntervalStartTime) {
+                return -1;
+            } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                return 1;
+            }else{
+                return 0;
+            }
+        })
         return slotsView;
     }
 
