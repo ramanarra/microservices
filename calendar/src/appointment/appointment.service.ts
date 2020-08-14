@@ -279,7 +279,6 @@ export class AppointmentService {
     async todayAppointments(doctorId,date): Promise<any> {
         const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [date,doctorId]);
         let apps: any= appointments;
-        console.log("appointments <<< " + appointments);
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
@@ -301,7 +300,6 @@ export class AppointmentService {
     async todayAppointmentsForDoctor(doctorId,date): Promise<any> {
         const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date,doctorId,'notCompleted','paused','online']);
         let apps: any= appointments;
-        console.log("appointments <<< " + appointments);
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
@@ -563,6 +561,7 @@ export class AppointmentService {
                 let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
+                let breaktheloop = 0;
                 while (appointmentSlots.length <= page*7+7) {  // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
                     let dayOfWeek = day.getDay();
@@ -617,6 +616,7 @@ export class AppointmentService {
                             let intervalEndTime = v.endTime;
                             let intervalEnd = false;
                             let slotStartTime = v.startTime;
+                            let breaktheloop2 = 0;
                             while (!intervalEnd) {  // until the interval endTime comes run the while loop
                                 let slotEndTimeCalculate = Helper.getTimeInMilliSeconds(slotStartTime);
                                 slotEndTimeCalculate += consultationSessionTimingInMilliSeconds; // adding slot startime + consultationSessionTiming, ex: 30 minutes
@@ -632,7 +632,6 @@ export class AppointmentService {
                                     let compareDate = Helper.getDayMonthYearFromDate(day);
                                     return appDate === compareDate;
                                 })
-                                console.log(appointmentPresentOnThisDate);
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
                                     let startTimeInMilliSec = Helper.getTimeInMilliSeconds(v.startTime);
                                     let endTimeInMilliSec = Helper.getTimeInMilliSeconds(v.endTime);
@@ -743,12 +742,16 @@ export class AppointmentService {
                                     }
                                 })
                                 slotStartTime = slotEndTime; // update the next slot start time
+                                breaktheloop2++;
+                                if(breaktheloop2 > 10) break;
                             }
                     //    })
                         }
                         appointmentSlots.push(slotObject);
                     }
                     dayOfWeekCount++; // increase to next  Day
+                    breaktheloop++;
+                    if(breaktheloop > 20) break;
                 }
                 var res=[];
                 var count =0;
@@ -818,7 +821,6 @@ export class AppointmentService {
                         const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
                         if(!appoint.message){
                             const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                            console.log(appDocConfig);
                             return  {
                                 appointment:appoint,
                                 appointmentDocConfig:appDocConfig
@@ -860,11 +862,8 @@ export class AppointmentService {
     async appointmentDetails(id: any): Promise<any> {
         try {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
-            console.log(appointmentDetails);
             const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
-            console.log(pat);
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
-            console.log(pay);
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
@@ -1109,7 +1108,6 @@ export class AppointmentService {
             }
             const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
             let appNumber = appNum.length;
-            console.log(appNumber);
             if (app.length) {
                 var appList: any = [];
                 for(let appointmentList of app){
@@ -1392,6 +1390,7 @@ export class AppointmentService {
             let start = Helper.getTimeInMilliSeconds(worksched.startTime);
             let end = Helper.getTimeInMilliSeconds(worksched.endTime);
             let end1 = start + consultSession;
+            let count = 0;
             while(start < end && end1 <= end){
                 let res = {
                     start:Helper.getTimeinHrsMins(start),
@@ -1420,6 +1419,8 @@ export class AppointmentService {
                 start = start + consultSession;
                 end1 = start + consultSession;
                 slots.push(res);
+                count++;
+                if(count > 20) break;
             }
         }
         let date = new Date();
