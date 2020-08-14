@@ -1,16 +1,16 @@
-server :
-  URL : 'redis://localhost:6379'
+server:
+  URL: 'redis://localhost:6379'
 
-database :
-  type : 'postgres'
-  username : 'postgres'
-  password : 'root'
-  host: 'localhost'
-  database : 'calendar'
-  port : 5432
-  synchronize : false
+database:
+  type: 'postgres'
+  username: 'postgres'
+  password: 'postgres'
+  host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
+  database: 'calendar'
+  port: 5432
+  synchronize: false
 
 openVidu:
-  urlOpenViduServer : "https://devideo.virujh.com/dashboard"
-  secret : "Virujh#123"
+  urlOpenViduServer: "https://devideo.virujh.com/dashboard"
+  secret: "Virujh#123"
   
