@@ -82,6 +82,10 @@ export class AuthController {
       this.logger.log(`Patient Login  Api -> Request data ${JSON.stringify(patientDto)}`);
       const patient = await this.userService.patientLogin(patientDto);
       if(patient.patientId){
+        const details = await this.calendarService.getPatientDetails(patient.patientId);
+        patient.firstName = details.firstName;
+        patient.lastName = details.lastName;
+        patient.photo = details.photo;
         const status = await this.calendarService.updatePatOnline(patient.patientId);
       }     
       return patient;
@@ -177,8 +181,10 @@ export class AuthController {
     async logOut(@Request() req,@Response() res) {
       if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         const status = await this.calendarService.updateDocOffline(req.user.doctor_key);
+        const lastActive = await this.calendarService.updateDocLastActive(req.user.doctor_key);
       }else if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
         const status = await this.calendarService.updatePatOffline(req.user.patientId);
+        const lastActive = await this.calendarService.updatePatLastActive(req.user.patientId);
       }
       req.logOut();
       return res.json({message: "sucessfully loggedout"})

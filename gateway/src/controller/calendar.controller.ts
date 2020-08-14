@@ -39,7 +39,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG,HospitalDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -472,17 +472,18 @@ export class CalendarController {
         return this.calendarService.patientBookAppointment(patientDto);
     }
 
-    @Get('patient/appointmentSlotsView')
+    @Post('patient/appointmentSlotsView')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Patient')
+    @ApiBody({type: DoctorDto})
     @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    viewAppointmentSlotsForPatient(@Request() req,@patient() check:boolean, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: String) {
+    viewAppointmentSlotsForPatient(@Request() req,@patient() check:boolean,@Body() doctorDto: DoctorDto) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorKey)}`);
-        return this.calendarService.viewAppointmentSlotsForPatient(doctorKey, appointmentDate);
+        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
+        return this.calendarService.viewAppointmentSlotsForPatient(req.user,doctorDto);
     }
 
     @Get('patient/pastAppointmentsList')
@@ -588,18 +589,19 @@ export class CalendarController {
         return this.calendarService.doctorDetails(doctorKey,appointmentId);
     }
 
-    @Get('doctor/availableSlots')
+    @Post('doctor/availableSlots')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
-    @ApiOkResponse({description: 'request body example:  Doc_5'})
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({description: 'request body example:  {"appointmentDate": "2020-08-14","doctorKey":"Doc_5","confirmation":true}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    availableSlots(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Query('doctorKey') doctorKey: String, @Query('appointmentDate') appointmentDate: string) {
+    availableSlots(@selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Request() req, @Body() doctorDto: DoctorDto) {
         if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        let date = new Date(appointmentDate);    
+        let date = new Date(doctorDto.appointmentDate);    
         this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
-        return this.calendarService.availableSlots(req.user, doctorKey,date);
+        return this.calendarService.availableSlots(req.user, doctorDto);
     }
 
     @Post('doctor/creatingAppointmetAlongWithRegisteringPatient')
@@ -870,6 +872,21 @@ export class CalendarController {
         }
         this.logger.log(`patient reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         return this.calendarService.patientAppointmentReschedule(appointmentDto, req.user);
+    }
+
+
+    @Post('payment/order')
+    @ApiOkResponse({
+        description: 'requestBody example :   { "amount":"10", "currency":"INR", "receipt": "001", "payment_capture": false }'
+    })
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Payment')
+    @ApiBody({type: AccountDto})
+    paymentOrder(@Request() req, @Body() accountDto: AccountDto) {
+        this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
+        return this.calendarService.paymentOrder(accountDto, req.user);
     }
 
 
