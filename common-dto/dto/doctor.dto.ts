@@ -17,4 +17,6 @@ export class DoctorDto {
     speciality: string;
     registrationNumber:string;  
     photo:string;
+    confirmation:boolean;
+    appointmentDate:Date;
   }

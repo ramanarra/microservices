@@ -43,4 +43,5 @@ export const queries = {
     getPastAppointmentsForPatient: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "doctorId" = $4 AND "appointment_date" <= $2 AND "is_cancel"=false AND status= $5 order by appointment_date limit 10 offset $3',
     getPastAppDoctorList:'SELECT * FROM appointment WHERE "doctorId" = $1 AND "patient_id" = $2 AND appointment_date <= $3 AND status= $4 order by appointment_date',
     getPatientDoctorApps:'SELECT * from appointment a join patient_details pd ON a."patient_id" = pd."patient_id" WHERE a."doctorId" = $1 AND a."appointment_date" >= current_date AND a."is_cancel"=false AND pd.name ~* $2 OR pd.email ~* $2 OR pd.phone ~* $2',
+    getAccountAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date'
 }

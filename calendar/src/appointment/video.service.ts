@@ -43,7 +43,7 @@ export class VideoService {
             console.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
             await this.openViduSessionTokenRepository.createTokenForDoctorAndPatient(OVsessionTokenDate, 'DOCTOR');
             console.log("Token => " + token);
-            return {isToken : true, token : token, isDoctor : true, isPatient : false, sessionId : sessionId };
+            return {isToken : true, token : token, isDoctor : true, isPatient : false, sessionId : sessionId, doctorName : doc.doctorName };
         } catch (e) {
             console.log(e);
             return {

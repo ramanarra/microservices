@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto,Email
+    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto,Email,Sms
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -55,7 +55,8 @@ export class AppointmentService {
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
-        private email: Email
+        private email: Email,
+        private sms:Sms
 
     ) {
     }
@@ -282,10 +283,8 @@ export class AppointmentService {
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
-            val1IntervalStartTime = val1IntervalStartTime.split(':');
-            val1IntervalStartTime = val1IntervalStartTime[0];
-            val2IntervalStartTime = val2IntervalStartTime.split(':');
-            val2IntervalStartTime = val2IntervalStartTime[0];
+            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
             if (val1IntervalStartTime < val2IntervalStartTime) {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
@@ -294,7 +293,7 @@ export class AppointmentService {
                 return 0;
             }
         })
-        return appointments;
+        return apps;
     }
 
     async todayAppointmentsForDoctor(doctorId,date): Promise<any> {
@@ -303,10 +302,8 @@ export class AppointmentService {
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
-            val1IntervalStartTime = val1IntervalStartTime.split(':');
-            val1IntervalStartTime = val1IntervalStartTime[0];
-            val2IntervalStartTime = val2IntervalStartTime.split(':');
-            val2IntervalStartTime = val2IntervalStartTime[0];
+            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
             if (val1IntervalStartTime < val2IntervalStartTime) {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
@@ -315,7 +312,7 @@ export class AppointmentService {
                 return 0;
             }
         })
-        return appointments;
+        return apps;
     }
 
     async doctorConfigUpdate(doctorConfigDto: DocConfigDto): Promise<any> {
@@ -594,10 +591,8 @@ export class AppointmentService {
                         sortedWorkScheduleTimeInterval = sortedWorkScheduleTimeInterval.sort((val1, val2) => {
                             let val1IntervalStartTime = val1.startTime;
                             let val2IntervalStartTime = val2.startTime;
-                            val1IntervalStartTime = val1IntervalStartTime.split(':');
-                            val1IntervalStartTime = val1IntervalStartTime[0];
-                            val2IntervalStartTime = val2IntervalStartTime.split(':');
-                            val2IntervalStartTime = val2IntervalStartTime[0];
+                            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+                            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
                             if (val1IntervalStartTime < val2IntervalStartTime) {
                                 return -1;
                             } else if (val1IntervalStartTime > val2IntervalStartTime) {
@@ -745,7 +740,7 @@ export class AppointmentService {
                                 breaktheloop2++;
                                 if(breaktheloop2 > 10) break;
                             }
-                    //    })
+                        //    })
                         }
                         appointmentSlots.push(slotObject);
                     }
@@ -1625,6 +1620,18 @@ export class AppointmentService {
         return await this.patientDetailsRepository.update( condition, values);
     }
 
+    async updatePatLastActive(patientId): Promise<any> {
+        let date = new Date();
+        var condition: any = {
+            patientId: patientId
+        }
+        let dto={
+            lastActive:date
+        }
+        var values: any = dto;
+        return await this.patientDetailsRepository.update( condition, values);
+    }
+
     async updateDocOnline(doctorKey): Promise<any> {
         var condition: any = {
             doctorKey: doctorKey
@@ -1642,6 +1649,18 @@ export class AppointmentService {
         }
         let dto={
             liveStatus:'offline'
+        }
+        var values: any = dto;
+        return await this.doctorRepository.update( condition, values);
+    }
+
+    async updateDocLastActive(doctorKey): Promise<any> {
+        let date = new Date();
+        var condition: any = {
+            doctorKey: doctorKey
+        }
+        let dto={
+            lastActive:date
         }
         var values: any = dto;
         return await this.doctorRepository.update( condition, values);
@@ -1673,6 +1692,52 @@ export class AppointmentService {
 
     }
 
+    async updateDoctorAndPatientStatus(role : string, id : string, status : string){
+
+        if(role === CONSTANT_MSG.ROLES.DOCTOR){
+            const doc = await this.doctorRepository.findOne({doctorKey: id});
+            if(doc){
+                doc.liveStatus = status;
+                doc.lastActive = new Date();
+                await this.doctorRepository.save(doc)
+            }
+        } else if (role === CONSTANT_MSG.ROLES.PATIENT){
+            const patient = await this.patientDetailsRepository.findOne({patientId : Number(id)});
+            if(patient){
+                patient.liveStatus = status;
+                patient.lastActive = new Date();
+                await this.patientDetailsRepository.save(patient);
+            }
+
+        }
+
+    }
+
+    async accountPatientList(accountKey:any): Promise<any> {
+        const doctorId = await this.doctorRepository.find({accountKey:accountKey});
+        let app = [];
+        for(let m of doctorId){
+            const app1 = await  this.appointmentRepository.query(queries.getAccountAppList,[m.doctorId]);
+            app= app.concat(app1)
+        }
+        let ids = [];
+        app.forEach(a => {
+            let flag = false;
+            ids.forEach(i => {
+                if(i == a.patient_id)
+                    flag = true;
+            });
+            if(flag == false){
+                ids.push(a.patient_id)
+            }              
+        });
+        let patientList = [];
+        for(let x of ids){
+            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+            patientList.push(patient[0]);
+        }
+        return patientList;
+    }
 
 
 
@@ -1861,24 +1926,94 @@ async sendAppCancelledEmail(req) {
 
 }
 
-    async updateDoctorAndPatientStatus(role : string, id : string, status : string){
+async sendAppRescheduleEmail(req) {
 
-        if(role === CONSTANT_MSG.ROLES.DOCTOR){
-            const doc = await this.doctorRepository.findOne({doctorKey: id});
-            if(doc){
-                doc.liveStatus = status;
-                await this.doctorRepository.save(doc)
-            }
-        } else if (role === CONSTANT_MSG.ROLES.PATIENT){
-            const patient = await this.patientDetailsRepository.findOne({patientId : Number(id)});
-            if(patient){
-                patient.liveStatus = status;
-                await this.patientDetailsRepository.save(patient);
-            }
+    var email = req.email;
+    var doctorFirstName = req.doctorFirstName;
+    var doctorLastName = req.doctorLastName;
+    var patientFirstName = req.patientFirstName;
+    var patientLastName = req.patientLastName;
+    var hospital = req.hospital;
+    var startTime = req.startTime;
+    var endTime = req.endTime;
+    var role = req.role;
+    var appointmentId = req.appointmentId;
+    var appointmentDate = req.appointmentDate;
+    var rescheduledAppointmentDate = req.rescheduledAppointmentDate;
+    var rescheduledStartTime = req.rescheduledStartTime;
+    var rescheduledEndTime = req.rescheduledEndTime;
+    var rescheduledOn = req.rescheduledOn;
 
+     const params:any = {};
+
+     params.subject = 'Appointment Rescheduled';
+     params.recipient = email;
+     params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Rescheduled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user rescheduled appointment through VIRUJH. Please find the appointment details Below</div></div>\
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Rescheduled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Old Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Date</div><div style="display: inline-block;">: {rescheduledAppointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Start time</div><div style="display: inline-block;">: {rescheduledStartTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Resheduled Appointment End time</div><div style="display: inline-block;">: {rescheduledEndTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div class="reset_titles" style="display: inline-block;">Rescheduled On</div><div style="display: inline-block;">: {rescheduledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  ';        //sending Mail to user
+
+    params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
+    params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
+    params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
+    params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
+    params.template = params.template.replace(/{rescheduledAppointmentDate}/gi, rescheduledAppointmentDate);
+    params.template = params.template.replace(/{rescheduledStartTime}/gi, rescheduledStartTime);
+    params.template = params.template.replace(/{rescheduledEndTime}/gi, rescheduledEndTime);
+    params.template = params.template.replace(/{hospital}/gi, hospital);
+    params.template = params.template.replace(/{startTime}/gi, startTime);
+    params.template = params.template.replace(/{endTime}/gi, endTime);
+    params.template = params.template.replace(/{role}/gi, role);
+    params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+    params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
+    params.template = params.template.replace(/{rescheduledOn}/gi, rescheduledOn);
+
+    try{
+        const sendMail = await this.email.sendEmail(params);
+        return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.MAIL_OK
         }
-
+    } catch (e) {
+        console.log(e);
+        return {
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.DB_ERROR
+        }
     }
+
+}
+
+async sendSmsForCreatingAppointment(req){
+    var number = req.number;
+    const params:any ={}
+    params.message ='Appointment created\nCreated by {role}';
+    params.sender = 'Virujh';
+    params.number = number;
+    try{
+        const sendMail = await this.sms.sendSms(params);
+        return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.SMS_OK
+        }
+    } catch (e) {
+        console.log(e);
+        return {
+            statusCode: HttpStatus.NO_CONTENT,
+            message: CONSTANT_MSG.DB_ERROR
+        }
+    }
+}
 
 
 }

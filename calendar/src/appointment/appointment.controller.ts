@@ -7,6 +7,8 @@ import {Helper} from "../utility/helper";
 import { of } from 'rxjs';
 import { VideoService } from './video.service';
 import { PatientDetailsRepository } from './patientDetails/patientDetails.repository';
+import * as Razorpay from 'razorpay';
+import { PaymentService } from './payment.service';
 
 //import {DoctorService} from './doctor/doctor.service';
 
@@ -19,6 +21,7 @@ export class AppointmentController {
 
     constructor(private readonly appointmentService: AppointmentService,
         private readonly videoService : VideoService,
+        private readonly paymentService : PaymentService,
         private patientDetailsRepository : PatientDetailsRepository) {
 
     }
@@ -305,6 +308,30 @@ export class AppointmentController {
     appointmentDto.configSession = config.consultationSessionTimings;
     appointmentDto.config = config;
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+    const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
+    const account = await this.appointmentService.accountDetails(doctor.accountKey);
+    let date = new Date();  
+    if(!appointment.message){
+        let data={
+            email:doctor.email,
+            appointmentId:app.appointmentDetails.id,
+            patientFirstName:pat.firstName,
+            patientLastName:pat.lastName,
+            doctorFirstName:doctor.firstName ,
+            doctorLastName:doctor.lastName ,
+            hospital: account.hospitalName,
+            appointmentDate:app.appointmentDetails.appointmentDate,
+            startTime:app.appointmentDetails.startTime,
+            endTime:app.appointmentDetails.endTime,
+            role:CONSTANT_MSG.ROLES.PATIENT,
+            rescheduledOn:date,
+            rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
+            rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
+            rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+        }
+        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+        console.log(mail);
+    }
     return appointment;
     }
 
@@ -429,9 +456,27 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'patient_view_appointment'})
-    async viewAppointmentSlotsForPatient(details: any): Promise<any> {
-        const appointment = await this.appointmentService.availableSlots(details);
-        return appointment;
+    async viewAppointmentSlotsForPatient(user: any): Promise<any> {
+        const doctor = await this.appointmentService.availableSlots(user);
+        if(!doctor.length && user.confirmation){
+            let avlbl= doctor;
+            const nextday = new Date(user.appointmentDate)
+            while(!avlbl.length){
+                nextday.setDate(nextday.getDate() + 1)
+                user.appointmentDate = nextday;
+                const doctor = await this.appointmentService.availableSlots(user);
+                avlbl = doctor;
+            }
+           return{
+               date:nextday,
+               slots:avlbl
+           }
+        }
+        
+        return {
+            date:new Date(user.appointmentDate),
+            slots:doctor
+        }; 
     }
 
     @MessagePattern({cmd: 'patient_past_appointments'})
@@ -507,7 +552,25 @@ export class AppointmentController {
         const doc = await this.appointmentService.doctorDetails(user.doctorKey);
         if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
             const doctor = await this.appointmentService.availableSlots(user);
-            return doctor; 
+            if(!doctor.length && user.confirmation){
+                let avlbl= doctor;
+                const nextday = new Date(user.appointmentDate)
+                while(!avlbl.length){
+                    nextday.setDate(nextday.getDate() + 1)
+                    user.appointmentDate = nextday;
+                    const doctor = await this.appointmentService.availableSlots(user);
+                    avlbl = doctor;
+                }
+               return{
+                   date:nextday,
+                   slots:avlbl
+               }
+            }
+            
+            return {
+                date:new Date(user.appointmentDate),
+                slots:doctor
+            }; 
         }else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
@@ -812,6 +875,12 @@ export class AppointmentController {
         
     }
 
+    @MessagePattern({cmd: 'update_patient_last_active'})
+    async updatePatLastActive(patientId:any): Promise<any> {
+        return await this. appointmentService.updatePatLastActive(patientId);
+        
+    }
+
     @MessagePattern({cmd: 'update_doctor_online'})
     async updateDocOnline(doctorKey:any): Promise<any> {
         return await this. appointmentService.updateDocOnline(doctorKey);       
@@ -822,11 +891,15 @@ export class AppointmentController {
         return await this. appointmentService.updateDocOffline(doctorKey);       
     }
 
+    @MessagePattern({cmd: 'update_doctor_last_active'})
+    async updateDocLastActive(doctorKey:any): Promise<any> {
+        return await this. appointmentService.updateDocLastActive(doctorKey);       
+    }
+
     
-    @MessagePattern({cmd: 'doc_patient_general_search'})
-    async patientGeneralSearch(user: any): Promise<any> {
-        const doctor =await this.appointmentService.doctorDetails(user.doctorKey);
-        const patient = await this.appointmentService.patientGeneralSearch(user.patientSearch,doctor.doctorId);
+    @MessagePattern({cmd: 'get_patient_details'})
+    async getPatientDetails(patientId: any): Promise<any> {
+        const patient = await this.appointmentService.getPatientDetails(patientId);
         return patient;
     }
 
@@ -834,7 +907,7 @@ export class AppointmentController {
     async patientAppointmentReschedule(appointmentDto: any): Promise<any> {
         const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
         const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
-        if(app.patientId == appointmentDto.user.patientId){
+        if(app.appointmentDetails.patientId == appointmentDto.user.patientId){
             if(config.isPatientRescheduleAllowed){
                 let canDays=config.rescheduleDays;
                 let canTime= config.rescheduleDays+":"+config.rescheduleDays;
@@ -850,14 +923,74 @@ export class AppointmentController {
                 diffDate.setDate(diffDate.getDate() - canDays);
                 let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
                 if(date<diffDate){
+                    const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+                    const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+                    appointmentDto.configSession = config.consultationSessionTimings;
+                    appointmentDto.config = config;
+                    appointmentDto.doctorId = app.appointmentDetails.doctorId;
                     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+                    const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
+                    const account = await this.appointmentService.accountDetails(doctor.accountKey);  
+                    if(!appointment.message){
+                        let data={
+                            email:doctor.email,
+                            appointmentId:app.appointmentDetails.id,
+                            patientFirstName:pat.firstName,
+                            patientLastName:pat.lastName,
+                            doctorFirstName:doctor.firstName ,
+                            doctorLastName:doctor.lastName ,
+                            hospital: account.hospitalName,
+                            appointmentDate:app.appointmentDetails.appointmentDate,
+                            startTime:app.appointmentDetails.startTime,
+                            endTime:app.appointmentDetails.endTime,
+                            role:CONSTANT_MSG.ROLES.PATIENT,
+                            rescheduledOn:date,
+                            rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
+                            rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
+                            rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                        }
+                        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                        console.log(mail);
+                    }
                     return appointment;
                 }else if(date == diffDate){
                     if(date == diffDate){
                         const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+                        const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+                        const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
+                        appointmentDto.configSession = config.consultationSessionTimings;
+                        appointmentDto.config = config;
+                        appointmentDto.doctorId = doctor.doctorId;
+                        const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
+                        const account = await this.appointmentService.accountDetails(doctor.accountKey);  
+                        if(!appointment.message){
+                            let data={
+                                email:doctor.email,
+                                appointmentId:app.appointmentDetails.id,
+                                patientFirstName:pat.firstName,
+                                patientLastName:pat.lastName,
+                                doctorFirstName:doctor.firstName ,
+                                doctorLastName:doctor.lastName ,
+                                hospital: account.hospitalName,
+                                appointmentDate:app.appointmentDetails.appointmentDate,
+                                startTime:app.appointmentDetails.startTime,
+                                endTime:app.appointmentDetails.endTime,
+                                role:CONSTANT_MSG.ROLES.PATIENT,
+                                rescheduledOn:date,
+                                rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
+                                rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
+                                rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                            }
+                            const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                        }
                         return appointment;
                     }
 
+                }else{
+                    return{
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.RESCHED_EXCEEDS
+                    }
                 }
 
             }else{
@@ -879,5 +1012,72 @@ export class AppointmentController {
         this.appointmentService.updateDoctorAndPatientStatus(userIfo.role, userIfo.id, userIfo.status);
     }
 
+    @MessagePattern({cmd: 'doc_patient_general_search'})
+    async patientGeneralSearch(user: any): Promise<any> {
+        const doctor =await this.appointmentService.doctorDetails(user.doctorKey);
+        const patient = await this.appointmentService.patientGeneralSearch(user.patientSearch,doctor.doctorId);
+        return patient;
+    }
+
+    // @MessagePattern({cmd : 'payment_payment'})
+    // async payment(userInfo : any){
+    //     var instance = new Razorpay({
+    //         key_id: 'YOUR_KEY_ID',
+    //         key_secret: 'YOUR_KEY_SECRET',
+    //     });
+
+    //     var options = {
+    //     amount: 50000,  // amount in the smallest currency unit
+    //     currency: "INR",
+    //     receipt: "order_rcptid_11",
+    //     payment_capture: '0'
+    //     };
+    //     instance.orders.create(options, function(err, order) {
+    //     console.log(order);
+    //     });
+
+    //     instance.payments.fetch(userInfo.paymentId)
+
+    //     instance.payments.all({
+    //         from: '2016-08-01',
+    //         to: '2016-08-20'
+    //       }).then((response) => {
+    //         // handle success
+    //       }).catch((error) => {
+    //         // handle error
+    //       })
+    
+    // }   
+    
+    @MessagePattern({cmd: 'get_payment_order'})
+    async paymentOrder(user: any): Promise<any> {
+        const patient = await this.paymentService.paymentOrder(user.accountDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'get_payment_verification'})
+    async paymentVerification(user: any): Promise<any> {
+        const patient = await this.paymentService.paymentVerification(user.accountDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'account_patients_list'})
+    async accountPatientsList(user: any): Promise<any> {
+        if(user.account_key == user.accountKey){
+            const patients = await this.appointmentService.accountPatientList(user.accountKey);
+            return patients;
+        }else{
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message:CONSTANT_MSG.INVALID_REQUEST
+            }
+        }       
+    }
+
+    @MessagePattern({cmd: 'get_time_milli'})
+    async getMilli(time: any): Promise<any> {
+        const patient = Helper.getTimeInMilliSeconds(time);
+        return patient;
+    }
 
 }

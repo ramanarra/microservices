@@ -130,12 +130,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public viewAppointmentSlotsForPatient(doctorKey : any, appointmentDate : any) : Observable <any> {
-        let details={
-            doctorKey:doctorKey,
-            appointmentDate:appointmentDate
-        }
-        return this.redisClient.send({ cmd : 'patient_view_appointment'}, details);
+    public viewAppointmentSlotsForPatient(user : any, doctorDto : any) : Observable <any> {
+        user.doctorKey = doctorDto.doctorKey;
+        user.appointmentDate = doctorDto.appointmentDate;
+        user.confirmation = doctorDto.confirmation;
+        return this.redisClient.send({ cmd : 'patient_view_appointment'}, user);
     }
 
     @UseFilters(AllClientServiceException)
@@ -192,9 +191,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public availableSlots(user:any,doctorKey:any,appointmentDate:any): Observable<any> {
-        user.doctorKey = doctorKey;
-        user.appointmentDate = appointmentDate;
+    public availableSlots(user:any,doctorDto:any): Observable<any> {
+        user.doctorKey = doctorDto.doctorKey;
+        user.appointmentDate = doctorDto.appointmentDate;
+        user.confirmation = doctorDto.confirmation;
         return this.redisClient.send({cmd: 'app_doctor_slots'}, user);
     }
 
@@ -260,6 +260,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public updatePatLastActive(patientId:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_patient_last_active'},patientId).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public updateDocOnline(doctorKey:any) : Promise <any> {
         return this.redisClient.send({ cmd : 'update_doctor_online'},doctorKey).toPromise();
     }
@@ -267,6 +272,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     @UseFilters(AllClientServiceException)
     public updateDocOffline(doctorKey:any) : Promise <any> {
         return this.redisClient.send({ cmd : 'update_doctor_offline'},doctorKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public updateDocLastActive(doctorKey:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'update_doctor_last_active'},doctorKey).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -280,6 +290,34 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public patientAppointmentReschedule(appointmentDto: any,user:any): Observable<any> {
         appointmentDto.user = user;
         return this.redisClient.send({cmd: 'patient_appointment_reschedule'},appointmentDto);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public getPatientDetails(patientId:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_patient_details'},patientId).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public getMilli(time:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_time_milli'},time).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public paymentOrder(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'get_payment_order'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public paymentVerification(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'get_payment_verification'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public accountPatientsList(user:any, accountKey:any) : Promise <any> {
+        user.accountKey = accountKey;
+        return this.redisClient.send({ cmd : 'account_patients_list'},user).toPromise();
     }
 
 

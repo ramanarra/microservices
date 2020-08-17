@@ -1,11 +1,7 @@
 export class AccountDto {
-    accountId: number;
-    accountName: string;
+    amount: number;
+    currency: string;
     noOfUsers: number;
-    subStartDate: Date;
-    subEndDate: Date;
-    accountKey: string;
-    updatedTime: Date;
-    updatedUser:number;
-    isActive:boolean;
+    receipt: string;
+    payment_capture: number;
   }
