@@ -3,9 +3,9 @@ server :
 
 database :
   type : 'postgres'
-  username : 'postgres'
-  password : 'root'
-  host: 'localhost'
+  username: 'postgres'
+  password: 'postgres'
+  host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
   database : 'auth'
   port : 5432
   synchronize : false
