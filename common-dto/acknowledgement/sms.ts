@@ -1,7 +1,8 @@
 import { CONSTANT_MSG } from '../config';
-import * as config from '../config';
+// import * as config from '../config';
+//import * as cconfig from '../../auth/config';
 var request = require('request');
-//const textLocalConfig = config.get('textLocal');
+//const textLocalConfig = cconfig.get('textLocal');
 
 export class Sms {
     sendSms (params:any) {        

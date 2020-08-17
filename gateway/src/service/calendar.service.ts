@@ -298,9 +298,26 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public getMilli(time:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_time_milli'},time).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public paymentOrder(accountDto:any, user:any) : Promise <any> {
         user.accountDto = accountDto;
         return this.redisClient.send({ cmd : 'get_payment_order'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public paymentVerification(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'get_payment_verification'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public accountPatientsList(user:any, accountKey:any) : Promise <any> {
+        user.accountKey = accountKey;
+        return this.redisClient.send({ cmd : 'account_patients_list'},user).toPromise();
     }
 
 

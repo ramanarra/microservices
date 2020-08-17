@@ -1055,4 +1055,29 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'get_payment_verification'})
+    async paymentVerification(user: any): Promise<any> {
+        const patient = await this.paymentService.paymentVerification(user.accountDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'account_patients_list'})
+    async accountPatientsList(user: any): Promise<any> {
+        if(user.account_key == user.accountKey){
+            const patients = await this.appointmentService.accountPatientList(user.accountKey);
+            return patients;
+        }else{
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message:CONSTANT_MSG.INVALID_REQUEST
+            }
+        }       
+    }
+
+    @MessagePattern({cmd: 'get_time_milli'})
+    async getMilli(time: any): Promise<any> {
+        const patient = Helper.getTimeInMilliSeconds(time);
+        return patient;
+    }
+
 }

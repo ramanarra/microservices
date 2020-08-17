@@ -739,7 +739,7 @@ export class AppointmentService {
                                 })
                                 slotStartTime = slotEndTime; // update the next slot start time
                             }
-                    //    })
+                        //    })
                         }
                         appointmentSlots.push(slotObject);
                     }
@@ -1710,6 +1710,32 @@ export class AppointmentService {
 
         }
 
+    }
+
+    async accountPatientList(accountKey:any): Promise<any> {
+        const doctorId = await this.doctorRepository.find({accountKey:accountKey});
+        let app = [];
+        for(let m of doctorId){
+            const app1 = await  this.appointmentRepository.query(queries.getAccountAppList,[m.doctorId]);
+            app= app.concat(app1)
+        }
+        let ids = [];
+        app.forEach(a => {
+            let flag = false;
+            ids.forEach(i => {
+                if(i == a.patient_id)
+                    flag = true;
+            });
+            if(flag == false){
+                ids.push(a.patient_id)
+            }              
+        });
+        let patientList = [];
+        for(let x of ids){
+            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+            patientList.push(patient[0]);
+        }
+        return patientList;
     }
 
 
