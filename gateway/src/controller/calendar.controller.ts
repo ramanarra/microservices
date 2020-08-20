@@ -236,7 +236,7 @@ export class CalendarController {
         //     console.log("Provide doctorKey");
         //     return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
         // }else if(workScheduleDto.updateWorkSchedule){
-        //     for(let x of workScheduleDto.updateWorkSchedule){
+        //     workScheduleDto.updateWorkSchedule.forEach(async x => {
         //         if(!x.scheduledayid){
         //             console.log("Provide scheduledayid");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
@@ -265,7 +265,7 @@ export class CalendarController {
         //             console.log("Provide isDelete");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
         //         }
-        //     }
+        //     });
         // }else if(workScheduleDto.workScheduleConfig){
         //     let y = workScheduleDto.workScheduleConfig;
         //     if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
@@ -667,7 +667,7 @@ export class CalendarController {
     @Post('doctor/hospitaldetailsEdit')
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
-    @ApiTags('Doctors')
+    @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
     @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})

@@ -69,9 +69,9 @@ export class VideoGateway {
   }
 
   @SubscribeMessage('removeSessionAndTokenByDoctor')
-  async removeSessionAndTokenByDoctor(client: AuthenticatedSocket, data : string) {
+  async removeSessionAndTokenByDoctor(client: AuthenticatedSocket, appointmentId : string) {
     this.logger.log(`Socket request remove Session And Token By Doctor from Doc-key => ${client.auth.data.doctor_key}` );
-    await this.videoService.removeSessionAndTokenByDoctor(client.auth.data.doctor_key);
+    await this.videoService.removeSessionAndTokenByDoctor(client.auth.data.doctor_key,appointmentId);
   }
 
   @SubscribeMessage('getAppointmentListForDoctor')

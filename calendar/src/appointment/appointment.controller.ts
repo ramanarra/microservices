@@ -1,7 +1,7 @@
 import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
 import {AppointmentService} from './appointment.service';
 import {MessagePattern} from '@nestjs/microservices';
-import {CONSTANT_MSG, queries, DoctorDto, DocConfigDto} from 'common-dto';
+import {CONSTANT_MSG, queries, DoctorDto, DocConfigDto, Sms} from 'common-dto';
 import {PatientDto} from 'common-dto';
 import {Helper} from "../utility/helper";
 import { of } from 'rxjs';
@@ -622,7 +622,7 @@ export class AppointmentController {
         const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
         const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
         if(doc.doctorId==app.appointmentDetails.doctorId){
-            let tokenResponseDetails = await this.videoService.createPatientTokenByDoctor(doc, pat);
+            let tokenResponseDetails = await this.videoService.createPatientTokenByDoctor(doc, pat,docPatientDetail.appointmentId);
             return tokenResponseDetails;
         }else {
             return {
@@ -638,7 +638,7 @@ export class AppointmentController {
         const doc = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
         const pat = await this.patientDetailsRepository.findOne({patientId: docPatientDetail.patientId});
         if(docPatientDetail.patientId == app.appointmentDetails.patientId){
-            let tokenResponseDetails = await this.videoService.getPatientToken(doc.doctorId, pat.patientId);
+            let tokenResponseDetails = await this.videoService.getPatientToken(doc.doctorId, pat.patientId, docPatientDetail.appointmentId);
             return tokenResponseDetails;
         }else {
             return {
@@ -671,10 +671,10 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'video_remove_session_token_by_doctor'})
-    async removeSessionAndTokenByDoctor(doctorKey): Promise<any> {
-        const doc = await this.appointmentService.doctorDetails(doctorKey);
+    async removeSessionAndTokenByDoctor(user): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
         if(doc){
-            await this.videoService.removeSessionAndTokenByDoctor(doc);
+            await this.videoService.removeSessionAndTokenByDoctor(doc,user.appointmentId);
         } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,

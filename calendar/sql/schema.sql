@@ -2497,3 +2497,101 @@ ALTER TABLE doctor ADD live_status live_statuses default 'offline';
 
 ALTER TABLE public.doctor
 ADD COLUMN last_active timestamp without time zone;
+
+CREATE TABLE public.message_template
+(
+    id serial NOT NULL,
+    sender character varying(200),
+    subject character varying(200),
+    body character varying(5000),
+    PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.message_template
+    OWNER to postgres;
+
+CREATE TABLE public.message_type
+(
+    id serial NOT NULL,
+    name character varying(200),
+    PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.message_type
+    OWNER to postgres;
+
+CREATE TABLE public.communication_type
+(
+    id serial NOT NULL,
+    name character varying(100),
+    PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.communication_type
+    OWNER to postgres;
+
+
+CREATE TABLE public.message_template_placeholders
+(
+id serial NOT NULL,
+message_template_id bigint,
+placeholder_name character varying(200),
+message_type_id bigint,
+PRIMARY KEY (id),
+CONSTRAINT message_template_id FOREIGN KEY (message_template_id)
+REFERENCES public.message_template (id) MATCH SIMPLE
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+NOT VALID,
+CONSTRAINT message_type_id FOREIGN KEY (message_type_id)
+REFERENCES public.message_type (id) MATCH SIMPLE
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+NOT VALID
+)
+WITH (
+OIDS = FALSE
+);
+
+ALTER TABLE public.message_template_placeholders
+OWNER to postgres;
+
+
+CREATE TABLE public.message_metadata
+(
+    id serial NOT NULL,
+    message_type_id bigint,
+    communication_type_id bigint,
+    message_template_id bigint,
+    PRIMARY KEY (id),
+    CONSTRAINT message_type_id FOREIGN KEY (message_type_id)
+        REFERENCES public.message_type (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT communication_type_id FOREIGN KEY (communication_type_id)
+        REFERENCES public.communication_type (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT message_template_id FOREIGN KEY (message_template_id)
+        REFERENCES public.message_template (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.message_metadata
+    OWNER to postgres;

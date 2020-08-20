@@ -44,8 +44,9 @@ export class VideoService {
     }
 
     @UseFilters(AllClientServiceException)
-    public removeSessionAndTokenByDoctor(doctor_key : string) : Promise <any> {
-        return this.redisClient.send({ cmd : 'video_remove_session_token_by_doctor'}, doctor_key).toPromise();
+    public removeSessionAndTokenByDoctor(doctor_key : string,appointmentId:string) : Promise <any> {
+        let reqData = {doctorKey : doctor_key, appointmentId : appointmentId};
+        return this.redisClient.send({ cmd : 'video_remove_session_token_by_doctor'}, reqData).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
