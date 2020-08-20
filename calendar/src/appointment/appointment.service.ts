@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto,Email,Sms
+    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email, Sms
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -30,7 +30,7 @@ import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.
 import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
 import {PatientDetails} from './patientDetails/patientDetails.entity';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
-import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
+import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
 import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
@@ -57,7 +57,7 @@ export class AppointmentService {
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
         private email: Email,
-        private sms:Sms,
+        private sms: Sms
     ) {
         // const mail= config.get('mail')
         // const dparams={
@@ -107,40 +107,40 @@ export class AppointmentService {
                     //             message:CONSTANT_MSG.INVALID_TIMINGS
                     //         }
                     //     }
-                    
+
                     let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
                     let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
-                    if(start > end){
-                        return{
-                            statusCode:HttpStatus.BAD_REQUEST,
-                            message:CONSTANT_MSG.INVALID_TIMINGS
+                    if (start > end) {
+                        return {
+                            statusCode: HttpStatus.BAD_REQUEST,
+                            message: CONSTANT_MSG.INVALID_TIMINGS
                         }
                     }
-                    if(endTime !==end){
-                        return{
-                            statusCode:HttpStatus.BAD_GATEWAY,
-                            message:CONSTANT_MSG.END_TIME_MISMATCHING
+                    if (endTime !== end) {
+                        return {
+                            statusCode: HttpStatus.BAD_GATEWAY,
+                            message: CONSTANT_MSG.END_TIME_MISMATCHING
                         }
                     }
-                    const exist=await this.appointmentRepository.query(queries.getExistAppointment,[appointmentDto.doctorId,appointmentDto.patientId,appointmentDto.appointmentDate])
-                    if(exist.length && !appointmentDto.confirmation){
-                        return{
-                            statusCode:HttpStatus.EXPECTATION_FAILED,
-                            message:CONSTANT_MSG.APPOINT_ALREADY_PRESENT
+                    const exist = await this.appointmentRepository.query(queries.getExistAppointment, [appointmentDto.doctorId, appointmentDto.patientId, appointmentDto.appointmentDate])
+                    if (exist.length && !appointmentDto.confirmation) {
+                        return {
+                            statusCode: HttpStatus.EXPECTATION_FAILED,
+                            message: CONSTANT_MSG.APPOINT_ALREADY_PRESENT
                         }
-                    }else{   
+                    } else {
                         // create appointment on existing date old records                   
-                        const appoint= await this.appointmentRepository.createAppointment(appointmentDto);
-                        if(!appoint.message){
+                        const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                        if (!appoint.message) {
                             const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
                             console.log(appDocConfig);
-                            return  {
-                                appointment:appoint,
-                                appointmentDocConfig:appDocConfig
-                            }  
-                        }else {
+                            return {
+                                appointment: appoint,
+                                appointmentDocConfig: appDocConfig
+                            }
+                        } else {
                             return appoint;
                         }
 
@@ -148,14 +148,14 @@ export class AppointmentService {
                 }
             }
             const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-            if(!appoint.message){
+            if (!appoint.message) {
                 const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
                 console.log(appDocConfig);
-                return  {
-                    appointment:appoint,
-                    appointmentDocConfig:appDocConfig
-                } 
-            }else {
+                return {
+                    appointment: appoint,
+                    appointmentDocConfig: appDocConfig
+                }
+            } else {
                 return appoint;
             }
         } catch (e) {
@@ -187,21 +187,21 @@ export class AppointmentService {
     async doctor_lists(accountKey): Promise<any> {
         try {
             const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
-            let res=[];
-            for(let list of doctorList){
-                var doc={
-                    doctorId:list.doctorId,
-                    accountkey:list.account_key,
-                    doctorKey:list.doctor_key,
-                    speciality:list.speciality,
-                    photo:list.photo,
-                    signature:list.signature,
-                    number:list.number,
-                    firstName:list.first_name,
-                    lastName:list.last_name,
-                    registrationNumber:list.registration_number,
-                    fee:list.consultation_cost,
-                    location:list.city
+            let res = [];
+            for (let list of doctorList) {
+                var doc = {
+                    doctorId: list.doctorId,
+                    accountkey: list.account_key,
+                    doctorKey: list.doctor_key,
+                    speciality: list.speciality,
+                    photo: list.photo,
+                    signature: list.signature,
+                    number: list.number,
+                    firstName: list.first_name,
+                    lastName: list.last_name,
+                    registrationNumber: list.registration_number,
+                    fee: list.consultation_cost,
+                    location: list.city
                 }
                 res.push(doc);
             }
@@ -229,29 +229,29 @@ export class AppointmentService {
             doctorList.forEach(a => {
                 let flag = false;
                 ids.forEach(i => {
-                    if(i.doctorId == a.doctorId)
+                    if (i.doctorId == a.doctorId)
                         flag = true;
                 });
-                if(flag == false){
+                if (flag == false) {
                     ids.push(a)
-                }              
+                }
             });
-            let res=[];
-            for(let list of ids){
-                var doc={
-                    doctorId:list.doctorId,
-                    accountkey:list.account_key,
-                    doctorKey:list.doctor_key,
-                    speciality:list.speciality,
-                    photo:list.photo,
-                    signature:list.signature,
-                    number:list.number,
-                    firstName:list.first_name,
-                    lastName:list.last_name,
-                    registrationNumber:list.registration_number,
-                    fee:list.consultation_cost,
-                    location:list.city,
-                    hospitalName:list.hospital_name
+            let res = [];
+            for (let list of ids) {
+                var doc = {
+                    doctorId: list.doctorId,
+                    accountkey: list.account_key,
+                    doctorKey: list.doctor_key,
+                    speciality: list.speciality,
+                    photo: list.photo,
+                    signature: list.signature,
+                    number: list.number,
+                    firstName: list.first_name,
+                    lastName: list.last_name,
+                    registrationNumber: list.registration_number,
+                    fee: list.consultation_cost,
+                    location: list.city,
+                    hospitalName: list.hospital_name
                 }
                 res.push(doc);
             }
@@ -285,9 +285,9 @@ export class AppointmentService {
         return await this.doctorConfigRepository.findOne({doctorKey: doctorKey});
     }
 
-    async todayAppointments(doctorId,date): Promise<any> {
-        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [date,doctorId]);
-        let apps: any= appointments;
+    async todayAppointments(doctorId, date): Promise<any> {
+        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [date, doctorId]);
+        let apps: any = appointments;
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
@@ -297,16 +297,16 @@ export class AppointmentService {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
         })
         return apps;
     }
 
-    async todayAppointmentsForDoctor(doctorId,date): Promise<any> {
-        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date,doctorId,'notCompleted','paused','online']);
-        let apps: any= appointments;
+    async todayAppointmentsForDoctor(doctorId, date): Promise<any> {
+        const appointments = await this.appointmentRepository.query(queries.getAppointmentForDoctorAlongWithPatient, [date, doctorId, 'notCompleted', 'paused', 'online']);
+        let apps: any = appointments;
         apps = apps.sort((val1, val2) => {
             let val1IntervalStartTime = val1.startTime;
             let val2IntervalStartTime = val2.startTime;
@@ -316,7 +316,7 @@ export class AppointmentService {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
         })
@@ -527,9 +527,9 @@ export class AppointmentService {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let page: number = user.paginationNumber;
-            var date:any = new Date();
-            var startDate:any = date;
-          //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
+            var date: any = new Date();
+            var startDate: any = date;
+            //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
             let possibleNextAppointments = await this.appointmentRepository.query(queries.getAppointByDocId, [docId, startDate])
             let doctorWorkSchedule = await this.docConfigScheduleDayRepository.query(queries.getDoctorScheduleIntervalAndDay, [user.doctorKey]);
             if (doctorWorkSchedule && doctorWorkSchedule.length) {
@@ -567,7 +567,10 @@ export class AppointmentService {
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
                 let breaktheloop = 0;
-                while (appointmentSlots.length <= page*7+7) {  // run while loop to get minimum 7  days of appointment slots
+                while (appointmentSlots.length <= page * 7 + 7) {
+                    breaktheloop++;
+                    if (breaktheloop > 20) break;
+                    // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
                     let dayOfWeek = day.getDay();
                     let workScheduleDayPresentOrNot = false;
@@ -611,16 +614,18 @@ export class AppointmentService {
                         var seconds = date.getSeconds();
                         var minutes = date.getMinutes();
                         var hour = date.getHours();
-                        var time = hour+":"+minutes;
+                        var time = hour + ":" + minutes;
                         var timeMilli = Helper.getTimeInMilliSeconds(time);
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
                         //sortedWorkScheduleTimeInterval.forEach(v => {
-                        for(let v of sortedWorkScheduleTimeInterval){
+                        for (let v of sortedWorkScheduleTimeInterval) {
                             let intervalEndTime = v.endTime;
                             let intervalEnd = false;
                             let slotStartTime = v.startTime;
                             let breaktheloop2 = 0;
                             while (!intervalEnd) {  // until the interval endTime comes run the while loop
+                                breaktheloop2++;
+                                if (breaktheloop2 > 10) break;
                                 let slotEndTimeCalculate = Helper.getTimeInMilliSeconds(slotStartTime);
                                 slotEndTimeCalculate += consultationSessionTimingInMilliSeconds; // adding slot startime + consultationSessionTiming, ex: 30 minutes
                                 let slotEndTime = Helper.getTimeinHrsMins(slotEndTimeCalculate);
@@ -641,96 +646,96 @@ export class AppointmentService {
                                     let slotStartTimeInMilliSec = Helper.getTimeInMilliSeconds(slotStartTime);
                                     let slotEndTimeInMilliSec = Helper.getTimeInMilliSeconds(slotEndTime);
                                     // if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
-                                    if(((startTimeInMilliSec<=slotStartTimeInMilliSec && endTimeInMilliSec <= slotEndTimeInMilliSec && slotStartTimeInMilliSec>=startTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec  ) || ( slotStartTimeInMilliSec <= startTimeInMilliSec &&  slotEndTimeInMilliSec <= endTimeInMilliSec && startTimeInMilliSec > slotEndTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec )|| ( startTimeInMilliSec <= slotStartTimeInMilliSec  &&  slotEndTimeInMilliSec <= endTimeInMilliSec)|| ( slotStartTimeInMilliSec >= startTimeInMilliSec &&  slotEndTimeInMilliSec <= endTimeInMilliSec)) && (!v.is_cancel)) {
-                                   // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
-                                        let daydate = Helper.getDayMonthYearFromDate(v.appointment_date );
+                                    if (((startTimeInMilliSec <= slotStartTimeInMilliSec && endTimeInMilliSec <= slotEndTimeInMilliSec && slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec) || (slotStartTimeInMilliSec <= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec && startTimeInMilliSec > slotEndTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec) || (startTimeInMilliSec <= slotStartTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec) || (slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec)) && (!v.is_cancel)) {
+                                        // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
+                                        let daydate = Helper.getDayMonthYearFromDate(v.appointment_date);
                                         let datedate = Helper.getDayMonthYearFromDate(date);
-                                        if(daydate == datedate){
+                                        if (daydate == datedate) {
                                             // if(v.appointmentDate == date){
-                                            if(timeMilli < endTimeInMilliSec){
+                                            if (timeMilli < endTimeInMilliSec) {
                                                 v.slotType = 'Booked';
                                                 v.preconsultationHours = preconsultationHours;
                                                 v.preconsultationMins = preconsultationMins;
                                                 // v.slotTiming = consultationSessionTiming;
                                                 let flag = false;
-                                                for(let i of slotObject.slots){
-                                                    if(i.id == v.id){
+                                                for (let i of slotObject.slots) {
+                                                    if (i.id == v.id) {
                                                         flag = true;
                                                     }
                                                 }
-                                                if(flag == false){
+                                                if (flag == false) {
                                                     slotObject.slots.push(v)
                                                     return true;
                                                 }
                                                 //slotObject.slots.push(v)
                                                 //return true;
-                                            }else {
+                                            } else {
                                                 return false;
                                             }
 
-                                        }else{
+                                        } else {
                                             v.slotType = 'Booked';
                                             v.preconsultationHours = preconsultationHours;
                                             v.preconsultationMins = preconsultationMins;
                                             // v.slotTiming = consultationSessionTiming;
                                             let flag = false;
-                                            for(let i of slotObject.slots){
-                                                if(i.id == v.id){
+                                            for (let i of slotObject.slots) {
+                                                if (i.id == v.id) {
                                                     flag = true;
                                                 }
                                             }
-                                            if(flag == false){
+                                            if (flag == false) {
                                                 slotObject.slots.push(v)
                                                 return true;
                                             }
                                             // slotObject.slots.push(v)
                                             // return true;
-                                        }                                        
+                                        }
                                     } else {
                                         return false;
                                     }
                                 })
                                 if (!slotPresentOrNot.length) { // if no appointment present on the slot timing, then push the free slots
                                     let dto = {
-                                        startTime : slotStartTime,
-                                        endTime :slotEndTime,
+                                        startTime: slotStartTime,
+                                        endTime: slotEndTime,
                                     }
                                     let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
                                     var time = date.getHours() + ":" + date.getMinutes();
                                     var timeInMS = Helper.getTimeInMilliSeconds(time);
                                     var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
-                                    if(!isOverLapping){
+                                    if (!isOverLapping) {
                                         let daydate = Helper.getDayMonthYearFromDate(day);
                                         let datedate = Helper.getDayMonthYearFromDate(date);
-                                        if(daydate === datedate){
-                                            if(timeMilli < slotEnd){
+                                        if (daydate === datedate) {
+                                            if (timeMilli < slotEnd) {
                                                 slotObject.slots.push({ // push free slot obj
                                                     startTime: slotStartTime,
                                                     endTime: slotEndTime,
                                                     slotType: 'Free',
                                                     slotTiming: consultationSessionTiming,
-                                                    preconsultationHours:preconsultationHours,
-                                                    preconsultationMins:preconsultationMins
+                                                    preconsultationHours: preconsultationHours,
+                                                    preconsultationMins: preconsultationMins
                                                 })
-                                            }else{
+                                            } else {
                                                 slotStartTime = slotEndTime;
                                                 continue
                                             }
-                                        }else{
+                                        } else {
                                             slotObject.slots.push({ // push free slot obj
                                                 startTime: slotStartTime,
                                                 endTime: slotEndTime,
                                                 slotType: 'Free',
                                                 slotTiming: consultationSessionTiming,
-                                                preconsultationHours:preconsultationHours,
-                                                preconsultationMins:preconsultationMins
+                                                preconsultationHours: preconsultationHours,
+                                                preconsultationMins: preconsultationMins
                                             })
                                         }
-                                       
+
                                     }
-                                   
+
                                 }
-                                 
+
                                 slotObject.slots = slotObject.slots.sort((val1, val2) => {
                                     let val1IntervalStartTime = val1.startTime;
                                     let val2IntervalStartTime = val2.startTime;
@@ -740,7 +745,7 @@ export class AppointmentService {
                                         return -1;
                                     } else if (val1IntervalStartTime > val2IntervalStartTime) {
                                         return 1;
-                                    }else{
+                                    } else {
                                         return 0;
                                     }
                                 })
@@ -749,7 +754,7 @@ export class AppointmentService {
                                 // if(breaktheloop2 > 10) break;
                                 if(slotEndTime >= intervalEndTime) break;
                             }
-                        //    })
+                            //    })
                         }
                         appointmentSlots.push(slotObject);
                     }
@@ -758,10 +763,10 @@ export class AppointmentService {
                     //if(breaktheloop > 20) break;
                     if(appointmentSlots.length > page*7+7) break;
                 }
-                var res=[];
-                var count =0;
-                appointmentSlots.forEach((e,iterationNumber) => {
-                    if( page*7 <= iterationNumber && count<7){
+                var res = [];
+                var count = 0;
+                appointmentSlots.forEach((e, iterationNumber) => {
+                    if (page * 7 <= iterationNumber && count < 7) {
                         res.push(e);
                         count++;
                     }
@@ -785,8 +790,6 @@ export class AppointmentService {
     }
 
 
-
-
     async appointmentReschedule(appointmentDto: any): Promise<any> {
         try {
 
@@ -805,16 +808,16 @@ export class AppointmentService {
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
                     let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
-                    if(start > end){
-                        return{
-                            statusCode:HttpStatus.BAD_REQUEST,
-                            message:CONSTANT_MSG.INVALID_TIMINGS
+                    if (start > end) {
+                        return {
+                            statusCode: HttpStatus.BAD_REQUEST,
+                            message: CONSTANT_MSG.INVALID_TIMINGS
                         }
                     }
-                    if(endTime !==end){
-                        return{
-                            statusCode:HttpStatus.BAD_GATEWAY,
-                            message:CONSTANT_MSG.END_TIME_MISMATCHING
+                    if (endTime !== end) {
+                        return {
+                            statusCode: HttpStatus.BAD_GATEWAY,
+                            message: CONSTANT_MSG.END_TIME_MISMATCHING
                         }
                     }
                     //cancelling current appointment
@@ -824,17 +827,17 @@ export class AppointmentService {
                     } else {
                         // create appointment on existing date old records
                         const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-                        if(!appoint.message){
+                        if (!appoint.message) {
                             const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                            return  {
-                                appointment:appoint,
-                                appointmentDocConfig:appDocConfig
-                            } 
-                        }else {
+                            return {
+                                appointment: appoint,
+                                appointmentDocConfig: appDocConfig
+                            }
+                        } else {
                             return appoint;
                         }
                     }
-                    
+
                 }
 
             }
@@ -842,19 +845,19 @@ export class AppointmentService {
             var isCancel = await this.appointmentCancel(appointmentDto);
             if (isCancel.statusCode != HttpStatus.OK) {
                 return isCancel;
-            } else{
+            } else {
                 const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-                if(!appoint.message){
+                if (!appoint.message) {
                     const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
                     console.log(appDocConfig);
-                    return  {
-                        appointment:appoint,
-                        appointmentDocConfig:appDocConfig
-                    } 
-                }else {
+                    return {
+                        appointment: appoint,
+                        appointmentDocConfig: appDocConfig
+                    }
+                } else {
                     return appoint;
                 }
-            }            
+            }
         } catch (e) {
             console.log(e);
             return {
@@ -900,8 +903,8 @@ export class AppointmentService {
                 }
             }
             var appoint = await this.appointmentRepository.findOne({id: appointmentDto.appointmentId});
-            if(appoint.createdBy === CONSTANT_MSG.ROLES.DOCTOR && appoint.paymentOption === 'directPayment'){
-                if(!appointmentDto.confirmation){
+            if (appoint.createdBy === CONSTANT_MSG.ROLES.DOCTOR && appoint.paymentOption === 'directPayment') {
+                if (!appointmentDto.confirmation) {
                     return {
                         statusCode: HttpStatus.BAD_REQUEST,
                         message: CONSTANT_MSG.CONFIRMATION_REQUIRED
@@ -947,8 +950,8 @@ export class AppointmentService {
     async patientSearch(patientDto: any): Promise<any> {
         try {
             if (patientDto.phone) {
-               // const patientDetails = await this.patientDetailsRepository.find({phone: patientDto.phone});
-                const patientDetails = await this.patientDetailsRepository.query(queries.getPatient, [patientDto.phone+'%'])
+                // const patientDetails = await this.patientDetailsRepository.find({phone: patientDto.phone});
+                const patientDetails = await this.patientDetailsRepository.query(queries.getPatient, [patientDto.phone + '%'])
                 if (patientDetails) {
                     return patientDetails;
                 } else {
@@ -980,12 +983,12 @@ export class AppointmentService {
 
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
-          //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
+            //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
             const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName])
             const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
             return {
-                doctors:name,
-                hospitals:hospital
+                doctors: name,
+                hospitals: hospital
             }
         } catch (e) {
             console.log(e);
@@ -1002,8 +1005,8 @@ export class AppointmentService {
             const patient = await this.patientDetailsRepository.findOne({patientId: patientDto.patientId});
             if (patientDto.phone) {
                 let isPhone = await this.isPhoneExists(patientDto.phone);
-                if (isPhone.isPhone){
-                    if (isPhone.patientDetails.patientId == patientDto.patientId){
+                if (isPhone.isPhone) {
+                    if (isPhone.patientDetails.patientId == patientDto.patientId) {
                         if (!patient) {
                             return {
                                 statusCode: HttpStatus.NO_CONTENT,
@@ -1027,14 +1030,14 @@ export class AppointmentService {
                                 }
                             }
                         }
-                    }else{
-                         //return error message
+                    } else {
+                        //return error message
                         return {
                             statusCode: HttpStatus.NOT_FOUND,
                             message: CONSTANT_MSG.PHONE_EXISTS
                         }
                     }
-                   
+
                 }
             }
             if (!patient) {
@@ -1106,29 +1109,29 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = (user.paginationNumber)*(user.limit);
-            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
-            if(!app.length){
+            let offset = (user.paginationNumber) * (user.limit);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
+            if (!app.length) {
                 return [];
             }
             const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
-                for(let appointmentList of app){
+                for (let appointmentList of app) {
                     if (appointmentList.appointment_date == date) {
                         if (appointmentList.is_active == false) {
                             let doctor = await this.doctor_Details(appointmentList.doctorId);
                             let account = await this.accountDetails(doctor.accountKey);
                             let res = {
-                                appointmentDate:appointmentList.appointment_date,
-                                appointmentId:appointmentList.id,
-                                startTime:appointmentList.startTime,
-                                endTime:appointmentList.endTime,
-                                doctorFirstName:doctor.firstName,
-                                doctorLastName:doctor.lastName,
-                                hospitalName:account.hospitalName,
-                                doctorKey:doctor.doctorKey
+                                appointmentDate: appointmentList.appointment_date,
+                                appointmentId: appointmentList.id,
+                                startTime: appointmentList.startTime,
+                                endTime: appointmentList.endTime,
+                                doctorFirstName: doctor.firstName,
+                                doctorLastName: doctor.lastName,
+                                hospitalName: account.hospitalName,
+                                doctorKey: doctor.doctorKey
                             }
                             appList.push(res);
                         }
@@ -1136,21 +1139,21 @@ export class AppointmentService {
                         let doctor = await this.doctor_Details(appointmentList.doctorId);
                         let account = await this.accountDetails(doctor.accountKey);
                         let res = {
-                            appointmentDate:appointmentList.appointment_date,
-                            appointmentId:appointmentList.id,
-                            startTime:appointmentList.startTime,
-                            endTime:appointmentList.endTime,
-                            doctorFirstName:doctor.firstName,
-                            doctorLastName:doctor.lastName,
-                            hospitalName:account.hospitalName,
-                            doctorKey:doctor.doctorKey
+                            appointmentDate: appointmentList.appointment_date,
+                            appointmentId: appointmentList.id,
+                            startTime: appointmentList.startTime,
+                            endTime: appointmentList.endTime,
+                            doctorFirstName: doctor.firstName,
+                            doctorLastName: doctor.lastName,
+                            hospitalName: account.hospitalName,
+                            doctorKey: doctor.doctorKey
                         }
                         appList.push(res);
                     }
                 }
-                let result={
-                    totalAppointments:appNumber,
-                    appointments:appList
+                let result = {
+                    totalAppointments: appNumber,
+                    appointments: appList
                 }
                 return result;
             } else {
@@ -1171,16 +1174,16 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-            let offset = (user.paginationNumber)*(user.limit);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date,offset,user.limit]);
-            if(!app.length){
+            let offset = (user.paginationNumber) * (user.limit);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
+            if (!app.length) {
                 return [];
             }
             const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date]);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
-                for(let appointmentList of app){
+                for (let appointmentList of app) {
                     if (appointmentList.appointment_date == date) {
                         if (appointmentList.is_active == true) {
                             let doctor = await this.doctor_Details(appointmentList.doctorId);
@@ -1188,21 +1191,21 @@ export class AppointmentService {
                             let config = await this.getDoctorConfigDetails(doctor.doctorKey);
                             var preConsultationHours = null;
                             var preConsultationMins = null;
-                            if(config.isPreconsultationAllowed){
-                                preConsultationHours = config.preconsultationHours; 
-                                preConsultationMins = config.preconsultationMins; 
+                            if (config.isPreconsultationAllowed) {
+                                preConsultationHours = config.preconsultationHours;
+                                preConsultationMins = config.preconsultationMins;
                             }
                             let res = {
-                                appointmentDate:appointmentList.appointment_date,
-                                appointmentId:appointmentList.id,
-                                startTime:appointmentList.startTime,
-                                endTime:appointmentList.endTime,
-                                doctorFirstName:doctor.firstName,
-                                doctorLastName:doctor.lastName,
-                                hospitalName:account.hospitalName,
-                                preConsultationHours:preConsultationHours,
-                                preConsultationMins:preConsultationMins,
-                                doctorKey:doctor.doctorKey
+                                appointmentDate: appointmentList.appointment_date,
+                                appointmentId: appointmentList.id,
+                                startTime: appointmentList.startTime,
+                                endTime: appointmentList.endTime,
+                                doctorFirstName: doctor.firstName,
+                                doctorLastName: doctor.lastName,
+                                hospitalName: account.hospitalName,
+                                preConsultationHours: preConsultationHours,
+                                preConsultationMins: preConsultationMins,
+                                doctorKey: doctor.doctorKey
                             }
                             appList.push(res);
                         }
@@ -1212,28 +1215,28 @@ export class AppointmentService {
                         let config = await this.getDoctorConfigDetails(doctor.doctorKey);
                         var preConsultationHours = null;
                         var preConsultationMins = null;
-                        if(config.isPreconsultationAllowed){
-                            preConsultationHours = config.preconsultationHours; 
-                            preConsultationMins = config.preconsultationMins; 
+                        if (config.isPreconsultationAllowed) {
+                            preConsultationHours = config.preconsultationHours;
+                            preConsultationMins = config.preconsultationMins;
                         }
                         let res = {
-                            appointmentDate:appointmentList.appointment_date,
-                            appointmentId:appointmentList.id,
-                            startTime:appointmentList.startTime,
-                            endTime:appointmentList.endTime,
-                            doctorFirstName:doctor.firstName,
-                            doctorLastName:doctor.lastName,
-                            hospitalName:account.hospitalName,
-                            preConsultationHours:preConsultationHours,
-                            preConsultationMins:preConsultationMins,
-                            doctorKey:doctor.doctorKey
+                            appointmentDate: appointmentList.appointment_date,
+                            appointmentId: appointmentList.id,
+                            startTime: appointmentList.startTime,
+                            endTime: appointmentList.endTime,
+                            doctorFirstName: doctor.firstName,
+                            doctorLastName: doctor.lastName,
+                            hospitalName: account.hospitalName,
+                            preConsultationHours: preConsultationHours,
+                            preConsultationMins: preConsultationMins,
+                            doctorKey: doctor.doctorKey
                         }
                         appList.push(res);
                     }
                 }
-                let result={
-                    totalAppointments:appNumber,
-                    appointments:appList
+                let result = {
+                    totalAppointments: appNumber,
+                    appointments: appList
                 }
                 return result;
             } else {
@@ -1250,22 +1253,22 @@ export class AppointmentService {
         }
     }
 
-    async patientList(doctorId:any): Promise<any> {
-        const app = await  this.appointmentRepository.query(queries.getAppList,[doctorId]);
+    async patientList(doctorId: any): Promise<any> {
+        const app = await this.appointmentRepository.query(queries.getAppList, [doctorId]);
         let ids = [];
         app.forEach(a => {
             let flag = false;
             ids.forEach(i => {
-                if(i == a.patient_id)
+                if (i == a.patient_id)
                     flag = true;
             });
-            if(flag == false){
+            if (flag == false) {
                 ids.push(a.patient_id)
-            }              
+            }
         });
         let patientList = [];
-        for(let x of ids){
-            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+        for (let x of ids) {
+            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
             patientList.push(patient[0]);
         }
         return patientList;
@@ -1340,93 +1343,88 @@ export class AppointmentService {
         let reschDays;
         let reschHours;
         let reschMins;
-        if(config.isPreconsultationAllowed){
-            preHours=config.preconsultationHours;
+        if (config.isPreconsultationAllowed) {
+            preHours = config.preconsultationHours;
             preMins = config.preconsultationMins;
         }
-        if(config.isPatientCancellationAllowed){
-            canDays= config.cancellationDays;
+        if (config.isPatientCancellationAllowed) {
+            canDays = config.cancellationDays;
             canHours = config.cancellationHours;
-            canMins=config.cancellationMins;
+            canMins = config.cancellationMins;
         }
-        if(config.isPatientRescheduleAllowed){
-            reschDays=config.rescheduleDays;
-            reschHours=config.rescheduleHours;
-            reschMins=config.rescheduleMins;
+        if (config.isPatientRescheduleAllowed) {
+            reschDays = config.rescheduleDays;
+            reschHours = config.rescheduleHours;
+            reschMins = config.rescheduleMins;
         }
         var res = {
-            email:doctor.email,
-            mobileNo:doctor.number,
-            hospitalName:account.hospitalName,
-            location:account.city,
-            appointmentDate:app.appointmentDetails.appointmentDate,
-            startTime:app.appointmentDetails.startTime,
-            endTime:app.appointmentDetails.endTime,
-            preConsultationHours:preHours,
-            preConsulationMinutes:preMins,
-            cancellationDays:canDays,
-            cancellationHours:canHours,
-            cancellationMins:canMins,
-            rescheduleDays:reschDays,
-            rescheduleHours:reschHours,
-            rescheduleMins:reschMins,
-            doctorId:doctor.doctorId,
-            patientId:app.appointmentDetails.patientId,
-            autoCancelDays:config.autoCancelDays,
-            autoCancelHours:config.autoCancelHours,
-            autoCancelMins:config.autoCancelMins,
-            doctorFirstName:doctor.firstName,
-            doctorLastName:doctor.lastName,
-            patientFirstName:patient.firstName,
-            patientLastName:patient.lastName
+            email: doctor.email,
+            mobileNo: doctor.number,
+            hospitalName: account.hospitalName,
+            location: account.city,
+            appointmentDate: app.appointmentDetails.appointmentDate,
+            startTime: app.appointmentDetails.startTime,
+            endTime: app.appointmentDetails.endTime,
+            preConsultationHours: preHours,
+            preConsulationMinutes: preMins,
+            cancellationDays: canDays,
+            cancellationHours: canHours,
+            cancellationMins: canMins,
+            rescheduleDays: reschDays,
+            rescheduleHours: reschHours,
+            rescheduleMins: reschMins,
+            doctorId: doctor.doctorId,
+            patientId: app.appointmentDetails.patientId
         }
         return res;
-        
+
     }
 
     async availableSlots(user: any): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
         const config = await this.getDoctorConfigDetails(user.doctorKey)
-        let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let dt = new Date(user.appointmentDate);
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
-        const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots,[day,doctor.doctorKey]) 
-        if(!workSchedule[0].startTime){
+        const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
+        if (!workSchedule[0].startTime) {
             return [];
-        } 
+        }
         let slots = [];
         let slotsView = [];
         let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-        for(let worksched of workSchedule){
+        for (let worksched of workSchedule) {
             let start = Helper.getTimeInMilliSeconds(worksched.startTime);
             let end = Helper.getTimeInMilliSeconds(worksched.endTime);
             let end1 = start + consultSession;
             let count = 0;
-            while(start < end && end1 <= end){
+            while (start < end && end1 <= end) {
+                count++;
+                if (count > 20) break;
                 let res = {
-                    start:Helper.getTimeinHrsMins(start),
-                    end:Helper.getTimeinHrsMins(start + consultSession),
+                    start: Helper.getTimeinHrsMins(start),
+                    end: Helper.getTimeinHrsMins(start + consultSession),
                 }
                 let flag = false;
-                if(app.length){
-                    for(let appointment of app){
+                if (app.length) {
+                    for (let appointment of app) {
                         flag = false;
-                        let dto={
-                            startTime :Helper.getTimeinHrsMins(start),
-                            endTime :Helper.getTimeinHrsMins(start + consultSession)
+                        let dto = {
+                            startTime: Helper.getTimeinHrsMins(start),
+                            endTime: Helper.getTimeinHrsMins(start + consultSession)
                         }
                         let isOverLapping = await this.findTimeOverlaping(app, dto);
-                        if((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping){
+                        if ((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping) {
                             flag = true;
                             break;
                         }
                     }
-                    if(flag == false){
+                    if (flag == false) {
                         slotsView.push(res);
-                    }                        
-                }else{
+                    }
+                } else {
                     slotsView.push(res);
                 }
                 start = start + consultSession;
@@ -1441,12 +1439,12 @@ export class AppointmentService {
         var timeMilli = Helper.getTimeInMilliSeconds(time);
         let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
         let datedate = Helper.getDayMonthYearFromDate(date);
-        let i:any;
-        let resSlots=[];
-        if(daydate == datedate){
-            for(i of slotsView){
-                let end =Helper.getTimeInMilliSeconds(i.end);
-                if(timeMilli<end){
+        let i: any;
+        let resSlots = [];
+        if (daydate == datedate) {
+            for (i of slotsView) {
+                let end = Helper.getTimeInMilliSeconds(i.end);
+                if (timeMilli < end) {
                     resSlots.push(i);
                 }
             }
@@ -1459,7 +1457,7 @@ export class AppointmentService {
                     return -1;
                 } else if (val1IntervalStartTime > val2IntervalStartTime) {
                     return 1;
-                }else{
+                } else {
                     return 0;
                 }
             })
@@ -1474,51 +1472,51 @@ export class AppointmentService {
                 return -1;
             } else if (val1IntervalStartTime > val2IntervalStartTime) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
         })
         return slotsView;
     }
 
-    async patientDetails(patientId:any): Promise<any> {
-        const app = await  this.appointmentRepository.query(queries.getAppListForPatient,[patientId]);
-        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
+    async patientDetails(patientId: any): Promise<any> {
+        const app = await this.appointmentRepository.query(queries.getAppListForPatient, [patientId]);
+        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [patientId]);
         let res = {
-            patientDetails:patient[0],
-            appointments:app
+            patientDetails: patient[0],
+            appointments: app
         }
         return res;
     }
 
-    async reports(accountKey:any,paginationNumber:any): Promise<any> {
-        let offset = paginationNumber*10;
-        const app = await  this.appointmentRepository.query(queries.getReports,[accountKey,offset]);
+    async reports(accountKey: any, paginationNumber: any): Promise<any> {
+        let offset = paginationNumber * 10;
+        const app = await this.appointmentRepository.query(queries.getReports, [accountKey, offset]);
         return app;
     }
 
-    async listOfDoctorsInHospital(accountKey:any): Promise<any> {
-        const app = await  this.doctorRepository.query(queries.getDocListDetails,[accountKey]);
-        let res =[];
+    async listOfDoctorsInHospital(accountKey: any): Promise<any> {
+        const app = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
+        let res = [];
         app.forEach(a => {
-           let b = {
-            doctorId:a.doctorId,
-            accountkey:a.account_key,
-            doctorKey:a.doctor_key,
-            speciality:a.speciality,
-            photo:a.photo,
-            signature:a.signature,
-            number:a.number,
-            firstName:a.first_name,
-            lastName:a.last_name,
-            registrationNumber:a.registration_number,
-            fee:a.consultation_cost,
-            location:a.city,
-            hospitalName:a.hospital_name
+            let b = {
+                doctorId: a.doctorId,
+                accountkey: a.account_key,
+                doctorKey: a.doctor_key,
+                speciality: a.speciality,
+                photo: a.photo,
+                signature: a.signature,
+                number: a.number,
+                firstName: a.first_name,
+                lastName: a.last_name,
+                registrationNumber: a.registration_number,
+                fee: a.consultation_cost,
+                location: a.city,
+                hospitalName: a.hospital_name
             }
             res.push(b);
         });
-        
+
         return res;
     }
 
@@ -1534,45 +1532,45 @@ export class AppointmentService {
         let reschDays;
         let reschHours;
         let reschMins;
-        if(config.isPreconsultationAllowed){
-            preHours=config.preconsultationHours;
+        if (config.isPreconsultationAllowed) {
+            preHours = config.preconsultationHours;
             preMins = config.preconsultationMins;
         }
-        if(config.isPatientCancellationAllowed){
-            canDays= config.cancellationDays;
+        if (config.isPatientCancellationAllowed) {
+            canDays = config.cancellationDays;
             canHours = config.cancellationHours;
-            canMins=config.cancellationMins;
+            canMins = config.cancellationMins;
         }
-        if(config.isPatientRescheduleAllowed){
-            reschDays=config.rescheduleDays;
-            reschHours=config.rescheduleHours;
-            reschMins=config.rescheduleMins;
+        if (config.isPatientRescheduleAllowed) {
+            reschDays = config.rescheduleDays;
+            reschHours = config.rescheduleHours;
+            reschMins = config.rescheduleMins;
         }
         var res = {
-            name:doctor.doctorName,
-            firstName:doctor.firstName,
-            lastName:doctor.lastName,
-            speciality:doctor.speciality,
-            mobileNo:doctor.number,
-            hospitalName:account.hospitalName,
-            location:account.city,
-            fee:config.consultationCost,
+            name: doctor.doctorName,
+            firstName: doctor.firstName,
+            lastName: doctor.lastName,
+            speciality: doctor.speciality,
+            mobileNo: doctor.number,
+            hospitalName: account.hospitalName,
+            location: account.city,
+            fee: config.consultationCost,
             preConsultationHours: preHours,
-            preConsulationMinutes:preMins,
-            cancellationHours:canHours,
-            cancellationDays:canDays,
-            cancellationMins:canMins,
-            rescheduleDays:reschDays,
-            rescheduleHours:reschHours,
-            rescheduleMins:reschMins,
-            photo:doctor.photo,
-            sessionTiming:config.consultationSessionTimings
+            preConsulationMinutes: preMins,
+            cancellationHours: canHours,
+            cancellationDays: canDays,
+            cancellationMins: canMins,
+            rescheduleDays: reschDays,
+            rescheduleHours: reschHours,
+            rescheduleMins: reschMins,
+            photo: doctor.photo,
+            sessionTiming: config.consultationSessionTimings
         }
-        return res;       
+        return res;
     }
 
-    async getPatientDetails(patientId:any){
-        const patient = await this.patientDetailsRepository.findOne({patientId:patientId});
+    async getPatientDetails(patientId: any) {
+        const patient = await this.patientDetailsRepository.findOne({patientId: patientId});
         return patient;
     }
 
@@ -1580,38 +1578,38 @@ export class AppointmentService {
         return await this.appointmentDocConfigRepository.findOne({appointmentId: appointmentId});
     }
 
-    async detailsOfPatient(patientId:any): Promise<any> {
-        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[patientId]); 
-        let patientDetails=patient[0];
-        patientDetails["description"]="";
-        patientDetails["allergiesList"]=[];
+    async detailsOfPatient(patientId: any): Promise<any> {
+        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [patientId]);
+        let patientDetails = patient[0];
+        patientDetails["description"] = "";
+        patientDetails["allergiesList"] = [];
         return patientDetails;
     }
-    
-    async patientUpcomingAppointmentsForDoctor(user:any): Promise<any> {
-        const doc=await this.doctorDetails(user.patientDto.doctorKey);
-        const d:Date = new Date();
+
+    async patientUpcomingAppointmentsForDoctor(user: any): Promise<any> {
+        const doc = await this.doctorDetails(user.patientDto.doctorKey);
+        const d: Date = new Date();
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-        if(user.patientDto.paginationNumber){           
-            let offset = (user.paginationNumber)*(10);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date,offset,doc.doctorId,'notCompleted','paused']);
+        if (user.patientDto.paginationNumber) {
+            let offset = (user.paginationNumber) * (10);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'notCompleted', 'paused']);
             return app;
-        }else{
-            const app = await this.appointmentRepository.query(queries.getAppDoctorList,[doc.doctorId,user.patientDto.patientId,date,'notCompleted','paused'])
+        } else {
+            const app = await this.appointmentRepository.query(queries.getAppDoctorList, [doc.doctorId, user.patientDto.patientId, date, 'notCompleted', 'paused'])
             return app;
         }
     }
 
-    async patientPastAppointmentsForDoctor(user:any): Promise<any> {
-        const doc=await this.doctorDetails(user.patientDto.doctorKey);
-        const d:Date = new Date();
+    async patientPastAppointmentsForDoctor(user: any): Promise<any> {
+        const doc = await this.doctorDetails(user.patientDto.doctorKey);
+        const d: Date = new Date();
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-        if(user.patientDto.paginationNumber){           
-            let offset = (user.paginationNumber)*(10);
-            const app = await this.appointmentRepository.query(queries.getPastAppointmentsForPatient, [user.patientDto.patientId, date,offset,doc.doctorId,'completed']);
+        if (user.patientDto.paginationNumber) {
+            let offset = (user.paginationNumber) * (10);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'completed']);
             return app;
-        }else{
-            const app = await this.appointmentRepository.query(queries.getPastAppDoctorList,[doc.doctorId,user.patientDto.patientId,date,'completed'])
+        } else {
+            const app = await this.appointmentRepository.query(queries.getPastAppDoctorList, [doc.doctorId, user.patientDto.patientId, date, 'completed'])
             return app;
         }
     }
@@ -1620,22 +1618,22 @@ export class AppointmentService {
         var condition: any = {
             patientId: patientId
         }
-        let dto={
-            liveStatus:'online'
+        let dto = {
+            liveStatus: 'online'
         }
         var values: any = dto;
-        return await this.patientDetailsRepository.update( condition, values);
+        return await this.patientDetailsRepository.update(condition, values);
     }
 
     async updatePatOffline(patientId): Promise<any> {
         var condition: any = {
             patientId: patientId
         }
-        let dto={
-            liveStatus:'offline'
+        let dto = {
+            liveStatus: 'offline'
         }
         var values: any = dto;
-        return await this.patientDetailsRepository.update( condition, values);
+        return await this.patientDetailsRepository.update(condition, values);
     }
 
     async updatePatLastActive(patientId): Promise<any> {
@@ -1643,33 +1641,33 @@ export class AppointmentService {
         var condition: any = {
             patientId: patientId
         }
-        let dto={
-            lastActive:date
+        let dto = {
+            lastActive: date
         }
         var values: any = dto;
-        return await this.patientDetailsRepository.update( condition, values);
+        return await this.patientDetailsRepository.update(condition, values);
     }
 
     async updateDocOnline(doctorKey): Promise<any> {
         var condition: any = {
             doctorKey: doctorKey
         }
-        let dto={
-            liveStatus:'online'
+        let dto = {
+            liveStatus: 'online'
         }
         var values: any = dto;
-        return await this.doctorRepository.update( condition, values);
+        return await this.doctorRepository.update(condition, values);
     }
 
     async updateDocOffline(doctorKey): Promise<any> {
         var condition: any = {
             doctorKey: doctorKey
         }
-        let dto={
-            liveStatus:'offline'
+        let dto = {
+            liveStatus: 'offline'
         }
         var values: any = dto;
-        return await this.doctorRepository.update( condition, values);
+        return await this.doctorRepository.update(condition, values);
     }
 
     async updateDocLastActive(doctorKey): Promise<any> {
@@ -1677,27 +1675,27 @@ export class AppointmentService {
         var condition: any = {
             doctorKey: doctorKey
         }
-        let dto={
-            lastActive:date
+        let dto = {
+            lastActive: date
         }
         var values: any = dto;
-        return await this.doctorRepository.update( condition, values);
+        return await this.doctorRepository.update(condition, values);
     }
 
 
-    async patientGeneralSearch(patientSearch:any, doctorId: any): Promise<any> {
+    async patientGeneralSearch(patientSearch: any, doctorId: any): Promise<any> {
         try {
-            const app = await  this.appointmentRepository.query(queries.getPatientDoctorApps,[doctorId,patientSearch]);
+            const app = await this.appointmentRepository.query(queries.getPatientDoctorApps, [doctorId, patientSearch]);
             let ids = [];
             app.forEach(a => {
                 let flag = false;
                 ids.forEach(i => {
-                    if(i.patient_id == a.patient_id)
+                    if (i.patient_id == a.patient_id)
                         flag = true;
                 });
-                if(flag == false){
+                if (flag == false) {
                     ids.push(a)
-                }              
+                }
             });
             return ids;
         } catch (e) {
@@ -1710,18 +1708,18 @@ export class AppointmentService {
 
     }
 
-    async updateDoctorAndPatientStatus(role : string, id : string, status : string){
+    async updateDoctorAndPatientStatus(role: string, id: string, status: string) {
 
-        if(role === CONSTANT_MSG.ROLES.DOCTOR){
+        if (role === CONSTANT_MSG.ROLES.DOCTOR) {
             const doc = await this.doctorRepository.findOne({doctorKey: id});
-            if(doc){
+            if (doc) {
                 doc.liveStatus = status;
                 doc.lastActive = new Date();
                 await this.doctorRepository.save(doc)
             }
-        } else if (role === CONSTANT_MSG.ROLES.PATIENT){
-            const patient = await this.patientDetailsRepository.findOne({patientId : Number(id)});
-            if(patient){
+        } else if (role === CONSTANT_MSG.ROLES.PATIENT) {
+            const patient = await this.patientDetailsRepository.findOne({patientId: Number(id)});
+            if (patient) {
                 patient.liveStatus = status;
                 patient.lastActive = new Date();
                 await this.patientDetailsRepository.save(patient);
@@ -1731,33 +1729,31 @@ export class AppointmentService {
 
     }
 
-    async accountPatientList(accountKey:any): Promise<any> {
-        const doctorId = await this.doctorRepository.find({accountKey:accountKey});
+    async accountPatientList(accountKey: any): Promise<any> {
+        const doctorId = await this.doctorRepository.find({accountKey: accountKey});
         let app = [];
-        for(let m of doctorId){
-            const app1 = await  this.appointmentRepository.query(queries.getAccountAppList,[m.doctorId]);
-            app= app.concat(app1)
+        for (let m of doctorId) {
+            const app1 = await this.appointmentRepository.query(queries.getAccountAppList, [m.doctorId]);
+            app = app.concat(app1)
         }
         let ids = [];
         app.forEach(a => {
             let flag = false;
             ids.forEach(i => {
-                if(i == a.patient_id)
+                if (i == a.patient_id)
                     flag = true;
             });
-            if(flag == false){
+            if (flag == false) {
                 ids.push(a.patient_id)
-            }              
+            }
         });
         let patientList = [];
-        for(let x of ids){
-            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails,[x]); 
+        for (let x of ids) {
+            const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
             patientList.push(patient[0]);
         }
         return patientList;
     }
-
-
 
 
     // common functions below===============================================================
@@ -1804,7 +1800,7 @@ export class AppointmentService {
             } else if (startTimeMilliSeconds === vstartTimeMilliSeconds && endTimeMilliSeconds === vEndTimeMilliSeconds) {
                 isOverLapping = true;
             }
-            if(v.is_cancel == true){
+            if (v.is_cancel == true) {
                 isOverLapping = false;
             }
         })
@@ -1818,10 +1814,10 @@ export class AppointmentService {
         if (number) {
             isPhone = true;
         }
-        return {isPhone:isPhone,patientDetails:number};
+        return {isPhone: isPhone, patientDetails: number};
     }
 
-    
+
     async isWorkScheduleAvailable(day, workScheduleObj): Promise<any> {
         return workScheduleObj[day].length >= 1 ? true : false;
     }
@@ -1840,11 +1836,11 @@ export class AppointmentService {
         var appointmentId = req.appointmentId;
         var appointmentDate = req.appointmentDate;
 
-         const params:any = {};
+        const params: any = {};
 
-         params.subject = 'Appointment Created';
-         params.recipient = email;
-         params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>\
+        params.subject = 'Appointment Created';
+        params.recipient = email;
+        params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>\
              <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Created By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
@@ -1867,9 +1863,9 @@ export class AppointmentService {
         params.template = params.template.replace(/{role}/gi, role);
         params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
         params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
-        try{
+        try {
             const sendMail = await this.email.sendEmail(params);
-            return{
+            return {
                 statusCode: HttpStatus.OK,
                 message: CONSTANT_MSG.MAIL_OK
             }
@@ -1880,29 +1876,29 @@ export class AppointmentService {
                 message: CONSTANT_MSG.DB_ERROR
             }
         }
-        
-}
 
-async sendAppCancelledEmail(req) {
+    }
 
-    var email = req.email;
-    var doctorFirstName = req.doctorFirstName;
-    var doctorLastName = req.doctorLastName;
-    var patientFirstName = req.patientFirstName;
-    var patientLastName = req.patientLastName;
-    var hospital = req.hospital;
-    var startTime = req.startTime;
-    var endTime = req.endTime;
-    var role = req.role;
-    var appointmentId = req.appointmentId;
-    var appointmentDate = req.appointmentDate;
-    var cancelledOn = req.cancelledOn;
+    async sendAppCancelledEmail(req) {
 
-     const params:any = {};
+        var email = req.email;
+        var doctorFirstName = req.doctorFirstName;
+        var doctorLastName = req.doctorLastName;
+        var patientFirstName = req.patientFirstName;
+        var patientLastName = req.patientLastName;
+        var hospital = req.hospital;
+        var startTime = req.startTime;
+        var endTime = req.endTime;
+        var role = req.role;
+        var appointmentId = req.appointmentId;
+        var appointmentDate = req.appointmentDate;
+        var cancelledOn = req.cancelledOn;
 
-     params.subject = 'Appointment Cancelled';
-     params.recipient = email;
-     params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>\
+        const params: any = {};
+
+        params.subject = 'Appointment Cancelled';
+        params.recipient = email;
+        params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>\
          <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Cancelled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
@@ -1915,58 +1911,58 @@ async sendAppCancelledEmail(req) {
 <div class="reset_titles" style="display: inline-block;">Cancelled On</div><div style="display: inline-block;">: {cancelledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  ';        //sending Mail to user
 
-    params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
-    params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
-    params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
-    params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
-    params.template = params.template.replace(/{email}/gi, email);
-    params.template = params.template.replace(/{hospital}/gi, hospital);
-    params.template = params.template.replace(/{startTime}/gi, startTime);
-    params.template = params.template.replace(/{endTime}/gi, endTime);
-    params.template = params.template.replace(/{role}/gi, role);
-    params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
-    params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
-    params.template = params.template.replace(/{cancelledOn}/gi, cancelledOn);
+        params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
+        params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
+        params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
+        params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
+        params.template = params.template.replace(/{email}/gi, email);
+        params.template = params.template.replace(/{hospital}/gi, hospital);
+        params.template = params.template.replace(/{startTime}/gi, startTime);
+        params.template = params.template.replace(/{endTime}/gi, endTime);
+        params.template = params.template.replace(/{role}/gi, role);
+        params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+        params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
+        params.template = params.template.replace(/{cancelledOn}/gi, cancelledOn);
 
-    try{
-        const sendMail = await this.email.sendEmail(params);
-        return{
-            statusCode: HttpStatus.OK,
-            message: CONSTANT_MSG.MAIL_OK
+        try {
+            const sendMail = await this.email.sendEmail(params);
+            return {
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.MAIL_OK
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
         }
-    } catch (e) {
-        console.log(e);
-        return {
-            statusCode: HttpStatus.NO_CONTENT,
-            message: CONSTANT_MSG.DB_ERROR
-        }
+
     }
 
-}
+    async sendAppRescheduleEmail(req) {
 
-async sendAppRescheduleEmail(req) {
+        var email = req.email;
+        var doctorFirstName = req.doctorFirstName;
+        var doctorLastName = req.doctorLastName;
+        var patientFirstName = req.patientFirstName;
+        var patientLastName = req.patientLastName;
+        var hospital = req.hospital;
+        var startTime = req.startTime;
+        var endTime = req.endTime;
+        var role = req.role;
+        var appointmentId = req.appointmentId;
+        var appointmentDate = req.appointmentDate;
+        var rescheduledAppointmentDate = req.rescheduledAppointmentDate;
+        var rescheduledStartTime = req.rescheduledStartTime;
+        var rescheduledEndTime = req.rescheduledEndTime;
+        var rescheduledOn = req.rescheduledOn;
 
-    var email = req.email;
-    var doctorFirstName = req.doctorFirstName;
-    var doctorLastName = req.doctorLastName;
-    var patientFirstName = req.patientFirstName;
-    var patientLastName = req.patientLastName;
-    var hospital = req.hospital;
-    var startTime = req.startTime;
-    var endTime = req.endTime;
-    var role = req.role;
-    var appointmentId = req.appointmentId;
-    var appointmentDate = req.appointmentDate;
-    var rescheduledAppointmentDate = req.rescheduledAppointmentDate;
-    var rescheduledStartTime = req.rescheduledStartTime;
-    var rescheduledEndTime = req.rescheduledEndTime;
-    var rescheduledOn = req.rescheduledOn;
+        const params: any = {};
 
-     const params:any = {};
-
-     params.subject = 'Appointment Rescheduled';
-     params.recipient = email;
-     params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Rescheduled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user rescheduled appointment through VIRUJH. Please find the appointment details Below</div></div>\
+        params.subject = 'Appointment Rescheduled';
+        params.recipient = email;
+        params.template = '  <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Rescheduled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user rescheduled appointment through VIRUJH. Please find the appointment details Below</div></div>\
          <div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Rescheduled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div class="reset_titles" style="display: inline-block;">Old Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
@@ -1981,57 +1977,57 @@ async sendAppRescheduleEmail(req) {
 <div class="reset_titles" style="display: inline-block;">Rescheduled On</div><div style="display: inline-block;">: {rescheduledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">\
 <div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  ';        //sending Mail to user
 
-    params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
-    params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
-    params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
-    params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
-    params.template = params.template.replace(/{rescheduledAppointmentDate}/gi, rescheduledAppointmentDate);
-    params.template = params.template.replace(/{rescheduledStartTime}/gi, rescheduledStartTime);
-    params.template = params.template.replace(/{rescheduledEndTime}/gi, rescheduledEndTime);
-    params.template = params.template.replace(/{hospital}/gi, hospital);
-    params.template = params.template.replace(/{startTime}/gi, startTime);
-    params.template = params.template.replace(/{endTime}/gi, endTime);
-    params.template = params.template.replace(/{role}/gi, role);
-    params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
-    params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
-    params.template = params.template.replace(/{rescheduledOn}/gi, rescheduledOn);
+        params.template = params.template.replace(/{doctorFirstName}/gi, doctorFirstName);
+        params.template = params.template.replace(/{doctorLastName}/gi, doctorLastName);
+        params.template = params.template.replace(/{patientFirstName}/gi, patientFirstName);
+        params.template = params.template.replace(/{patientLastName}/gi, patientLastName);
+        params.template = params.template.replace(/{rescheduledAppointmentDate}/gi, rescheduledAppointmentDate);
+        params.template = params.template.replace(/{rescheduledStartTime}/gi, rescheduledStartTime);
+        params.template = params.template.replace(/{rescheduledEndTime}/gi, rescheduledEndTime);
+        params.template = params.template.replace(/{hospital}/gi, hospital);
+        params.template = params.template.replace(/{startTime}/gi, startTime);
+        params.template = params.template.replace(/{endTime}/gi, endTime);
+        params.template = params.template.replace(/{role}/gi, role);
+        params.template = params.template.replace(/{appointmentId}/gi, appointmentId);
+        params.template = params.template.replace(/{appointmentDate}/gi, appointmentDate);
+        params.template = params.template.replace(/{rescheduledOn}/gi, rescheduledOn);
 
-    try{
-        const sendMail = await this.email.sendEmail(params);
-        return{
-            statusCode: HttpStatus.OK,
-            message: CONSTANT_MSG.MAIL_OK
+        try {
+            const sendMail = await this.email.sendEmail(params);
+            return {
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.MAIL_OK
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
         }
-    } catch (e) {
-        console.log(e);
-        return {
-            statusCode: HttpStatus.NO_CONTENT,
-            message: CONSTANT_MSG.DB_ERROR
-        }
+
     }
 
-}
-
-async sendSmsForCreatingAppointment(req){
-    var number = req.number;
-    const params:any ={}
-    params.message ='Appointment created\nCreated by {role}';
-    params.sender = 'Virujh';
-    params.number = number;
-    try{
-        const sendMail = await this.sms.sendSms(params);
-        return{
-            statusCode: HttpStatus.OK,
-            message: CONSTANT_MSG.SMS_OK
-        }
-    } catch (e) {
-        console.log(e);
-        return {
-            statusCode: HttpStatus.NO_CONTENT,
-            message: CONSTANT_MSG.DB_ERROR
+    async sendSmsForCreatingAppointment(req) {
+        var number = req.number;
+        const params: any = {}
+        params.message = 'Appointment created\nCreated by {role}';
+        params.sender = 'Virujh';
+        params.number = number;
+        try {
+            const sendMail = await this.sms.sendSms(params);
+            return {
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.SMS_OK
+            }
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
         }
     }
-}
 
 
 }
