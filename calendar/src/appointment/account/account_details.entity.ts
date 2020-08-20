@@ -58,4 +58,13 @@ export class AccountDetails extends BaseEntity{
     })
     hospitalPhoto : string;
 
+    @Column({
+        name : 'country'
+    })
+    country : string;
+
+    @Column({
+        name : 'landmark'
+    })
+    landmark : string;
 }

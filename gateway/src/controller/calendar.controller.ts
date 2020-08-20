@@ -209,6 +209,24 @@ export class CalendarController {
         if(!req.body.doctorKey){
             console.log("Provide doctorKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
+        }else if(req.body.isPatientCancellationAllowed){
+            let cTime=docConfigDto.cancellationHours+':'+docConfigDto.cancellationMins;
+            if(docConfigDto.cancellationDays == 0){
+                const canTime= await this.calendarService.getMilli(cTime);
+                if(canTime < 600000){
+                    console.log("cancellation time should be greater than 10 minutes");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
+                }
+            }           
+        }else if(req.body.isPatientRescheduleAllowed){
+            let rTime=docConfigDto.rescheduleHours+':'+docConfigDto.rescheduleMins;
+            if(docConfigDto.rescheduleDays == 0){
+                const canTime= await this.calendarService.getMilli(rTime);
+                if(canTime < 600000){
+                    console.log("reschedule time should be greater than 10 minutes");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "reschedule time should be greater than 10 minutes"}
+                }
+            }           
         }
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
