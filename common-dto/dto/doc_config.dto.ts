@@ -22,7 +22,7 @@ export class DocConfigDto {
     @IsOptional()
     @Min(0)
     @Max(31)
-    cancellationDays : string;
+    cancellationDays : number;
     @IsNumber()
     @IsOptional()
     @Min(0)
@@ -38,7 +38,7 @@ export class DocConfigDto {
     @IsOptional()
     @Min(0)
     @Max(31)
-    rescheduleDays : string;
+    rescheduleDays : number;
     @IsNumber()
     @IsOptional()
     @Min(0)
