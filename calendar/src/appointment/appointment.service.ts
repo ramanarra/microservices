@@ -1374,7 +1374,11 @@ export class AppointmentService {
             rescheduleHours: reschHours,
             rescheduleMins: reschMins,
             doctorId: doctor.doctorId,
-            patientId: app.appointmentDetails.patientId
+            patientId: app.appointmentDetails.patientId,
+            doctorFirstName: doctor.firstName,
+            doctorLastName: doctor.lastName,
+            patientFirstName: patient.firstName,
+            patientLastName: patient.lastName,
         }
         return res;
 
