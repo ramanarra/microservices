@@ -2,11 +2,25 @@ import * as nodemailer from 'nodemailer';
 import { CONSTANT_MSG } from '../config';
 // import {HttpStatus} from '@nestjs/common';
 export class Email {
+    smtpUser:any;
+    smtpPass:any;
+    smtpHost:any;
+    smtpPort:any;
+    // constructor(private params: any) {
+    //     this.smtpUser = params.smtpUser;
+    //     this.smtpPass = params.smtpPass;
+    //     this.smtpHost = params.smtpHost;
+    //     this.smtpPort = params.smtpPort;
+    //  }
     sendEmail (params:any) {
         var smtpUser = "dharani@softsuave.com";
         var smtpPass = "softsuave@123";
         var smtpHost = "smtp.gmail.com";
         var smtpPort = 465;
+        // var smtpUser = params.smtpUser;
+        // var smtpPass = params.smtpPass;
+        // var smtpHost = "smtp.gmail.com";
+        // var smtpPort = 465;
 
         //const nodemailer = MailerModule;
         //const nodemailer = require('nodemailer')

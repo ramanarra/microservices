@@ -32,15 +32,16 @@ import {PatientDetails} from './patientDetails/patientDetails.entity';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
-import {AnimationFrameScheduler} from 'rxjs/internal/scheduler/AnimationFrameScheduler';
-import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
-
+import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
+import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
+import * as config from 'config';
 var async = require('async');
 
 
 @Injectable()
 export class AppointmentService {
-
+    mail:any
+    parameter:any
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -58,6 +59,14 @@ export class AppointmentService {
         private email: Email,
         private sms: Sms
     ) {
+        // const mail= config.get('mail')
+        // const dparams={
+        //     smtpUser:this.mail.smtpUser,
+        //     smtpPass:this.mail.smtpPass,
+        //     smtpHost:this.mail.smtpHost,
+        //     smtpPort:this.mail.smtpPort
+        // }
+        // this.parameter = new Email(dparams);
     }
 
 
@@ -741,12 +750,18 @@ export class AppointmentService {
                                     }
                                 })
                                 slotStartTime = slotEndTime; // update the next slot start time
+                                // breaktheloop2++;
+                                // if(breaktheloop2 > 10) break;
+                                if(slotEndTime >= intervalEndTime) break;
                             }
                             //    })
                         }
                         appointmentSlots.push(slotObject);
                     }
                     dayOfWeekCount++; // increase to next  Day
+                    breaktheloop++;
+                    //if(breaktheloop > 20) break;
+                    if(appointmentSlots.length > page*7+7) break;
                 }
                 var res = [];
                 var count = 0;
@@ -1032,7 +1047,7 @@ export class AppointmentService {
                 }
             } else {
                 var condition1 = {
-                    id: patientDto.patientId
+                    patientId: patientDto.patientId
                 }
                 var values: any = patientDto;
                 var updatePatientDetails = await this.patientDetailsRepository.update(condition1, values);
@@ -1319,6 +1334,7 @@ export class AppointmentService {
         const account = await this.accountDetails(doctor.accountKey);
         const app = await this.appointmentDetails(details.appointmentId);
         const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+        const patient = await this.getPatientDetails(app.appointmentDetails.patientId);
         let preHours;
         let preMins;
         let canDays;
@@ -1414,6 +1430,8 @@ export class AppointmentService {
                 start = start + consultSession;
                 end1 = start + consultSession;
                 slots.push(res);
+                count++;
+                if(end1 > end) break;
             }
         }
         let date = new Date();
