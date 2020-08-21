@@ -62,11 +62,10 @@ export class VideoGateway {
     this.logger.log(`Socket request remove Patient Token By Doctor from Doc-key => ${client.auth.data.doctor_key} and PatientId => ${appointmentId}` );
     const response:any = await this.videoService.removePatientTokenByDoctor(client.auth.data.doctor_key, appointmentId);
     console.log("response >>" + JSON.stringify(response));
-    // let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
-    // patientSocketList.forEach( (val : Socket) => {
-    //   val.emit("videoTokenRemoved", {isRemoved : true});
-    // });
-    client.emit("videoTokenRemoved", {isRemoved : true});
+    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
+    patientSocketList.forEach( (val : Socket) => {
+      val.emit("videoTokenRemoved", response);
+    });
   }
 
   @SubscribeMessage('removeSessionAndTokenByDoctor')
