@@ -71,7 +71,11 @@ export class VideoGateway {
   @SubscribeMessage('removeSessionAndTokenByDoctor')
   async removeSessionAndTokenByDoctor(client: AuthenticatedSocket, appointmentId : string) {
     this.logger.log(`Socket request remove Session And Token By Doctor from Doc-key => ${client.auth.data.doctor_key}` );
-    await this.videoService.removeSessionAndTokenByDoctor(client.auth.data.doctor_key,appointmentId);
+    const response:any = await this.videoService.removeSessionAndTokenByDoctor(client.auth.data.doctor_key,appointmentId);
+    let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
+    patientSocketList.forEach( (val : Socket) => {
+      val.emit("videoSessionRemoved", {isRemoved : true});
+    });
   }
 
   @SubscribeMessage('getAppointmentListForDoctor')

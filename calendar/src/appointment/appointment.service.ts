@@ -258,10 +258,7 @@ export class AppointmentService {
             if (doctorList.length) {
                 return res;
             } else {
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.INVALID_REQUEST
-                }
+                return [];
             }
         } catch (e) {
             return {
