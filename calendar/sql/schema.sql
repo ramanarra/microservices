@@ -2595,3 +2595,9 @@ WITH (
 
 ALTER TABLE public.message_metadata
     OWNER to postgres;
+
+ALTER TABLE public.account_details
+    ADD COLUMN country character varying(100);
+
+ALTER TABLE public.account_details
+    ADD COLUMN landmark character varying(100);
