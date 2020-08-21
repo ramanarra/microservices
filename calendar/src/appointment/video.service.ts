@@ -119,7 +119,7 @@ export class VideoService {
             this.openViduSessionTokenRepository.remove(openViduSessionToken);
             await this.openViduService.removeTokenFromSession(openViduSession.sessionId, openViduSessionToken.token);
             var condition: any = {
-                appointmentId: appointmentId
+                id: appointmentId
             }
             let dto={
                 status:'paused'
@@ -145,7 +145,7 @@ export class VideoService {
         await this.openViduSessionRepo.remove(openViduSessionList);
         await this.openViduService.removeSessionList(sessionIdList);
         var condition: any = {
-            appointmentId: appointmentId
+            id: appointmentId
         }
         let dto={
             status:'completed'

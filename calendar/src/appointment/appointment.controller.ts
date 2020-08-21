@@ -674,8 +674,16 @@ export class AppointmentController {
     @MessagePattern({cmd: 'video_remove_session_token_by_doctor'})
     async removeSessionAndTokenByDoctor(user): Promise<any> {
         const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        const app = await this.appointmentService.appointmentDetails(user.appointmentId);
+        const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
         if(doc){
             await this.videoService.removeSessionAndTokenByDoctor(doc,user.appointmentId);
+            const patient=pat.patientId;
+            let result={
+                patient:patient,
+                isRemoved:true
+            }
+            return result;
         } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
