@@ -659,7 +659,8 @@ export class AppointmentController {
             const patient=pat.patientId;
             let result={
                 response: res,
-                patient:patient
+                patient:patient,
+                isRemoved:true
             }
             return result;
         }else {
