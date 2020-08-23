@@ -11,9 +11,9 @@ export class AppointmentDocConfigRepository extends Repository<AppointmentDocCon
         const appointment = new AppointmentDocConfig();
         appointment.appointmentId = appointmentDto.appointmentId;
         appointment.consultationCost =appointmentDto.config.consultationCost ;
-        appointment.isPatientPreconsultationAllowed = appointmentDto.config.isPatientPreconsultationAllowed ;
+        appointment.isPatientPreconsultationAllowed = appointmentDto.config.isPreconsultationAllowed ;
         appointment.preconsultationHours = appointmentDto.config.preconsultationHours;
-        appointment.preconsultationMinutes = appointmentDto.config.preconsultationMinutes;
+        appointment.preconsultationMinutes = appointmentDto.config.preconsultationMins;
         appointment.isPatientCancellationAllowed = appointmentDto.config.isPatientCancellationAllowed;
         appointment.cancellationDays= appointmentDto.config.cancellationDays;
         appointment.cancellationHours= appointmentDto.config.cancellationHours;
