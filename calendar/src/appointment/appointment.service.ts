@@ -1185,7 +1185,7 @@ export class AppointmentService {
                         if (appointmentList.is_active == true) {
                             let doctor = await this.doctor_Details(appointmentList.doctorId);
                             let account = await this.accountDetails(doctor.accountKey);
-                            let config = await this.getDoctorConfigDetails(doctor.doctorKey);
+                            let config = await this.getAppDoctorConfigDetails(appointmentList.id);
                             var preConsultationHours = null;
                             var preConsultationMins = null;
                             if (config.isPreconsultationAllowed) {
@@ -1209,12 +1209,12 @@ export class AppointmentService {
                     } else {
                         let doctor = await this.doctor_Details(appointmentList.doctorId);
                         let account = await this.accountDetails(doctor.accountKey);
-                        let config = await this.getDoctorConfigDetails(doctor.doctorKey);
+                        let config = await this.getAppDoctorConfigDetails(appointmentList.id);
                         var preConsultationHours = null;
                         var preConsultationMins = null;
-                        if (config.isPreconsultationAllowed) {
+                        if (config.isPatientPreconsultationAllowed) {
                             preConsultationHours = config.preconsultationHours;
-                            preConsultationMins = config.preconsultationMins;
+                            preConsultationMins = config.preconsultationMinutes;
                         }
                         let res = {
                             appointmentDate: appointmentList.appointment_date,
@@ -1330,29 +1330,29 @@ export class AppointmentService {
         const doctor = await this.doctorDetails(details.doctorKey);
         const account = await this.accountDetails(doctor.accountKey);
         const app = await this.appointmentDetails(details.appointmentId);
-        const config = await this.getDoctorConfigDetails(doctor.doctorKey);
+        const config = await this.getAppDoctorConfigDetails(details.appointmentId);
         const patient = await this.getPatientDetails(app.appointmentDetails.patientId);
-        let preHours;
-        let preMins;
-        let canDays;
-        let canHours;
-        let canMins;
-        let reschDays;
-        let reschHours;
-        let reschMins;
-        if (config.isPreconsultationAllowed) {
+        let preHours = null;
+        let preMins = null;
+        let canDays = null;
+        let canHours = null;
+        let canMins = null;
+        let reschDays = null;
+        let reschHours = null;
+        let reschMins = null;
+        if (config.isPatientPreconsultationAllowed) {
             preHours = config.preconsultationHours;
-            preMins = config.preconsultationMins;
+            preMins = config.preconsultationMinutes;
         }
         if (config.isPatientCancellationAllowed) {
             canDays = config.cancellationDays;
             canHours = config.cancellationHours;
-            canMins = config.cancellationMins;
+            canMins = config.cancellationMinutes;
         }
         if (config.isPatientRescheduleAllowed) {
             reschDays = config.rescheduleDays;
             reschHours = config.rescheduleHours;
-            reschMins = config.rescheduleMins;
+            reschMins = config.rescheduleMinutes;
         }
         var res = {
             email: doctor.email,
@@ -1590,15 +1590,42 @@ export class AppointmentService {
     async patientUpcomingAppointmentsForDoctor(user: any): Promise<any> {
         const doc = await this.doctorDetails(user.patientDto.doctorKey);
         const d: Date = new Date();
+        let app =[];
+        let res=[];
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
         if (user.patientDto.paginationNumber) {
             let offset = (user.paginationNumber) * (10);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'notCompleted', 'paused']);
-            return app;
+            app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'notCompleted', 'paused']);
         } else {
-            const app = await this.appointmentRepository.query(queries.getAppDoctorList, [doc.doctorId, user.patientDto.patientId, date, 'notCompleted', 'paused'])
-            return app;
+            app = await this.appointmentRepository.query(queries.getAppDoctorList, [doc.doctorId, user.patientDto.patientId, date, 'notCompleted', 'paused'])
         }
+        for(let x of app){
+            let preHours = 0;
+            let preMins = 0;
+            if(x.is_preconsultation_allowed){
+                if(x.pre_consultation_hours){
+                    preHours = x.pre_consultation_hours;
+                }
+                if(x.pre_consultation_mins){
+                    preMins = x.pre_consultation_mins;
+                }
+            }
+            let preConsultationStart = preHours +':'+ preMins;
+            let result ={
+                appointmentDate:x.appointmentDate,
+                isPreconsultationAllowed:x.is_preconsultation_allowed,
+                preConsultationStart:preConsultationStart,
+                doctorId:x.doctorId,
+                doctorFirstName:x.doctorFirstName,
+                doctorLastName:x.doctorLastName,
+                patientId:x.patientId,
+                startTime:x.startTime,
+                endTime:x.endTime,
+                hospitalName:x.hospitalName
+            }
+            res.push(result);
+        }
+        return res;
     }
 
     async patientPastAppointmentsForDoctor(user: any): Promise<any> {
