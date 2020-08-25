@@ -36,8 +36,8 @@ export class PaymentService {
         const shasum = crypto.createHmac('sha256',secret)
         shasum.update(JSON.stringify(req))
         const digest = shasum.digest('hex')
-        console.log(digest,req.headers['x-razorpay-signature'])
-        if(digest === req.headers['x-razorpay-signature']){
+        console.log(digest,req.razorpay_signature)
+        if(digest === req.razorpay_signature){
             console.log('request is legit');
         }else{
             return{
