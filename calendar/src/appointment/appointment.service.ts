@@ -1600,6 +1600,7 @@ export class AppointmentService {
             app = await this.appointmentRepository.query(queries.getAppDoctorList, [doc.doctorId, user.patientDto.patientId, date, 'notCompleted', 'paused'])
         }
         for(let x of app){
+            let time = null;
             let preHours = 0;
             let preMins = 0;
             if(x.is_preconsultation_allowed){
@@ -1609,12 +1610,12 @@ export class AppointmentService {
                 if(x.pre_consultation_mins){
                     preMins = x.pre_consultation_mins;
                 }
+                time = preHours*60 + preMins;
             }
-            let preConsultationStart = preHours +':'+ preMins;
             let result ={
                 appointmentDate:x.appointmentDate,
                 isPreconsultationAllowed:x.is_preconsultation_allowed,
-                preConsultationStart:preConsultationStart,
+                preConsultationTime:time,
                 doctorId:x.doctorId,
                 doctorFirstName:x.doctorFirstName,
                 doctorLastName:x.doctorLastName,
