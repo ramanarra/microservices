@@ -38,8 +38,8 @@ export class VideoService {
     }
 
     @UseFilters(AllClientServiceException)
-    public removePatientTokenByDoctor(doctor_key : string, appointmentId : string) : Promise <any> {
-        let reqData = {doctorKey : doctor_key, appointmentId : appointmentId};
+    public removePatientTokenByDoctor(doctor_key : string, appointmentId : string, status : string) : Promise <any> {
+        let reqData = {doctorKey : doctor_key, appointmentId : appointmentId, status : status};
         return this.redisClient.send({ cmd : 'video_remove_patient_token_by_doctor'}, reqData).toPromise();
     }
 

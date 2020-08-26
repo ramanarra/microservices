@@ -655,7 +655,7 @@ export class AppointmentController {
         const app = await this.appointmentService.appointmentDetails(docPatientDetail.appointmentId);
         const pat = await this.patientDetailsRepository.findOne({patientId: app.appointmentDetails.patientId});
         if(doc.doctorId==app.appointmentDetails.doctorId){
-            const res=await this.videoService.removePatientToken(doc, pat.patientId, docPatientDetail.appointmentId);
+            const res=await this.videoService.removePatientToken(doc, pat.patientId, docPatientDetail.appointmentId, docPatientDetail.status);
             const patient=pat.patientId;
             let result={
                 response: res,
@@ -1027,36 +1027,6 @@ export class AppointmentController {
         const patient = await this.appointmentService.patientGeneralSearch(user.patientSearch,doctor.doctorId);
         return patient;
     }
-
-    // @MessagePattern({cmd : 'payment_payment'})
-    // async payment(userInfo : any){
-    //     var instance = new Razorpay({
-    //         key_id: 'YOUR_KEY_ID',
-    //         key_secret: 'YOUR_KEY_SECRET',
-    //     });
-
-    //     var options = {
-    //     amount: 50000,  // amount in the smallest currency unit
-    //     currency: "INR",
-    //     receipt: "order_rcptid_11",
-    //     payment_capture: '0'
-    //     };
-    //     instance.orders.create(options, function(err, order) {
-    //     console.log(order);
-    //     });
-
-    //     instance.payments.fetch(userInfo.paymentId)
-
-    //     instance.payments.all({
-    //         from: '2016-08-01',
-    //         to: '2016-08-20'
-    //       }).then((response) => {
-    //         // handle success
-    //       }).catch((error) => {
-    //         // handle error
-    //       })
-    
-    // }   
     
     @MessagePattern({cmd: 'get_payment_order'})
     async paymentOrder(user: any): Promise<any> {
