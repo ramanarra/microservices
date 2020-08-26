@@ -32,13 +32,15 @@ export class PaymentService {
 
     async paymentVerification(req): Promise<any> {
         const secret = 'Oec8MS34qSS2BVhGMND0ym3L';
-        console.log(req);  
-        const shasum = crypto.createHmac('sha256',secret)
-        shasum.update(JSON.stringify(req))
-        const digest = shasum.digest('hex')
+        console.log(req);
+        let data = req.razorpay_order_id+"|"+req.razorpay_payment_id;
+        const digest = crypto.createHmac('SHA256', secret).update(data).digest('hex');
         console.log(digest,req.razorpay_signature)
         if(digest === req.razorpay_signature){
-            console.log('request is legit');
+            return{
+                statusCode:HttpStatus.OK,
+                message:CONSTANT_MSG.SIGNATURE_VERIFIED
+            }
         }else{
             return{
                 statusCode:HttpStatus.BAD_REQUEST,

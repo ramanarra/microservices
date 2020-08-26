@@ -108,7 +108,7 @@ export class VideoService {
     }
 
 
-    async removePatientToken(doc : Doctor, patientId : number, appointmentId : number) : Promise<void> {
+    async removePatientToken(doc : Doctor, patientId : number, appointmentId : number, status: string) : Promise<void> {
 
         const openViduSession : OpenViduSession =  await this.openViduSessionRepo.findOne({doctorKey : doc.doctorKey});
         const openViduSessionToken : OpenViduSessionToken =  await this.openViduSessionTokenRepository.findOne({ where: {
@@ -122,7 +122,7 @@ export class VideoService {
                 id: appointmentId
             }
             let dto={
-                status:'paused'
+                status: status
             }
             var values: any = dto;
             var updateAppStatus = await this.appointmentRepository.update( condition, values);
