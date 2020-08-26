@@ -37,6 +37,7 @@ export const CONSTANT_MSG = {
     RESCHED_NOT_ALLOWED:'Patient is not allowed to reschedule this appointment',
     SIGNATURE_NOT_MATCHED:'Signature not matched',
     SIGNATURE_VERIFIED:'Signature verified',
+    NO_APPOINT_PRESENT:'No Appointment present on this date',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

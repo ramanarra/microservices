@@ -946,7 +946,7 @@ export class CalendarController {
     }
 
     @Post('doctor/patientUpcomingAppList')
-    @ApiOkResponse({description: 'patientUpcomingList API'})
+    @ApiOkResponse({description: 'request body example:   {"patientId":5,"doctorKey":"Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -963,7 +963,7 @@ export class CalendarController {
     }
 
     @Post('doctor/patientPastAppList')
-    @ApiOkResponse({description: 'patientUpcomingList API'})
+    @ApiOkResponse({description: 'request body example:   {"patientId":5,"doctorKey":"Doc_5"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -1060,7 +1060,7 @@ export class CalendarController {
 
     @Post('payment/verification')
     @ApiOkResponse({
-        description: 'requestBody example :   { "amount":"10", "currency":"INR", "receipt": "001", "payment_capture": false }'
+        description: 'requestBody example :   {"razorpay_order_id": "order_FV6u13eob2vaLE","razorpay_payment_id": "pay_FV6uMsxQHGLJwC","razorpay_signature": "d4adf91d6277a9ef0350638e6370b148ab372be11da2c002d101b56814688cb3"}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
@@ -1095,6 +1095,33 @@ export class CalendarController {
         }
         
     }
+
+    @Get('patient/appointmentPresentOnDate')
+    @ApiOkResponse({description: 'appointmentPresentOnDate API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Patient')
+    async appointmentPresentOnDate(@Request() req,@patient() check: boolean, @Query('appointmentDate') appointmentDate: string, @Query('doctorKey') doctorKey: string) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
+            await this.calendarService.updatePatLastActive(req.user.patientId);
+        }
+        const appDate = new Date(appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(appDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
+        this.logger.log(`appointmentPresentOnDate Api -> Request data }`);
+        return this.calendarService.appointmentPresentOnDate(req.user,appDate,doctorKey);
+    }
+
 
     @Get('admin/patients')
     @ApiOkResponse({description: 'patientList API'})
