@@ -298,6 +298,13 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public appointmentPresentOnDate(user:any, appointmentDate:any, doctorKey: any) : Promise <any> {
+        user.appointmentDate = appointmentDate;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'patient_app_date'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public getMilli(time:any) : Promise <any> {
         return this.redisClient.send({ cmd : 'get_time_milli'},time).toPromise();
     }

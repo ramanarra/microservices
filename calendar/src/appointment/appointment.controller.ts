@@ -1027,6 +1027,15 @@ export class AppointmentController {
         const patient = await this.appointmentService.patientGeneralSearch(user.patientSearch,doctor.doctorId);
         return patient;
     }
+
+    @MessagePattern({cmd: 'patient_app_date'})
+    async appointmentPresentOnDate(user: any): Promise<any> {
+        const doctor = await this.appointmentService.doctorDetails(user.doctorKey);
+        user.doctorId = doctor.doctorId;
+        const patient = await this.appointmentService.appointmentPresentOnDate(user);
+        return patient;
+    }
+
     
     @MessagePattern({cmd: 'get_payment_order'})
     async paymentOrder(user: any): Promise<any> {

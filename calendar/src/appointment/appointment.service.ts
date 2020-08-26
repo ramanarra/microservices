@@ -1784,6 +1784,22 @@ export class AppointmentService {
         return patientList;
     }
 
+    async appointmentPresentOnDate(user:any): Promise<any> {
+        const exist = await this.appointmentRepository.query(queries.getExistAppointment, [user.doctorId, user.patientId, user.appointmentDate])
+        if (exist.length) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.APPOINT_ALREADY_PRESENT
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.NO_APPOINT_PRESENT
+            }
+        } 
+     }
+
+
 
     // common functions below===============================================================
 
