@@ -21,21 +21,24 @@ export class PaymentService {
  
     async paymentOrder(req): Promise<any> {
         const options = {
-            amount:req.amount,
+            amount:req.amount*100,
             currency:'INR',
             receipt:shortid.generate(),
             payment_capture:1
         }
        const response = await instance.orders.create(options);
+       let res:any = response.amount/100;
        if(response){
             const pay = new PaymentDetails();
-            pay.amount = response.amount;
+            pay.amount = res;
             pay.orderId = response.id;
             pay.receiptId = response.receipt;
             pay.paymentStatus = CONSTANT_MSG.PAYMENT_STATUS.NOT_PAID
             const payment = await pay.save();
        }
        console.log(response);
+       response.amount = res;
+       response.amount_due = res;
        return response;
     }
 

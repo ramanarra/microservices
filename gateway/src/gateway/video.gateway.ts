@@ -66,6 +66,8 @@ export class VideoGateway {
     patientSocketList.forEach( (val : Socket) => {
       val.emit("videoTokenRemoved", response);
     });
+    const responseDoc : any = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
+    client.emit("getDoctorAppointments", responseDoc);
   }
 
   @SubscribeMessage('removeSessionAndTokenByDoctor')
