@@ -225,6 +225,19 @@ export class UserService {
         return bcrypt.hash(password, salt);
     }
 
-
+    async doctorForgotPassword(user: any): Promise<any> {
+        const users =  await this.userRepository.findOne({id: user.userId});
+        if(users){
+            const salt = await bcrypt.genSalt(); 
+            users.salt = salt;
+            users.password = await this.hashPassword(user.userDto.password, salt);
+            await this.userRepository.save(users);
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
 
 }

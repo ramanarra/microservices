@@ -56,6 +56,11 @@ export class AppointmentController {
         const account = await this.appointmentService.accountDetails(doctorId.accountKey);  
         const appointment = await this.appointmentService.createAppointment(appointmentDto);       
         if(!appointment.message){
+            const pay = new PaymentDetails();
+            pay.amount = appointmentDto.config.consultationCost;
+            pay.appointmentId = appointment.appointment.appointmentdetails.id;
+            pay.paymentStatus = CONSTANT_MSG.PAYMENT_STATUS.FULLY_PAID
+            const payment = await pay.save();
             let data={
                 email:pat.email,
                 appointmentId:appointment.appointment.appointmentdetails.id,
@@ -70,6 +75,9 @@ export class AppointmentController {
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
             const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            //let apiKey = new Sms(this.textLocal.apiKey);
+            let params = {
+            }
         }
         return appointment;
     }
@@ -1074,5 +1082,12 @@ export class AppointmentController {
         const patient = Helper.getTimeInMilliSeconds(time);
         return patient;
     }
+
+    @MessagePattern({cmd: 'create_payment_link'})
+    async createPaymentLink(user: any): Promise<any> {
+        const patient = await this.paymentService.createPaymentLink(user.accountDto);
+        return patient;
+    }
+
 
 }

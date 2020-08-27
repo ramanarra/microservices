@@ -90,4 +90,22 @@ export class UserController {
         
     };
 
+    @MessagePattern({cmd: 'auth_doctor_forgot_password'})
+    async doctorsForgotPassword(user: any): Promise<any> {
+        const doctor = await this.userService.doctorForgotPassword(user);
+        if(doctor.message == CONSTANT_MSG.INVALID_CREDENTIALS){
+            return{
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_CREDENTIALS
+            }
+        }
+        return {
+            "doctorKey": doctor.doctor_key,
+            "accountKey": doctor.account_key,
+            "role":doctor.role,
+            "accessToken": doctor.accessToken,
+            "rolesPermission": doctor.rolesPermission
+        }
+    };
+
 }
