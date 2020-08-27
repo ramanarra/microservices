@@ -9,4 +9,5 @@ export class UserDto {
     isActive:boolean;
     updatedTime:Date;
     role:string;
+    confirmPassword:string;
 }

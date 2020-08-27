@@ -327,5 +327,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'account_patients_list'},user).toPromise();
     }
 
+    @UseFilters(AllClientServiceException)
+    public createPaymentLink(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'create_payment_link'},user).toPromise();
+    }
+
 
 }

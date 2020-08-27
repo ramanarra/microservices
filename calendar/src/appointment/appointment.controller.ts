@@ -70,6 +70,9 @@ export class AppointmentController {
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
             const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            //let apiKey = new Sms(this.textLocal.apiKey);
+            let params = {
+            }
         }
         return appointment;
     }
@@ -1074,5 +1077,12 @@ export class AppointmentController {
         const patient = Helper.getTimeInMilliSeconds(time);
         return patient;
     }
+
+    @MessagePattern({cmd: 'create_payment_link'})
+    async createPaymentLink(user: any): Promise<any> {
+        const patient = await this.paymentService.createPaymentLink(user.accountDto);
+        return patient;
+    }
+
 
 }

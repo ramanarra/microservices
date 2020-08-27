@@ -254,36 +254,69 @@ export class CalendarController {
         //     console.log("Provide doctorKey");
         //     return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
         // }else if(workScheduleDto.updateWorkSchedule){
-        //     workScheduleDto.updateWorkSchedule.forEach(async x => {
-        //         if(!x.scheduledayid){
+        //     let y;
+        //     let x=workScheduleDto.updateWorkSchedule
+        //     for(y=0;y<=workScheduleDto.updateWorkSchedule.length;y++){
+        //         if(!x[y].scheduledayid){
         //             console.log("Provide scheduledayid");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
-        //         }else if(!x.startTime){
+        //         }else if(!x[y].startTime){
         //             console.log("Provide startTime");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
-        //         }else if(x.startTime){
-        //             console.log(x.startTime);
+        //         }else if(x[y].startTime){
+        //             console.log(x[y].startTime);
         //             const start = await this.calendarService.getMilli(x.startTime);
+        //             console.log(start);
         //             const base = await this.calendarService.getMilli('23:59');
         //             if(start>base){
         //                 console.log("Time must be in military time format");
         //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time must be in military time format"}
         //             }
-        //         }else if(!x.endTime){
+        //         }else if(!x[y].endTime){
         //             console.log("Provide endTime");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
-        //         }else if(x.endTime){
-        //             const end = await this.calendarService.getMilli(x.endTime);
+        //         }else if(x[y].endTime){
+        //             const end = await this.calendarService.getMilli(x[y].endTime);
         //             const base = await this.calendarService.getMilli('23:59');
         //             if(end>base){
         //                 console.log("End time must be in military time format");
         //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time must be in military time format"}
         //             }
-        //         }else if(!x.isDelete){
+        //         }else if(!x[y].isDelete){
         //             console.log("Provide isDelete");
         //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
         //         }
-        //     });
+        //     }
+        //     // workScheduleDto.updateWorkSchedule.forEach(async x => {
+        //     //     if(!x.scheduledayid){
+        //     //         console.log("Provide scheduledayid");
+        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
+        //     //     }else if(!x.startTime){
+        //     //         console.log("Provide startTime");
+        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        //     //     }else if(x.startTime){
+        //     //         console.log(x.startTime);
+        //     //         const start = await this.calendarService.getMilli(x.startTime);
+        //     //         const base = await this.calendarService.getMilli('23:59');
+        //     //         if(start>base){
+        //     //             console.log("Time must be in military time format");
+        //     //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time must be in military time format"}
+        //     //         }
+        //     //     }else if(!x.endTime){
+        //     //         console.log("Provide endTime");
+        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
+        //     //     }else if(x.endTime){
+        //     //         const end = await this.calendarService.getMilli(x.endTime);
+        //     //         const base = await this.calendarService.getMilli('23:59');
+        //     //         if(end>base){
+        //     //             console.log("End time must be in military time format");
+        //     //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time must be in military time format"}
+        //     //         }
+        //     //     }else if(!x.isDelete){
+        //     //         console.log("Provide isDelete");
+        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
+        //     //     }
+        //     // });
         // }else if(workScheduleDto.workScheduleConfig){
         //     let y = workScheduleDto.workScheduleConfig;
         //     if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
@@ -1143,5 +1176,19 @@ export class CalendarController {
         return await this.calendarService.accountPatientsList(req.user, accountKey);
     }
 
+    @Post('payment/createPaymentLink')
+    @ApiOkResponse({
+        description: 'requestBody example :   {"customer": {"name": "Acme Enterprises", "email": "admin@aenterprises.com","contact": "9999999999"}, "type": "link", "view_less": 1,"amount": 6742,"currency": "INR", "description": "Payment Link for this purpose - cvb.","receipt": "#TS1989","sms_notify": 1, "email_notify": 1, "expire_by": 1793630556 }'
+    })
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Payment')
+    @ApiBody({type: AccountDto})
+    createPaymentLink(@Request() req, @Body() accountDto: any) {
+        this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
+        return this.calendarService.createPaymentLink(accountDto, req.user);
+    }
+    
 
 }

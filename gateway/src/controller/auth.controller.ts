@@ -29,6 +29,8 @@ import {
 import { defaultMaxListeners } from 'stream';
 import {AuthGuard} from '@nestjs/passport';
 import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
+import {JwtService} from '@nestjs/jwt';
+import { toNamespacedPath } from 'path';
 
 
 @Controller('api/auth')
@@ -37,7 +39,7 @@ export class AuthController {
 
   private logger = new Logger('AuthController');
 
-  constructor(private readonly userService: UserService, private readonly calendarService: CalendarService) { }
+  constructor(private readonly userService: UserService, private readonly calendarService: CalendarService,  private readonly jwtService: JwtService) { }
 
     @Post('doctorLogin')
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
@@ -189,5 +191,50 @@ export class AuthController {
       req.logOut();
       return res.json({message: "sucessfully loggedout"})
     }
+
+    @Get('refreshToken')
+    @ApiBearerAuth('JWT')
+    @ApiOkResponse({description: 'refreshToken API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async refreshToken(@Request() req,@Response() res) {
+      var token2 = req.headers.authorization;
+      token2 = token2.replace("Bearer", "").trim();
+      var token1 = this.jwtService.decode(token2); 
+      let token:any = token1;
+      delete token.exp;
+      delete token.iat;
+      try{
+        const newToken = this.jwtService.sign(token);
+        return res.json({newToken:newToken,statusCode:HttpStatus.OK, message: "Token updated successfully"})
+      } catch(e){
+        console.log(e);
+      }      
+    }
+
+    @Post('doctor/forgotPassword')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"email":"test@apollo.com",\n' +
+          '"password": "123456" \n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    @ApiTags('Doctors')
+    async doctorsForgotPassword(@Request() req, @Body() userDto : UserDto) {
+      if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+        const status = await this.calendarService.updateDocOnline(req.user.doctorKey);
+      }
+      if(!userDto.password){
+        console.log("Provide password");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
+      }else if(!userDto.confirmPassword){
+        console.log("Provide confirmPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmPassword"}
+      }
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      const doc:any =await this.userService.doctorsForgotPassword(req.user,userDto);
+      return doc;
+    }
+
+
 
 }
