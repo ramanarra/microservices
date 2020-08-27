@@ -9,6 +9,9 @@ import { VideoService } from './video.service';
 import { PatientDetailsRepository } from './patientDetails/patientDetails.repository';
 import * as Razorpay from 'razorpay';
 import { PaymentService } from './payment.service';
+import * as config from 'config';
+import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
+import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 
 //import {DoctorService} from './doctor/doctor.service';
 
@@ -18,12 +21,13 @@ import { PaymentService } from './payment.service';
 export class AppointmentController {
 
     private logger = new Logger('AppointmentController');
-
+    textLocal:any;
     constructor(private readonly appointmentService: AppointmentService,
         private readonly videoService : VideoService,
         private readonly paymentService : PaymentService,
-        private patientDetailsRepository : PatientDetailsRepository) {
-
+        private patientDetailsRepository : PatientDetailsRepository,
+        private paymentDetailsRepository: PaymentDetailsRepository) {
+        //    this.textLocal = config.get('textLocal');
     }
 
     @MessagePattern({cmd: 'calendar_appointment_create'})
@@ -437,6 +441,9 @@ export class AppointmentController {
         const pat = await this.appointmentService.getPatientDetails(patientDto.patientId); 
         const account = await this.appointmentService.accountDetails(docId.accountKey); 
         if(app){
+            const pay = await this.paymentDetailsRepository.findOne( { where : {id : patientDto.paymentId}});
+            pay.appointmentId = app.appointment.appointmentdetails.id;
+            const payment = await this.paymentDetailsRepository.save(pay);
             let data={
                 email:doctor.email,
                 appointmentId:app.appointment.appointmentdetails.id,
