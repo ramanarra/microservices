@@ -43,7 +43,7 @@ export class VideoService {
             console.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
             await this.openViduSessionTokenRepository.createTokenForDoctorAndPatient(OVsessionTokenDate, 'DOCTOR');
             console.log("Token => " + token);
-            return {isToken : true, token : token, isDoctor : true, isPatient : false, sessionId : sessionId };
+            return {isToken : true, token : token, isDoctor : true, isPatient : false, sessionId : sessionId, doctorName : doc.doctorName };
         } catch (e) {
             console.log(e);
             return {
@@ -55,7 +55,7 @@ export class VideoService {
     }
 
 
-    async createPatientTokenByDoctor(doc : Doctor, patient : PatientDetails) : Promise<any> {
+    async createPatientTokenByDoctor(doc : Doctor, patient : PatientDetails, appointmentId:any) : Promise<any> {
         try {
             const openViduSession : OpenViduSession =  await this.openViduSessionRepo.findOne({doctorKey : doc.doctorKey});
             if(openViduSession){
@@ -71,7 +71,7 @@ export class VideoService {
                 console.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
                 await this.openViduSessionTokenRepository.createTokenForDoctorAndPatient(OVsessionTokenDate, CONSTANT_MSG.ROLES.PATIENT);
                 console.log("Token => " + token);
-                return { isToken : true, token : token, isDoctor : false, isPatient : true, sessionId : sessionId, patient : patient.patientId};
+                return { isToken : true, token : token, isDoctor : false, isPatient : true, sessionId : sessionId, patient : patient.patientId, appointmentId : appointmentId};
             } else {
                 return {
                     isToken : false,
@@ -87,14 +87,14 @@ export class VideoService {
         }
     }
 
-    async getPatientToken(doctorId : number , patientId : number) : Promise<any> {
+    async getPatientToken(doctorId : number , patientId : number, appointmentId : number) : Promise<any> {
         try {
             const openViduSessionToken : OpenViduSessionToken =  await this.openViduSessionTokenRepository.findOne({where :
                 {patientId : patientId, 
                 doctorId : doctorId}});
             if(openViduSessionToken){
                 const sessionId = openViduSessionToken.openviduSessionId;
-                return { isToken : true, token : openViduSessionToken.token, isDoctor : false, isPatient : true, sessionId : sessionId };
+                return { isToken : true, token : openViduSessionToken.token, isDoctor : false, isPatient : true, sessionId : sessionId, appointmentId : appointmentId };
             }else {
                 return { isToken : false, message : "Still Token not created for patient" };
             }
@@ -108,7 +108,7 @@ export class VideoService {
     }
 
 
-    async removePatientToken(doc : Doctor, patientId : number, appointmentId : number) : Promise<void> {
+    async removePatientToken(doc : Doctor, patientId : number, appointmentId : number, status: string) : Promise<void> {
 
         const openViduSession : OpenViduSession =  await this.openViduSessionRepo.findOne({doctorKey : doc.doctorKey});
         const openViduSessionToken : OpenViduSessionToken =  await this.openViduSessionTokenRepository.findOne({ where: {
@@ -119,17 +119,17 @@ export class VideoService {
             this.openViduSessionTokenRepository.remove(openViduSessionToken);
             await this.openViduService.removeTokenFromSession(openViduSession.sessionId, openViduSessionToken.token);
             var condition: any = {
-                appointmentId: appointmentId
+                id: appointmentId
             }
             let dto={
-                status:'paused'
+                status: status
             }
             var values: any = dto;
             var updateAppStatus = await this.appointmentRepository.update( condition, values);
         }
     }
 
-    async removeSessionAndTokenByDoctor(doctor : Doctor) : Promise<void> {
+    async removeSessionAndTokenByDoctor(doctor : Doctor,appointmentId:number) : Promise<void> {
         const openViduSessionList : OpenViduSession[] =  await this.openViduSessionRepo.find({ where: {
             doctorKey : doctor.doctorKey
         }});
@@ -144,6 +144,14 @@ export class VideoService {
         await this.openViduSessionTokenRepository.remove(openViduSessionTokenList)
         await this.openViduSessionRepo.remove(openViduSessionList);
         await this.openViduService.removeSessionList(sessionIdList);
+        var condition: any = {
+            id: appointmentId
+        }
+        let dto={
+            status:'completed'
+        }
+        var values: any = dto;
+        var updateAppStatus = await this.appointmentRepository.update( condition, values);
     }
    
 }

@@ -26,10 +26,18 @@ export const CONSTANT_MSG = {
     NO_WORK_SCHEDULE:'Doctor has no work schedule on this date',
     MAIL_OK:'Mail sent successfully',
     MAIL_ERROR : 'Failure to send mail',
+    SMS_OK:'SMS sent successfully',
+    SMS_ERROR : 'Failure to send SMS',
+    PAYMENT_OK:'SMS sent successfully',
+    PAYMENT_ERROR : 'Failure to send SMS',
     CANCEL_EXCEEDS : 'Cancellation is not possible; posting date exceeds limit of days for cancellation',
+    RESCHED_EXCEEDS : 'Reschedule is not possible; posting date exceeds limit of days for Reschedule',
     APPOINT_ALREADY_PRESENT:'Appointment already present on this date',
     CANCEL_NOT_ALLOWED:'Patient is not allowed to cancel this appointment',
     RESCHED_NOT_ALLOWED:'Patient is not allowed to reschedule this appointment',
+    SIGNATURE_NOT_MATCHED:'Signature not matched',
+    SIGNATURE_VERIFIED:'Signature verified',
+    NO_APPOINT_PRESENT:'No Appointment present on this date',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',
@@ -46,5 +54,11 @@ export const CONSTANT_MSG = {
         COMPLETED : "completed",
         PAUSED : "paused",
         NOT_COMPLETED : "notCompleted"
+    },
+    PAYMENT_STATUS : {
+        NOT_PAID : "notPaid",
+        PARTIALLY_PAID : "partiallyPaid",
+        FULLY_PAID : "fullyPaid",
+        REFUNDED :"refunded"
     }
 }
