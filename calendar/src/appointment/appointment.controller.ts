@@ -56,6 +56,11 @@ export class AppointmentController {
         const account = await this.appointmentService.accountDetails(doctorId.accountKey);  
         const appointment = await this.appointmentService.createAppointment(appointmentDto);       
         if(!appointment.message){
+            const pay = new PaymentDetails();
+            pay.amount = appointmentDto.config.consultationCost;
+            pay.appointmentId = appointment.appointment.appointmentdetails.id;
+            pay.paymentStatus = CONSTANT_MSG.PAYMENT_STATUS.FULLY_PAID
+            const payment = await pay.save();
             let data={
                 email:pat.email,
                 appointmentId:appointment.appointment.appointmentdetails.id,

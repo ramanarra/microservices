@@ -10,6 +10,7 @@ export class PatientDto {
     registrationNumber: string;
     address: string;
     state: string;
+    @IsOptional()
     @IsPostalCode()
     pincode: string;
     @IsOptional ()
