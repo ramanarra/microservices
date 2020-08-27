@@ -539,6 +539,7 @@ export class CalendarController {
             '"appointmentDate": "2020-06-12", \n' +
             '"paymentOption":"directPayment", \n' +
             '"confirmation":false,\n'+
+            '"paymentId":176,\n'+
             '"consultationMode":"online" \n' +
             '}'
     })
@@ -562,6 +563,9 @@ export class CalendarController {
         } else if(!req.body.startTime){
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+        } else if(!req.body.paymentId){
+            console.log("Provide paymentId");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide paymentId"}
         }
         patientDto.appointmentDate= new Date(patientDto.appointmentDate);
         const today = new Date()

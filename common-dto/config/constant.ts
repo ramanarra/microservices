@@ -54,5 +54,11 @@ export const CONSTANT_MSG = {
         COMPLETED : "completed",
         PAUSED : "paused",
         NOT_COMPLETED : "notCompleted"
+    },
+    PAYMENT_STATUS : {
+        NOT_PAID : "notPaid",
+        PARTIALLY_PAID : "partiallyPaid",
+        FULLY_PAID : "fullyPaid",
+        REFUNDED :"refunded"
     }
 }

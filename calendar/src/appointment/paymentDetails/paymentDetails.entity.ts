@@ -14,15 +14,24 @@ export class PaymentDetails extends BaseEntity{
     })
     appointmentId : number;
 
-  //  @Exclude()
     @Column({
-        name : 'refund'
+        name : 'order_id'
     })
-    refund : string;
+    orderId : string;
 
     @Column({
-        name : 'is_paid'
+        name : 'receipt_id'
     })
-    isPaid : boolean;
+    receiptId : string;
+
+    @Column({
+        name : 'amount'
+    })
+    amount : string;
+
+    @Column({
+        name : 'payment_status'
+    })
+    paymentStatus : string;
 
 }
