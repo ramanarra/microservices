@@ -5,6 +5,7 @@ export class DocConfigDto {
     @IsOptional()
     id : number;
     doctorKey: string;
+    @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(9999)

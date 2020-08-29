@@ -300,6 +300,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_reschedule'})
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+    const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
     if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
     }else{
@@ -327,6 +328,8 @@ export class AppointmentController {
     const account = await this.appointmentService.accountDetails(doctor.accountKey);
     let date = new Date();  
     if(!appointment.message){
+        payment.appointmentId = appointment.appointment.appointmentdetails.id;
+        await payment.save();
         let data={
             email:doctor.email,
             appointmentId:app.appointmentDetails.id,
@@ -933,6 +936,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_appointment_reschedule'})
     async patientAppointmentReschedule(appointmentDto: any): Promise<any> {
         const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+        const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
         const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
         if(app.appointmentDetails.patientId == appointmentDto.user.patientId){
             if(config.isPatientRescheduleAllowed){
@@ -959,6 +963,8 @@ export class AppointmentController {
                     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
                     const account = await this.appointmentService.accountDetails(doctor.accountKey);  
                     if(!appointment.message){
+                        payment.appointmentId = appointment.appointment.appointmentdetails.id;
+                        await payment.save();
                         let data={
                             email:doctor.email,
                             appointmentId:app.appointmentDetails.id,
@@ -991,6 +997,8 @@ export class AppointmentController {
                         const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
                         const account = await this.appointmentService.accountDetails(doctor.accountKey);  
                         if(!appointment.message){
+                            payment.appointmentId = appointment.appointment.appointmentdetails.id;
+                            await payment.save();
                             let data={
                                 email:doctor.email,
                                 appointmentId:app.appointmentDetails.id,
