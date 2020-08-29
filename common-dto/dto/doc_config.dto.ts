@@ -1,10 +1,13 @@
-import {IsEmail,IsNumber,IsPhoneNumber,IsOptional, Min, Max } from 'class-validator';
+import {IsEmail,IsNumber,IsPhoneNumber,IsOptional, Min, Max, IsInt } from 'class-validator';
 
 export class DocConfigDto {
     @IsNumber()
     @IsOptional()
     id : number;
     doctorKey: string;
+    @IsNumber()
+    @Min(1)
+    @Max(9999)
     consultationCost: string;
     isPreconsultationAllowed: boolean;
     @IsNumber()
