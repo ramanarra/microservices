@@ -250,93 +250,66 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        // if(!req.body.doctorKey){
-        //     console.log("Provide doctorKey");
-        //     return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
-        // }else if(workScheduleDto.updateWorkSchedule){
-        //     let y;
-        //     let x=workScheduleDto.updateWorkSchedule
-        //     for(y=0;y<=workScheduleDto.updateWorkSchedule.length;y++){
-        //         if(!x[y].scheduledayid){
-        //             console.log("Provide scheduledayid");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
-        //         }else if(!x[y].startTime){
-        //             console.log("Provide startTime");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
-        //         }else if(x[y].startTime){
-        //             console.log(x[y].startTime);
-        //             const start = await this.calendarService.getMilli(x.startTime);
-        //             console.log(start);
-        //             const base = await this.calendarService.getMilli('23:59');
-        //             if(start>base){
-        //                 console.log("Time must be in military time format");
-        //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time must be in military time format"}
-        //             }
-        //         }else if(!x[y].endTime){
-        //             console.log("Provide endTime");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
-        //         }else if(x[y].endTime){
-        //             const end = await this.calendarService.getMilli(x[y].endTime);
-        //             const base = await this.calendarService.getMilli('23:59');
-        //             if(end>base){
-        //                 console.log("End time must be in military time format");
-        //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time must be in military time format"}
-        //             }
-        //         }else if(!x[y].isDelete){
-        //             console.log("Provide isDelete");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
-        //         }
-        //     }
-        //     // workScheduleDto.updateWorkSchedule.forEach(async x => {
-        //     //     if(!x.scheduledayid){
-        //     //         console.log("Provide scheduledayid");
-        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
-        //     //     }else if(!x.startTime){
-        //     //         console.log("Provide startTime");
-        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
-        //     //     }else if(x.startTime){
-        //     //         console.log(x.startTime);
-        //     //         const start = await this.calendarService.getMilli(x.startTime);
-        //     //         const base = await this.calendarService.getMilli('23:59');
-        //     //         if(start>base){
-        //     //             console.log("Time must be in military time format");
-        //     //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time must be in military time format"}
-        //     //         }
-        //     //     }else if(!x.endTime){
-        //     //         console.log("Provide endTime");
-        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
-        //     //     }else if(x.endTime){
-        //     //         const end = await this.calendarService.getMilli(x.endTime);
-        //     //         const base = await this.calendarService.getMilli('23:59');
-        //     //         if(end>base){
-        //     //             console.log("End time must be in military time format");
-        //     //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time must be in military time format"}
-        //     //         }
-        //     //     }else if(!x.isDelete){
-        //     //         console.log("Provide isDelete");
-        //     //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
-        //     //     }
-        //     // });
-        // }else if(workScheduleDto.workScheduleConfig){
-        //     let y = workScheduleDto.workScheduleConfig;
-        //     if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
-        //         console.log("Provide valid overBookingType");
-        //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
-        //     }else if(y.overBookingCount){
-        //         if(!(y.overBookingCount>0 && y.overBookingCount<30)){
-        //             console.log("Provide valid overBookingCount");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingCount"}
-        //         }
-        //     }else if(!y.overBookingEnabled){
-        //         console.log("Provide valid overBookingEnabled");
-        //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
-        //     }else if(y.consultationSessionTimings){
-        //         if(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60){
-        //             console.log("Provide valid consultationSessionTimings");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
-        //         }
-        //     }
-        // }
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
+        }else if(workScheduleDto.updateWorkSchedule){
+            let y;
+            let x=workScheduleDto.updateWorkSchedule
+            for(y=0;y<workScheduleDto.updateWorkSchedule.length;y++){
+                if(!x[y].scheduledayid){
+                    console.log("Provide scheduledayid");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
+                }else if(!x[y].startTime){
+                    console.log("Provide startTime");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+                }else if(!x[y].endTime){
+                    console.log("Provide endTime");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
+                }
+                if(x[y].startTime){
+                    console.log(x[y].startTime);
+                    let splitStartTime = x[y].startTime.split(':');
+                    if((splitStartTime[0]*60*60000) > 86340000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time hours must be less than 23 hours"}
+                    }
+                    if((splitStartTime[1]*60000) > 3540000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time minutes must be less than 59 minutes"}
+                    }
+                }
+                if(x[y].endTime){
+                    let splitEndTime = x[y].endTime.split(':');
+                    if((splitEndTime[0]*60*60000) > 86340000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time hours must be less than 23 hours"}
+                    }
+                    if((splitEndTime[1]*60000) > 3540000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time minutes must be less than 59 minutes"}
+                    }
+                }
+            }
+        }
+        if(workScheduleDto.workScheduleConfig){
+            let y = workScheduleDto.workScheduleConfig;
+            if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
+                console.log("Provide valid overBookingType");
+                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
+            } else if(!y.overBookingEnabled){
+                console.log("Provide valid overBookingEnabled");
+                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+            }
+            if(y.consultationSessionTimings){
+                if(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60){
+                    console.log("Provide valid consultationSessionTimings");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
+                }
+            }
+            if(y.overBookingCount){
+                if(!(y.overBookingCount>0 && y.overBookingCount<30)){
+                    console.log("Provide valid overBookingCount");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingCount"}
+                }
+            }
+        }
 
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
         return await this.calendarService.workScheduleEdit(workScheduleDto, req.user);
@@ -622,7 +595,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Patient')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
+    @ApiOkResponse({description: 'request body example: {"doctorKey":"Doc_5","appointmentDate":"2020-08-27","confirmation":true}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async viewAppointmentSlotsForPatient(@Request() req,@patient() check:boolean,@Body() doctorDto: DoctorDto) {
         if (!check)
@@ -630,7 +603,24 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
             await this.calendarService.updatePatLastActive(req.user.patientId);
         }
-        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
+        } else if(!req.body.appointmentDate){
+            console.log("Provide appointmentDate");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}
+        } 
+        doctorDto.appointmentDate= new Date(doctorDto.appointmentDate);
+        const today = new Date()
+        const yesterday = new Date(today)
+        yesterday.setDate(yesterday.getDate() - 1)
+        if(doctorDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
+        this.logger.log(`Doctor View Appointments Slots Api -> Request data ${JSON.stringify(doctorDto)}`);
         return await this.calendarService.viewAppointmentSlotsForPatient(req.user,doctorDto);
     }
 

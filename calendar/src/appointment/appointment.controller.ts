@@ -239,6 +239,9 @@ export class AppointmentController {
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
         if((workScheduleDto.user.role == CONSTANT_MSG.ROLES.ADMIN && workScheduleDto.user.account_key == doctor.accountKey) || (workScheduleDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && workScheduleDto.user.doctor_key == doctor.doctorKey)){
+            if(workScheduleDto.user.role == CONSTANT_MSG.ROLES.ADMIN){
+                workScheduleDto.user.doctor_key = workScheduleDto.doctorKey;
+            }
             const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
             return updateRes;
         }

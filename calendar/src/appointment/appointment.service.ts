@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email, Sms
+    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email,Sms
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -358,6 +358,22 @@ export class AppointmentService {
                         sunday.push(v);
                     }
                 })
+                let days =[monday,tuesday,wednesday,thursday,friday,saturday,sunday];
+                days.forEach(e => {
+                    e = e.sort((val1, val2) => {
+                        let val1IntervalStartTime = val1.startTime;
+                        let val2IntervalStartTime = val2.startTime;
+                        val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+                        val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+                        if (val1IntervalStartTime < val2IntervalStartTime) {
+                            return -1;
+                        } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    })
+                });
                 const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
                 let config1 = config[0];
                 let responseData = {
@@ -1365,6 +1381,9 @@ export class AppointmentService {
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
+        if(!workSchedule.length){
+            return [];
+        }
         if (!workSchedule[0].startTime) {
             return [];
         }
