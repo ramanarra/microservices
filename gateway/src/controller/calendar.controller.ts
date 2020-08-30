@@ -715,7 +715,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiOkResponse({description: 'request body example:   {"accountKey":"Acc_1","hospitalName":"Apollo Hospitals", "city":"Chennai","state":"Tamil Nadu","pincode":"600006","country":"India","street1":"Thousand lights","street2":"Greams Lane","phone":"9623456256","supportEmail":"chennaiapollo@gmail.com","hospitalPhoto":"https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50","landmark":"Thousand Lights"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
         if (!check)
