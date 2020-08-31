@@ -1,5 +1,5 @@
-server:
-  URL: 'redis://localhost:6379'
+server :
+  URL : 'redis://dev-redis-gateway.ysl6gq.ng.0001.aps1.cache.amazonaws.com:6379'
 
 database:
   type: 'postgres'
