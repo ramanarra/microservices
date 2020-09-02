@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto, HospitalDto} from 'common-dto';
 import {AllClientServiceException} from 'src/common/filter/all-clientservice-exceptions.filter';
 import { UserService } from './user.service';
+import { patient } from '@src/common/decorator/patientPermission.decorator';
 
 
 @Injectable()

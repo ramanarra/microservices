@@ -218,7 +218,8 @@ export class CalendarController {
                     return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
                 }
             }           
-        }else if(req.body.isPatientRescheduleAllowed){
+        }
+        if(req.body.isPatientRescheduleAllowed){
             let rTime=docConfigDto.rescheduleHours+':'+docConfigDto.rescheduleMins;
             if(docConfigDto.rescheduleDays == 0){
                 const canTime= await this.calendarService.getMilli(rTime);
@@ -510,7 +511,7 @@ export class CalendarController {
             '"state":"state", \n' +
             '"pincode":"pincode", \n' +
             '"dateOfBirth":"dateOfBirth", \n' +
-            '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
+            '"photo":"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU" \n' +
             '}'
     })
     @ApiBearerAuth('JWT')
@@ -714,7 +715,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiOkResponse({description: 'request body example:   {"accountKey":"Acc_1","hospitalName":"Apollo Hospitals", "city":"Chennai","state":"Tamil Nadu","pincode":"600006","country":"India","street1":"Thousand lights","street2":"Greams Lane","phone":"9623456256","supportEmail":"chennaiapollo@gmail.com","hospitalPhoto":"https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50","landmark":"Thousand Lights"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
         if (!check)
@@ -782,6 +783,7 @@ export class CalendarController {
                                             '"appointmentDate":"2020-07-26", \n' +
                                             '"startTime":"10:00", \n' +
                                             '"endTime":"11:00", \n' +
+                                            '"doctorKey":"Doc_5", \n' +
                                             '"paymentOption":"directPayment", \n' +
                                             '"consultationMode":"online" \n' +
                                             '}'})
@@ -845,7 +847,8 @@ export class CalendarController {
                     startTime:patientDto.startTime,
                     endTime:patientDto.endTime,
                     paymentOption:patientDto.paymentOption,
-                    consultationMode:patientDto.consultationMode
+                    consultationMode:patientDto.consultationMode,
+                    doctorKey:patientDto.doctorKey
                 }
                
                 appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
@@ -1002,7 +1005,7 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        this.logger.log(`patientUpcomingAppList Api -> Request data }`);
+        this.logger.log(`patientPastAppList Api -> Request data }`);
         return await this.calendarService.patientPastAppList(req.user, patientDto);
     }
 

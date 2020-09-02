@@ -1098,11 +1098,11 @@ export class AppointmentService {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             let offset = (user.paginationNumber) * (user.limit);
-            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit,'completed']);
             if (!app.length) {
                 return [];
             }
-            const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
+            const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date,'completed']);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
@@ -1163,11 +1163,11 @@ export class AppointmentService {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             let offset = (user.paginationNumber) * (user.limit);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
+            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
             if (!app.length) {
                 return [];
             }
-            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date]);
+            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
