@@ -291,15 +291,20 @@ export class CalendarController {
         }
         if(workScheduleDto.workScheduleConfig){
             let y = workScheduleDto.workScheduleConfig;
-            if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
-                console.log("Provide valid overBookingType");
-                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
-            } else if(!y.overBookingEnabled){
-                console.log("Provide valid overBookingEnabled");
-                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+            if(y.overBookingType){
+                if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
+                    console.log("Provide valid overBookingType");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
+                }
+            }
+            if(y.overBookingEnabled){
+                if(!y.overBookingEnabled){
+                    console.log("Provide valid overBookingEnabled");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+                }
             }
             if(y.consultationSessionTimings){
-                if(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60){
+                if(!(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60)){
                     console.log("Provide valid consultationSessionTimings");
                     return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
                 }
