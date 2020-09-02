@@ -769,7 +769,15 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        let date = new Date(doctorDto.appointmentDate);    
+        //let date = new Date(doctorDto.appointmentDate);   
+        doctorDto.appointmentDate = moment(doctorDto.appointmentDate).format();
+        const yesterday = moment().subtract(1, 'days').format()
+        if(doctorDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        } 
         this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
         return await this.calendarService.availableSlots(req.user, doctorDto);
     }
