@@ -14,7 +14,7 @@ import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.reposito
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 
 //import {DoctorService} from './doctor/doctor.service';
-
+var moment = require('moment');
 
 
 @Controller('appointment')

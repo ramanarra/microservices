@@ -58,6 +58,7 @@ import {patient} from "../common/decorator/patientPermission.decorator";
 import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
+var moment = require('moment');
 
 
 @Controller('api/calendar')
@@ -291,15 +292,20 @@ export class CalendarController {
         }
         if(workScheduleDto.workScheduleConfig){
             let y = workScheduleDto.workScheduleConfig;
-            if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
-                console.log("Provide valid overBookingType");
-                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
-            } else if(!y.overBookingEnabled){
-                console.log("Provide valid overBookingEnabled");
-                return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+            if(y.overBookingType){
+                if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
+                    console.log("Provide valid overBookingType");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
+                }
+            }
+            if(y.overBookingEnabled){
+                if(!y.overBookingEnabled){
+                    console.log("Provide valid overBookingEnabled");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+                }
             }
             if(y.consultationSessionTimings){
-                if(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60){
+                if(!(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60)){
                     console.log("Provide valid consultationSessionTimings");
                     return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
                 }
@@ -764,7 +770,15 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        let date = new Date(doctorDto.appointmentDate);    
+        //let date = new Date(doctorDto.appointmentDate);   
+        doctorDto.appointmentDate = moment(doctorDto.appointmentDate).format();
+        const yesterday = moment().subtract(1, 'days').format()
+        if(doctorDto.appointmentDate < yesterday){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        } 
         this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
         return await this.calendarService.availableSlots(req.user, doctorDto);
     }
