@@ -58,6 +58,7 @@ import {patient} from "../common/decorator/patientPermission.decorator";
 import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
+var moment = require('moment');
 
 
 @Controller('api/calendar')
