@@ -58,6 +58,7 @@ import {patient} from "../common/decorator/patientPermission.decorator";
 import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 var moment = require('moment');
 
 
@@ -68,7 +69,7 @@ export class CalendarController {
 
     private logger = new Logger('CalendarController');
 
-    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService,) {
+    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService ) {
     }
 
 
@@ -105,11 +106,21 @@ export class CalendarController {
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
-        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -210,25 +221,6 @@ export class CalendarController {
         if(!req.body.doctorKey){
             console.log("Provide doctorKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
-        }else if(req.body.isPatientCancellationAllowed){
-            let cTime=docConfigDto.cancellationHours+':'+docConfigDto.cancellationMins;
-            if(docConfigDto.cancellationDays == 0){
-                const canTime= await this.calendarService.getMilli(cTime);
-                if(canTime < 600000){
-                    console.log("cancellation time should be greater than 10 minutes");
-                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
-                }
-            }           
-        }
-        if(req.body.isPatientRescheduleAllowed){
-            let rTime=docConfigDto.rescheduleHours+':'+docConfigDto.rescheduleMins;
-            if(docConfigDto.rescheduleDays == 0){
-                const canTime= await this.calendarService.getMilli(rTime);
-                if(canTime < 600000){
-                    console.log("reschedule time should be greater than 10 minutes");
-                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "reschedule time should be greater than 10 minutes"}
-                }
-            }           
         }
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
@@ -389,10 +381,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -581,10 +584,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide paymentId"}
         }
         patientDto.appointmentDate= new Date(patientDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(patientDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // patientDto.appointmentDate = moment(patientDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(patientDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -618,10 +632,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}
         } 
         doctorDto.appointmentDate= new Date(doctorDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(doctorDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // doctorDto.appointmentDate = moment(doctorDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(doctorDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -770,10 +795,18 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        //let date = new Date(doctorDto.appointmentDate);   
-        doctorDto.appointmentDate = moment(doctorDto.appointmentDate).format();
-        const yesterday = moment().subtract(1, 'days').format()
-        if(doctorDto.appointmentDate < yesterday){
+        doctorDto.appointmentDate = new Date(doctorDto.appointmentDate);
+        var appDate:any = new Date(doctorDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        const today = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        var shortStartDate = year + "-" + month + "-" + day;
+        if(appDate < shortStartDate){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -864,12 +897,22 @@ export class CalendarController {
                     consultationMode:patientDto.consultationMode,
                     doctorKey:patientDto.doctorKey
                 }
-               
                 appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-                const today = new Date()
-                const yesterday = new Date(today)
-                yesterday.setDate(yesterday.getDate() - 1)
-                if(appointmentDto.appointmentDate < yesterday){
+                // const yesterday = new Date(today)
+                // yesterday.setDate(yesterday.getDate() - 1)
+                // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+                // const yesterday = moment().subtract(1, 'days').format()
+                var appDate:any = new Date(appointmentDto.appointmentDate);
+                var month = appDate.getMonth() + 1
+                var day = appDate.getDay();
+                var year = appDate.getFullYear();
+                appDate = year + "-" + month + "-" + day;
+                var today:any = new Date()
+                month = today.getMonth() + 1
+                day = today.getDay();
+                year = today.getFullYear();
+                today = year + "-" + month + "-" + day;
+                if(appDate < today){
                     return{
                         statusCode:HttpStatus.BAD_REQUEST,
                         message:"Past Dates are not acceptable"
@@ -1074,10 +1117,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -1152,11 +1206,23 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
             await this.calendarService.updatePatLastActive(req.user.patientId);
         }
-        const appDate = new Date(appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appDate < yesterday){
+        // const appDate = new Date(appointmentDate);
+        // const today = new Date()
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // const appDate = moment(appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDay();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDay();
+        year = today.getFullYear();
+        today = year + "-" + month + "-" + day;
+        if(appDate < today){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
