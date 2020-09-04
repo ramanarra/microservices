@@ -36,6 +36,7 @@ import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameS
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import * as config from 'config';
 var async = require('async');
+var moment = require('moment');
 
 
 @Injectable()
@@ -121,17 +122,18 @@ export class AppointmentService {
 
                     }
                 }
-            }
-            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-            if (!appoint.message) {
-                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                console.log(appDocConfig);
-                return {
-                    appointment: appoint,
-                    appointmentDocConfig: appDocConfig
+            }else{
+                const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                if (!appoint.message) {
+                    const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                    console.log(appDocConfig);
+                    return {
+                        appointment: appoint,
+                        appointmentDocConfig: appDocConfig
+                    }
+                } else {
+                    return appoint;
                 }
-            } else {
-                return appoint;
             }
         } catch (e) {
             console.log(e);
@@ -515,6 +517,7 @@ export class AppointmentService {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let page: number = user.paginationNumber;
+            //var date = moment().format('YYYY-MM-DD');
             var date: any = new Date();
             var startDate: any = date;
             //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
@@ -557,9 +560,12 @@ export class AppointmentService {
                 let breaktheloop = 0;
                 while (appointmentSlots.length <= page * 7 + 7) {
                     breaktheloop++;
-                    if (breaktheloop > 20) break;
+                    //if (breaktheloop > 20) break;
                     // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
+                    //let day = moment(startDate,'YYYY-MM-DD').add(dayOfWeekCount, 'days').format()
+                    //let day = new Date(startDate.valueOf() + (dayOfWeekCount * 24 * 60 * 60 * 1000));
+                    //let dayOfWeek = moment(day).day();
                     let dayOfWeek = day.getDay();
                     let workScheduleDayPresentOrNot = false;
                     let dayOfWeekInWords;
@@ -603,6 +609,7 @@ export class AppointmentService {
                         var minutes = date.getMinutes();
                         var hour = date.getHours();
                         var time = hour + ":" + minutes;
+                        //var time = moment().format("HH:mm:ss");
                         var timeMilli = Helper.getTimeInMilliSeconds(time);
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
                         //sortedWorkScheduleTimeInterval.forEach(v => {
@@ -613,7 +620,7 @@ export class AppointmentService {
                             let breaktheloop2 = 0;
                             while (!intervalEnd) {  // until the interval endTime comes run the while loop
                                 breaktheloop2++;
-                                if (breaktheloop2 > 10) break;
+                               // if (breaktheloop2 > 10) break;
                                 let slotEndTimeCalculate = Helper.getTimeInMilliSeconds(slotStartTime);
                                 slotEndTimeCalculate += consultationSessionTimingInMilliSeconds; // adding slot startime + consultationSessionTiming, ex: 30 minutes
                                 let slotEndTime = Helper.getTimeinHrsMins(slotEndTimeCalculate);
@@ -625,7 +632,9 @@ export class AppointmentService {
                                 }
                                 let appointmentPresentOnThisDate = possibleNextAppointments.filter(v => { // check any appointment present on this date
                                     let appDate = Helper.getDayMonthYearFromDate(v.appointment_date);
+                                    //let appDate = moment(v.appointment_date).format('YYYY-MM-DD');
                                     let compareDate = Helper.getDayMonthYearFromDate(day);
+                                    //let compareDate = moment(day).format('YYYY-MM-DD');
                                     return appDate === compareDate;
                                 })
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
@@ -636,7 +645,9 @@ export class AppointmentService {
                                     // if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
                                     if (((startTimeInMilliSec <= slotStartTimeInMilliSec && endTimeInMilliSec <= slotEndTimeInMilliSec && slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec) || (slotStartTimeInMilliSec <= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec && startTimeInMilliSec > slotEndTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec) || (startTimeInMilliSec <= slotStartTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec) || (slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec)) && (!v.is_cancel)) {
                                         // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
+                                        //let daydate = moment(v.appointment_date).format('YYYY-MM-DD');
                                         let daydate = Helper.getDayMonthYearFromDate(v.appointment_date);
+                                        //let datedate = moment(date).format('YYYY-MM-DD');
                                         let datedate = Helper.getDayMonthYearFromDate(date);
                                         if (daydate == datedate) {
                                             // if(v.appointmentDate == date){
@@ -690,10 +701,13 @@ export class AppointmentService {
                                     }
                                     let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
                                     var time = date.getHours() + ":" + date.getMinutes();
+                                    //var time = moment().format("HH:mm:ss");
                                     var timeInMS = Helper.getTimeInMilliSeconds(time);
                                     var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
                                     if (!isOverLapping) {
+                                        //let daydate = moment(day).format('YYYY-MM-DD');
                                         let daydate = Helper.getDayMonthYearFromDate(day);
+                                        //let datedate = moment(date).format('YYYY-MM-DD');
                                         let datedate = Helper.getDayMonthYearFromDate(date);
                                         if (daydate === datedate) {
                                             if (timeMilli < slotEnd) {
@@ -1096,6 +1110,7 @@ export class AppointmentService {
     async patientPastAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
+            //var date = moment().format('YYYY-MM-DD');
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             let offset = (user.paginationNumber) * (user.limit);
             const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit,'completed']);
@@ -1162,6 +1177,7 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
             const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
             if (!app.length) {
@@ -1234,6 +1250,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -1375,6 +1392,7 @@ export class AppointmentService {
     async availableSlots(user: any): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
+        console.log(app);
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let dt = new Date(user.appointmentDate);
@@ -1431,9 +1449,12 @@ export class AppointmentService {
         }
         let date = new Date();
         var time = date.getHours() + ":" + date.getMinutes();
+        //const time = moment().format("HH:mm:ss");
         var timeMilli = Helper.getTimeInMilliSeconds(time);
         let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
+        //let daydate = moment(user.appointmentDate).format('YYYY-MM-DD');
         let datedate = Helper.getDayMonthYearFromDate(date);
+        //let datedate = moment().format('YYYY-MM-DD');
         let i: any;
         let resSlots = [];
         if (daydate == datedate) {
@@ -1587,6 +1608,7 @@ export class AppointmentService {
         let app =[];
         let res=[];
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        //var date = moment().format('YYYY-MM-DD');
         if (user.patientDto.paginationNumber) {
             let offset = (user.paginationNumber) * (10);
             app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'notCompleted', 'paused']);
@@ -1627,6 +1649,7 @@ export class AppointmentService {
         const doc = await this.doctorDetails(user.patientDto.doctorKey);
         const d: Date = new Date();
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        //var date = moment().format('YYYY-MM-DD');
         if (user.patientDto.paginationNumber) {
             let offset = (user.paginationNumber) * (10);
             const app = await this.appointmentRepository.query(queries.getPastAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'completed']);
@@ -1660,6 +1683,7 @@ export class AppointmentService {
     }
 
     async updatePatLastActive(patientId): Promise<any> {
+        //let date = moment().format();
         let date = new Date();
         var condition: any = {
             patientId: patientId
@@ -1694,6 +1718,7 @@ export class AppointmentService {
     }
 
     async updateDocLastActive(doctorKey): Promise<any> {
+        //let date = moment().format();
         let date = new Date();
         var condition: any = {
             doctorKey: doctorKey
@@ -1737,6 +1762,7 @@ export class AppointmentService {
             const doc = await this.doctorRepository.findOne({doctorKey: id});
             if (doc) {
                 doc.liveStatus = status;
+                //doc.lastActive = moment().format();
                 doc.lastActive = new Date();
                 await this.doctorRepository.save(doc)
             }
@@ -1744,6 +1770,7 @@ export class AppointmentService {
             const patient = await this.patientDetailsRepository.findOne({patientId: Number(id)});
             if (patient) {
                 patient.liveStatus = status;
+                //patient.lastActive = moment().format()
                 patient.lastActive = new Date();
                 await this.patientDetailsRepository.save(patient);
             }

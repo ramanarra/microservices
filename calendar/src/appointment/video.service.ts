@@ -9,6 +9,7 @@ import { CONSTANT_MSG } from 'common-dto';
 import { OpenViduSession } from './openviduSession/openviduSession.entity';
 import { OpenViduSessionToken } from './openviduSession/openviduSessionToken.entity';
 import {AppointmentRepository} from './appointment.repository';
+var moment = require('moment');
 
 
 @Injectable()
@@ -31,6 +32,7 @@ export class VideoService {
             let OVSessionData = {
                 sessionId : session.getSessionId(),
                 sessionName : doc.doctorName + '_'+ new Date().getTime(),
+                //sessionName : doc.doctorName + '_'+ moment().valueOf(),
                 doctorKey : doc.doctorKey
             }
             console.log("OVSessionData => " + JSON.stringify(OVSessionData));

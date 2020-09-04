@@ -91,7 +91,11 @@ export class AppointmentController {
             docKey.fees = config.consultationCost;
             let app =[];
             //let slots = [];
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             var date:any = new Date();
+            //var currenttime= moment()
+            //const time = moment(currenttime).format("hh:mm"));
             var seconds = date.getSeconds();
             var minutes = date.getMinutes();
             var hour = date.getHours();
@@ -134,6 +138,8 @@ export class AppointmentController {
                 var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
                 v.fees = config.consultationCost;
                 let app =[];
+                // const date = moment().format();
+                // const time = moment().format("HH:mm:ss");
                 var date:any = new Date();
                 var minutes = date.getMinutes();
                 var hour = date.getHours();
@@ -225,6 +231,60 @@ export class AppointmentController {
     async doctorConfigUpdate(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.docConfigDto.doctorKey);
         if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.docConfigDto.doctorKey) || (user.account_key == doctor.accountKey)){
+            const configDetails = await this.appointmentService.getDoctorConfigDetails(user.docConfigDto.doctorKey);
+            var iscanAllowed = configDetails.isPatientCancellationAllowed;
+            var isreschAllowed = configDetails.isPatientRescheduleAllowed;
+            var canhours = configDetails.cancellationDays;
+            var canDays = configDetails.cancellationDays;
+            var canMins = configDetails.cancellationMins;
+            var reschDays = configDetails.rescheduleDays;
+            var reschedHours = configDetails.rescheduleHours;
+            var reschedMins = configDetails.rescheduleMins;
+            if(user.docConfigDto.isPatientCancellationAllowed){
+                iscanAllowed = user.docConfigDto.isPatientCancellationAllowed;
+            }
+            if(user.docConfigDto.isPatientRescheduleAllowed){
+                isreschAllowed = user.docConfigDto.isPatientRescheduleAllowed;
+            }
+            if(user.docConfigDto.cancellationDays>=0){
+                canDays = user.docConfigDto.cancellationDays;
+            }
+            if(user.docConfigDto.cancellationHours>=0){
+                canhours = user.docConfigDto.cancellationHours;
+            }
+            if(user.docConfigDto.cancellationMins>=0){
+                canMins = user.docConfigDto.cancellationMins;
+            }
+            if(user.docConfigDto.rescheduleDays>=0){
+                reschDays = user.docConfigDto.rescheduleDays;
+            }
+            if(user.docConfigDto.rescheduleHours>=0){
+                reschedHours = user.docConfigDto.rescheduleHours;
+            }
+            if(user.docConfigDto.rescheduleMins>=0){
+                reschedMins = user.docConfigDto.rescheduleMins;
+            }
+            if(iscanAllowed){
+                let cTime=canhours+':'+canMins;
+                if(canDays == 0){
+                    const canTime=  Helper.getTimeInMilliSeconds(cTime);
+                    if(canTime < 600000){
+                        console.log("cancellation time should be greater than 10 minutes");
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
+                    }
+                }           
+            }
+            if(isreschAllowed){
+                let rTime=reschedHours+':'+reschedMins;
+                if(reschDays == 0){
+                    const canTime= Helper.getTimeInMilliSeconds(rTime);
+                    if(canTime < 600000){
+                        console.log("reschedule time should be greater than 10 minutes");
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "reschedule time should be greater than 10 minutes"}
+                    }
+                }           
+            }
+            
             const docConfig = await this.appointmentService.doctorConfigUpdate(user.docConfigDto);
             return docConfig;
         }else {
@@ -326,6 +386,7 @@ export class AppointmentController {
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
     const account = await this.appointmentService.accountDetails(doctor.accountKey);
+    //const date = moment().format();
     let date = new Date();  
     if(!appointment.message){
         payment.appointmentId = appointment.appointment.appointmentdetails.id;
@@ -374,6 +435,7 @@ export class AppointmentController {
         message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
+    //const date = moment().format();
     let date = new Date();
     const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
@@ -481,8 +543,10 @@ export class AppointmentController {
         const doctor = await this.appointmentService.availableSlots(user);
         if(!doctor.length && user.confirmation){
             let avlbl= doctor;
+            //var nextday = moment(user.appointmentDate).format();
             const nextday = new Date(user.appointmentDate)
             while(!avlbl.length){
+                //nextday = moment(nextday).add(1, 'days').format()
                 nextday.setDate(nextday.getDate() + 1)
                 user.appointmentDate = nextday;
                 const doctor = await this.appointmentService.availableSlots(user);
@@ -575,8 +639,10 @@ export class AppointmentController {
             const doctor = await this.appointmentService.availableSlots(user);
             if(!doctor.length && user.confirmation){
                 let avlbl= doctor;
+                //var nextday = moment(user.appointmentDate).format();
                 const nextday = new Date(user.appointmentDate)
                 while(!avlbl.length){
+                    //nextday = moment(nextday).add(1, 'days').format()
                     nextday.setDate(nextday.getDate() + 1)
                     user.appointmentDate = nextday;
                     const doctor = await this.appointmentService.availableSlots(user);
@@ -719,6 +785,8 @@ export class AppointmentController {
         const doc = await this.appointmentService.doctorDetails(doctorKey);
         if(doc){
             let app =[];
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             var date:any = new Date();
             var seconds = date.getSeconds();
             var minutes = date.getMinutes();
@@ -790,6 +858,8 @@ export class AppointmentController {
         if(config.isPatientCancellationAllowed){
             let canDays=config.cancellationDays;
             let canTime= config.cancellationHours+":"+config.cancellationMins;
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             let date = new Date();
             var minutes = date.getMinutes();
             var hour = date.getHours();
@@ -799,6 +869,7 @@ export class AppointmentController {
             let appStart = app.appointmentDetails.startTime;
             let appMilli = Helper.getTimeInMilliSeconds(appStart);
             let diffDate = appDate;
+            //diffDate = moment(diffDate).subtract(canDays, 'days').format()
             diffDate.setDate(diffDate.getDate() - canDays);
             let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
             if(date < diffDate){
@@ -942,6 +1013,8 @@ export class AppointmentController {
             if(config.isPatientRescheduleAllowed){
                 let canDays=config.rescheduleDays;
                 let canTime= config.rescheduleDays+":"+config.rescheduleDays;
+                //const date = moment().format();
+                //const time = moment().format("HH:mm:ss");
                 let date = new Date();
                 var minutes = date.getMinutes();
                 var hour = date.getHours();
@@ -951,6 +1024,7 @@ export class AppointmentController {
                 let appStart = app.appointmentDetails.startTime;
                 let appMilli = Helper.getTimeInMilliSeconds(appStart);
                 let diffDate = appDate;
+                //diffDate = moment(diffDate).subtract(canDays, 'days').format()
                 diffDate.setDate(diffDate.getDate() - canDays);
                 let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
                 if(date<diffDate){
