@@ -673,8 +673,7 @@ export class AppointmentService {
                                                     slotObject.slots.push(v)
                                                     return true;
                                                 }
-                                                //slotObject.slots.push(v)
-                                                //return true;
+
                                             } else {
                                                 return false;
                                             }
@@ -694,8 +693,7 @@ export class AppointmentService {
                                                 slotObject.slots.push(v)
                                                 return true;
                                             }
-                                            // slotObject.slots.push(v)
-                                            // return true;
+
                                         }
                                     } else {
                                         return false;
@@ -765,7 +763,10 @@ export class AppointmentService {
                             }
                             //    })
                         }
-                        appointmentSlots.push(slotObject);
+                        if (slotObject.slots && slotObject.slots.length) {
+                            appointmentSlots.push(slotObject);
+                        }
+                        
                     }
                     dayOfWeekCount++; // increase to next  Day
                     breaktheloop++;
