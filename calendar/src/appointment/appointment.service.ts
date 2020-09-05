@@ -417,6 +417,13 @@ export class AppointmentService {
         // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
         if (scheduleTimeIntervals && scheduleTimeIntervals.length) {
+            let sortArrayForDelete = [];
+            let sortArrayForNotDelete = [];
+            // this sort array to push isDelete in top order and notIsDelete in lower order
+            scheduleTimeIntervals.map(v=>{
+                v.isDelete ? sortArrayForDelete.push(v) : sortArrayForNotDelete.push(v);
+            })
+            scheduleTimeIntervals = [...sortArrayForDelete,...sortArrayForNotDelete ]
             for (let scheduleTimeInterval of scheduleTimeIntervals) {
                 if (scheduleTimeInterval.scheduletimeid) {
                     if (scheduleTimeInterval.isDelete) {
