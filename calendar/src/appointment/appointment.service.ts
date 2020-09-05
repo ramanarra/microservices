@@ -1636,6 +1636,7 @@ export class AppointmentService {
                 time = preHours*60 + preMins;
             }
             let result ={
+                appointmentId:x.appointmentId,
                 appointmentDate:x.appointmentDate,
                 isPreconsultationAllowed:x.is_preconsultation_allowed,
                 preConsultationTime:time,
