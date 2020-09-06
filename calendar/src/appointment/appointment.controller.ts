@@ -281,6 +281,15 @@ export class AppointmentController {
                     } else if(canTime < 600000){
                         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Cancellation time should be greater than 10 minutes"}
                     }
+                } else {
+
+                    if (user.docConfigDto.isPatientCancellationAllowed) {
+                        // by default 10 mins cancelation will set
+                        user.docConfigDto['cancellationMins'] = '10';
+                        user.docConfigDto['cancellationHours'] = '0';
+                        user.docConfigDto['cancellationDays'] = '0';
+
+                    }
                 }           
             }
             if(isreschAllowed){
@@ -297,6 +306,15 @@ export class AppointmentController {
                     } else if(canTime < 600000){
 
                         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Reschedule time should be greater than 10 minutes"}
+                    }
+                } else {
+
+                    if (user.docConfigDto.isPatientRescheduleAllowed) {
+                        // by default 10 mins reschdule will set
+                        user.docConfigDto['rescheduleMins'] = '10';
+                        user.docConfigDto['rescheduleHours'] = '0';
+                        user.docConfigDto['rescheduleDays'] = '0';
+
                     }
                 }           
             }
