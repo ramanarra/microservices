@@ -234,12 +234,15 @@ export class AppointmentController {
             const configDetails = await this.appointmentService.getDoctorConfigDetails(user.docConfigDto.doctorKey);
             var iscanAllowed = configDetails.isPatientCancellationAllowed;
             var isreschAllowed = configDetails.isPatientRescheduleAllowed;
-            var canhours = configDetails.cancellationDays;
+
+            var canhours = configDetails.cancellationHours;
             var canDays = configDetails.cancellationDays;
             var canMins = configDetails.cancellationMins;
+
             var reschDays = configDetails.rescheduleDays;
             var reschedHours = configDetails.rescheduleHours;
             var reschedMins = configDetails.rescheduleMins;
+
             if(user.docConfigDto.isPatientCancellationAllowed){
                 iscanAllowed = user.docConfigDto.isPatientCancellationAllowed;
             }
@@ -268,9 +271,15 @@ export class AppointmentController {
                 let cTime=canhours+':'+canMins;
                 if(canDays == 0){
                     const canTime=  Helper.getTimeInMilliSeconds(cTime);
-                    if(canTime < 600000){
-                        console.log("cancellation time should be greater than 10 minutes");
-                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
+
+                    if (user.docConfigDto.isPatientCancellationAllowed) {
+                        // by default 10 mins cancelation will set
+                        user.docConfigDto['cancellationMins'] = '10';
+                        user.docConfigDto['cancellationHours'] = '0';
+                        user.docConfigDto['cancellationDays'] = '0';
+
+                    } else if(canTime < 600000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Cancellation time should be greater than 10 minutes"}
                     }
                 }           
             }
@@ -278,9 +287,16 @@ export class AppointmentController {
                 let rTime=reschedHours+':'+reschedMins;
                 if(reschDays == 0){
                     const canTime= Helper.getTimeInMilliSeconds(rTime);
-                    if(canTime < 600000){
-                        console.log("reschedule time should be greater than 10 minutes");
-                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "reschedule time should be greater than 10 minutes"}
+
+                    if (user.docConfigDto.isPatientRescheduleAllowed) {
+                        // by default 10 mins reschdule will set
+                        user.docConfigDto['rescheduleMins'] = '10';
+                        user.docConfigDto['rescheduleHours'] = '0';
+                        user.docConfigDto['rescheduleDays'] = '0';
+
+                    } else if(canTime < 600000){
+
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Reschedule time should be greater than 10 minutes"}
                     }
                 }           
             }
