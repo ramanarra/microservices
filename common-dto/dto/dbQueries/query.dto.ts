@@ -43,5 +43,15 @@ export const queries = {
     getPastAppointmentsForPatient: 'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate",a."startTime",a."endTime",a."patient_id" as "patientId", a."doctorId", d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName" FROM appointment a join  doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key" WHERE a."patient_id" = $1 AND a."doctorId" = $4 AND a."appointment_date" <= $2 AND a."is_cancel"=false AND a.status= $5 order by a.appointment_date limit 10 offset $3',
     getPastAppDoctorList:'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate", a."startTime",a."endTime",a."patient_id" as "patientId", a."doctorId",d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName"  FROM appointment a join  doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key" WHERE a."doctorId" = $1 AND a."patient_id" = $2 AND a.appointment_date <= $3 AND a.status= $4 order by a.appointment_date',
     getPatientDoctorApps:'SELECT * from appointment a join patient_details pd ON a."patient_id" = pd."patient_id" WHERE a."doctorId" = $1 AND a."appointment_date" >= current_date AND a."is_cancel"=false AND (pd.name ~* $2 OR pd.email ~* $2 OR pd.phone ~* $2)',
-    getAccountAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date'
+    getAccountAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
+    sunday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    monday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    tuesday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    wednesday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    thursday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    friday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    saturday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
+    getDoctorKey:"SELECT replace(users.doctor_key, 'Doc_', '') AS maxDoc FROM users WHERE doctor_key notnull order by replace(users.doctor_key, 'Doc_', '')::int desc limit 1",
+    getUser:'SELECT users.id FROM users order by id desc limit 1',
+    insertDoctor:'INSERT INTO public.users(id, name, email, password, salt, account_id, doctor_key)VALUES ($1, $2, $3, $4, $5, $6, $7);'
 }

@@ -1174,5 +1174,11 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'doctor_details_insertion'})
+    async doctorInsertion(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.appointmentService.doctorRegistration(doctorDto);
+        return doctor;
+    }
+
 
 }

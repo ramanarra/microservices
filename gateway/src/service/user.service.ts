@@ -96,5 +96,27 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'update_patient_doctor_live_status'}, userInfo).toPromise();
     }
 
+    // public doctorRegistration(doctorDto: any,user:any):Promise<any> {
+    //     doctorDto.user = user;
+    //     const doctor = this.redisClient.send( { cmd: 'auth_doctor_registration' }, doctorDto)
+    //     .pipe(catchError(err => {
+    //         return throwError(err);
+    //     }),).toPromise();
+    //     return doctor;
+    // }
+    public doctorRegistration(doctorDto: any,user:any):Promise<any> {
+        doctorDto.user = user;
+        return this.redisClient.send( { cmd: 'auth_doctor_registration' }, doctorDto).toPromise();
+        // .pipe(catchError(err => {
+        //     return throwError(err);
+        // }),).toPromise();
+        //return doctor;
+    }
+
+    public findDoctorByEmail(email : string) : Promise <any> {
+        return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email).toPromise();
+    }
+
+
 
 }

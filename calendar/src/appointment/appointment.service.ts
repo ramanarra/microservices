@@ -20,6 +20,7 @@ import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_c
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
+import {docConfig} from "./doc_config/docConfig.entity";
 //import {queries} from "../config/query";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
@@ -1820,6 +1821,26 @@ export class AppointmentService {
             }
         } 
      }
+
+     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        if(doctor){
+            const Sunday = await this.docConfigScheduleDayRepository.query(queries.sunday, [doctor.doctorId, doctorDto.doctorKey,'Sunday'])
+            const Monday = await this.docConfigScheduleDayRepository.query(queries.monday, [doctor.doctorId, doctorDto.doctorKey,'Monday'])
+            const Tuesday = await this.docConfigScheduleDayRepository.query(queries.tuesday, [doctor.doctorId, doctorDto.doctorKey,'Tuesday'])
+            const Wednesday = await this.docConfigScheduleDayRepository.query(queries.wednesday, [doctor.doctorId, doctorDto.doctorKey,'Wednesday'])
+            const Thursday = await this.docConfigScheduleDayRepository.query(queries.thursday, [doctor.doctorId, doctorDto.doctorKey,'Thursday'])
+            const Friday = await this.docConfigScheduleDayRepository.query(queries.friday, [doctor.doctorId, doctorDto.doctorKey,'Friday'])
+            const Saturday = await this.docConfigScheduleDayRepository.query(queries.saturday, [doctor.doctorId, doctorDto.doctorKey,'Saturday'])
+            const config = new docConfig();
+            config.doctorKey = doctorDto.doctorKey;
+            config.isPatientRescheduleAllowed = false;
+            config.isPreconsultationAllowed = false;
+            config.isPatientCancellationAllowed = false;
+            const configCreate = await config.save();
+        }
+        return doctor;
+    }
 
 
 
