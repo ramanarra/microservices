@@ -1219,7 +1219,8 @@ export class AppointmentService {
                                 hospitalName: account.hospitalName,
                                 preConsultationHours: preConsultationHours,
                                 preConsultationMins: preConsultationMins,
-                                doctorKey: doctor.doctorKey
+                                doctorKey: doctor.doctorKey,
+                                liveStatus : doctor.liveStatus
                             }
                             appList.push(res);
                         }
@@ -1243,7 +1244,8 @@ export class AppointmentService {
                             hospitalName: account.hospitalName,
                             preConsultationHours: preConsultationHours,
                             preConsultationMins: preConsultationMins,
-                            doctorKey: doctor.doctorKey
+                            doctorKey: doctor.doctorKey,
+                            liveStatus : doctor.liveStatus
                         }
                         appList.push(res);
                     }
