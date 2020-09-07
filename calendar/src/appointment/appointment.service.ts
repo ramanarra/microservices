@@ -1286,7 +1286,9 @@ export class AppointmentService {
         let patientList = [];
         for (let x of ids) {
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
-            patientList.push(patient[0]);
+            if(patient[0]){
+                patientList.push(patient[0]);
+            }
         }
         return patientList;
     }
