@@ -18,8 +18,6 @@ import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repos
 import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
-import {Email} from "common-dto";
-import {Sms} from "common-dto";
 
 import { VideoService } from './video.service';
 import { PaymentService } from './payment.service';
@@ -37,6 +35,6 @@ import { OpenViduService } from './open-vidu.service';
 
   ],
   controllers: [AppointmentController],
-  providers: [AppointmentService, VideoService, OpenViduService,Email,PaymentService,Sms]
+  providers: [AppointmentService, VideoService, OpenViduService,PaymentService]
 })
 export class AppointmentModule { }

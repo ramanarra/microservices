@@ -12,6 +12,9 @@ export class Email {
     //     this.smtpHost = params.smtpHost;
     //     this.smtpPort = params.smtpPort;
     //  }
+    constructor(){
+        
+    }
     sendEmail (params:any) {
         var smtpUser = "dharani@softsuave.com";
         var smtpPass = "softsuave@123";
