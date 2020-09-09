@@ -1192,7 +1192,7 @@ export class AppointmentService {
 
             let app;
 
-            if (user.paginationNumber && user.limit) {
+            if (user.limit) {
 
                 app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
                 if (!app.length) {
