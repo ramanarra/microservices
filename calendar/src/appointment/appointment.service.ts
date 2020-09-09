@@ -1189,10 +1189,22 @@ export class AppointmentService {
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
-            if (!app.length) {
-                return [];
+
+            let app;
+
+            if (user.paginationNumber && user.limit) {
+
+                app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
+                if (!app.length) {
+                    return [];
+                }
+            } else {
+                app = await this.appointmentRepository.query(queries.getTodayAppointments, [user.patientId, date, 'notCompleted', 'paused']);
+                if (!app.length) {
+                    return [];
+                }
             }
+
             const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
@@ -1219,6 +1231,7 @@ export class AppointmentService {
                                 hospitalName: account.hospitalName,
                                 preConsultationHours: preConsultationHours,
                                 preConsultationMins: preConsultationMins,
+                                doctorId: appointmentList.doctorId,
                                 doctorKey: doctor.doctorKey,
                                 liveStatus : doctor.liveStatus
                             }
@@ -1244,6 +1257,7 @@ export class AppointmentService {
                             hospitalName: account.hospitalName,
                             preConsultationHours: preConsultationHours,
                             preConsultationMins: preConsultationMins,
+                            doctorId: appointmentList.doctorId,
                             doctorKey: doctor.doctorKey,
                             liveStatus : doctor.liveStatus
                         }
