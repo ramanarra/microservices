@@ -1199,7 +1199,7 @@ export class AppointmentService {
                     return [];
                 }
             } else {
-                app = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date, 'notCompleted', 'paused']);
+                app = await this.appointmentRepository.query(queries.getTodayAppointments, [user.patientId, date, 'notCompleted', 'paused']);
                 if (!app.length) {
                     return [];
                 }
