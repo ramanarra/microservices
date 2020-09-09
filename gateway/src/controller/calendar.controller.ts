@@ -388,14 +388,14 @@ export class CalendarController {
         // const yesterday = moment().subtract(1, 'days').format()
         var appDate:any = new Date(appointmentDto.appointmentDate);
         var month = appDate.getMonth() + 1
-        var day = appDate.getDay();
+        var date = appDate.getDate();
         var year = appDate.getFullYear();
-        appDate = year + "-" + month + "-" + day;
+        appDate = year + "-" + month + "-" + date;
         var today:any = new Date()
         month = today.getMonth() + 1
-        day = today.getDay();
+        date = today.getDate();
         year = today.getFullYear();
-        var today1 = year + "-" + month + "-" + day;
+        var today1 = year + "-" + month + "-" + date;
         if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
@@ -591,14 +591,14 @@ export class CalendarController {
         // const yesterday = moment().subtract(1, 'days').format()
         var appDate:any = new Date(patientDto.appointmentDate);
         var month = appDate.getMonth() + 1
-        var day = appDate.getDay();
+        var date = appDate.getDate();
         var year = appDate.getFullYear();
-        appDate = year + "-" + month + "-" + day;
+        appDate = year + "-" + month + "-" + date;
         var today:any = new Date()
         month = today.getMonth() + 1
-        day = today.getDay();
+        date = today.getDate();
         year = today.getFullYear();
-        var today1 = year + "-" + month + "-" + day;
+        var today1 = year + "-" + month + "-" + date;
         if((patientDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
@@ -639,14 +639,14 @@ export class CalendarController {
         // const yesterday = moment().subtract(1, 'days').format()
         var appDate:any = new Date(doctorDto.appointmentDate);
         var month = appDate.getMonth() + 1
-        var day = appDate.getDay();
+        var date = appDate.getDate();
         var year = appDate.getFullYear();
-        appDate = year + "-" + month + "-" + day;
+        appDate = year + "-" + month + "-" + date;
         var today:any = new Date()
         month = today.getMonth() + 1
-        day = today.getDay();
+        date = today.getDate();
         year = today.getFullYear();
-        var today1 = year + "-" + month + "-" + day;
+        var today1 = year + "-" + month + "-" + date;
         if((doctorDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
@@ -905,14 +905,14 @@ export class CalendarController {
                 // const yesterday = moment().subtract(1, 'days').format()
                 var appDate:any = new Date(appointmentDto.appointmentDate);
                 var month = appDate.getMonth() + 1
-                var day = appDate.getDay();
+                var date = appDate.getDate();
                 var year = appDate.getFullYear();
-                appDate = year + "-" + month + "-" + day;
+                appDate = year + "-" + month + "-" + date;
                 var today:any = new Date()
                 month = today.getMonth() + 1
-                day = today.getDay();
+                date = today.getDate();
                 year = today.getFullYear();
-                var today1 = year + "-" + month + "-" + day;
+                var today1 = year + "-" + month + "-" + date;
                 if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
                     return{
                         statusCode:HttpStatus.BAD_REQUEST,
@@ -1124,14 +1124,14 @@ export class CalendarController {
         // const yesterday = moment().subtract(1, 'days').format()
         var appDate:any = new Date(appointmentDto.appointmentDate);
         var month = appDate.getMonth() + 1
-        var day = appDate.getDay();
+        var date = appDate.getDate();
         var year = appDate.getFullYear();
-        appDate = year + "-" + month + "-" + day;
+        appDate = year + "-" + month + "-" + date;
         var today:any = new Date()
         month = today.getMonth() + 1
-        day = today.getDay();
+        date = today.getDate();
         year = today.getFullYear();
-        var today1 = year + "-" + month + "-" + day;
+        var today1 = year + "-" + month + "-" + date;
         if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
@@ -1216,14 +1216,14 @@ export class CalendarController {
         var appDate1 = new Date(appointmentDate);
         var appDate:any = new Date(appointmentDate);
         var month = appDate.getMonth() + 1
-        var day = appDate.getDay();
+        var date = appDate.getDate();
         var year = appDate.getFullYear();
-        appDate = year + "-" + month + "-" + day;
+        appDate = year + "-" + month + "-" + date;
         var today:any = new Date()
         month = today.getMonth() + 1
-        day = today.getDay();
+        date = today.getDate();
         year = today.getFullYear();
-        var today1 = year + "-" + month + "-" + day;
+        var today1 = year + "-" + month + "-" + date;
         if((appDate1 < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,

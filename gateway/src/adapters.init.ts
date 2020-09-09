@@ -13,6 +13,7 @@ export const initAdapters = (app: INestApplication): INestApplication => {
   const userService = app.get(UserService)
 
   app.useWebSocketAdapter(new SocketStateAdapter(app, socketStateService, redisPropagatorService, jwtService, userService));
+  app.enableCors();
 
   return app;
 };

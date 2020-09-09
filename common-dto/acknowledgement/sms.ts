@@ -5,6 +5,11 @@ var request = require('request');
 //const textLocalConfig = cconfig.get('textLocal');
 
 export class Sms {
+
+    constructor(){
+        
+    }
+
     sendSms (params:any) {        
         try {
             // Construct data

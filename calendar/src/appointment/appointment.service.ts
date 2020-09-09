@@ -44,6 +44,8 @@ var moment = require('moment');
 export class AppointmentService {
     mail:any
     parameter:any
+    email : Email;
+    sms: Sms;
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -58,9 +60,9 @@ export class AppointmentService {
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
-        private email: Email,
-        private sms: Sms
     ) {
+        this.email = new Email();
+        this.sms = new Sms();
         // const mail= config.get('mail')
         // const dparams={
         //     smtpUser:this.mail.smtpUser,
@@ -418,6 +420,13 @@ export class AppointmentService {
         // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
         if (scheduleTimeIntervals && scheduleTimeIntervals.length) {
+            let sortArrayForDelete = [];
+            let sortArrayForNotDelete = [];
+            // this sort array to push isDelete in top order and notIsDelete in lower order
+            scheduleTimeIntervals.map(v=>{
+                v.isDelete ? sortArrayForDelete.push(v) : sortArrayForNotDelete.push(v);
+            })
+            scheduleTimeIntervals = [...sortArrayForDelete,...sortArrayForNotDelete ]
             for (let scheduleTimeInterval of scheduleTimeIntervals) {
                 if (scheduleTimeInterval.scheduletimeid) {
                     if (scheduleTimeInterval.isDelete) {
@@ -667,8 +676,7 @@ export class AppointmentService {
                                                     slotObject.slots.push(v)
                                                     return true;
                                                 }
-                                                //slotObject.slots.push(v)
-                                                //return true;
+
                                             } else {
                                                 return false;
                                             }
@@ -688,8 +696,7 @@ export class AppointmentService {
                                                 slotObject.slots.push(v)
                                                 return true;
                                             }
-                                            // slotObject.slots.push(v)
-                                            // return true;
+
                                         }
                                     } else {
                                         return false;
@@ -759,7 +766,10 @@ export class AppointmentService {
                             }
                             //    })
                         }
-                        appointmentSlots.push(slotObject);
+                        if (slotObject.slots && slotObject.slots.length) {
+                            appointmentSlots.push(slotObject);
+                        }
+                        
                     }
                     dayOfWeekCount++; // increase to next  Day
                     breaktheloop++;
@@ -1210,7 +1220,8 @@ export class AppointmentService {
                                 hospitalName: account.hospitalName,
                                 preConsultationHours: preConsultationHours,
                                 preConsultationMins: preConsultationMins,
-                                doctorKey: doctor.doctorKey
+                                doctorKey: doctor.doctorKey,
+                                liveStatus : doctor.liveStatus
                             }
                             appList.push(res);
                         }
@@ -1234,7 +1245,8 @@ export class AppointmentService {
                             hospitalName: account.hospitalName,
                             preConsultationHours: preConsultationHours,
                             preConsultationMins: preConsultationMins,
-                            doctorKey: doctor.doctorKey
+                            doctorKey: doctor.doctorKey,
+                            liveStatus : doctor.liveStatus
                         }
                         appList.push(res);
                     }
@@ -1275,7 +1287,9 @@ export class AppointmentService {
         let patientList = [];
         for (let x of ids) {
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
-            patientList.push(patient[0]);
+            if(patient[0]){
+                patientList.push(patient[0]);
+            }
         }
         return patientList;
     }
