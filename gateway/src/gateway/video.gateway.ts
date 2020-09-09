@@ -100,8 +100,8 @@ export class VideoGateway {
       let doctorArr = [0];
 
       patientTodayApp.forEach(element => {
-
-        if (element.doctorId && (doctorArr.length && doctorArr.includes(element.doctodId))) {
+      console.log('doctor = >', element.doctorId);
+        if (element.doctorId && (doctorArr.length && !doctorArr.includes(element.doctodId))) {
           doctorArr.push(element.doctorId);
           // docList -> DOCTOR
           let patientDocSocketList : Socket[] = this.socketStateService.get("DOCTOR_"+ element.doctorId);

@@ -1221,6 +1221,8 @@ export class AppointmentService {
                                 preConsultationHours = config.preconsultationHours;
                                 preConsultationMins = config.preconsultationMins;
                             }
+
+                            console.log('appointmentList.doctor = >', appointmentList.doctorId);
                             let res = {
                                 appointmentDate: appointmentList.appointment_date,
                                 appointmentId: appointmentList.id,
@@ -1247,6 +1249,7 @@ export class AppointmentService {
                             preConsultationHours = config.preconsultationHours;
                             preConsultationMins = config.preconsultationMinutes;
                         }
+                        console.log('appointmentList.doctor = >', appointmentList.doctorId);
                         let res = {
                             appointmentDate: appointmentList.appointment_date,
                             appointmentId: appointmentList.id,
