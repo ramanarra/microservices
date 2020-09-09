@@ -43,6 +43,8 @@ var moment = require('moment');
 export class AppointmentService {
     mail:any
     parameter:any
+    email : Email;
+    sms: Sms;
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -57,9 +59,9 @@ export class AppointmentService {
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
-        private email: Email,
-        private sms: Sms
     ) {
+        this.email = new Email();
+        this.sms = new Sms();
         // const mail= config.get('mail')
         // const dparams={
         //     smtpUser:this.mail.smtpUser,
@@ -1298,7 +1300,9 @@ export class AppointmentService {
         let patientList = [];
         for (let x of ids) {
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
-            patientList.push(patient[0]);
+            if(patient[0]){
+                patientList.push(patient[0]);
+            }
         }
         return patientList;
     }
