@@ -1423,107 +1423,126 @@ export class AppointmentService {
     async availableSlots(user: any): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
+       
         console.log(app);
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let dt = new Date(user.appointmentDate);
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
-        const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
-        if(!workSchedule.length){
-            return [];
+        user.paginationNumber=0;
+        let slotsviews=await this.appointmentSlotsView(user);
+        let slotview;
+
+       for(let j=0;j<slotsviews.length;j++){
+        if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
+            slotview=slotsviews[j];
+            break;
         }
-        if (!workSchedule[0].startTime) {
-            return [];
-        }
-        let slots = [];
-        let slotsView = [];
-        let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-        for (let worksched of workSchedule) {
-            let start = Helper.getTimeInMilliSeconds(worksched.startTime);
-            let end = Helper.getTimeInMilliSeconds(worksched.endTime);
-            let end1 = start + consultSession;
-            let count = 0;
-            while (start < end && end1 <= end) {
-                count++;
-                if (count > 20) break;
-                let res = {
-                    start: Helper.getTimeinHrsMins(start),
-                    end: Helper.getTimeinHrsMins(start + consultSession),
-                }
-                let flag = false;
-                if (app.length) {
-                    for (let appointment of app) {
-                        flag = false;
-                        let dto = {
-                            startTime: Helper.getTimeinHrsMins(start),
-                            endTime: Helper.getTimeinHrsMins(start + consultSession)
-                        }
-                        let isOverLapping = await this.findTimeOverlaping(app, dto);
-                        if ((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (flag == false) {
-                        slotsView.push(res);
-                    }
-                } else {
-                    slotsView.push(res);
-                }
-                start = start + consultSession;
-                end1 = start + consultSession;
-                slots.push(res);
-                count++;
-                if(end1 > end) break;
-            }
-        }
-        let date = new Date();
-        var time = date.getHours() + ":" + date.getMinutes();
-        //const time = moment().format("HH:mm:ss");
-        var timeMilli = Helper.getTimeInMilliSeconds(time);
-        let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
-        //let daydate = moment(user.appointmentDate).format('YYYY-MM-DD');
-        let datedate = Helper.getDayMonthYearFromDate(date);
-        //let datedate = moment().format('YYYY-MM-DD');
-        let i: any;
-        let resSlots = [];
-        if (daydate == datedate) {
-            for (i of slotsView) {
-                let end = Helper.getTimeInMilliSeconds(i.end);
-                if (timeMilli < end) {
-                    resSlots.push(i);
-                }
-            }
-            resSlots = resSlots.sort((val1, val2) => {
-                let val1IntervalStartTime = val1.start;
-                let val2IntervalStartTime = val2.start;
-                val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
-                val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
-                if (val1IntervalStartTime < val2IntervalStartTime) {
-                    return -1;
-                } else if (val1IntervalStartTime > val2IntervalStartTime) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            })
-            return resSlots;
-        }
-        slotsView = slotsView.sort((val1, val2) => {
-            let val1IntervalStartTime = val1.start;
-            let val2IntervalStartTime = val2.start;
-            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
-            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
-            if (val1IntervalStartTime < val2IntervalStartTime) {
-                return -1;
-            } else if (val1IntervalStartTime > val2IntervalStartTime) {
-                return 1;
-            } else {
-                return 0;
-            }
-        })
-        return slotsView;
+       }
+       let resSlot=[];
+       if(slotview !== undefined)
+       for(let j=0;j<slotview.slots.length;j++){
+           if(slotview.slots[j].slotType.toLowerCase() == 'free'){
+               resSlot.push(slotview.slots[j]);
+           }
+       }
+       return resSlot;
+    //    const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
+    //    if(!workSchedule.length){
+    //        return [];
+    //    }
+    //    if (!workSchedule[0].startTime) {
+    //        return [];
+    //    }
+    //    let slots = [];
+    //    let slotsView = [];
+    //    let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+    //    for (let worksched of workSchedule) {
+    //        let start = Helper.getTimeInMilliSeconds(worksched.startTime);
+    //        let end = Helper.getTimeInMilliSeconds(worksched.endTime);
+    //        let end1 = start + consultSession;
+    //        let count = 0;
+    //        while (start < end && end1 <= end) {
+    //            count++;
+    //            if (count > 20) break;
+    //            let res = {
+    //                start: Helper.getTimeinHrsMins(start),
+    //                end: Helper.getTimeinHrsMins(start + consultSession),
+    //            }
+    //            let flag = false;
+    //            if (app.length) {
+    //                for (let appointment of app) {
+    //                    flag = false;
+    //                    let dto = {
+    //                        startTime: Helper.getTimeinHrsMins(start),
+    //                        endTime: Helper.getTimeinHrsMins(start + consultSession)
+    //                    }
+    //                    let isOverLapping = await this.findTimeOverlaping(app, dto);
+    //                    if ((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping) {
+    //                        flag = true;
+    //                        break;
+    //                    }
+    //                }
+    //                if (flag == false) {
+    //                    slotsView.push(res);
+    //                }
+    //            } else {
+    //                slotsView.push(res);
+    //            }
+    //            start = start + consultSession;
+    //            end1 = start + consultSession;
+    //            slots.push(res);
+    //            count++;
+    //            if(end1 > end) break;
+    //        }
+    //    }
+    //    let date = new Date();
+    //    var time = date.getHours() + ":" + date.getMinutes();
+    //    //const time = moment().format("HH:mm:ss");
+    //    var timeMilli = Helper.getTimeInMilliSeconds(time);
+    //    let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
+    //    //let daydate = moment(user.appointmentDate).format('YYYY-MM-DD');
+    //    let datedate = Helper.getDayMonthYearFromDate(date);
+    //    //let datedate = moment().format('YYYY-MM-DD');
+    //    let i: any;
+    //    let resSlots = [];
+    //    if (daydate == datedate) {
+    //        for (i of slotsView) {
+    //            let end = Helper.getTimeInMilliSeconds(i.end);
+    //            if (timeMilli < end) {
+    //                resSlots.push(i);
+    //            }
+    //        }
+    //        resSlots = resSlots.sort((val1, val2) => {
+    //            let val1IntervalStartTime = val1.start;
+    //            let val2IntervalStartTime = val2.start;
+    //            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+    //            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+    //            if (val1IntervalStartTime < val2IntervalStartTime) {
+    //                return -1;
+    //            } else if (val1IntervalStartTime > val2IntervalStartTime) {
+    //                return 1;
+    //            } else {
+    //                return 0;
+    //            }
+    //        })
+    //        return resSlots;
+    //    }
+    //    slotsView = slotsView.sort((val1, val2) => {
+    //        let val1IntervalStartTime = val1.start;
+    //        let val2IntervalStartTime = val2.start;
+    //        val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+    //        val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+    //        if (val1IntervalStartTime < val2IntervalStartTime) {
+    //            return -1;
+    //        } else if (val1IntervalStartTime > val2IntervalStartTime) {
+    //            return 1;
+    //        } else {
+    //            return 0;
+    //        }
+    //    })
+    //    return slotsView;
     }
 
     async patientDetails(patientId: any): Promise<any> {
