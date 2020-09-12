@@ -1434,12 +1434,12 @@ export class AppointmentService {
         let slotsviews=await this.appointmentSlotsView(user);
         let slotview;
 
-       for(let j=0;j<slotsviews.length;j++){
-        if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
-            slotview=slotsviews[j];
-            break;
+    //    for(let j=0;j<slotsviews.length;j++){
+        if(slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
+            slotview=slotsviews[0];
+            // break;
         }
-       }
+    //    }
        let resSlot=[];
        if(slotview !== undefined)
        for(let j=0;j<slotview.slots.length;j++){
