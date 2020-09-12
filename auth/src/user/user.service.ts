@@ -1,7 +1,7 @@
 import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
+import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
@@ -240,4 +240,15 @@ export class UserService {
         }
     }
 
+    async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        try {
+            return await this.userRepository.doctorRegistration(doctorDto);
+        } catch (e) {
+	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
 }

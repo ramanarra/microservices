@@ -20,6 +20,7 @@ import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_c
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
+import {docConfig} from "./doc_config/docConfig.entity";
 //import {queries} from "../config/query";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
@@ -521,7 +522,7 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async appointmentSlotsView(user: any, type): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
@@ -786,10 +787,14 @@ export class AppointmentService {
                 return res;
                 //return appointmentSlots;
             } else {
-                console.log("Error in appointmentSlotsView api 1")
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                if (type === 'todaysAvailabilitySeats') {
+                    return [];
+                } else {
+                    console.log("Error in appointmentSlotsView api 1")
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    }
                 }
             }
         } catch (e) {
@@ -1431,11 +1436,15 @@ export class AppointmentService {
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         user.paginationNumber=0;
-        let slotsviews=await this.appointmentSlotsView(user);
+
+        // find today availablity seates
+        let slotsviews = await this.appointmentSlotsView(user, 'todaysAvailabilitySeats');
         let slotview;
 
     //    for(let j=0;j<slotsviews.length;j++){
-        if(slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
+        if(slotsviews && slotsviews.length && typeof slotsviews === 'object'
+        && !slotsviews.statusCode
+         && slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
             slotview=slotsviews[0];
             // break;
         }
@@ -1870,6 +1879,21 @@ export class AppointmentService {
             }
         } 
      }
+
+     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        if(doctor){
+            // add config details
+            const config = await this.doctorConfigRepository.doctorConfigSetup(doctor, doctorDto)
+            return doctor;
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.DOC_REG_FAIL
+            };
+        }
+        
+    }
 
 
 

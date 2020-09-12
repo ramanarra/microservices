@@ -97,4 +97,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     }
 
 
+    public doctorRegistration(doctorDto: any,user:any):Promise<any> {
+        doctorDto.user = user;
+        return this.redisClient.send( { cmd: 'auth_doctor_registration' }, doctorDto).toPromise();
+    }
+
+    public findDoctorByEmail(email : string) : Promise <any> {
+        return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email).toPromise();
+    }
 }

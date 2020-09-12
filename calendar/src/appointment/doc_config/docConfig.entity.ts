@@ -57,7 +57,7 @@ export class docConfig extends BaseEntity{
     @Column({
         name : 'is_patient_reschedule_allowed'
     })
-    isPatientRescheduleAllowed : string;
+    isPatientRescheduleAllowed : boolean;
 
     @Column({
         name : 'reschedule_days'
