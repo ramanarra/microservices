@@ -53,5 +53,6 @@ export const queries = {
     saturday:'INSERT INTO public.doc_config_schedule_day(doctor_id, "dayOfWeek", doctor_key)VALUES ($1, $3, $2);',
     getDoctorKey:"SELECT replace(users.doctor_key, 'Doc_', '') AS maxDoc FROM users WHERE doctor_key notnull order by replace(users.doctor_key, 'Doc_', '')::int desc limit 1",
     getUser:'SELECT users.id FROM users order by id desc limit 1',
-    insertDoctor:'INSERT INTO public.users(id, name, email, password, salt, account_id, doctor_key)VALUES ($1, $2, $3, $4, $5, $6, $7);'
+    insertDoctor:'INSERT INTO public.users(id, name, email, password, salt, account_id, doctor_key)VALUES ($1, $2, $3, $4, $5, $6, $7);',
+    getTodayAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" = $2 AND ("status"= $3 OR "status"=$4)  AND "is_cancel"=false',
 }

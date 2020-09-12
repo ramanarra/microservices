@@ -25,6 +25,10 @@ export class VideoService {
     async createDoctorSession(doc : Doctor) : Promise<any>{
         try {
             console.log("Create FDoc " + doc.doctorName);
+
+            // check existing session
+            let removeSession = await this.removeSessionAndTokenByDoctor(doc, 0);
+
             let session : Session = await this.openViduService.createSession();
     
             const token = await this.openViduService.createTokenForDoctor(session);
@@ -153,7 +157,10 @@ export class VideoService {
             status:'completed'
         }
         var values: any = dto;
+
+        if (appointmentId) {
         var updateAppStatus = await this.appointmentRepository.update( condition, values);
+        }
     }
    
 }
