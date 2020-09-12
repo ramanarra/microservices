@@ -88,7 +88,7 @@ export class AppointmentController {
         if (user.role == CONSTANT_MSG.ROLES.DOCTOR) {
             var docKey = await this.appointmentService.doctorDetails(user.doctor_key);
             var config = await this.appointmentService.getDoctorConfigDetails(user.doctor_key);
-            docKey.fees = config.consultationCost;
+            docKey.fees = config['consultationCost'];
             let app =[];
             //let slots = [];
             //const date = moment().format();
@@ -136,7 +136,7 @@ export class AppointmentController {
               // add static values for temp
               for(let v of doctor){
                 var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
-                v.fees = config.consultationCost;
+                v.fees = config['consultationCost'];
                 let app =[];
                 // const date = moment().format();
                 // const time = moment().format("HH:mm:ss");
@@ -380,7 +380,7 @@ export class AppointmentController {
             }
         }
         if(((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) &&  user.account_key == doctor.accountKey) || (user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey)){
-            const appointment = await this.appointmentService.appointmentSlotsView(user);
+            const appointment = await this.appointmentService.appointmentSlotsView(user, '');
             return appointment;
         }else{
             return {

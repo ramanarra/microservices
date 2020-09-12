@@ -243,7 +243,6 @@ export class UserService {
     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
         try {
             return await this.userRepository.doctorRegistration(doctorDto);
-            
         } catch (e) {
 	        console.log(e);
             return {

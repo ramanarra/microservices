@@ -39,29 +39,38 @@ export class UserRepository extends Repository<Users> {
     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
         const user = new Users();
         const salt = await bcrypt.genSalt();
-        const uid:any = await this.query(queries.getUser)
-        let id = Number(uid[0].id) +1;
+
+        const uid: any = await this.query(queries.getUser)
+        let id = Number(uid[0].id) + 1;
         user.id = id;
         var password = 'docVirujh#123';
-        if(doctorDto.firstName){
-            var firstName = doctorDto.firstName;
+        var firstName = '', lastName = '';
+
+        if (doctorDto['firstName']) {
+            firstName = doctorDto['firstName'];
         }
-        if(doctorDto.lastName){
-            var lastName = doctorDto.lastName;
+        if (doctorDto['lastName']) {
+            lastName = doctorDto['lastName'];
         }
-        user.name = firstName+" "+lastName;
-        if(doctorDto.password){
+        user.name = firstName + " " + lastName;
+        if (doctorDto.password) {
             password = doctorDto.password;
         }
         user.password = await this.hashPassword(password, salt);
         user.salt = salt
         user.email = doctorDto.email;
-        if(doctorDto.isNewAccount){
+
+        if (doctorDto['isNewAccount']) {
             //creating new Account with accountDetails And then updating AdminDetails
-        }else{
+            return {
+                'message' : 'Under development'
+            }
+        } else {
             user.account_id = doctorDto.accountId;
         }
-        const maxDocKey:any = await this.query(queries.getDoctorKey)
+
+        // Find max doctor Key
+        const maxDocKey: any = await this.query(queries.getDoctorKey)
         let docKey = 'Doc_';
         if (maxDocKey.length) {
             let m = maxDocKey[0]
@@ -70,17 +79,19 @@ export class UserRepository extends Repository<Users> {
             docKey = 'Doc_1'
         }
         user.doctor_key = docKey;
-        const userRes = await this.query(queries.insertDoctor,[user.id,user.name,user.email,user.password,user.salt,user.account_id,user.doctor_key])
-        console.log(user)
+
+        const userRes = await this.query(queries.insertDoctor, [user.id, user.name, user.email, user.password, user.salt, user.account_id, user.doctor_key])
+       
         try {
-            var userId = userRes.id;
             var roleId = 2;
             const userRole = new UserRole();
             userRole.user_id = id;
             userRole.role_id = roleId;
             const userRoles = await userRole.save();
             return user;
+
         } catch (error) {
+
             if (error.code === "23505") {
                 this.logger.warn(`Email already exists, Email is ${doctorDto.email}`);
                 throw new ConflictException("Email already exists");

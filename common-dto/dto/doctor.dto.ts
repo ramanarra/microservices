@@ -22,4 +22,7 @@ export class DoctorDto {
     firstName:string;
     lastName:string;
     isNewAccount:boolean;
+    signature: string;
+    qualification: string;
+    number: string;
   }

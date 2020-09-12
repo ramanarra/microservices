@@ -241,35 +241,54 @@ export class AuthController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1}' })
+    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5"}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async doctorRegistration(@Request() req, @reports() check:boolean, @Body() doctorDto : DoctorDto) {
-      if(!doctorDto.email){
+
+      if (doctorDto['isNewAccount']) {
+        return {
+          statusCode: HttpStatus.NO_CONTENT,
+          message: "Under development"
+        }
+
+      } else if (req.user.account_key !== 'Acc_' + doctorDto.accountId) {
+
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: CONSTANT_MSG.DOC_REG_HOS_RES,
+        }
+
+      } else if (!doctorDto.email) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
           message: "Provide email"
         }
-      }else{      
+      } else {
         const email = await this.userService.findDoctorByEmail(doctorDto.email);
-        if(email){
+        if (email) {
           return {
             statusCode: HttpStatus.BAD_REQUEST,
             message: CONSTANT_MSG.ALREADY_PRESENT
           }
-        }else{
-          const signUp = await this.userService.doctorRegistration(doctorDto,req.user);
-          if(signUp){
+        } else {
+
+          const signUp = await this.userService.doctorRegistration(doctorDto, req.user);
+
+          if (signUp && !signUp.statusCode) {
             doctorDto.accountKey = signUp.accountKey;
             doctorDto.doctorKey = signUp.doctorKey;
+
             const doctor = await this.calendarService.doctorInsertion(doctorDto);
             return doctor;
+          } else {
+
+            return  {
+              signUp
+            };
+
           }
         }
       }
 
     }
-
-
-
-
 }
