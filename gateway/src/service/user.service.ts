@@ -105,7 +105,4 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     public findDoctorByEmail(email : string) : Promise <any> {
         return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email).toPromise();
     }
-
-
-
 }
