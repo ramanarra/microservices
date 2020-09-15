@@ -63,6 +63,7 @@ export class AuthController {
       if(doc.role == CONSTANT_MSG.ROLES.DOCTOR){
         const status = await this.calendarService.updateDocOnline(doc.doctorKey);
       }
+      console.log('returning doc login ', doc);
       return doc;
     }
 

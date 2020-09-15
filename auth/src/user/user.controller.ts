@@ -51,13 +51,18 @@ export class UserController {
                 message: CONSTANT_MSG.INVALID_CREDENTIALS
             }
         }
-        return {
+
+        let docLoginResponse = {
             "doctorKey": doctor.doctor_key,
             "accountKey": doctor.account_key,
             "role":doctor.role,
             "accessToken": doctor.accessToken,
             "rolesPermission": doctor.rolesPermission
-        }
+        };
+
+        console.log('returning doc login in auth ', docLoginResponse);
+
+        return docLoginResponse;
     };
 
     @MessagePattern({cmd: 'auth_patient_login'})

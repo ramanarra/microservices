@@ -43,7 +43,7 @@ export class UserRepository extends Repository<Users> {
         const uid: any = await this.query(queries.getUser)
         let id = Number(uid[0].id) + 1;
         user.id = id;
-        var password = 'docVirujh#123';
+        var password = 'docVirujh#12';
         var firstName = '', lastName = '';
 
         if (doctorDto['firstName']) {
