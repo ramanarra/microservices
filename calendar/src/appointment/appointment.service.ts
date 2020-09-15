@@ -1763,6 +1763,7 @@ export class AppointmentService {
             liveStatus: 'online'
         }
         var values: any = dto;
+        console.log('updateDocOnline status ', {condition: condition, values: values});
         return await this.doctorRepository.update(condition, values);
     }
 

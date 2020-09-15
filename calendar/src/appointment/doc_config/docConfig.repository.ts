@@ -22,6 +22,7 @@ export class docConfigRepository extends Repository<docConfig> {
 
         const config = new docConfig();
         config.doctorKey = doctorDto.doctorKey;
+        config.consultationCost = doctorDto['consultationCost'];
         config.isPatientRescheduleAllowed = false;
         config.isPreconsultationAllowed = false;
         config.isPatientCancellationAllowed = false;

@@ -44,6 +44,11 @@ export class UserRepository extends Repository<Users> {
         let id = Number(uid[0].id) + 1;
         user.id = id;
         var password = 'docVirujh#12';
+
+        if (doctorDto.password && doctorDto.password.trim()) {
+            password = doctorDto.password.trim();
+        }
+
         var firstName = '', lastName = '';
 
         if (doctorDto['firstName']) {

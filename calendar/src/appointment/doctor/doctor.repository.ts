@@ -24,10 +24,11 @@ export class DoctorRepository extends Repository<Doctor> {
         const doctor = new Doctor();
         doctor.accountKey = doctorDto.accountKey;
         doctor.doctorKey = doctorDto.doctorKey;
+        doctor.email = doctorDto.email;
         doctor.firstName = doctorDto['firstName'];
         doctor.lastName = doctorDto['lastName'];
         doctor.doctorName = doctorDto['firstName'] + " " + doctorDto['lastName'];
-        doctor.experience = doctorDto.doctorExperience ? doctorDto.doctorExperience : null;
+        doctor.experience = doctorDto['experience'] ? doctorDto['experience'] : null;
         doctor.speciality = doctorDto.speciality ? doctorDto.speciality : null;
         doctor.qualification = doctorDto.qualification ? doctorDto.qualification : null;
         doctor.photo = doctorDto.photo ? doctorDto.photo : null;
