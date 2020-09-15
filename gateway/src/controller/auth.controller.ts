@@ -60,10 +60,13 @@ export class AuthController {
       }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any =await this.userService.doctorsLogin(userDto);
+      console.log('returning doc login 0 ', doc);
+
       if(doc.role == CONSTANT_MSG.ROLES.DOCTOR){
         const status = await this.calendarService.updateDocOnline(doc.doctorKey);
+        console.log('returning doc login 2 status ', status);
       }
-      console.log('returning doc login ', doc);
+      console.log('returning doc login 1', doc);
       return doc;
     }
 
