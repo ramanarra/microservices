@@ -1018,6 +1018,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'update_doctor_online'})
     async updateDocOnline(doctorKey:any): Promise<any> {
+        console.log('update_doctor_online ', doctorKey)
         return await this. appointmentService.updateDocOnline(doctorKey);       
     }
 

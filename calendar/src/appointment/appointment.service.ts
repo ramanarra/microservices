@@ -1764,7 +1764,11 @@ export class AppointmentService {
         }
         var values: any = dto;
         console.log('updateDocOnline status ', {condition: condition, values: values});
-        return await this.doctorRepository.update(condition, values);
+
+        let docOnlineStatus = await this.doctorRepository.update(condition, values);
+        console.log('updateDocOnline status ', docOnlineStatus);
+
+        return docOnlineStatus;
     }
 
     async updateDocOffline(doctorKey): Promise<any> {
