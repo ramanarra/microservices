@@ -1250,7 +1250,7 @@ export class AppointmentService {
                         let config = await this.getAppDoctorConfigDetails(appointmentList.id);
                         var preConsultationHours = null;
                         var preConsultationMins = null;
-                        if (config.isPatientPreconsultationAllowed) {
+                        if (config && config.isPatientPreconsultationAllowed) {
                             preConsultationHours = config.preconsultationHours;
                             preConsultationMins = config.preconsultationMinutes;
                         }
@@ -1425,7 +1425,7 @@ export class AppointmentService {
 
     }
 
-    async availableSlots(user: any): Promise<any> {
+    async availableSlots(user: any, type: string): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
        
@@ -1447,16 +1447,41 @@ export class AppointmentService {
          && slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
             slotview=slotsviews[0];
             // break;
+        } else if (!type && type !== 'doctorList') {
+
+            for(let j=0;j<slotsviews.length;j++){
+
+                if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
+                
+                slotview=slotsviews[j];
+                
+                break;
+                }
+            }
         }
+
     //    }
        let resSlot=[];
-       if(slotview !== undefined)
-       for(let j=0;j<slotview.slots.length;j++){
-           if(slotview.slots[j].slotType.toLowerCase() == 'free'){
-               resSlot.push(slotview.slots[j]);
-           }
-       }
-       return resSlot;
+        if (slotview !== undefined) {
+            for (let j = 0; j < slotview.slots.length; j++) {
+                if (slotview.slots[j].slotType.toLowerCase() == 'free') {
+                    resSlot.push(slotview.slots[j]);
+                }
+            }
+        } else {
+            for (let j = 0; j < slotview.slots.length; j++) {
+                if (slotview.slots[j].slotType.toLowerCase() == 'free') {
+                    resSlot.push(slotview.slots[j]);
+                }
+            }
+        }
+
+        // if (!type && type !== 'doctorList') {
+            return resSlot;
+        // } else {
+        //     return resSlot;
+        // }
+
     //    const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
     //    if(!workSchedule.length){
     //        return [];
