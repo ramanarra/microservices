@@ -29,6 +29,9 @@ import {
 import { defaultMaxListeners } from 'stream';
 import {AuthGuard} from '@nestjs/passport';
 import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
+import {JwtService} from '@nestjs/jwt';
+import { toNamespacedPath } from 'path';
+import {reports} from "../common/decorator/reports.decorator";
 
 
 @Controller('api/auth')
@@ -37,7 +40,7 @@ export class AuthController {
 
   private logger = new Logger('AuthController');
 
-  constructor(private readonly userService: UserService, private readonly calendarService: CalendarService) { }
+  constructor(private readonly userService: UserService, private readonly calendarService: CalendarService,  private readonly jwtService: JwtService) { }
 
     @Post('doctorLogin')
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
@@ -57,9 +60,13 @@ export class AuthController {
       }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any =await this.userService.doctorsLogin(userDto);
+      console.log('returning doc login 0 ', doc);
+
       if(doc.role == CONSTANT_MSG.ROLES.DOCTOR){
         const status = await this.calendarService.updateDocOnline(doc.doctorKey);
+        console.log('returning doc login 2 status ', status);
       }
+      console.log('returning doc login 1', doc);
       return doc;
     }
 
@@ -190,4 +197,102 @@ export class AuthController {
       return res.json({message: "sucessfully loggedout"})
     }
 
+    @Get('refreshToken')
+    @ApiBearerAuth('JWT')
+    @ApiOkResponse({description: 'refreshToken API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async refreshToken(@Request() req,@Response() res) {
+      var token2 = req.headers.authorization;
+      token2 = token2.replace("Bearer", "").trim();
+      var token1 = this.jwtService.decode(token2); 
+      let token:any = token1;
+      delete token.exp;
+      delete token.iat;
+      try{
+        const newToken = this.jwtService.sign(token);
+        return res.json({newToken:newToken,statusCode:HttpStatus.OK, message: "Token updated successfully"})
+      } catch(e){
+        console.log(e);
+      }      
+    }
+
+    @Post('doctor/forgotPassword')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"email":"test@apollo.com",\n' +
+          '"password": "123456" \n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    @ApiTags('Doctors')
+    async doctorsForgotPassword(@Request() req, @Body() userDto : UserDto) {
+      if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+        const status = await this.calendarService.updateDocOnline(req.user.doctorKey);
+      }
+      if(!userDto.password){
+        console.log("Provide password");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
+      }else if(!userDto.confirmPassword){
+        console.log("Provide confirmPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmPassword"}
+      }
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      const doc:any =await this.userService.doctorsForgotPassword(req.user,userDto);
+      return doc;
+    }
+
+    @Post('doctorRegistration')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Admin')
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5", "password": "123456", "consultationCost" : "100", "number":"7845127845"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    async doctorRegistration(@Request() req, @reports() check:boolean, @Body() doctorDto : DoctorDto) {
+
+      if (doctorDto['isNewAccount']) {
+        return {
+          statusCode: HttpStatus.NO_CONTENT,
+          message: "Under development"
+        }
+
+      } else if (req.user.account_key !== 'Acc_' + doctorDto.accountId) {
+
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: CONSTANT_MSG.DOC_REG_HOS_RES,
+        }
+
+      } else if (!doctorDto.email) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Provide email"
+        }
+      } else {
+        const email = await this.userService.findDoctorByEmail(doctorDto.email);
+        if (email) {
+          return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: CONSTANT_MSG.ALREADY_PRESENT
+          }
+        } else {
+
+          const signUp = await this.userService.doctorRegistration(doctorDto, req.user);
+
+          if (signUp && !signUp.statusCode) {
+            doctorDto.accountKey = signUp.accountKey;
+            doctorDto.doctorKey = signUp.doctorKey;
+
+            const doctor = await this.calendarService.doctorInsertion(doctorDto);
+            return doctor;
+          } else {
+
+            return  {
+              signUp
+            };
+
+          }
+        }
+      }
+
+    }
 }

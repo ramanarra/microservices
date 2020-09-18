@@ -35,6 +35,7 @@ export class VideoGateway {
   async createTokenForDoctor(client: AuthenticatedSocket, data : string) {
     this.logger.log(`Socket request for create Token for Doctor from Doc-key => ${client.auth.data.doctor_key}`);
     const response : any = await this.videoService.videoDoctorSessionCreate(client.auth.data.doctor_key);
+    console.log("response Doctor >>" + JSON.stringify(response));
     client.emit("videoTokenForDoctor", response);
     return response;
   }
@@ -43,7 +44,7 @@ export class VideoGateway {
   async createTokenForPatientByDoctor(client: AuthenticatedSocket, appointmentId : string) {
     this.logger.log(`Socket request for create Token for Patient from Doc-key => ${client.auth.data.doctor_key} and appointmentId => ${appointmentId}` );
     const response : any = await this.videoService.createTokenForPatientByDoctor(client.auth.data.doctor_key, appointmentId);
-    console.log("response >>" + JSON.stringify(response));
+    console.log("response Patient >>" + JSON.stringify(response));
     let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
     patientSocketList.forEach( (val : Socket) => {
       val.emit("videoTokenForPatient", response);
@@ -94,6 +95,30 @@ export class VideoGateway {
     if(userInfo.permission === "CUSTOMER"){
       this.logger.log(`Socket request update live status for ${CONSTANT_MSG.ROLES.PATIENT} => ${userInfo.patientId} and status => ${data.status}`);
       this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.PATIENT, userInfo.patientId, data.status);
+
+      //patient related doc list - today's appoinmnet without doctor duplication
+      const patientTodayApp : any = await this.videoService.patientUpcomingAppointments(userInfo.patientId, 0, 0);
+      let doctorArr = [0];
+
+      console.log('patientTodayApp = > ', patientTodayApp);
+
+      patientTodayApp.forEach(element => {
+      console.log(element);
+        console.log('doctor = >', element.doctorId);
+        if (element.doctorId && (doctorArr.length && !doctorArr.includes(element.doctodId))) {
+          doctorArr.push(element.doctorId);
+          // docList -> DOCTOR
+          let patientDocSocketList : Socket[] = this.socketStateService.get("DOCTOR_"+ element.doctorId);
+
+          // emiting response
+          patientDocSocketList.forEach( async(val : Socket) => {
+            const response : any = await this.videoService.getDoctorAppointments(element.doctorKey);
+            client.emit("getDoctorAppointments", response);
+            });
+        }
+
+      });
+
     }else {
       this.logger.log(`Socket request update live status for ${CONSTANT_MSG.ROLES.DOCTOR} => ${userInfo.doctor_key} and status => ${data.status}`);
       this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.DOCTOR, userInfo.doctor_key, data.status);

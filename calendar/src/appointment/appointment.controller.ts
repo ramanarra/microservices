@@ -14,7 +14,7 @@ import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.reposito
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 
 //import {DoctorService} from './doctor/doctor.service';
-
+var moment = require('moment');
 
 
 @Controller('appointment')
@@ -56,6 +56,11 @@ export class AppointmentController {
         const account = await this.appointmentService.accountDetails(doctorId.accountKey);  
         const appointment = await this.appointmentService.createAppointment(appointmentDto);       
         if(!appointment.message){
+            const pay = new PaymentDetails();
+            pay.amount = appointmentDto.config.consultationCost;
+            pay.appointmentId = appointment.appointment.appointmentdetails.id;
+            pay.paymentStatus = CONSTANT_MSG.PAYMENT_STATUS.FULLY_PAID
+            const payment = await pay.save();
             let data={
                 email:pat.email,
                 appointmentId:appointment.appointment.appointmentdetails.id,
@@ -70,6 +75,9 @@ export class AppointmentController {
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
             const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            //let apiKey = new Sms(this.textLocal.apiKey);
+            let params = {
+            }
         }
         return appointment;
     }
@@ -80,10 +88,14 @@ export class AppointmentController {
         if (user.role == CONSTANT_MSG.ROLES.DOCTOR) {
             var docKey = await this.appointmentService.doctorDetails(user.doctor_key);
             var config = await this.appointmentService.getDoctorConfigDetails(user.doctor_key);
-            docKey.fees = config.consultationCost;
+            docKey.fees = config['consultationCost'];
             let app =[];
             //let slots = [];
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             var date:any = new Date();
+            //var currenttime= moment()
+            //const time = moment(currenttime).format("hh:mm"));
             var seconds = date.getSeconds();
             var minutes = date.getMinutes();
             var hour = date.getHours();
@@ -111,7 +123,7 @@ export class AppointmentController {
                 doctorKey:user.doctor_key,
                 appointmentDate:date
             }
-            var available = await this.appointmentService.availableSlots(dto);
+            var available = await this.appointmentService.availableSlots(dto, 'doctorList');
             docKey.todaysAvailabilitySeats = available.length;
             return {
                 statusCode: HttpStatus.OK,
@@ -124,8 +136,10 @@ export class AppointmentController {
               // add static values for temp
               for(let v of doctor){
                 var config = await this.appointmentService.getDoctorConfigDetails(v.doctorKey);
-                v.fees = config.consultationCost;
+                v.fees = config['consultationCost'];
                 let app =[];
+                // const date = moment().format();
+                // const time = moment().format("HH:mm:ss");
                 var date:any = new Date();
                 var minutes = date.getMinutes();
                 var hour = date.getHours();
@@ -152,7 +166,7 @@ export class AppointmentController {
                     doctorKey:v.doctorKey,
                     appointmentDate:date
                 }
-                var available = await this.appointmentService.availableSlots(dto);
+                var available = await this.appointmentService.availableSlots(dto, 'doctorList');
                 v.todaysAvailabilitySeats = available.length;
             }
             return {
@@ -217,6 +231,94 @@ export class AppointmentController {
     async doctorConfigUpdate(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(user.docConfigDto.doctorKey);
         if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.docConfigDto.doctorKey) || (user.account_key == doctor.accountKey)){
+            const configDetails = await this.appointmentService.getDoctorConfigDetails(user.docConfigDto.doctorKey);
+            var iscanAllowed = configDetails.isPatientCancellationAllowed;
+            var isreschAllowed = configDetails.isPatientRescheduleAllowed;
+
+            var canhours = configDetails.cancellationHours;
+            var canDays = configDetails.cancellationDays;
+            var canMins = configDetails.cancellationMins;
+
+            var reschDays = configDetails.rescheduleDays;
+            var reschedHours = configDetails.rescheduleHours;
+            var reschedMins = configDetails.rescheduleMins;
+
+            if(user.docConfigDto.isPatientCancellationAllowed){
+                iscanAllowed = user.docConfigDto.isPatientCancellationAllowed;
+            }
+            if(user.docConfigDto.isPatientRescheduleAllowed){
+                isreschAllowed = user.docConfigDto.isPatientRescheduleAllowed;
+            }
+            if(user.docConfigDto.cancellationDays>=0){
+                canDays = user.docConfigDto.cancellationDays;
+            }
+            if(user.docConfigDto.cancellationHours>=0){
+                canhours = user.docConfigDto.cancellationHours;
+            }
+            if(user.docConfigDto.cancellationMins>=0){
+                canMins = user.docConfigDto.cancellationMins;
+            }
+            if(user.docConfigDto.rescheduleDays>=0){
+                reschDays = user.docConfigDto.rescheduleDays;
+            }
+            if(user.docConfigDto.rescheduleHours>=0){
+                reschedHours = user.docConfigDto.rescheduleHours;
+            }
+            if(user.docConfigDto.rescheduleMins>=0){
+                reschedMins = user.docConfigDto.rescheduleMins;
+            }
+            if(iscanAllowed){
+                let cTime=canhours+':'+canMins;
+                if(canDays == 0){
+                    const canTime=  Helper.getTimeInMilliSeconds(cTime);
+
+                    if (user.docConfigDto.isPatientCancellationAllowed) {
+                        // by default 10 mins cancelation will set
+                        user.docConfigDto['cancellationMins'] = '10';
+                        user.docConfigDto['cancellationHours'] = '0';
+                        user.docConfigDto['cancellationDays'] = '0';
+
+                    } else if(canTime < 600000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Cancellation time should be greater than 10 minutes"}
+                    }
+                } else {
+
+                    if (user.docConfigDto.isPatientCancellationAllowed) {
+                        // by default 10 mins cancelation will set
+                        user.docConfigDto['cancellationMins'] = '10';
+                        user.docConfigDto['cancellationHours'] = '0';
+                        user.docConfigDto['cancellationDays'] = '0';
+
+                    }
+                }           
+            }
+            if(isreschAllowed){
+                let rTime=reschedHours+':'+reschedMins;
+                if(reschDays == 0){
+                    const canTime= Helper.getTimeInMilliSeconds(rTime);
+
+                    if (user.docConfigDto.isPatientRescheduleAllowed) {
+                        // by default 10 mins reschdule will set
+                        user.docConfigDto['rescheduleMins'] = '10';
+                        user.docConfigDto['rescheduleHours'] = '0';
+                        user.docConfigDto['rescheduleDays'] = '0';
+
+                    } else if(canTime < 600000){
+
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Reschedule time should be greater than 10 minutes"}
+                    }
+                } else {
+
+                    if (user.docConfigDto.isPatientRescheduleAllowed) {
+                        // by default 10 mins reschdule will set
+                        user.docConfigDto['rescheduleMins'] = '10';
+                        user.docConfigDto['rescheduleHours'] = '0';
+                        user.docConfigDto['rescheduleDays'] = '0';
+
+                    }
+                }           
+            }
+            
             const docConfig = await this.appointmentService.doctorConfigUpdate(user.docConfigDto);
             return docConfig;
         }else {
@@ -231,6 +333,9 @@ export class AppointmentController {
     async workScheduleEdit(workScheduleDto: any): Promise<any> {
         const doctor = await this.appointmentService.doctorDetails(workScheduleDto.doctorKey);
         if((workScheduleDto.user.role == CONSTANT_MSG.ROLES.ADMIN && workScheduleDto.user.account_key == doctor.accountKey) || (workScheduleDto.user.role == CONSTANT_MSG.ROLES.DOCTOR && workScheduleDto.user.doctor_key == doctor.doctorKey)){
+            if(workScheduleDto.user.role == CONSTANT_MSG.ROLES.ADMIN){
+                workScheduleDto.user.doctor_key = workScheduleDto.doctorKey;
+            }
             const updateRes = await this.appointmentService.workScheduleEdit(workScheduleDto);
             return updateRes;
         }
@@ -275,7 +380,7 @@ export class AppointmentController {
             }
         }
         if(((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) &&  user.account_key == doctor.accountKey) || (user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == doctor.doctorKey)){
-            const appointment = await this.appointmentService.appointmentSlotsView(user);
+            const appointment = await this.appointmentService.appointmentSlotsView(user, '');
             return appointment;
         }else{
             return {
@@ -289,6 +394,7 @@ export class AppointmentController {
     @MessagePattern({cmd: 'appointment_reschedule'})
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+    const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
     if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
     }else{
@@ -314,8 +420,11 @@ export class AppointmentController {
     const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
     const account = await this.appointmentService.accountDetails(doctor.accountKey);
+    //const date = moment().format();
     let date = new Date();  
     if(!appointment.message){
+        payment.appointmentId = appointment.appointment.appointmentdetails.id;
+        await payment.save();
         let data={
             email:doctor.email,
             appointmentId:app.appointmentDetails.id,
@@ -360,6 +469,7 @@ export class AppointmentController {
         message: CONSTANT_MSG.INVALID_REQUEST
         }
     }
+    //const date = moment().format();
     let date = new Date();
     const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
@@ -464,14 +574,16 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'patient_view_appointment'})
     async viewAppointmentSlotsForPatient(user: any): Promise<any> {
-        const doctor = await this.appointmentService.availableSlots(user);
+        const doctor = await this.appointmentService.availableSlots(user, '');
         if(!doctor.length && user.confirmation){
             let avlbl= doctor;
+            //var nextday = moment(user.appointmentDate).format();
             const nextday = new Date(user.appointmentDate)
             while(!avlbl.length){
+                //nextday = moment(nextday).add(1, 'days').format()
                 nextday.setDate(nextday.getDate() + 1)
                 user.appointmentDate = nextday;
-                const doctor = await this.appointmentService.availableSlots(user);
+                const doctor = await this.appointmentService.availableSlots(user, '');
                 avlbl = doctor;
             }
            return{
@@ -558,14 +670,16 @@ export class AppointmentController {
     async availableSlots(user: any): Promise<any> {
         const doc = await this.appointmentService.doctorDetails(user.doctorKey);
         if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
-            const doctor = await this.appointmentService.availableSlots(user);
+            const doctor = await this.appointmentService.availableSlots(user, '');
             if(!doctor.length && user.confirmation){
                 let avlbl= doctor;
+                //var nextday = moment(user.appointmentDate).format();
                 const nextday = new Date(user.appointmentDate)
                 while(!avlbl.length){
+                    //nextday = moment(nextday).add(1, 'days').format()
                     nextday.setDate(nextday.getDate() + 1)
                     user.appointmentDate = nextday;
-                    const doctor = await this.appointmentService.availableSlots(user);
+                    const doctor = await this.appointmentService.availableSlots(user, '');
                     avlbl = doctor;
                 }
                return{
@@ -705,6 +819,8 @@ export class AppointmentController {
         const doc = await this.appointmentService.doctorDetails(doctorKey);
         if(doc){
             let app =[];
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             var date:any = new Date();
             var seconds = date.getSeconds();
             var minutes = date.getMinutes();
@@ -776,15 +892,20 @@ export class AppointmentController {
         if(config.isPatientCancellationAllowed){
             let canDays=config.cancellationDays;
             let canTime= config.cancellationHours+":"+config.cancellationMins;
+            //const date = moment().format();
+            //const time = moment().format("HH:mm:ss");
             let date = new Date();
             var minutes = date.getMinutes();
             var hour = date.getHours();
             var time = hour+":"+minutes;
             var timeMilli = Helper.getTimeInMilliSeconds(time);
             let appDate=app.appointmentDetails.appointmentDate;
+            let appointmentMinutesArray = app.appointmentDetails.startTime.split(':');
+            let appointmentMinutes = moment(appDate).add((appointmentMinutesArray[0] * 60) + appointmentMinutesArray[1], 'm');
             let appStart = app.appointmentDetails.startTime;
             let appMilli = Helper.getTimeInMilliSeconds(appStart);
             let diffDate = appDate;
+            //diffDate = moment(diffDate).subtract(canDays, 'days').format()
             diffDate.setDate(diffDate.getDate() - canDays);
             let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
             if(date < diffDate){
@@ -899,6 +1020,7 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'update_doctor_online'})
     async updateDocOnline(doctorKey:any): Promise<any> {
+        console.log('update_doctor_online ', doctorKey)
         return await this. appointmentService.updateDocOnline(doctorKey);       
     }
 
@@ -922,23 +1044,35 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_appointment_reschedule'})
     async patientAppointmentReschedule(appointmentDto: any): Promise<any> {
         const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
+        const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
         const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
         if(app.appointmentDetails.patientId == appointmentDto.user.patientId){
             if(config.isPatientRescheduleAllowed){
-                let canDays=config.rescheduleDays;
-                let canTime= config.rescheduleDays+":"+config.rescheduleDays;
+                let canDays = config.rescheduleDays;
+                let canTime = config.rescheduleHours + ":" + config.rescheduleMins;
+                //const date = moment().format();
+                //const time = moment().format("HH:mm:ss");
                 let date = new Date();
-                var minutes = date.getMinutes();
-                var hour = date.getHours();
-                var time = hour+":"+minutes;
-                var timeMilli = Helper.getTimeInMilliSeconds(time);
+                // var minutes = date.getMinutes();
+                // var hour = date.getHours();
+                // var time = hour+":"+minutes;
+                // var timeMilli = Helper.getTimeInMilliSeconds(time);
                 let appDate=app.appointmentDetails.appointmentDate;
-                let appStart = app.appointmentDetails.startTime;
-                let appMilli = Helper.getTimeInMilliSeconds(appStart);
+                // let appStart = app.appointmentDetails.startTime;
+                // let appMilli = Helper.getTimeInMilliSeconds(appStart);
                 let diffDate = appDate;
-                diffDate.setDate(diffDate.getDate() - canDays);
-                let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
-                if(date<diffDate){
+                //diffDate = moment(diffDate).subtract(canDays, 'days').format()
+                diffDate.setDate(diffDate.getDate() - canDays)
+                // .setHours(hour, minutes);
+                let reschduleDateCompare = date.setHours(0,0,0,0);
+                // let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
+
+                let appointmentMinutesArray = app.appointmentDetails.startTime.split(':');
+                let appointmentMinutes = moment(appDate).add(((Number(appointmentMinutesArray[0]) * 60) + Number(appointmentMinutesArray[1])), 'm').toDate();
+
+                let rescAppointmentMinutes= moment(appointmentMinutes).subtract((Number(config.rescheduleDays) * 1440) + (Number(config.rescheduleHours) * 60) + Number(config.rescheduleMinutes), 'm').toDate();
+
+                if(moment().valueOf() < rescAppointmentMinutes.valueOf()) {
                     const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
                     const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
                     appointmentDto.configSession = config.consultationSessionTimings;
@@ -948,6 +1082,8 @@ export class AppointmentController {
                     const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
                     const account = await this.appointmentService.accountDetails(doctor.accountKey);  
                     if(!appointment.message){
+                        payment.appointmentId = appointment.appointment.appointmentdetails.id;
+                        await payment.save();
                         let data={
                             email:doctor.email,
                             appointmentId:app.appointmentDetails.id,
@@ -969,17 +1105,24 @@ export class AppointmentController {
                         console.log(mail);
                     }
                     return appointment;
-                }else if(date == diffDate){
-                    if(date == diffDate){
-                        const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+
+                } else if(moment().valueOf() === rescAppointmentMinutes.valueOf()){
+                    // if(date == diffDate){
                         const doctor = await this.appointmentService.doctor_Details(app.appointmentDetails.doctorId);
+                        appointmentDto.doctorId = doctor.doctorId;
+                        
                         const config = await this.appointmentService.getDoctorConfigDetails(doctor.doctorKey);
                         appointmentDto.configSession = config.consultationSessionTimings;
                         appointmentDto.config = config;
-                        appointmentDto.doctorId = doctor.doctorId;
+
+                        const appointment = await this.appointmentService.appointmentReschedule(appointmentDto);
+                                                
                         const pat = await this.appointmentService.getPatientDetails(app.appointmentDetails.patientId); 
                         const account = await this.appointmentService.accountDetails(doctor.accountKey);  
+                        
                         if(!appointment.message){
+                            payment.appointmentId = appointment.appointment.appointmentdetails.id;
+                            await payment.save();
                             let data={
                                 email:doctor.email,
                                 appointmentId:app.appointmentDetails.id,
@@ -1000,7 +1143,7 @@ export class AppointmentController {
                             const mail = await this.appointmentService.sendAppRescheduleEmail(data);
                         }
                         return appointment;
-                    }
+                    // }
 
                 }else{
                     return{
@@ -1074,5 +1217,18 @@ export class AppointmentController {
         const patient = Helper.getTimeInMilliSeconds(time);
         return patient;
     }
+
+    @MessagePattern({cmd: 'create_payment_link'})
+    async createPaymentLink(user: any): Promise<any> {
+        const patient = await this.paymentService.createPaymentLink(user.accountDto);
+        return patient;
+    }
+
+    @MessagePattern({cmd: 'doctor_details_insertion'})
+    async doctorInsertion(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.appointmentService.doctorRegistration(doctorDto);
+        return doctor;
+    }
+
 
 }

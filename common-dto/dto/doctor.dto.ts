@@ -19,4 +19,10 @@ export class DoctorDto {
     photo:string;
     confirmation:boolean;
     appointmentDate:Date;
+    firstName:string;
+    lastName:string;
+    isNewAccount:boolean;
+    signature: string;
+    qualification: string;
+    number: string;
   }

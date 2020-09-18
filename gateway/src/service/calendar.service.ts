@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {UserDto, AppointmentDto, DoctorConfigCanReschDto, DocConfigDto,WorkScheduleDto,PatientDto, DoctorDto, HospitalDto} from 'common-dto';
 import {AllClientServiceException} from 'src/common/filter/all-clientservice-exceptions.filter';
 import { UserService } from './user.service';
+import { patient } from '@src/common/decorator/patientPermission.decorator';
 
 
 @Injectable()
@@ -325,6 +326,17 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public accountPatientsList(user:any, accountKey:any) : Promise <any> {
         user.accountKey = accountKey;
         return this.redisClient.send({ cmd : 'account_patients_list'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public createPaymentLink(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'create_payment_link'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public doctorInsertion(doctorDto:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'doctor_details_insertion'},doctorDto).toPromise();
     }
 
 

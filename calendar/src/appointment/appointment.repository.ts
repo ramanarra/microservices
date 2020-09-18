@@ -27,12 +27,16 @@ export class AppointmentRepository extends Repository<Appointment> {
         appointment.appointmentDate =new Date(appointmentDto.appointmentDate);
         appointment.startTime = appointmentDto.startTime;
         appointment.endTime = appointmentDto.endTime;
+        // appointment.appointmentDate = moment.utc(moment(appointmentDto.appointmentDate)).format();
+        // appointment.startTime = new moment(appointmentDto.startTime, "HH:mm").utc();
+        // appointment.endTime = new moment(appointmentDto.endTime, "HH:mm").utc();
         appointment.slotTiming = appointmentDto.configSession;
         appointment.isActive= true;
         appointment.isCancel= false;
         appointment.paymentOption = appointmentDto.paymentOption;
         appointment.consultationMode = appointmentDto.consultationMode;
         appointment.createdTime = new Date();
+        //appointment.createdTime = moment().format();
         if(appointmentDto.user){
             appointment.createdBy = appointmentDto.user.role;
             appointment.createdId = appointmentDto.user.userId;

@@ -58,6 +58,8 @@ import {patient} from "../common/decorator/patientPermission.decorator";
 import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+var moment = require('moment');
 
 
 @Controller('api/calendar')
@@ -67,7 +69,7 @@ export class CalendarController {
 
     private logger = new Logger('CalendarController');
 
-    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService,) {
+    constructor(private readonly calendarService: CalendarService,private readonly userService: UserService ) {
     }
 
 
@@ -104,11 +106,22 @@ export class CalendarController {
             console.log("Provide startTime");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
-        appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        appointmentDto.appointmentDate = new Date(appointmentDto.appointmentDate);
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var day = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + day;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        day = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + day;
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -209,24 +222,6 @@ export class CalendarController {
         if(!req.body.doctorKey){
             console.log("Provide doctorKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
-        }else if(req.body.isPatientCancellationAllowed){
-            let cTime=docConfigDto.cancellationHours+':'+docConfigDto.cancellationMins;
-            if(docConfigDto.cancellationDays == 0){
-                const canTime= await this.calendarService.getMilli(cTime);
-                if(canTime < 600000){
-                    console.log("cancellation time should be greater than 10 minutes");
-                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "cancellation time should be greater than 10 minutes"}
-                }
-            }           
-        }else if(req.body.isPatientRescheduleAllowed){
-            let rTime=docConfigDto.rescheduleHours+':'+docConfigDto.rescheduleMins;
-            if(docConfigDto.rescheduleDays == 0){
-                const canTime= await this.calendarService.getMilli(rTime);
-                if(canTime < 600000){
-                    console.log("reschedule time should be greater than 10 minutes");
-                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "reschedule time should be greater than 10 minutes"}
-                }
-            }           
         }
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
@@ -250,60 +245,71 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        // if(!req.body.doctorKey){
-        //     console.log("Provide doctorKey");
-        //     return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
-        // }else if(workScheduleDto.updateWorkSchedule){
-        //     workScheduleDto.updateWorkSchedule.forEach(async x => {
-        //         if(!x.scheduledayid){
-        //             console.log("Provide scheduledayid");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
-        //         }else if(!x.startTime){
-        //             console.log("Provide startTime");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
-        //         }else if(x.startTime){
-        //             console.log(x.startTime);
-        //             const start = await this.calendarService.getMilli(x.startTime);
-        //             const base = await this.calendarService.getMilli('23:59');
-        //             if(start>base){
-        //                 console.log("Time must be in military time format");
-        //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time must be in military time format"}
-        //             }
-        //         }else if(!x.endTime){
-        //             console.log("Provide endTime");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
-        //         }else if(x.endTime){
-        //             const end = await this.calendarService.getMilli(x.endTime);
-        //             const base = await this.calendarService.getMilli('23:59');
-        //             if(end>base){
-        //                 console.log("End time must be in military time format");
-        //                 return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time must be in military time format"}
-        //             }
-        //         }else if(!x.isDelete){
-        //             console.log("Provide isDelete");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide isDelete"}
-        //         }
-        //     });
-        // }else if(workScheduleDto.workScheduleConfig){
-        //     let y = workScheduleDto.workScheduleConfig;
-        //     if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
-        //         console.log("Provide valid overBookingType");
-        //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
-        //     }else if(y.overBookingCount){
-        //         if(!(y.overBookingCount>0 && y.overBookingCount<30)){
-        //             console.log("Provide valid overBookingCount");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingCount"}
-        //         }
-        //     }else if(!y.overBookingEnabled){
-        //         console.log("Provide valid overBookingEnabled");
-        //         return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
-        //     }else if(y.consultationSessionTimings){
-        //         if(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60){
-        //             console.log("Provide valid consultationSessionTimings");
-        //             return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
-        //         }
-        //     }
-        // }
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"} 
+        }else if(workScheduleDto.updateWorkSchedule){
+            let y;
+            let x=workScheduleDto.updateWorkSchedule
+            for(y=0;y<workScheduleDto.updateWorkSchedule.length;y++){
+                if(!x[y].scheduledayid){
+                    console.log("Provide scheduledayid");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide scheduledayid"}  
+                }else if(!x[y].startTime){
+                    console.log("Provide startTime");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
+                }else if(!x[y].endTime){
+                    console.log("Provide endTime");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide endTime"}
+                }
+                if(x[y].startTime){
+                    console.log(x[y].startTime);
+                    let splitStartTime = x[y].startTime.split(':');
+                    if((splitStartTime[0]*60*60000) > 86340000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time hours must be less than 23 hours"}
+                    }
+                    if((splitStartTime[1]*60000) > 3540000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "Start time minutes must be less than 59 minutes"}
+                    }
+                }
+                if(x[y].endTime){
+                    let splitEndTime = x[y].endTime.split(':');
+                    if((splitEndTime[0]*60*60000) > 86340000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time hours must be less than 23 hours"}
+                    }
+                    if((splitEndTime[1]*60000) > 3540000){
+                        return {statusCode:HttpStatus.BAD_REQUEST ,message: "End time minutes must be less than 59 minutes"}
+                    }
+                }
+            }
+        }
+        if(workScheduleDto.workScheduleConfig){
+            let y = workScheduleDto.workScheduleConfig;
+            if(y.overBookingType){
+                if(y.overBookingType != 'Per Hour' && y.overBookingType != 'Per Day'){
+                    console.log("Provide valid overBookingType");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingType"}
+                }
+            }
+            if(y.overBookingEnabled){
+                if(!y.overBookingEnabled){
+                    console.log("Provide valid overBookingEnabled");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingEnabled"}
+                }
+            }
+            if(y.consultationSessionTimings){
+                if(!(y.consultationSessionTimings>0 && y.consultationSessionTimings<=60)){
+                    console.log("Provide valid consultationSessionTimings");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "consultationSessionTimings must be greater than 0 and less than 60 "}
+                }
+            }
+            if(y.overBookingCount){
+                if(!(y.overBookingCount>0 && y.overBookingCount<30)){
+                    console.log("Provide valid overBookingCount");
+                    return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide valid overBookingCount"}
+                }
+            }
+        }
 
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(workScheduleDto, req.user)}`);
         return await this.calendarService.workScheduleEdit(workScheduleDto, req.user);
@@ -376,10 +382,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var date = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + date;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        date = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + date;
+        if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -504,7 +521,7 @@ export class CalendarController {
             '"state":"state", \n' +
             '"pincode":"pincode", \n' +
             '"dateOfBirth":"dateOfBirth", \n' +
-            '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
+            '"photo":"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU" \n' +
             '}'
     })
     @ApiBearerAuth('JWT')
@@ -568,10 +585,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide paymentId"}
         }
         patientDto.appointmentDate= new Date(patientDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(patientDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // patientDto.appointmentDate = moment(patientDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(patientDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var date = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + date;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        date = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + date;
+        if((patientDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -589,7 +617,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Patient')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:  Doc_5, 2020-05-05'})
+    @ApiOkResponse({description: 'request body example: {"doctorKey":"Doc_5","appointmentDate":"2020-08-27","confirmation":true}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async viewAppointmentSlotsForPatient(@Request() req,@patient() check:boolean,@Body() doctorDto: DoctorDto) {
         if (!check)
@@ -597,7 +625,35 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
             await this.calendarService.updatePatLastActive(req.user.patientId);
         }
-        this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(doctorDto)}`);
+        if(!req.body.doctorKey){
+            console.log("Provide doctorKey");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
+        } else if(!req.body.appointmentDate){
+            console.log("Provide appointmentDate");
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentDate"}
+        } 
+        doctorDto.appointmentDate= new Date(doctorDto.appointmentDate);
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // doctorDto.appointmentDate = moment(doctorDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(doctorDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var date = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + date;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        date = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + date;
+        if((doctorDto.appointmentDate < today)&&!(appDate == today1)){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        }
+        this.logger.log(`Doctor View Appointments Slots Api -> Request data ${JSON.stringify(doctorDto)}`);
         return await this.calendarService.viewAppointmentSlotsForPatient(req.user,doctorDto);
     }
 
@@ -691,7 +747,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:   {"doctorKey": "Doc_5"}'})
+    @ApiOkResponse({description: 'request body example:   {"accountKey":"Acc_1","hospitalName":"Apollo Hospitals", "city":"Chennai","state":"Tamil Nadu","pincode":"600006","country":"India","street1":"Thousand lights","street2":"Greams Lane","phone":"9623456256","supportEmail":"chennaiapollo@gmail.com","hospitalPhoto":"https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50","landmark":"Thousand Lights"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
         if (!check)
@@ -740,7 +796,23 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        let date = new Date(doctorDto.appointmentDate);    
+        doctorDto.appointmentDate = new Date(doctorDto.appointmentDate);
+        //var appDate:any = new Date(doctorDto.appointmentDate);
+        var month = doctorDto.appointmentDate.getMonth() + 1
+        var day = doctorDto.appointmentDate.getDate();
+        var year = doctorDto.appointmentDate.getFullYear();
+        var appDate:any = year + "-" + month + "-" + day;
+        const today = new Date()
+        month = today.getMonth() + 1
+        day = today.getDate();
+        year = today.getFullYear();
+        var shortStartDate:any = year + "-" + month + "-" + day;
+        if((doctorDto.appointmentDate < today)&&!(appDate == shortStartDate)){
+            return{
+                statusCode:HttpStatus.BAD_REQUEST,
+                message:"Past Dates are not acceptable"
+            }
+        } 
         this.logger.log(`Doctor availableSlots  Api -> Request data ${JSON.stringify(req.user)}`);
         return await this.calendarService.availableSlots(req.user, doctorDto);
     }
@@ -759,6 +831,7 @@ export class CalendarController {
                                             '"appointmentDate":"2020-07-26", \n' +
                                             '"startTime":"10:00", \n' +
                                             '"endTime":"11:00", \n' +
+                                            '"doctorKey":"Doc_5", \n' +
                                             '"paymentOption":"directPayment", \n' +
                                             '"consultationMode":"online" \n' +
                                             '}'})
@@ -822,14 +895,25 @@ export class CalendarController {
                     startTime:patientDto.startTime,
                     endTime:patientDto.endTime,
                     paymentOption:patientDto.paymentOption,
-                    consultationMode:patientDto.consultationMode
+                    consultationMode:patientDto.consultationMode,
+                    doctorKey:patientDto.doctorKey
                 }
-               
                 appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-                const today = new Date()
-                const yesterday = new Date(today)
-                yesterday.setDate(yesterday.getDate() - 1)
-                if(appointmentDto.appointmentDate < yesterday){
+                // const yesterday = new Date(today)
+                // yesterday.setDate(yesterday.getDate() - 1)
+                // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+                // const yesterday = moment().subtract(1, 'days').format()
+                var appDate:any = new Date(appointmentDto.appointmentDate);
+                var month = appDate.getMonth() + 1
+                var date = appDate.getDate();
+                var year = appDate.getFullYear();
+                appDate = year + "-" + month + "-" + date;
+                var today:any = new Date()
+                month = today.getMonth() + 1
+                date = today.getDate();
+                year = today.getFullYear();
+                var today1 = year + "-" + month + "-" + date;
+                if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
                     return{
                         statusCode:HttpStatus.BAD_REQUEST,
                         message:"Past Dates are not acceptable"
@@ -979,7 +1063,7 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        this.logger.log(`patientUpcomingAppList Api -> Request data }`);
+        this.logger.log(`patientPastAppList Api -> Request data }`);
         return await this.calendarService.patientPastAppList(req.user, patientDto);
     }
 
@@ -1034,10 +1118,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide startTime"}
         }
         appointmentDto.appointmentDate= new Date(appointmentDto.appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appointmentDto.appointmentDate < yesterday){
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // appointmentDto.appointmentDate = moment(appointmentDto.appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate:any = new Date(appointmentDto.appointmentDate);
+        var month = appDate.getMonth() + 1
+        var date = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + date;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        date = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + date;
+        if((appointmentDto.appointmentDate < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -1112,11 +1207,24 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
             await this.calendarService.updatePatLastActive(req.user.patientId);
         }
-        const appDate = new Date(appointmentDate);
-        const today = new Date()
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-        if(appDate < yesterday){
+        // const appDate = new Date(appointmentDate);
+        // const today = new Date()
+        // const yesterday = new Date(today)
+        // yesterday.setDate(yesterday.getDate() - 1)
+        // const appDate = moment(appointmentDate).format();
+        // const yesterday = moment().subtract(1, 'days').format()
+        var appDate1 = new Date(appointmentDate);
+        var appDate:any = new Date(appointmentDate);
+        var month = appDate.getMonth() + 1
+        var date = appDate.getDate();
+        var year = appDate.getFullYear();
+        appDate = year + "-" + month + "-" + date;
+        var today:any = new Date()
+        month = today.getMonth() + 1
+        date = today.getDate();
+        year = today.getFullYear();
+        var today1 = year + "-" + month + "-" + date;
+        if((appDate1 < today)&&!(appDate == today1)){
             return{
                 statusCode:HttpStatus.BAD_REQUEST,
                 message:"Past Dates are not acceptable"
@@ -1143,5 +1251,19 @@ export class CalendarController {
         return await this.calendarService.accountPatientsList(req.user, accountKey);
     }
 
+    @Post('payment/createPaymentLink')
+    @ApiOkResponse({
+        description: 'requestBody example :   {"customer": {"name": "Acme Enterprises", "email": "admin@aenterprises.com","contact": "9999999999"}, "type": "link", "view_less": 1,"amount": 6742,"currency": "INR", "description": "Payment Link for this purpose - cvb.","receipt": "#TS1989","sms_notify": 1, "email_notify": 1, "expire_by": 1793630556 }'
+    })
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Payment')
+    @ApiBody({type: AccountDto})
+    createPaymentLink(@Request() req, @Body() accountDto: any) {
+        this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
+        return this.calendarService.createPaymentLink(accountDto, req.user);
+    }
+    
 
 }

@@ -1,7 +1,7 @@
 import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
+import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
@@ -225,6 +225,30 @@ export class UserService {
         return bcrypt.hash(password, salt);
     }
 
+    async doctorForgotPassword(user: any): Promise<any> {
+        const users =  await this.userRepository.findOne({id: user.userId});
+        if(users){
+            const salt = await bcrypt.genSalt(); 
+            users.salt = salt;
+            users.password = await this.hashPassword(user.userDto.password, salt);
+            await this.userRepository.save(users);
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
 
-
+    async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        try {
+            return await this.userRepository.doctorRegistration(doctorDto);
+        } catch (e) {
+	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
 }

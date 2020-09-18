@@ -8,7 +8,7 @@ import {
     DoctorConfigCanReschDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email, Sms
+    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email,Sms
 } from 'common-dto';
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
@@ -20,6 +20,7 @@ import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_c
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
+import {docConfig} from "./doc_config/docConfig.entity";
 //import {queries} from "../config/query";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
@@ -36,12 +37,15 @@ import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameS
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import * as config from 'config';
 var async = require('async');
+var moment = require('moment');
 
 
 @Injectable()
 export class AppointmentService {
     mail:any
     parameter:any
+    email : Email;
+    sms: Sms;
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -56,9 +60,9 @@ export class AppointmentService {
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
-        private email: Email,
-        private sms: Sms
     ) {
+        this.email = new Email();
+        this.sms = new Sms();
         // const mail= config.get('mail')
         // const dparams={
         //     smtpUser:this.mail.smtpUser,
@@ -121,17 +125,18 @@ export class AppointmentService {
 
                     }
                 }
-            }
-            const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
-            if (!appoint.message) {
-                const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                console.log(appDocConfig);
-                return {
-                    appointment: appoint,
-                    appointmentDocConfig: appDocConfig
+            }else{
+                const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
+                if (!appoint.message) {
+                    const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
+                    console.log(appDocConfig);
+                    return {
+                        appointment: appoint,
+                        appointmentDocConfig: appDocConfig
+                    }
+                } else {
+                    return appoint;
                 }
-            } else {
-                return appoint;
             }
         } catch (e) {
             console.log(e);
@@ -358,6 +363,22 @@ export class AppointmentService {
                         sunday.push(v);
                     }
                 })
+                let days =[monday,tuesday,wednesday,thursday,friday,saturday,sunday];
+                days.forEach(e => {
+                    e = e.sort((val1, val2) => {
+                        let val1IntervalStartTime = val1.startTime;
+                        let val2IntervalStartTime = val2.startTime;
+                        val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+                        val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+                        if (val1IntervalStartTime < val2IntervalStartTime) {
+                            return -1;
+                        } else if (val1IntervalStartTime > val2IntervalStartTime) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    })
+                });
                 const config = await this.doctorConfigRepository.query(queries.getConfig, [docKey]);
                 let config1 = config[0];
                 let responseData = {
@@ -399,6 +420,13 @@ export class AppointmentService {
         // update for sheduleTime Intervals
         let scheduleTimeIntervals = workScheduleDto.updateWorkSchedule;
         if (scheduleTimeIntervals && scheduleTimeIntervals.length) {
+            let sortArrayForDelete = [];
+            let sortArrayForNotDelete = [];
+            // this sort array to push isDelete in top order and notIsDelete in lower order
+            scheduleTimeIntervals.map(v=>{
+                v.isDelete ? sortArrayForDelete.push(v) : sortArrayForNotDelete.push(v);
+            })
+            scheduleTimeIntervals = [...sortArrayForDelete,...sortArrayForNotDelete ]
             for (let scheduleTimeInterval of scheduleTimeIntervals) {
                 if (scheduleTimeInterval.scheduletimeid) {
                     if (scheduleTimeInterval.isDelete) {
@@ -494,11 +522,12 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async appointmentSlotsView(user: any, type): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
             let page: number = user.paginationNumber;
+            //var date = moment().format('YYYY-MM-DD');
             var date: any = new Date();
             var startDate: any = date;
             //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
@@ -541,9 +570,12 @@ export class AppointmentService {
                 let breaktheloop = 0;
                 while (appointmentSlots.length <= page * 7 + 7) {
                     breaktheloop++;
-                    if (breaktheloop > 20) break;
+                    //if (breaktheloop > 20) break;
                     // run while loop to get minimum 7  days of appointment slots
                     let day = new Date(startDate.getTime() + (dayOfWeekCount * 24 * 60 * 60 * 1000)); // increase the day one by one in loop
+                    //let day = moment(startDate,'YYYY-MM-DD').add(dayOfWeekCount, 'days').format()
+                    //let day = new Date(startDate.valueOf() + (dayOfWeekCount * 24 * 60 * 60 * 1000));
+                    //let dayOfWeek = moment(day).day();
                     let dayOfWeek = day.getDay();
                     let workScheduleDayPresentOrNot = false;
                     let dayOfWeekInWords;
@@ -587,6 +619,7 @@ export class AppointmentService {
                         var minutes = date.getMinutes();
                         var hour = date.getHours();
                         var time = hour + ":" + minutes;
+                        //var time = moment().format("HH:mm:ss");
                         var timeMilli = Helper.getTimeInMilliSeconds(time);
                         // In below code => an doctor can have  many intervals on particular day, so run in loop the interval
                         //sortedWorkScheduleTimeInterval.forEach(v => {
@@ -597,7 +630,7 @@ export class AppointmentService {
                             let breaktheloop2 = 0;
                             while (!intervalEnd) {  // until the interval endTime comes run the while loop
                                 breaktheloop2++;
-                                if (breaktheloop2 > 10) break;
+                               // if (breaktheloop2 > 10) break;
                                 let slotEndTimeCalculate = Helper.getTimeInMilliSeconds(slotStartTime);
                                 slotEndTimeCalculate += consultationSessionTimingInMilliSeconds; // adding slot startime + consultationSessionTiming, ex: 30 minutes
                                 let slotEndTime = Helper.getTimeinHrsMins(slotEndTimeCalculate);
@@ -609,7 +642,9 @@ export class AppointmentService {
                                 }
                                 let appointmentPresentOnThisDate = possibleNextAppointments.filter(v => { // check any appointment present on this date
                                     let appDate = Helper.getDayMonthYearFromDate(v.appointment_date);
+                                    //let appDate = moment(v.appointment_date).format('YYYY-MM-DD');
                                     let compareDate = Helper.getDayMonthYearFromDate(day);
+                                    //let compareDate = moment(day).format('YYYY-MM-DD');
                                     return appDate === compareDate;
                                 })
                                 let slotPresentOrNot = appointmentPresentOnThisDate.filter(v => {
@@ -620,7 +655,9 @@ export class AppointmentService {
                                     // if((slotStartTimeInMilliSec<startTimeInMilliSec && endTimeInMilliSec<=slotEndTimeInMilliSec)||(slotStartTimeInMilliSec >= startTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec)||(slotEndTimeInMilliSec <= endTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec)||(slotStartTimeInMilliSec === startTimeInMilliSec && slotEndTimeInMilliSec === endTimeInMilliSec)&& (!v.is_cancel)) {
                                     if (((startTimeInMilliSec <= slotStartTimeInMilliSec && endTimeInMilliSec <= slotEndTimeInMilliSec && slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec > startTimeInMilliSec) || (slotStartTimeInMilliSec <= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec && startTimeInMilliSec > slotEndTimeInMilliSec && slotStartTimeInMilliSec < endTimeInMilliSec) || (startTimeInMilliSec <= slotStartTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec) || (slotStartTimeInMilliSec >= startTimeInMilliSec && slotEndTimeInMilliSec <= endTimeInMilliSec)) && (!v.is_cancel)) {
                                         // if ((startTimeInMilliSec === slotStartTimeInMilliSec) && (!v.is_cancel)) {  // if any appointment present then push the booked appointment slots
+                                        //let daydate = moment(v.appointment_date).format('YYYY-MM-DD');
                                         let daydate = Helper.getDayMonthYearFromDate(v.appointment_date);
+                                        //let datedate = moment(date).format('YYYY-MM-DD');
                                         let datedate = Helper.getDayMonthYearFromDate(date);
                                         if (daydate == datedate) {
                                             // if(v.appointmentDate == date){
@@ -639,8 +676,7 @@ export class AppointmentService {
                                                     slotObject.slots.push(v)
                                                     return true;
                                                 }
-                                                //slotObject.slots.push(v)
-                                                //return true;
+
                                             } else {
                                                 return false;
                                             }
@@ -660,8 +696,7 @@ export class AppointmentService {
                                                 slotObject.slots.push(v)
                                                 return true;
                                             }
-                                            // slotObject.slots.push(v)
-                                            // return true;
+
                                         }
                                     } else {
                                         return false;
@@ -674,10 +709,13 @@ export class AppointmentService {
                                     }
                                     let isOverLapping = await this.findTimeOverlapingForAppointments(appointmentPresentOnThisDate, dto);
                                     var time = date.getHours() + ":" + date.getMinutes();
+                                    //var time = moment().format("HH:mm:ss");
                                     var timeInMS = Helper.getTimeInMilliSeconds(time);
                                     var slotEnd = Helper.getTimeInMilliSeconds(slotEndTime);
                                     if (!isOverLapping) {
+                                        //let daydate = moment(day).format('YYYY-MM-DD');
                                         let daydate = Helper.getDayMonthYearFromDate(day);
+                                        //let datedate = moment(date).format('YYYY-MM-DD');
                                         let datedate = Helper.getDayMonthYearFromDate(date);
                                         if (daydate === datedate) {
                                             if (timeMilli < slotEnd) {
@@ -728,7 +766,10 @@ export class AppointmentService {
                             }
                             //    })
                         }
-                        appointmentSlots.push(slotObject);
+                        if (slotObject.slots && slotObject.slots.length) {
+                            appointmentSlots.push(slotObject);
+                        }
+                        
                     }
                     dayOfWeekCount++; // increase to next  Day
                     breaktheloop++;
@@ -746,10 +787,14 @@ export class AppointmentService {
                 return res;
                 //return appointmentSlots;
             } else {
-                console.log("Error in appointmentSlotsView api 1")
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                if (type === 'todaysAvailabilitySeats') {
+                    return [];
+                } else {
+                    console.log("Error in appointmentSlotsView api 1")
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    }
                 }
             }
         } catch (e) {
@@ -1080,13 +1125,14 @@ export class AppointmentService {
     async patientPastAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
+            //var date = moment().format('YYYY-MM-DD');
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
             let offset = (user.paginationNumber) * (user.limit);
-            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
+            const app = await this.appointmentRepository.query(queries.getPastAppointmentsWithPagination, [user.patientId, date, offset, user.limit,'completed']);
             if (!app.length) {
                 return [];
             }
-            const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date]);
+            const appNum = await this.appointmentRepository.query(queries.getPastAppointments, [user.patientId, date,'completed']);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
@@ -1146,12 +1192,25 @@ export class AppointmentService {
         try {
             let d = new Date();
             var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
-            const app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit]);
-            if (!app.length) {
-                return [];
+
+            let app;
+
+            if (user.limit) {
+
+                app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
+                if (!app.length) {
+                    return [];
+                }
+            } else {
+                app = await this.appointmentRepository.query(queries.getTodayAppointments, [user.patientId, date, 'notCompleted', 'paused']);
+                if (!app.length) {
+                    return [];
+                }
             }
-            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date]);
+
+            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
@@ -1167,6 +1226,8 @@ export class AppointmentService {
                                 preConsultationHours = config.preconsultationHours;
                                 preConsultationMins = config.preconsultationMins;
                             }
+
+                            console.log('appointmentList.doctor = >', appointmentList.doctorId);
                             let res = {
                                 appointmentDate: appointmentList.appointment_date,
                                 appointmentId: appointmentList.id,
@@ -1177,7 +1238,9 @@ export class AppointmentService {
                                 hospitalName: account.hospitalName,
                                 preConsultationHours: preConsultationHours,
                                 preConsultationMins: preConsultationMins,
-                                doctorKey: doctor.doctorKey
+                                doctorId: appointmentList.doctorId,
+                                doctorKey: doctor.doctorKey,
+                                liveStatus : doctor.liveStatus
                             }
                             appList.push(res);
                         }
@@ -1187,10 +1250,11 @@ export class AppointmentService {
                         let config = await this.getAppDoctorConfigDetails(appointmentList.id);
                         var preConsultationHours = null;
                         var preConsultationMins = null;
-                        if (config.isPatientPreconsultationAllowed) {
+                        if (config && config.isPatientPreconsultationAllowed) {
                             preConsultationHours = config.preconsultationHours;
                             preConsultationMins = config.preconsultationMinutes;
                         }
+                        console.log('appointmentList.doctor = >', appointmentList.doctorId);
                         let res = {
                             appointmentDate: appointmentList.appointment_date,
                             appointmentId: appointmentList.id,
@@ -1201,7 +1265,9 @@ export class AppointmentService {
                             hospitalName: account.hospitalName,
                             preConsultationHours: preConsultationHours,
                             preConsultationMins: preConsultationMins,
-                            doctorKey: doctor.doctorKey
+                            doctorId: appointmentList.doctorId,
+                            doctorKey: doctor.doctorKey,
+                            liveStatus : doctor.liveStatus
                         }
                         appList.push(res);
                     }
@@ -1218,6 +1284,7 @@ export class AppointmentService {
                 }
             }
         } catch (e) {
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -1241,7 +1308,9 @@ export class AppointmentService {
         let patientList = [];
         for (let x of ids) {
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
-            patientList.push(patient[0]);
+            if(patient[0]){
+                patientList.push(patient[0]);
+            }
         }
         return patientList;
     }
@@ -1356,103 +1425,158 @@ export class AppointmentService {
 
     }
 
-    async availableSlots(user: any): Promise<any> {
+    async availableSlots(user: any, type: string): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
+       
+        console.log(app);
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let dt = new Date(user.appointmentDate);
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
-        const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
-        if (!workSchedule[0].startTime) {
-            return [];
-        }
-        let slots = [];
-        let slotsView = [];
-        let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
-        for (let worksched of workSchedule) {
-            let start = Helper.getTimeInMilliSeconds(worksched.startTime);
-            let end = Helper.getTimeInMilliSeconds(worksched.endTime);
-            let end1 = start + consultSession;
-            let count = 0;
-            while (start < end && end1 <= end) {
-                count++;
-                if (count > 20) break;
-                let res = {
-                    start: Helper.getTimeinHrsMins(start),
-                    end: Helper.getTimeinHrsMins(start + consultSession),
-                }
-                let flag = false;
-                if (app.length) {
-                    for (let appointment of app) {
-                        flag = false;
-                        let dto = {
-                            startTime: Helper.getTimeinHrsMins(start),
-                            endTime: Helper.getTimeinHrsMins(start + consultSession)
-                        }
-                        let isOverLapping = await this.findTimeOverlaping(app, dto);
-                        if ((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (flag == false) {
-                        slotsView.push(res);
-                    }
-                } else {
-                    slotsView.push(res);
-                }
-                start = start + consultSession;
-                end1 = start + consultSession;
-                slots.push(res);
-                count++;
-                if(end1 > end) break;
-            }
-        }
-        let date = new Date();
-        var time = date.getHours() + ":" + date.getMinutes();
-        var timeMilli = Helper.getTimeInMilliSeconds(time);
-        let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
-        let datedate = Helper.getDayMonthYearFromDate(date);
-        let i: any;
-        let resSlots = [];
-        if (daydate == datedate) {
-            for (i of slotsView) {
-                let end = Helper.getTimeInMilliSeconds(i.end);
-                if (timeMilli < end) {
-                    resSlots.push(i);
+        user.paginationNumber=0;
+
+        // find today availablity seates
+        let slotsviews = await this.appointmentSlotsView(user, 'todaysAvailabilitySeats');
+        let slotview;
+
+    //    for(let j=0;j<slotsviews.length;j++){
+        if(slotsviews && slotsviews.length && typeof slotsviews === 'object'
+        && !slotsviews.statusCode
+         && slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
+            slotview=slotsviews[0];
+            // break;
+        } else if (!type && type !== 'doctorList') {
+
+            for(let j=0;j<slotsviews.length;j++){
+
+                if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
+                
+                slotview=slotsviews[j];
+                
+                break;
                 }
             }
-            resSlots = resSlots.sort((val1, val2) => {
-                let val1IntervalStartTime = val1.start;
-                let val2IntervalStartTime = val2.start;
-                val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
-                val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
-                if (val1IntervalStartTime < val2IntervalStartTime) {
-                    return -1;
-                } else if (val1IntervalStartTime > val2IntervalStartTime) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            })
-            return resSlots;
         }
-        slotsView = slotsView.sort((val1, val2) => {
-            let val1IntervalStartTime = val1.start;
-            let val2IntervalStartTime = val2.start;
-            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
-            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
-            if (val1IntervalStartTime < val2IntervalStartTime) {
-                return -1;
-            } else if (val1IntervalStartTime > val2IntervalStartTime) {
-                return 1;
-            } else {
-                return 0;
+
+    //    }
+       let resSlot=[];
+        if (slotview !== undefined) {
+            for (let j = 0; j < slotview.slots.length; j++) {
+                if (slotview.slots[j].slotType.toLowerCase() == 'free') {
+                    resSlot.push(slotview.slots[j]);
+                }
             }
-        })
-        return slotsView;
+        } else if (slotview && slotview.length) {
+            for (let j = 0; j < slotview.slots.length; j++) {
+                if (slotview.slots[j].slotType.toLowerCase() == 'free') {
+                    resSlot.push(slotview.slots[j]);
+                }
+            }
+        }
+
+        // if (!type && type !== 'doctorList') {
+            return resSlot;
+        // } else {
+        //     return resSlot;
+        // }
+
+    //    const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
+    //    if(!workSchedule.length){
+    //        return [];
+    //    }
+    //    if (!workSchedule[0].startTime) {
+    //        return [];
+    //    }
+    //    let slots = [];
+    //    let slotsView = [];
+    //    let consultSession = Helper.getMinInMilliSeconds(config.consultationSessionTimings);
+    //    for (let worksched of workSchedule) {
+    //        let start = Helper.getTimeInMilliSeconds(worksched.startTime);
+    //        let end = Helper.getTimeInMilliSeconds(worksched.endTime);
+    //        let end1 = start + consultSession;
+    //        let count = 0;
+    //        while (start < end && end1 <= end) {
+    //            count++;
+    //            if (count > 20) break;
+    //            let res = {
+    //                start: Helper.getTimeinHrsMins(start),
+    //                end: Helper.getTimeinHrsMins(start + consultSession),
+    //            }
+    //            let flag = false;
+    //            if (app.length) {
+    //                for (let appointment of app) {
+    //                    flag = false;
+    //                    let dto = {
+    //                        startTime: Helper.getTimeinHrsMins(start),
+    //                        endTime: Helper.getTimeinHrsMins(start + consultSession)
+    //                    }
+    //                    let isOverLapping = await this.findTimeOverlaping(app, dto);
+    //                    if ((appointment.startTime == Helper.getTimeinHrsMins(start)) || isOverLapping) {
+    //                        flag = true;
+    //                        break;
+    //                    }
+    //                }
+    //                if (flag == false) {
+    //                    slotsView.push(res);
+    //                }
+    //            } else {
+    //                slotsView.push(res);
+    //            }
+    //            start = start + consultSession;
+    //            end1 = start + consultSession;
+    //            slots.push(res);
+    //            count++;
+    //            if(end1 > end) break;
+    //        }
+    //    }
+    //    let date = new Date();
+    //    var time = date.getHours() + ":" + date.getMinutes();
+    //    //const time = moment().format("HH:mm:ss");
+    //    var timeMilli = Helper.getTimeInMilliSeconds(time);
+    //    let daydate = Helper.getDayMonthYearFromDate(user.appointmentDate);
+    //    //let daydate = moment(user.appointmentDate).format('YYYY-MM-DD');
+    //    let datedate = Helper.getDayMonthYearFromDate(date);
+    //    //let datedate = moment().format('YYYY-MM-DD');
+    //    let i: any;
+    //    let resSlots = [];
+    //    if (daydate == datedate) {
+    //        for (i of slotsView) {
+    //            let end = Helper.getTimeInMilliSeconds(i.end);
+    //            if (timeMilli < end) {
+    //                resSlots.push(i);
+    //            }
+    //        }
+    //        resSlots = resSlots.sort((val1, val2) => {
+    //            let val1IntervalStartTime = val1.start;
+    //            let val2IntervalStartTime = val2.start;
+    //            val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+    //            val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+    //            if (val1IntervalStartTime < val2IntervalStartTime) {
+    //                return -1;
+    //            } else if (val1IntervalStartTime > val2IntervalStartTime) {
+    //                return 1;
+    //            } else {
+    //                return 0;
+    //            }
+    //        })
+    //        return resSlots;
+    //    }
+    //    slotsView = slotsView.sort((val1, val2) => {
+    //        let val1IntervalStartTime = val1.start;
+    //        let val2IntervalStartTime = val2.start;
+    //        val1IntervalStartTime = Helper.getTimeInMilliSeconds(val1IntervalStartTime);
+    //        val2IntervalStartTime = Helper.getTimeInMilliSeconds(val2IntervalStartTime);
+    //        if (val1IntervalStartTime < val2IntervalStartTime) {
+    //            return -1;
+    //        } else if (val1IntervalStartTime > val2IntervalStartTime) {
+    //            return 1;
+    //        } else {
+    //            return 0;
+    //        }
+    //    })
+    //    return slotsView;
     }
 
     async patientDetails(patientId: any): Promise<any> {
@@ -1568,6 +1692,7 @@ export class AppointmentService {
         let app =[];
         let res=[];
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        //var date = moment().format('YYYY-MM-DD');
         if (user.patientDto.paginationNumber) {
             let offset = (user.paginationNumber) * (10);
             app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'notCompleted', 'paused']);
@@ -1588,6 +1713,7 @@ export class AppointmentService {
                 time = preHours*60 + preMins;
             }
             let result ={
+                appointmentId:x.appointmentId,
                 appointmentDate:x.appointmentDate,
                 isPreconsultationAllowed:x.is_preconsultation_allowed,
                 preConsultationTime:time,
@@ -1608,6 +1734,7 @@ export class AppointmentService {
         const doc = await this.doctorDetails(user.patientDto.doctorKey);
         const d: Date = new Date();
         var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        //var date = moment().format('YYYY-MM-DD');
         if (user.patientDto.paginationNumber) {
             let offset = (user.paginationNumber) * (10);
             const app = await this.appointmentRepository.query(queries.getPastAppointmentsForPatient, [user.patientDto.patientId, date, offset, doc.doctorId, 'completed']);
@@ -1641,6 +1768,7 @@ export class AppointmentService {
     }
 
     async updatePatLastActive(patientId): Promise<any> {
+        //let date = moment().format();
         let date = new Date();
         var condition: any = {
             patientId: patientId
@@ -1660,7 +1788,12 @@ export class AppointmentService {
             liveStatus: 'online'
         }
         var values: any = dto;
-        return await this.doctorRepository.update(condition, values);
+        console.log('updateDocOnline status ', {condition: condition, values: values});
+
+        let docOnlineStatus = await this.doctorRepository.update(condition, values);
+        console.log('updateDocOnline status ', docOnlineStatus);
+
+        return docOnlineStatus;
     }
 
     async updateDocOffline(doctorKey): Promise<any> {
@@ -1675,6 +1808,7 @@ export class AppointmentService {
     }
 
     async updateDocLastActive(doctorKey): Promise<any> {
+        //let date = moment().format();
         let date = new Date();
         var condition: any = {
             doctorKey: doctorKey
@@ -1718,6 +1852,7 @@ export class AppointmentService {
             const doc = await this.doctorRepository.findOne({doctorKey: id});
             if (doc) {
                 doc.liveStatus = status;
+                //doc.lastActive = moment().format();
                 doc.lastActive = new Date();
                 await this.doctorRepository.save(doc)
             }
@@ -1725,6 +1860,7 @@ export class AppointmentService {
             const patient = await this.patientDetailsRepository.findOne({patientId: Number(id)});
             if (patient) {
                 patient.liveStatus = status;
+                //patient.lastActive = moment().format()
                 patient.lastActive = new Date();
                 await this.patientDetailsRepository.save(patient);
             }
@@ -1773,6 +1909,21 @@ export class AppointmentService {
             }
         } 
      }
+
+     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        if(doctor){
+            // add config details
+            const config = await this.doctorConfigRepository.doctorConfigSetup(doctor, doctorDto)
+            return doctor;
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.DOC_REG_FAIL
+            };
+        }
+        
+    }
 
 
 
