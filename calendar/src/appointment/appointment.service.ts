@@ -1468,7 +1468,7 @@ export class AppointmentService {
                     resSlot.push(slotview.slots[j]);
                 }
             }
-        } else {
+        } else if (slotview && slotview.length) {
             for (let j = 0; j < slotview.slots.length; j++) {
                 if (slotview.slots[j].slotType.toLowerCase() == 'free') {
                     resSlot.push(slotview.slots[j]);

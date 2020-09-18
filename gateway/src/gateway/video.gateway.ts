@@ -100,8 +100,11 @@ export class VideoGateway {
       const patientTodayApp : any = await this.videoService.patientUpcomingAppointments(userInfo.patientId, 0, 0);
       let doctorArr = [0];
 
+      console.log('patientTodayApp = > ', patientTodayApp);
+
       patientTodayApp.forEach(element => {
-      console.log('doctor = >', element.doctorId);
+      console.log(element);
+        console.log('doctor = >', element.doctorId);
         if (element.doctorId && (doctorArr.length && !doctorArr.includes(element.doctodId))) {
           doctorArr.push(element.doctorId);
           // docList -> DOCTOR
