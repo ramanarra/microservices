@@ -11,7 +11,7 @@ export class docConfigRepository extends Repository<docConfig> {
     
     async doctorConfigSetup(doctor: Doctor, doctorDto: DoctorDto): Promise<any> {
 
-        const docConfigQuery  = await this.query(queries.docConfig, [doctor.doctorKey, 0]);
+        // const docConfigQuery  = await this.query(queries.docConfig, [doctor.doctorKey, 0]);
         const Sunday = await this.query(queries.sunday, [doctor.doctorId, doctor.doctorKey ,'Sunday'])
         const Monday = await this.query(queries.monday, [doctor.doctorId, doctor.doctorKey, 'Monday'])
         const Tuesday = await this.query(queries.tuesday, [doctor.doctorId, doctor.doctorKey, 'Tuesday'])
