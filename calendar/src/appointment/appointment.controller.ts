@@ -891,7 +891,7 @@ export class AppointmentController {
         const config = await this.appointmentService.getAppDoctorConfigDetails(appointmentDto.appointmentId);
         if(config.isPatientCancellationAllowed){
             let canDays=config.cancellationDays;
-            let canTime= config.cancellationHours+":"+config.cancellationMins;
+            let canTime= config.cancellationHours+":"+config.cancellationMinutes;
             //const date = moment().format();
             //const time = moment().format("HH:mm:ss");
             let date = new Date();
@@ -901,14 +901,18 @@ export class AppointmentController {
             var timeMilli = Helper.getTimeInMilliSeconds(time);
             let appDate=app.appointmentDetails.appointmentDate;
             let appointmentMinutesArray = app.appointmentDetails.startTime.split(':');
-            let appointmentMinutes = moment(appDate).add((appointmentMinutesArray[0] * 60) + appointmentMinutesArray[1], 'm');
+            let appointmentMinutes = moment(appDate).add(((Number(appointmentMinutesArray[0]) * 60) + Number(appointmentMinutesArray[1])), 'm').toDate();
             let appStart = app.appointmentDetails.startTime;
             let appMilli = Helper.getTimeInMilliSeconds(appStart);
             let diffDate = appDate;
             //diffDate = moment(diffDate).subtract(canDays, 'days').format()
             diffDate.setDate(diffDate.getDate() - canDays);
             let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
-            if(date < diffDate){
+
+            let cancelAppointmentMinutes= moment(appointmentMinutes).subtract((Number(config.cancellationDays) * 1440) + (Number(config.cancellationHours) * 60) + Number(config.cancellationMinutes), 'm').toDate();;
+
+            // if(date < diffDate){
+            if(moment().valueOf() < cancelAppointmentMinutes.valueOf()) {
                 const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
                 if(appointment.statusCode==HttpStatus.OK){
                     let data={
@@ -928,7 +932,7 @@ export class AppointmentController {
                     const mail = await this.appointmentService.sendAppCancelledEmail(data)
                 }
                 return appointment;
-            }else if(date == diffDate){
+            }else if(moment().valueOf() == cancelAppointmentMinutes.valueOf()){
                 if(timeMilli < diffTime){
                     const appointment = await this.appointmentService.appointmentCancel(appointmentDto);
                     if(!appointment.message){
@@ -1064,7 +1068,7 @@ export class AppointmentController {
                 //diffDate = moment(diffDate).subtract(canDays, 'days').format()
                 diffDate.setDate(diffDate.getDate() - canDays)
                 // .setHours(hour, minutes);
-                let reschduleDateCompare = date.setHours(0,0,0,0);
+                // let reschduleDateCompare = date.setHours(0,0,0,0);
                 // let diffTime = appMilli-Helper.getTimeInMilliSeconds(canTime);
 
                 let appointmentMinutesArray = app.appointmentDetails.startTime.split(':');
