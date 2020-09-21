@@ -2481,19 +2481,19 @@ ALTER TABLE public.account_details
     ALTER COLUMN hospital_photo TYPE character varying(500) COLLATE pg_catalog."default";
 
 
-CREATE TYPE statuses AS ENUM ('completed','paused', 'notCompleted');
-    ALTER TABLE appointment ADD status statuses default 'notCompleted';
+CREATE TYPE public.statuses AS ENUM ('completed','paused', 'notCompleted');
+    ALTER TABLE public.appointment ADD status public.statuses default 'notCompleted';
 
 ALTER TABLE public.appointment
 ADD COLUMN "createdTime" timestamp without time zone;
 
-CREATE TYPE live_statuses AS ENUM ('offline','online', 'videoSessionReady', 'inSession'); 
-ALTER TABLE patient_details ADD live_status live_statuses default 'offline';
+CREATE TYPE public.live_statuses AS ENUM ('offline','online', 'videoSessionReady', 'inSession'); 
+ALTER TABLE patient_details ADD live_status public.live_statuses default 'offline';
 
 ALTER TABLE public.patient_details
 ADD COLUMN last_active timestamp without time zone;
 
-ALTER TABLE doctor ADD live_status live_statuses default 'offline';
+ALTER TABLE public.doctor ADD live_status public.live_statuses default 'offline';
 
 ALTER TABLE public.doctor
 ADD COLUMN last_active timestamp without time zone;
