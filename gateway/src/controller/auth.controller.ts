@@ -245,7 +245,7 @@ export class AuthController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5", "password": "123456", "consultationCost" : "100", "number":"7845127845"}' })
+    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5", "password": "123456", "consultationCost" : "100", "number":"7845127845", "consultationSessionTimings":10}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async doctorRegistration(@Request() req, @reports() check:boolean, @Body() doctorDto : DoctorDto) {
 

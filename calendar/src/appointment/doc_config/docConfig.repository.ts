@@ -22,7 +22,8 @@ export class docConfigRepository extends Repository<docConfig> {
 
         const config = new docConfig();
         config.doctorKey = doctorDto.doctorKey;
-        config.consultationCost = doctorDto['consultationCost'];
+        config.consultationCost = doctorDto['consultationCost'] ? doctorDto['consultationCost'] : 100;
+        config.consultationSessionTimings = doctorDto['consultationSessionTimings'] ? doctorDto['consultationSessionTimings'] : 10;
         config.isPatientRescheduleAllowed = false;
         config.isPreconsultationAllowed = false;
         config.isPatientCancellationAllowed = false;

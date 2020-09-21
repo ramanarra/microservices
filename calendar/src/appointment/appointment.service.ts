@@ -563,8 +563,8 @@ export class AppointmentService {
                 const doctorConfigDetails = await this.doctorConfigRepository.findOne({doctorKey: doc.doctorKey});
                 let preconsultationHours = doctorConfigDetails.preconsultationHours;
                 let preconsultationMins = doctorConfigDetails.preconsultationMins;
-                let consultationSessionTiming = doctorConfigDetails.consultationSessionTimings;
-                let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
+                let consultationSessionTiming = doctorConfigDetails.consultationSessionTimings ? doctorConfigDetails.consultationSessionTimings : 10;
+                let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings ? doctorConfigDetails.consultationSessionTimings : 10);
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
                 let breaktheloop = 0;
@@ -1001,7 +1001,8 @@ export class AppointmentService {
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
             //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
-            const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName])
+            let codeOrNameTime = codeOrName ? codeOrName.trim() : codeOrName;
+            const name = await this.doctorRepository.query(queries.getDoctorByName, ['%'+codeOrNameTime+'%'])
             const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
             return {
                 doctors: name,
