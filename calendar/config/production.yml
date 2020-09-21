@@ -6,7 +6,7 @@ database :
   username : 'postgres'
   password : 'postgres'
   host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
-  database : 'calendar'
+  database : 'livecalendar'
   port : 5432
   synchronize : false
   
