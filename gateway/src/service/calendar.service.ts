@@ -32,6 +32,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
     @UseFilters(AllClientServiceException)
     public doctorList(user): Observable<any> {
+        user.paginationNumber = 0;
         return this.redisClient.send({cmd: 'app_doctor_list'}, user);
     }
 
@@ -160,8 +161,12 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientList(doctorKey:any) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_list'},doctorKey);
+    public patientList(doctorKey:any,paginationNumber:any) : Observable <any> {
+        let user = {
+            doctorKey:doctorKey,
+            paginationNumber:paginationNumber
+        }
+        return this.redisClient.send({ cmd : 'patient_list'},user);
     }
 
     @UseFilters(AllClientServiceException)

@@ -35,6 +35,7 @@ import {Helper} from "../utility/helper";
 import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import * as config from 'config';
+import { identity } from 'rxjs';
 var async = require('async');
 var moment = require('moment');
 
@@ -1287,7 +1288,7 @@ export class AppointmentService {
         }
     }
 
-    async patientList(doctorId: any): Promise<any> {
+    async patientList(doctorId: any,paginationNumber:any): Promise<any> {
         const app = await this.appointmentRepository.query(queries.getAppList, [doctorId]);
         let ids = [];
         app.forEach(a => {
@@ -1301,7 +1302,20 @@ export class AppointmentService {
             }
         });
         let patientList = [];
-        for (let x of ids) {
+        let pag:number = paginationNumber;
+        let m:number = pag*10;
+        var n:number =  (pag*10)+10;
+        var pats =[];
+        for (var i = m; i < n; i++){
+            pats.push(ids[i]);
+        }
+        // for (let x of ids) {
+        //     const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
+        //     if(patient[0]){
+        //         patientList.push(patient[0]);
+        //     }
+        // }
+        for (let x of pats) {
             const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [x]);
             if(patient[0]){
                 patientList.push(patient[0]);
@@ -1440,13 +1454,27 @@ export class AppointmentService {
             break;
         }
        }
+       let date = new Date();
+       var time = date.getHours() + ":" + date.getMinutes();
+       var timeMilli = Helper.getTimeInMilliSeconds(time);
        let resSlot=[];
+       let dateForm = Helper.getDayMonthYearFromDate(date);
+       let dtForm = Helper.getDayMonthYearFromDate(dt);
        if(slotview !== undefined)
-       for(let j=0;j<slotview.slots.length;j++){
-           if(slotview.slots[j].slotType.toLowerCase() == 'free'){
-               resSlot.push(slotview.slots[j]);
-           }
-       }
+       if(dateForm == dtForm){
+        for(let j=0;j<slotview.slots.length;j++){
+            let end = Helper.getTimeInMilliSeconds(slotview.slots[j].endTime);
+            if((slotview.slots[j].slotType.toLowerCase() == 'free') && timeMilli < end){
+                resSlot.push(slotview.slots[j]);
+            }
+        }
+       } else {
+            for(let j=0;j<slotview.slots.length;j++){
+                if(slotview.slots[j].slotType.toLowerCase() == 'free'){
+                    resSlot.push(slotview.slots[j]);
+                }
+            }
+        }
        return resSlot;
     //    const workSchedule = await this.docConfigScheduleDayRepository.query(queries.getSlots, [day, doctor.doctorKey])
     //    if(!workSchedule.length){
