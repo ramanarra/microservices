@@ -1321,7 +1321,8 @@ export class AppointmentService {
                 patientList.push(patient[0]);
             }
         }
-        return patientList;
+        return {totalPatients:ids.length,
+            patientsList:patientList};
     }
 
     async doctorPersonalSettingsEdit(doctorDto: DoctorDto): Promise<any> {

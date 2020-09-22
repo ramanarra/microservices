@@ -695,14 +695,14 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
-    async patientList(@Request() req,@selfAppointmentRead() check: boolean, @accountUsersSettingsRead() check2:boolean, @accountUsersAppointmentRead() check3: boolean,  @Query('doctorKey') doctorKey: String,  @Query('paginationNumber') paginationNumber: Number) {
+    async patientList(@Request() req,@selfAppointmentRead() check: boolean, @accountUsersSettingsRead() check2:boolean, @accountUsersAppointmentRead() check3: boolean,  @Query('paginationNumber') paginationNumber: Number) {
         if (!check && !check2 && check3)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
         this.logger.log(`Upcoming Appointment Api -> Request data }`);
-        return await this.calendarService.patientList(doctorKey,paginationNumber);
+        return await this.calendarService.patientList(req.user.doctor_key,paginationNumber);
     }
 
     @Post('doctor/personalSettingsEdit')
