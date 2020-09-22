@@ -35,6 +35,9 @@ export class Email {
             auth: {
                 user: smtpUser,
                 pass: smtpPass
+            },
+            tls: {
+                rejectUnauthorized: false
             }
         });
 

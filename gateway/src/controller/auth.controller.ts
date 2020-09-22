@@ -31,6 +31,7 @@ import {AuthGuard} from '@nestjs/passport';
 import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
 import {JwtService} from '@nestjs/jwt';
 import { toNamespacedPath } from 'path';
+import {reports} from "../common/decorator/reports.decorator";
 
 
 @Controller('api/auth')
@@ -59,9 +60,13 @@ export class AuthController {
       }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any =await this.userService.doctorsLogin(userDto);
+      console.log('returning doc login 0 ', doc);
+
       if(doc.role == CONSTANT_MSG.ROLES.DOCTOR){
         const status = await this.calendarService.updateDocOnline(doc.doctorKey);
+        console.log('returning doc login 2 status ', status);
       }
+      console.log('returning doc login 1', doc);
       return doc;
     }
 
@@ -235,6 +240,59 @@ export class AuthController {
       return doc;
     }
 
+    @Post('doctorRegistration')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Admin')
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5", "password": "123456", "consultationCost" : "100", "number":"7845127845", "consultationSessionTimings":10}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    async doctorRegistration(@Request() req, @reports() check:boolean, @Body() doctorDto : DoctorDto) {
 
+      if (doctorDto['isNewAccount']) {
+        return {
+          statusCode: HttpStatus.NO_CONTENT,
+          message: "Under development"
+        }
 
+      } else if (req.user.account_key !== 'Acc_' + doctorDto.accountId) {
+
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: CONSTANT_MSG.DOC_REG_HOS_RES,
+        }
+
+      } else if (!doctorDto.email) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Provide email"
+        }
+      } else {
+        const email = await this.userService.findDoctorByEmail(doctorDto.email);
+        if (email) {
+          return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: CONSTANT_MSG.ALREADY_PRESENT
+          }
+        } else {
+
+          const signUp = await this.userService.doctorRegistration(doctorDto, req.user);
+
+          if (signUp && !signUp.statusCode) {
+            doctorDto.accountKey = signUp.accountKey;
+            doctorDto.doctorKey = signUp.doctorKey;
+
+            const doctor = await this.calendarService.doctorInsertion(doctorDto);
+            return doctor;
+          } else {
+
+            return  {
+              signUp
+            };
+
+          }
+        }
+      }
+
+    }
 }

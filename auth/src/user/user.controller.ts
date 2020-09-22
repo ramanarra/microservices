@@ -1,7 +1,8 @@
 import {Controller, UseFilters, Body, Logger,HttpStatus, Inject} from '@nestjs/common';
 import {MessagePattern} from '@nestjs/microservices';
 import {UserService} from './user.service';
-import {UserDto,PatientDto,CONSTANT_MSG} from 'common-dto';
+import {AccountRepository} from './account.repository';
+import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG} from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {ClientProxy} from "@nestjs/microservices";
 import {async} from 'rxjs/internal/scheduler/async';
@@ -13,7 +14,7 @@ export class UserController {
     private logger = new Logger('UserController');
 
 
-    constructor(private readonly userService: UserService) {
+    constructor(private readonly userService: UserService,private accountRepository:AccountRepository) {
 
     }
 
@@ -50,13 +51,18 @@ export class UserController {
                 message: CONSTANT_MSG.INVALID_CREDENTIALS
             }
         }
-        return {
+
+        let docLoginResponse = {
             "doctorKey": doctor.doctor_key,
             "accountKey": doctor.account_key,
             "role":doctor.role,
             "accessToken": doctor.accessToken,
             "rolesPermission": doctor.rolesPermission
-        }
+        };
+
+        console.log('returning doc login in auth ', docLoginResponse);
+
+        return docLoginResponse;
     };
 
     @MessagePattern({cmd: 'auth_patient_login'})
@@ -108,4 +114,45 @@ export class UserController {
         }
     };
 
+    @MessagePattern({ cmd: 'auth_doctor_registration' })
+    async doctorRegistration(doctorDto: any): Promise<any> {
+
+        if (!doctorDto.isNewAccount) {
+            var account = await this.accountRepository.findOne({ account_id: doctorDto.accountId })
+
+            if (account.account_key == doctorDto.user.account_key) {
+                if (!doctorDto.accountId) {
+                    doctorDto.accountId = account.account_id;
+                }
+                const doctor = await this.userService.doctorRegistration(doctorDto);
+                if (doctor.message) {
+                    return doctor;
+                } else {
+                    return {
+                        email: doctor.email,
+                        userId: doctor.id,
+                        doctorKey: doctor.doctor_key,
+                        accountKey: account.account_key,
+                        experience: doctor.experience ? doctor.experience : null,
+                        speciality: doctor.speciality ? doctor.speciality : null,
+                        qualification: doctor.qualification ? doctor.qualification : null,
+                        photo: doctor.photo ? doctor.photo : null,
+                        number: doctor.number ? doctor.number : null,
+                        signature: doctor.signature ? doctor.signature : null,
+                    }
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.DOC_REG_HOS_RES,
+                }
+            }
+        } else {
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: 'Under development'
+            }
+        }
+
+    };
 }

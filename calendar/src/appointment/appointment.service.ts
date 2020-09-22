@@ -20,6 +20,7 @@ import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_c
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
 import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
+import {docConfig} from "./doc_config/docConfig.entity";
 //import {queries} from "../config/query";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
@@ -522,7 +523,7 @@ export class AppointmentService {
     }
 
 
-    async appointmentSlotsView(user: any): Promise<any> {
+    async appointmentSlotsView(user: any, type): Promise<any> {
         try {
             const doc = await this.doctorDetails(user.doctorKey);
             let docId = doc.doctorId;
@@ -563,8 +564,8 @@ export class AppointmentService {
                 const doctorConfigDetails = await this.doctorConfigRepository.findOne({doctorKey: doc.doctorKey});
                 let preconsultationHours = doctorConfigDetails.preconsultationHours;
                 let preconsultationMins = doctorConfigDetails.preconsultationMins;
-                let consultationSessionTiming = doctorConfigDetails.consultationSessionTimings;
-                let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings);
+                let consultationSessionTiming = doctorConfigDetails.consultationSessionTimings ? doctorConfigDetails.consultationSessionTimings : 10;
+                let consultationSessionTimingInMilliSeconds = Helper.getMinInMilliSeconds(doctorConfigDetails.consultationSessionTimings ? doctorConfigDetails.consultationSessionTimings : 10);
                 let appointmentSlots = [];
                 let dayOfWeekCount = 0;
                 let breaktheloop = 0;
@@ -787,10 +788,14 @@ export class AppointmentService {
                 return res;
                 //return appointmentSlots;
             } else {
-                console.log("Error in appointmentSlotsView api 1")
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                if (type === 'todaysAvailabilitySeats') {
+                    return [];
+                } else {
+                    console.log("Error in appointmentSlotsView api 1")
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
+                    }
                 }
             }
         } catch (e) {
@@ -997,7 +1002,8 @@ export class AppointmentService {
     async findDoctorByCodeOrName(codeOrName: any): Promise<any> {
         try {
             //  const name = await this.doctorRepository.findOne({doctorName: codeOrName});
-            const name = await this.doctorRepository.query(queries.getDoctorByName, [codeOrName])
+            let codeOrNameTime = codeOrName ? codeOrName.trim() : codeOrName;
+            const name = await this.doctorRepository.query(queries.getDoctorByName, ['%'+codeOrNameTime+'%'])
             const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
             return {
                 doctors: name,
@@ -1246,7 +1252,7 @@ export class AppointmentService {
                         let config = await this.getAppDoctorConfigDetails(appointmentList.id);
                         var preConsultationHours = null;
                         var preConsultationMins = null;
-                        if (config.isPatientPreconsultationAllowed) {
+                        if (config && config.isPatientPreconsultationAllowed) {
                             preConsultationHours = config.preconsultationHours;
                             preConsultationMins = config.preconsultationMinutes;
                         }
@@ -1435,7 +1441,7 @@ export class AppointmentService {
 
     }
 
-    async availableSlots(user: any): Promise<any> {
+    async availableSlots(user: any, type: string): Promise<any> {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
        
@@ -1446,15 +1452,31 @@ export class AppointmentService {
         //let day = days[user.appointmentDate.getDay()]
         let day = days[dt.getDay()]
         user.paginationNumber=0;
-        let slotsviews=await this.appointmentSlotsView(user);
+
+        // find today availablity seates
+        let slotsviews = await this.appointmentSlotsView(user, 'todaysAvailabilitySeats');
         let slotview;
 
-       for(let j=0;j<slotsviews.length;j++){
-        if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
-            slotview=slotsviews[j];
-            break;
+    //    for(let j=0;j<slotsviews.length;j++){
+        if(slotsviews && slotsviews.length && typeof slotsviews === 'object'
+        && !slotsviews.statusCode
+         && slotsviews[0].dayOfWeek.toLowerCase() === day.toLowerCase()){
+            slotview=slotsviews[0];
+            // break;
+        } else if (!type && type !== 'doctorList') {
+
+            for(let j=0;j<slotsviews.length;j++){
+
+                if(slotsviews[j].dayOfWeek.toLowerCase() === day.toLowerCase()){
+                
+                slotview=slotsviews[j];
+                
+                break;
+                }
+            }
         }
-       }
+
+    //    }
        let date = new Date();
        var time = date.getHours() + ":" + date.getMinutes();
        var timeMilli = Helper.getTimeInMilliSeconds(time);
@@ -1783,7 +1805,12 @@ export class AppointmentService {
             liveStatus: 'online'
         }
         var values: any = dto;
-        return await this.doctorRepository.update(condition, values);
+        console.log('updateDocOnline status ', {condition: condition, values: values});
+
+        let docOnlineStatus = await this.doctorRepository.update(condition, values);
+        console.log('updateDocOnline status ', docOnlineStatus);
+
+        return docOnlineStatus;
     }
 
     async updateDocOffline(doctorKey): Promise<any> {
@@ -1899,6 +1926,21 @@ export class AppointmentService {
             }
         } 
      }
+
+     async doctorRegistration(doctorDto: DoctorDto): Promise<any> {
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        if(doctor){
+            // add config details
+            const config = await this.doctorConfigRepository.doctorConfigSetup(doctor, doctorDto)
+            return doctor;
+        } else {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.DOC_REG_FAIL
+            };
+        }
+        
+    }
 
 
 

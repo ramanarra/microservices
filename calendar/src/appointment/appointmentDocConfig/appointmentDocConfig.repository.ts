@@ -17,14 +17,14 @@ export class AppointmentDocConfigRepository extends Repository<AppointmentDocCon
         appointment.isPatientCancellationAllowed = appointmentDto.config.isPatientCancellationAllowed;
         appointment.cancellationDays= appointmentDto.config.cancellationDays;
         appointment.cancellationHours= appointmentDto.config.cancellationHours;
-        appointment.cancellationMinutes = appointmentDto.config.cancellationMinutes;
+        appointment.cancellationMinutes = appointmentDto.config.cancellationMins;
         appointment.isPatientRescheduleAllowed = appointmentDto.config.isPatientRescheduleAllowed;
         appointment.rescheduleDays = appointmentDto.config.rescheduleDays;
         appointment.rescheduleHours= appointmentDto.config.rescheduleHours;
-        appointment.rescheduleMinutes= appointmentDto.config.rescheduleMinutes;
+        appointment.rescheduleMinutes= appointmentDto.config.rescheduleMins;
         appointment.autoCancelDays = appointmentDto.config.autoCancelDays;
         appointment.autoCancelHours= appointmentDto.config.autoCancelHours;
-        appointment.autoCancelMinutes= appointmentDto.config.autoCancelMinutes;             
+        appointment.autoCancelMinutes= appointmentDto.config.autoCancelMins;             
 
         try {
             const app =  await appointment.save(); 
