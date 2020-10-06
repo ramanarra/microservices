@@ -20,6 +20,9 @@ export class Patient extends BaseEntity{
     @Column()
     createdBy : string;
 
+    @Column()
+    passcode : string;
+
     async validatePassword(password : string) : Promise<boolean> {
         const newPassword = await bcrypt.hash(password, this.salt);
         return newPassword === this.password;

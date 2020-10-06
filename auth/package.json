@@ -31,6 +31,7 @@
     "bcrypt": "^4.0.1",
     "common-dto": "file:../common-dto",
     "config": "^3.3.1",
+    "generate-password": "^1.5.1",
     "moment": "^2.27.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

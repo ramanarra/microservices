@@ -1,7 +1,7 @@
 import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG} from 'common-dto';
+import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG,queries} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
@@ -9,10 +9,11 @@ import {AccountRepository} from './account.repository';
 import {RolesRepository} from './roles.repository';
 import {RolePermissionRepository} from "./rolesPermission/role_permissions.repository";
 import {PermissionRepository} from "./permissions/permission.repository";
-import {queries} from "../config/query";
+//import {queries} from "../config/query";
 import {UserRoleRepository} from './user_role.repository';
 import {PatientRepository} from './patient.repository';
 import * as bcrypt from "bcrypt";
+var generator = require('generate-password');
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,7 @@ export class UserService {
     }
 
     async findByEmail(email: string): Promise<any> {
-        return await this.userRepository.findOne({email});
+        return await this.userRepository.findOne({email : email});
     }
 
     async findByPhone(phone: string): Promise<any> {
@@ -112,7 +113,8 @@ export class UserService {
     }
 
     async getRolesPermissionId(roleId: number): Promise<any> {
-        return await this.rolePersmissionRepository.query(queries.getRolesPermission, [roleId]);
+        const role = await this.rolePersmissionRepository.query(queries.getRolesPermission, [roleId]);
+        return role;
     }
 
     async patientLogin(email, password): Promise<any> {
@@ -225,13 +227,35 @@ export class UserService {
         return bcrypt.hash(password, salt);
     }
 
-    async doctorForgotPassword(user: any): Promise<any> {
-        const users =  await this.userRepository.findOne({id: user.userId});
+    async doctorsResetPassword(userDto: any): Promise<any> {
+        const users =  await this.userRepository.findOne({email: userDto.email});
         if(users){
-            const salt = await bcrypt.genSalt(); 
-            users.salt = salt;
-            users.password = await this.hashPassword(user.userDto.password, salt);
-            await this.userRepository.save(users);
+            if(users.passcode == userDto.passcode){
+                const salt = await bcrypt.genSalt(); 
+                users.salt = salt;
+                users.password = await this.hashPassword(userDto.password, salt);
+                users.passcode = null;
+                try{
+                    await this.userRepository.save(users);
+                    return{
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.PASSWORD_CHANGED
+                    }
+
+                } catch (e) {
+                    console.log(e);
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.DB_ERROR
+                    }
+                }
+
+            } else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.PASSCODE_NOT_MATCHED
+                }
+            }
         }else{
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
@@ -248,6 +272,150 @@ export class UserService {
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+    async accountRegistration(account: any): Promise<any> {
+        //return await this.accountRepository.findOne({account_id: accountId});
+        const maxAccKey: any = await this.accountRepository.query(queries.getAccountKey)
+        let accKey = 'Acc_';
+        if (maxAccKey.length) {
+            let m = maxAccKey[0]
+            accKey = accKey + (Number(m.maxacc) + 1)
+        } else {
+            accKey = 'Acc_1'
+        }
+        account.accountKey = accKey;
+        const uid: any = await this.userRepository.query(queries.getUser)
+        let id = Number(uid[0].id) + 1;
+        console.log(id);
+        account.id = id;
+        const accreg = await this.accountRepository.createAccount(account);
+        return accreg;
+    }
+
+    async genPassword(): Promise<any> {
+        try {
+            var password = generator.generate({
+                length: 8,
+                numbers: true
+            });
+            return password
+        } catch (e) {
+	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+    async patientResetPassword(patientDto: any): Promise<any> {
+        const users =  await this.patientRepository.findOne({phone : patientDto.phone});
+        if(users){
+            if(users.passcode == patientDto.passcode){
+                const salt = await bcrypt.genSalt(); 
+                users.salt = salt;
+                users.password = await this.hashPassword(patientDto.password, salt);
+                users.passcode = null;
+                try{
+                    await this.patientRepository.save(users);
+                    return{
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.PASSWORD_CHANGED
+                    }
+
+                } catch (e) {
+                    console.log(e);
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.DB_ERROR
+                    }
+                }
+
+            } else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.PASSCODE_NOT_MATCHED
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
+    async patientChangePassword(patientDto: any): Promise<any> {
+        const users =  await this.patientRepository.findOne({phone : patientDto.phone});
+        if(users && patientDto.user.patientId == users.patient_id){
+            const salt = await bcrypt.genSalt();
+            const pass = await this.hashPassword(patientDto.oldPassword, users.salt);
+            if(users.password == pass){
+                users.salt = salt;
+                users.password = await this.hashPassword(patientDto.newPassword, salt);
+                try{
+                    await this.patientRepository.save(users);
+                    return{
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.PASSWORD_CHANGED
+                    }
+                } catch (e) {
+                    console.log(e);
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.DB_ERROR
+                    }
+                }
+
+            } else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_PASSWORD
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+    }
+
+    async doctorChangePassword(patientDto: any): Promise<any> {
+        const users =  await this.userRepository.findOne({email : patientDto.email});
+        if(users && patientDto.user.email == users.email){
+            const salt = await bcrypt.genSalt();
+            const pass = await this.hashPassword(patientDto.oldPassword, users.salt);
+            if(users.password == pass){
+                users.salt = salt;
+                users.password = await this.hashPassword(patientDto.newPassword, salt);
+                try{
+                    await this.userRepository.save(users);
+                    return{
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.PASSWORD_CHANGED
+                    }
+                } catch (e) {
+                    console.log(e);
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.DB_ERROR
+                    }
+                }
+
+            } else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_PASSWORD
+                }
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
             }
         }
     }

@@ -1309,8 +1309,8 @@ export class AppointmentService {
         });
         let patientList = [];
         let pag:number = paginationNumber;
-        let m:number = pag*10;
-        var n:number =  (pag*10)+10;
+        let m:number = pag*15;
+        var n:number =  (pag*15)+15;
         var pats =[];
         for (var i = m; i < n; i++){
             pats.push(ids[i]);
@@ -1453,6 +1453,13 @@ export class AppointmentService {
         let day = days[dt.getDay()]
         user.paginationNumber=0;
 
+
+
+
+
+
+
+        
         // find today availablity seates
         let slotsviews = await this.appointmentSlotsView(user, 'todaysAvailabilitySeats');
         let slotview;
@@ -1940,6 +1947,11 @@ export class AppointmentService {
             };
         }
         
+    }
+
+    async accountdetailsInsertion(accountDto: any): Promise<any> {
+        const doctor = await this.accountDetailsRepository.accountdetailsInsertion(accountDto);
+        return doctor;
     }
 
 

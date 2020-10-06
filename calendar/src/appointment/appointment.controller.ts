@@ -1234,5 +1234,10 @@ export class AppointmentController {
         return doctor;
     }
 
+    @MessagePattern({cmd: 'account_details_insertion'})
+    async accountdetailsInsertion(user: any): Promise<any> {
+        const doctor = await this.appointmentService.accountdetailsInsertion(user.accountDto);
+        return doctor;
+    }
 
 }

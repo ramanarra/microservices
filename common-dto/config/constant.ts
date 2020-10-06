@@ -62,5 +62,8 @@ export const CONSTANT_MSG = {
         PARTIALLY_PAID : "partiallyPaid",
         FULLY_PAID : "fullyPaid",
         REFUNDED :"refunded"
-    }
+    },
+    USER_NOT_FOUND : 'No user registered with this email',
+    PASSWORD_CHANGED : 'Successfully updated password',
+    PASSCODE_NOT_MATCHED:'Passcode not matched'
 }

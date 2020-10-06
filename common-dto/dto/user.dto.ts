@@ -10,4 +10,5 @@ export class UserDto {
     updatedTime:Date;
     role:string;
     confirmPassword:string;
+    passcode:string;
 }
