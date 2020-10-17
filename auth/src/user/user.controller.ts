@@ -117,34 +117,35 @@ export class UserController {
     @MessagePattern({ cmd: 'auth_doctor_registration' })
     async doctorRegistration(doctorDto: any): Promise<any> {
 
-        if (!doctorDto.isNewAccount) {
-            var account = await this.accountRepository.findOne({ account_id: doctorDto.accountId })
-
-            if (account.account_key == doctorDto.user.account_key) {
-                if (!doctorDto.accountId) {
-                    doctorDto.accountId = account.account_id;
-                }
-                const doctor = await this.userService.doctorRegistration(doctorDto);
-                if (doctor.message) {
-                    return doctor;
-                } else {
+        if (!doctorDto.isNewAccount) {            
+            if (!doctorDto.accountId) {
+                var account = await this.accountRepository.findOne({ account_key: doctorDto.user.account_key })
+                doctorDto.accountId = account.account_id;
+            } else{
+                var accountDet =  await this.accountRepository.findOne({ account_id: doctorDto.accountId })
+                if(accountDet.account_key != doctorDto.user.account_key){
                     return {
-                        email: doctor.email,
-                        userId: doctor.id,
-                        doctorKey: doctor.doctor_key,
-                        accountKey: account.account_key,
-                        experience: doctor.experience ? doctor.experience : null,
-                        speciality: doctor.speciality ? doctor.speciality : null,
-                        qualification: doctor.qualification ? doctor.qualification : null,
-                        photo: doctor.photo ? doctor.photo : null,
-                        number: doctor.number ? doctor.number : null,
-                        signature: doctor.signature ? doctor.signature : null,
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.DOC_REG_HOS_RES,
                     }
                 }
+            }
+           
+            const doctor = await this.userService.doctorRegistration(doctorDto);
+            if (doctor.message) {
+                return doctor;
             } else {
                 return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message: CONSTANT_MSG.DOC_REG_HOS_RES,
+                    email: doctor.email,
+                    userId: doctor.id,
+                    doctorKey: doctor.doctor_key,
+                    accountKey: account.account_key,
+                    experience: doctor.experience ? doctor.experience : null,
+                    speciality: doctor.speciality ? doctor.speciality : null,
+                    qualification: doctor.qualification ? doctor.qualification : null,
+                    photo: doctor.photo ? doctor.photo : null,
+                    number: doctor.number ? doctor.number : null,
+                    signature: doctor.signature ? doctor.signature : null,
                 }
             }
         } else {
