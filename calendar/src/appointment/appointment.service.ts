@@ -1436,6 +1436,7 @@ export class AppointmentService {
             doctorLastName: doctor.lastName,
             patientFirstName: patient.firstName,
             patientLastName: patient.lastName,
+            doctorLiveStatus: doctor.liveStatus
         }
         return res;
 
