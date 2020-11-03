@@ -12,7 +12,7 @@ export const CONSTANT_MSG = {
     UPDATE_OK:"Updated Successfully",
     APPOINT_CANCELED: 'Appointment Cancelled Successfully',
     DAY_OF_WEEK:'Please enter DayOfWeek Correctly',
-    ALREADY_PRESENT:'User already present.Do login',
+    ALREADY_PRESENT:'Phone number already exists please login using the existing credentials',
     INVALID_REQUEST:'Invalid request',
     PHONE_EXISTS:"Phone number already exists",
     TIME_OVERLAP:'Time Overlapping with previous Time Interval',
