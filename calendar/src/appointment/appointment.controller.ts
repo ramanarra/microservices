@@ -611,9 +611,9 @@ export class AppointmentController {
     }
 
     @MessagePattern({cmd: 'patient_list'})
-    async patientList(doctorKey:any): Promise<any> {
-        const doctor =await this.appointmentService.doctorDetails(doctorKey);
-        const appointment = await this.appointmentService.patientList(doctor.doctorId);
+    async patientList(user:any): Promise<any> {
+        const doctor =await this.appointmentService.doctorDetails(user.doctorKey);
+        const appointment = await this.appointmentService.patientList(doctor.doctorId,user.paginationNumber);
         return appointment;
     }
 
@@ -1234,5 +1234,10 @@ export class AppointmentController {
         return doctor;
     }
 
+    @MessagePattern({cmd: 'account_details_insertion'})
+    async accountdetailsInsertion(user: any): Promise<any> {
+        const doctor = await this.appointmentService.accountdetailsInsertion(user.accountDto);
+        return doctor;
+    }
 
 }

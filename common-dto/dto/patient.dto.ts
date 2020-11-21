@@ -39,4 +39,9 @@ export class PatientDto {
     salt:string;
     paginationNumber:number;
     doctorKey:string;
+    confirmPassword: string;
+    passcode:string;
+    oldPassword:string;
+    newPassword:string;
+    confirmNewPassword:string;
 }

@@ -32,6 +32,9 @@ import { JwtStrategy } from 'src/common/jwt/jwt.strategy';
 import {JwtService} from '@nestjs/jwt';
 import { toNamespacedPath } from 'path';
 import {reports} from "../common/decorator/reports.decorator";
+import {patient} from "../common/decorator/patientPermission.decorator";
+import {selfUserSettingRead} from "../common/decorator/selfUserSettingRead.decorator";
+import {accountUsersSettingsRead} from "../common/decorator/accountUsersSettingsRead.decorator";
 
 
 @Controller('api/auth')
@@ -216,27 +219,31 @@ export class AuthController {
       }      
     }
 
-    @Post('doctor/forgotPassword')
-    @ApiOkResponse({ description: 'requestBody example :   {\n' +
-          '"email":"test@apollo.com",\n' +
-          '"password": "123456" \n' +
-          '}' })
+    @Post('doctor/resetPassword')
+    @ApiOkResponse({ description: '{ "password": "123456" ,"confirmPassword": "123456", "passcode":"k7noVjmL", "email":"test22@gmail.com"}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     @ApiTags('Doctors')
-    async doctorsForgotPassword(@Request() req, @Body() userDto : UserDto) {
-      if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-        const status = await this.calendarService.updateDocOnline(req.user.doctorKey);
-      }
+    async doctorsResetPassword(@Request() req, @Body() userDto : UserDto) {
       if(!userDto.password){
         console.log("Provide password");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }else if(!userDto.confirmPassword){
         console.log("Provide confirmPassword");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmPassword"}
+      } else if(!userDto.passcode){
+        console.log("Provide passcode");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide passcode"}
+      } else if(!userDto.email){
+        console.log("Provide email");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
+      }
+      if(userDto.password != userDto.confirmPassword){
+        console.log("password and confirmPassword are not matching");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"password and confirmPassword are not matching"}
       }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
-      const doc:any =await this.userService.doctorsForgotPassword(req.user,userDto);
+      const doc:any =await this.userService.doctorsResetPassword(userDto);
       return doc;
     }
 
@@ -295,4 +302,146 @@ export class AuthController {
       }
 
     }
+
+    @Post('accountRegistration')
+    @ApiOkResponse({description: 'accountRegistration API'})
+    @ApiUnauthorizedResponse({description: '{"isNewAccount":true,"hospitalName":"Lakshmi Hospitals","adminEmail":"lakshmi6@gmail.com","name":"Dharani","password":"123456", "state":"Andhra Pradesh","pincode":"533274","phone":"9999999999"}'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({type: DoctorDto})
+    async accountRegistration(@Request() req, @Body() doctorDto: DoctorDto) {
+      if (doctorDto.isNewAccount) {
+        const accountreg = await this.userService.accountRegistration(doctorDto,req.user);
+        if(accountreg.accountKey){
+          doctorDto.accountKey = accountreg.accountKey;
+          const accDetails = await this. calendarService.accountdetailsInsertion(doctorDto,req.user);
+          return accDetails
+        }
+      }
+
+    }
+
+
+    @Post('doctor/forgotPassword')
+    @ApiOkResponse({ description: ' { "email": "dharani@softsuave.com"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    @ApiTags('Doctors')
+    async doctorForgotPassword(@Body() userDto : UserDto) {
+      if(!userDto.email){
+        console.log("Provide email");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
+      }
+      this.logger.log(`Doctor forgot password  Api -> Request data ${JSON.stringify(userDto)}`);
+      const doc:any =await this.userService.doctorForgotPassword(userDto);
+      return doc;
+    }
+
+    @Post('patient/forgotPassword')
+    @ApiOkResponse({ description: ' { "phone": "9999999994"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    @ApiTags('Patient')
+    async patientForgotPassword(@Body() patientDto : PatientDto) {
+      if(!patientDto.phone){
+        console.log("Provide phone");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide phone"}
+      }
+      this.logger.log(`Patient forgot password  Api -> Request data ${JSON.stringify(patientDto)}`);
+      const pat:any =await this.userService.patientForgotPassword(patientDto);
+      return pat;
+    }
+
+    @Post('patient/resetPassword')
+    @ApiOkResponse({ description: '{ "password": "1234" ,"confirmPassword": "1234", "passcode":"syxT6KMr", "phone":"9999999994"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: UserDto })
+    @ApiTags('Patient')
+    async patientResetPassword(@Body() patientDto : PatientDto) {
+      if(!patientDto.password){
+        console.log("Provide password");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
+      }else if(!patientDto.confirmPassword){
+        console.log("Provide confirmPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmPassword"}
+      } else if(!patientDto.passcode){
+        console.log("Provide passcode");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide passcode"}
+      } else if(!patientDto.phone){
+        console.log("Provide phone");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide phone"}
+      }
+      if(patientDto.password != patientDto.confirmPassword){
+        console.log("password and confirmPassword are not matching");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"password and confirmPassword are not matching"}
+      }
+      this.logger.log(`Patient forgot password  Api -> Request data ${JSON.stringify(patientDto)}`);
+      const pat:any =await this.userService.patientResetPassword(patientDto);
+      return pat;
+    }
+
+    @Post('patient/changePassword')
+    @ApiOkResponse({ description: ' { "phone": "9999999994","oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({ type: UserDto })
+    @ApiTags('Patient')
+    async patientChangePassword(@Request() req, @patient() check: boolean,  @Body() patientDto : PatientDto) {
+      if (!check)
+        return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+      if(!patientDto.phone){
+        console.log("Provide phone");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide phone"}
+      }else if(!patientDto.newPassword){
+        console.log("Provide newPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide newPassword"}
+      }else if(!patientDto.oldPassword){
+        console.log("Provide oldPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide oldPassword"}
+      }else if(!patientDto.confirmNewPassword){
+        console.log("Provide confirmNewPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmNewPassword"}
+      }
+      if(patientDto.newPassword != patientDto.confirmNewPassword){
+        console.log("newPassword and confirmNewPassword are not same");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"newPassword and confirmNewPassword are not same"}
+      }
+      this.logger.log(`Patient change password  Api -> Request data ${JSON.stringify(patientDto)}`);
+      const pat:any =await this.userService.patientChangePassword(patientDto,req.user);
+      return pat;
+    }
+
+    @Post('doctor/changePassword')
+    @ApiOkResponse({ description: ' { "email": "test22@gmail.com","oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiBody({ type: UserDto })
+    @ApiTags('Doctors')
+    async doctorChangePassword(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req,  @Body() patientDto : PatientDto) {
+      if (!check && !check2)
+        return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+      if(!patientDto.email){
+        console.log("Provide email");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
+      }else if(!patientDto.newPassword){
+        console.log("Provide newPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide newPassword"}
+      }else if(!patientDto.oldPassword){
+        console.log("Provide oldPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide oldPassword"}
+      }else if(!patientDto.confirmNewPassword){
+        console.log("Provide confirmNewPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmNewPassword"}
+      }
+      if(patientDto.newPassword != patientDto.confirmNewPassword){
+        console.log("newPassword and confirmNewPassword are not same");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"newPassword and confirmNewPassword are not same"}
+      }
+      this.logger.log(`Doctor change password  Api -> Request data ${JSON.stringify(patientDto)}`);
+      const pat:any =await this.userService.doctorChangePassword(patientDto,req.user);
+      return pat;
+    }
+
 }

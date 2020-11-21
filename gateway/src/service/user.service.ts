@@ -64,9 +64,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send( { cmd: 'auth_doctor_login' }, userDto).toPromise();
     }
 
-    public doctorsForgotPassword(user:any,userDto: UserDto): Promise <any> {
-        user.userDto=userDto;
-        return this.redisClient.send( { cmd: 'auth_doctor_forgot_password' }, user).toPromise();
+    public doctorsResetPassword(userDto: UserDto): Promise <any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_reset_password' }, userDto).toPromise();
     }
 
 
@@ -104,5 +103,32 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
 
     public findDoctorByEmail(email : string) : Promise <any> {
         return this.redisClient.send({ cmd : 'auth_user_find_by_email'}, email).toPromise();
+    }
+
+    public accountRegistration(doctorDto: any,user:any): Promise<any> {
+        user.doctorDto = doctorDto;
+        return this.redisClient.send( { cmd: 'auth_account_registration' }, user).toPromise();
+    }
+
+    public doctorForgotPassword(userDto:any): Promise<any> {
+        return this.redisClient.send( { cmd: 'auth_doctor_forgotpassword' }, userDto).toPromise();
+    }
+
+    public patientForgotPassword(userDto:any): Promise<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_forgotpassword' }, userDto).toPromise();
+    }
+
+    public patientResetPassword(userDto:any): Promise<any> {
+        return this.redisClient.send( { cmd: 'auth_patient_resetpassword' }, userDto).toPromise();
+    }
+
+    public patientChangePassword(patientDto:any,user:any): Promise<any> {
+        patientDto.user = user;
+        return this.redisClient.send( { cmd: 'auth_patient_changepassword' }, patientDto).toPromise();
+    }
+
+    public doctorChangePassword(patientDto:any,user:any): Promise<any> {
+        patientDto.user = user;
+        return this.redisClient.send( { cmd: 'auth_doctor_changepassword' }, patientDto).toPromise();
     }
 }

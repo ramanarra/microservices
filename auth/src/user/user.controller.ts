@@ -96,21 +96,16 @@ export class UserController {
         
     };
 
-    @MessagePattern({cmd: 'auth_doctor_forgot_password'})
-    async doctorsForgotPassword(user: any): Promise<any> {
-        const doctor = await this.userService.doctorForgotPassword(user);
-        if(doctor.message == CONSTANT_MSG.INVALID_CREDENTIALS){
-            return{
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_CREDENTIALS
+    @MessagePattern({cmd: 'auth_doctor_reset_password'})
+    async doctorsResetPassword(userDto: any): Promise<any> {
+        const user = await this.userService.doctorsResetPassword(userDto);
+        if(user){
+            return user;
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
             }
-        }
-        return {
-            "doctorKey": doctor.doctor_key,
-            "accountKey": doctor.account_key,
-            "role":doctor.role,
-            "accessToken": doctor.accessToken,
-            "rolesPermission": doctor.rolesPermission
         }
     };
 
@@ -155,4 +150,85 @@ export class UserController {
         }
 
     };
+
+    @MessagePattern({cmd: 'auth_account_registration'})
+    async accountRegistration(user: any): Promise<any> {
+        return await this.userService.accountRegistration(user.doctorDto);
+    };
+
+    @MessagePattern({cmd: 'auth_doctor_forgotpassword'})
+    async doctorForgotPassword(email: any): Promise<any> {
+        const user = await this.userService.findByEmail(email.email);
+        if(user){
+            const passcode = await this.userService.genPassword();
+            user.passcode = passcode;
+            await user.save();
+            return{
+                passcode : passcode
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'auth_patient_forgotpassword'})
+    async patientForgotPassword(userDto: any): Promise<any> {
+        const user = await this.userService.findByPhone(userDto.phone);
+        if(user){
+            const passcode = await this.userService.genPassword();
+            user.passcode = passcode;
+            await user.save();
+            return{
+                passcode : passcode
+            }
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'auth_patient_resetpassword'})
+    async patientResetPassword(patientDto: any): Promise<any> {
+        const user = await this.userService.patientResetPassword(patientDto);
+        if(user){
+            return user;
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'auth_patient_changepassword'})
+    async patientChangePassword(patientDto: any): Promise<any> {
+        const user = await this.userService.patientChangePassword(patientDto);
+        if(user){
+            return user;
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
+            }
+        }
+    }
+
+    @MessagePattern({cmd: 'auth_doctor_changepassword'})
+    async doctorChangePassword(patientDto: any): Promise<any> {
+        const user = await this.userService.doctorChangePassword(patientDto);
+        if(user){
+            return user;
+        }else{
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.USER_NOT_FOUND
+            }
+        }
+    }
+
 }

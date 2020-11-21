@@ -32,6 +32,8 @@ export class Users extends BaseEntity{
     @Column()
     updated_time : Date;
 
+    @Column()
+    passcode : string;
 
     async validatePassword(password : string) : Promise<boolean> {
         const newPassword = await bcrypt.hash(password, this.salt);
