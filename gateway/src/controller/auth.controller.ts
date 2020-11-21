@@ -261,15 +261,8 @@ export class AuthController {
           statusCode: HttpStatus.NO_CONTENT,
           message: "Under development"
         }
-
-      } else if (req.user.account_key !== 'Acc_' + doctorDto.accountId) {
-
-        return {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: CONSTANT_MSG.DOC_REG_HOS_RES,
-        }
-
-      } else if (!doctorDto.email) {
+      }
+      else if (!doctorDto.email) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
           message: "Provide email"

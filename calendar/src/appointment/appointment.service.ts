@@ -662,7 +662,7 @@ export class AppointmentService {
                                         let datedate = Helper.getDayMonthYearFromDate(date);
                                         if (daydate == datedate) {
                                             // if(v.appointmentDate == date){
-                                            if (timeMilli < endTimeInMilliSec) {
+                                            if (timeMilli < startTimeInMilliSec) {
                                                 v.slotType = 'Booked';
                                                 v.preconsultationHours = preconsultationHours;
                                                 v.preconsultationMins = preconsultationMins;

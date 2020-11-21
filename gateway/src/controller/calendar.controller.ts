@@ -516,7 +516,7 @@ export class CalendarController {
             '"email":"nirmala@gmail.com",\n' +
             '"landmark":"landmark", \n' +
             '"country":"country", \n' +
-            '"name":"name", \n' +
+            '"firstName":"name", \n' +
             '"address":"address", \n' +
             '"state":"state", \n' +
             '"pincode":"pincode", \n' +
@@ -541,6 +541,10 @@ export class CalendarController {
         }
         if(req.body.patientId !== req.user.patientId){
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
+        }
+        if(req.body.firstName){
+            patientDto.lastName = "";
+            patientDto.name =  req.body.firstName+ " "+patientDto.lastName;
         }
         this.logger.log(`Patient Details Edit Api -> Request data ${JSON.stringify(patientDto)}`);
         return await this.calendarService.patientDetailsEdit(patientDto);
