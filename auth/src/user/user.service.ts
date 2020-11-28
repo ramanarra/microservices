@@ -37,7 +37,7 @@ export class UserService {
         if (!user)
             throw new UnauthorizedException("Invalid Credentials");
 
-        const jwtUserInfo: JwtPayLoad = {email: user.email, userId: user.id, account_key: '', doctor_key: '', role: '', permissions : []};
+        const jwtUserInfo: JwtPayLoad = {email: user.email, userId: user.id, account_key: '', doctor_key: '', role: '', permissions : [],accountName:" "};
         const accessToken = this.jwtService.sign(jwtUserInfo);
         user.accessToken = accessToken;
         return user;
@@ -68,6 +68,8 @@ export class UserService {
             user.account_key = accountData.account_key;
             var roleId = await this.roleId(user.id);
             var roles = await this.role(roleId.role_id);
+            user.accountName = accountData.account_name
+
             if (!roles)
                 throw  new UnauthorizedException('Content Not Available');
             var rolesPermission = await this.getRolesPermissionId(roleId.role_id);
@@ -81,7 +83,8 @@ export class UserService {
                 account_key: accountData.account_key,
                 doctor_key: user.doctor_key,
                 role: roles.roles,
-                permissions: permissionArray
+                permissions: permissionArray,
+                accountName: accountData.accountName
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
