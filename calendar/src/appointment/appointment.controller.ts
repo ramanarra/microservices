@@ -12,10 +12,10 @@ import { PaymentService } from './payment.service';
 import * as config from 'config';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
+//import * as moment from 'moment';
 
 //import {DoctorService} from './doctor/doctor.service';
 var moment = require('moment');
-
 
 @Controller('appointment')
 export class AppointmentController {
@@ -687,7 +687,23 @@ export class AppointmentController {
                    slots:avlbl
                }
             }
-            
+            var currentDate = new Date(Date.now());
+            let now = moment(currentDate).format('YYYY-MM-DD');
+            let appointmentDate = moment(user.appointmentDate).format('YYYY-MM-DD');
+            if(now == appointmentDate){
+                var doctorList = [];
+                for(const list of doctor)
+                {
+                    let time = moment(currentDate).format('HH:mm:ss');
+                    if(list.startTime> time){
+                        doctorList.push(list)
+                    }
+                }
+                return {
+                    date:new Date(user.appointmentDate),
+                    slots:doctorList
+                }
+            }
             return {
                 date:new Date(user.appointmentDate),
                 slots:doctor

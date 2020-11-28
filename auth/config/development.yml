@@ -1,12 +1,12 @@
 server :
-  URL : 'redis://dev-redis-gateway.ysl6gq.ng.0001.aps1.cache.amazonaws.com:6379'
+  URL : 'redis://virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com:6379'
 
 database :
   type : 'postgres'
-  username: 'postgres'
-  password: 'postgres'
+  username : 'postgres'
+  password : 'postgres'
   host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
-  database : 'auth'
+  database : 'liveauth'
   port : 5432
   synchronize : false
   
