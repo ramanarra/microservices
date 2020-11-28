@@ -1264,6 +1264,22 @@ export class CalendarController {
         this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
         return this.calendarService.createPaymentLink(accountDto, req.user);
     }
-    
+
+    @Get('patient/listOfHospitals')
+    @ApiOkResponse({description: 'listOfHospitals API'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Patient')
+    async listOfHospitals(@Request() req, @patient() check: boolean) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
+            await this.calendarService.updatePatLastActive(req.user.patientId);
+        }
+        this.logger.log(`listOfHospitals Api -> Request data }`);
+        return await this.calendarService.listOfHospitals(req.user);
+    }
+
 
 }
