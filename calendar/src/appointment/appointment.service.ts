@@ -168,8 +168,19 @@ export class AppointmentService {
     async doctor_lists(accountKey): Promise<any> {
         try {
             const doctorList = await this.doctorRepository.query(queries.getDocListDetails, [accountKey]);
+            let ids = [];
+            doctorList.forEach(a => {
+                let flag = false;
+                ids.forEach(i => {
+                    if (i.doctorId == a.doctorId)
+                        flag = true;
+                });
+                if (flag == false) {
+                    ids.push(a)
+                }
+            });
             let res = [];
-            for (let list of doctorList) {
+            for (let list of ids) {
                 var doc = {
                     doctorId: list.doctorId,
                     accountkey: list.account_key,
@@ -1953,6 +1964,11 @@ export class AppointmentService {
     async accountdetailsInsertion(accountDto: any): Promise<any> {
         const doctor = await this.accountDetailsRepository.accountdetailsInsertion(accountDto);
         return doctor;
+    }
+
+    async listOfHospitals(): Promise<any> {
+        const hospitals = await this.accountDetailsRepository.find();
+        return hospitals;
     }
 
 
