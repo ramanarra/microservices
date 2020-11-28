@@ -16,7 +16,6 @@ import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 
 //import {DoctorService} from './doctor/doctor.service';
 var moment = require('moment');
-var currentDate = new Date(Date.now());
 
 @Controller('appointment')
 export class AppointmentController {
@@ -688,6 +687,7 @@ export class AppointmentController {
                    slots:avlbl
                }
             }
+            var currentDate = new Date(Date.now());
             let now = moment(currentDate).format('YYYY-MM-DD');
             let appointmentDate = moment(user.appointmentDate).format('YYYY-MM-DD');
             if(now == appointmentDate){
