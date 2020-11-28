@@ -57,7 +57,8 @@ export class UserController {
             "accountKey": doctor.account_key,
             "role":doctor.role,
             "accessToken": doctor.accessToken,
-            "rolesPermission": doctor.rolesPermission
+            "rolesPermission": doctor.rolesPermission,
+            "accountName":doctor.accountName
         };
 
         console.log('returning doc login in auth ', docLoginResponse);
