@@ -58,4 +58,6 @@ export const queries = {
     insertDoctor:'INSERT INTO public.users(id, name, email, password, salt, account_id, doctor_key)VALUES ($1, $2, $3, $4, $5, $6, $7);',
     getTodayAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" = $2 AND ("status"= $3 OR "status"=$4)  AND "is_cancel"=false',
     getAccountKey:"SELECT replace(account.account_key, 'Acc_', '') AS maxAcc FROM account WHERE account_key notnull order by replace(account.account_key, 'Acc_', '')::int desc limit 1",
+    getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
+    getTableData:'SELECT * FROM '
 }

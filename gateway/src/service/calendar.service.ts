@@ -340,6 +340,12 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public tableDataViewOrDelete(accountDto:any, user:any) : Promise <any> {
+        user.accountDto = accountDto;
+        return this.redisClient.send({ cmd : 'table_data_view_delete'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public doctorInsertion(doctorDto:any) : Promise <any> {
         return this.redisClient.send({ cmd : 'doctor_details_insertion'},doctorDto).toPromise();
     }

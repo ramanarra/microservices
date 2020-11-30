@@ -1244,6 +1244,17 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'table_data_view_delete'})
+    async tableDataViewOrDelete(user: any): Promise<any> {
+        if(user.accountDto.type == 'view'){
+            const patient = await this.appointmentService.tableDataView(user.accountDto);
+            return patient;
+        }else if(user.accountDto.type == 'edit'){
+            const patient = await this.appointmentService.tableDataDelete(user.accountDto);
+            return patient;
+        }
+    }
+
     @MessagePattern({cmd: 'doctor_details_insertion'})
     async doctorInsertion(doctorDto: DoctorDto): Promise<any> {
         const doctor = await this.appointmentService.doctorRegistration(doctorDto);

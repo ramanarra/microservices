@@ -1931,6 +1931,18 @@ export class AppointmentService {
         return patientList;
     }
 
+    async tableDataView(accountDto: any): Promise<any> {
+        let tab: string = accountDto.table
+        const doctor = await this.accountDetailsRepository.query(queries.getTableData+tab,[]);
+        return doctor;
+    }
+    
+    async tableDataDelete(accountDto: any): Promise<any> {
+        let pre = 'DELETE FROM "'+accountDto.table +'" WHERE "'+accountDto.column+'" = '+accountDto.id
+        const doctor = await this.accountDetailsRepository.query(pre);
+        return doctor;
+    }
+
     async appointmentPresentOnDate(user:any): Promise<any> {
         const exist = await this.appointmentRepository.query(queries.getExistAppointment, [user.doctorId, user.patientId, user.appointmentDate])
         if (exist.length) {
