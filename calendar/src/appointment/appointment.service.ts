@@ -1502,6 +1502,8 @@ export class AppointmentService {
        let resSlot=[];
        let dateForm = Helper.getDayMonthYearFromDate(date);
        let dtForm = Helper.getDayMonthYearFromDate(dt);
+
+       console.log('slotview ', slotview, slotview.slots.length);
        if(slotview !== undefined)
        if(dateForm == dtForm){
         for(let j=0;j<slotview.slots.length;j++){
