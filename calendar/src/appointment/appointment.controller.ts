@@ -1273,4 +1273,16 @@ export class AppointmentController {
         return doctors;  
     }
 
+    @MessagePattern({cmd: 'doctor_prescription_insertion'})
+    async prescriptionInsertion(user:any): Promise<any> {
+        const doc = await this.appointmentService.prescriptionInsertion(user);
+        return doc;
+    }
+
+    @MessagePattern({cmd: 'doctor_prescription_download'})
+    async prescriptionDownload(user:any): Promise<any> {
+        const pat = await this.appointmentService.prescriptionDownload(user);
+        return pat;
+    }
+
 }

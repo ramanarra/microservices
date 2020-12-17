@@ -38,6 +38,7 @@ import {
     DoctorConfigCanReschDto,
     DoctorDto,
     DocConfigDto,
+    PrescriptionDto,
     WorkScheduleDto,
     PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
 } from 'common-dto';
@@ -956,7 +957,7 @@ export class CalendarController {
     }
 
     @Get('admin/reports')
-    @ApiOkResponse({description: 'patientList API'})
+    @ApiOkResponse({description: 'reportsList API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -1302,6 +1303,40 @@ export class CalendarController {
         }
         this.logger.log(`listOfHospitals Api -> Request data }`);
         return await this.calendarService.listOfHospitals(req.user);
+    }
+
+    @Post('doctor/prescriptionInsertion')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
+    @ApiBody({type: PrescriptionDto})
+    @ApiOkResponse({description: 'request body example:   {"appointmentId": "251", "typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async prescriptionInsertion(@selfUserSettingWrite() check:boolean,@accountUsersSettingsWrite() check2:boolean, @Request() req, @Body() prescriptionDto: PrescriptionDto) {
+        if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        this.logger.log(`Doctor prescriptionInsertion  Api -> Request data ${JSON.stringify(prescriptionDto)}`);
+        return await this.calendarService.prescriptionInsertion(req.user,prescriptionDto);
+    }
+
+    @Post('patient/prescriptionDownload')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Patient')
+    @ApiBody({type: PrescriptionDto})
+    @ApiOkResponse({description: 'request body example:   {"appointmentId": "251"}'})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    async prescriptionDownload(@patient() check: boolean, @Request() req, @Body() prescriptionDto: PrescriptionDto) {
+        if (!check)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
+            await this.calendarService.updatePatLastActive(req.user.patientId);
+        }
+        this.logger.log(`Doctor prescriptionDownload  Api -> Request data ${JSON.stringify(prescriptionDto)}`);
+        return await this.calendarService.prescriptionDownload(req.user,prescriptionDto.appointmentId);
     }
 
 

@@ -17,6 +17,7 @@ import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.reposito
 import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repository";
 import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
+import {PrescriptionRepository} from "./prescription.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 
 import { VideoService } from './video.service';
@@ -30,7 +31,7 @@ import { OpenViduService } from './open-vidu.service';
     TypeOrmModule.forFeature([AppointmentRepository,DoctorRepository, AccountDetailsRepository,
       DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
       DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,
-      PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository,
+      PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository,PrescriptionRepository,
       OpenViduSessionRepository,OpenViduSessionTokenRepository])
 
   ],

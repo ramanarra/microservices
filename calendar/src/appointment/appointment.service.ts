@@ -14,6 +14,7 @@ import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
 import {AccountDetailsRepository} from './account/account.repository';
+import {PrescriptionRepository} from './prescription.repository';
 import {AccountDetails} from './account/account_details.entity';
 import {DoctorConfigPreConsultationRepository} from './doctorConfigPreConsultancy/doctor_config_preconsultation.repository';
 import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_config_preconsultation.entity';
@@ -39,6 +40,9 @@ import * as config from 'config';
 import { identity } from 'rxjs';
 var async = require('async');
 var moment = require('moment');
+var request = require('request');
+var fs = require('fs');
+var pdf = require('html-pdf');
 
 
 @Injectable()
@@ -58,6 +62,7 @@ export class AppointmentService {
         private workScheduleDayRepository: WorkScheduleDayRepository,
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
+        private prescriptionRepository: PrescriptionRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
@@ -1983,6 +1988,62 @@ export class AppointmentService {
         return hospitals;
     }
 
+    async prescriptionInsertion(user: any): Promise<any> {
+        const details = await this.appointmentRepository.findOne({id: user.prescriptionDto.appointmentId});
+        const pat = await this.patientDetailsRepository.findOne({patientId: details.patientId});
+        const doc = await this.doctorRepository.findOne({doctorId: details.doctorId});
+        const hosp = await this.accountDetailsRepository.findOne({accountKey:doc.accountKey});
+        if(doc.doctorKey==user.doctor_key){
+            const prescriptionDetails = {
+                appointmentId:details.id,
+                appointmentDate:details.appointmentDate,
+                hospitalLogo:null,
+                hospitalName:hosp.hospitalName,
+                nameOfMedicine:user.prescriptionDto.nameOfMedicine,
+                frequencyOfEachDose:user.prescriptionDto.frequencyOfEachDose,
+                doseOfMedicine:user.prescriptionDto.doseOfMedicine,
+                typeOfMedicine:user.prescriptionDto.typeOfMedicine,
+                countOfDays:user.prescriptionDto.countOfDays,
+                doctorName:doc.firstName+" "+doc.lastName,
+                doctorSignature:doc.signature,
+                patientName:pat.firstName+" "+pat.lastName
+            }
+            const insert = this.prescriptionRepository.prescriptionInsertion(prescriptionDetails);
+            return insert;
+        }else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+  
+    }
+
+    async prescriptionDownload(user: any): Promise<any> {
+        try{
+            const details = await this.appointmentRepository.findOne({id: user.appointmentId});
+            const pat = await this.patientDetailsRepository.findOne({patientId: details.patientId});
+            if(pat.patientId==user.patientId){
+                const prescription = await this.prescriptionRepository.query(queries.getPrescription, [user.appointmentId])
+                //const prescription = this.prescriptionRepository.find({appointmentId:user.appointmentId});    
+                //console.log(prescription);
+                prescription.name = pat.name;
+                return this.htmlToPdf(prescription,pat.name,user.appointmentId);
+            }else{
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
+            }    
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+       
+    }
 
 
     // common functions below===============================================================
@@ -2258,5 +2319,82 @@ export class AppointmentService {
         }
     }
 
+    async htmlToPdf(prescription, patientName, appointmentId){
+        const params: any = {};
+        const AWS = require('aws-sdk');
+        let htmlPdf : any = '';
+        const ID = 'AKIAISEHN3PDMNBWK2UA';
+        const SECRET = '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';
+        const BUCKET_NAME = 'virujh-cloud';
+         // // s3 bucket creation
 
+         const s3 = new AWS.S3({
+            accessKeyId: ID,
+            secretAccessKey: SECRET
+        });
+        params.htmlTemplate = '<div style="height: 7px; background-color: #535353;">\
+        </div>\
+        <div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Prescription</div>\
+          <div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">Appointment created through VIRUJH. Please find the prescription details Below</div>\
+        </div>\
+        <table>\
+          <tr>\
+            <th>Name of Medicine </th>\
+            <th> Type of Medicine </th>\
+            <th> Frequency of Each dose </th>\
+            <th> Dose of Medicine </th>\
+            <th> Count of Days </th>\
+          </tr>\
+          {tabledata}\
+        </table>';
+        params.htmlTemplate = params.htmlTemplate.replace('{prescription}', prescription);
+        let tabledata = '';
+        console.log('prescription', prescription);
+        prescription.forEach(element => {
+            tabledata +=  ' <tr><td>' + element.name_of_medicine + '</td>' + '<td>' + element.type_of_medicine + '</td>'
+            + '<td>' + element.frequency_of_each_dose + '</td>' + '<td>' + element.dose_of_medicine + '</td>'
+            + '<td>' + element.count_of_days + '</td></tr>'
+        });
+        params.htmlTemplate = params.htmlTemplate.replace('{tabledata}', tabledata);
+        var options = { 
+            format: 'Letter',
+            orientation: "portrait", // portrait or landscape
+                "border": {
+                  "top": "0.6cm",// default is 0, units: mm, cm, in, px
+                  "right": "0.6cm",
+                  "left": "0.6cm"
+                },
+                paginationOffset: 1,       // Override the initial pagination number
+                footer: {
+                  "height": "1.2cm",
+                },
+                type: "pdf",
+                quality: "75",
+         };
+        pdf.create(params.htmlTemplate, options).toFile('./prescription.pdf', function(err, res) {
+            if (err) return console.log(err);
+            console.log(res);
+            htmlPdf = res.filename;
+            const fileContent = fs.readFileSync(htmlPdf);
+            
+            // Setting up S3 upload parameters
+            const parames = {
+                Bucket: BUCKET_NAME,
+                Key: `virujh/${patientName}/prescription/${appointmentId}.pdf`, // File name you want to save as in S3
+                Body: fileContent
+            };
+        
+            // Uploading files to the bucket
+            s3.upload(parames, function(err, data) {
+                if (err) {
+                    throw err;
+                }
+                console.log(data);
+                console.log(`File uploaded successfully. ${data.Location}`);
+            });   
+        });
+        
+    }
+    
+    
 }

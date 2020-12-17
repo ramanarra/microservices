@@ -2601,3 +2601,31 @@ ALTER TABLE public.account_details
 
 ALTER TABLE public.account_details
     ADD COLUMN landmark character varying(100);
+
+CREATE TABLE public.prescription
+(
+    id serial NOT NULL,
+    appointment_id bigint NOT NULL,
+    appointment_date date,
+    hospital_logo character varying(500),
+    hospital_name character varying(100),
+    name_of_medicine character varying(300),
+    frequency_of_each_dose character varying(100),
+    count_of_medicine_for_each_dose bigint,
+    type_of_medicine character varying(200),
+    count_of_days bigint,
+    doctor_name character varying(200),
+    doctor_signature character varying(500),
+    patient_name character varying(200),
+    CONSTRAINT "appointmentId" FOREIGN KEY (appointment_id)
+        REFERENCES public.appointment (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.prescription
+    OWNER to postgres;
