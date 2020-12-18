@@ -11,23 +11,19 @@ export class PrescriptionRepository extends Repository<Prescription> {
 
         const prescription = new Prescription();
         prescription.id = accountDto.id;
-        prescription.appointmentId =accountDto.appointmentId ;
+        prescription.appointmentId = accountDto.appointmentId;
         prescription.appointmentDate = accountDto.appointmentDate ? accountDto.appointmentDate : null;
         prescription.hospitalLogo = accountDto.hospitalLogo ? accountDto.hospitalLogo : null;
-        prescription.hospitalName = accountDto.hospitalName ? accountDto.hospitalName :null ;
-        prescription.nameOfMedicine = accountDto.nameOfMedicine;
-        prescription.frequencyOfEachDose= accountDto.frequencyOfEachDose;
-        prescription.doseOfMedicine= accountDto.doseOfMedicine;
-        prescription.typeOfMedicine = accountDto.typeOfMedicine ? accountDto.typeOfMedicine : null;
-        prescription.countOfDays = accountDto.countOfDays ? accountDto.countOfDays : null;
+        prescription.hospitalName = accountDto.hospitalName ? accountDto.hospitalName : null;
         prescription.doctorName = accountDto.doctorName ? accountDto.doctorName : null;
         prescription.doctorSignature = accountDto.doctorSignature ? accountDto.doctorSignature : null;
-        prescription.patientName = accountDto.patientName ? accountDto.patientName : null;            
+        prescription.patientName = accountDto.patientName ? accountDto.patientName : null;
+        prescription.prescriptionUrl =accountDto.prescriptionUrl? accountDto.prescriptionUrl : null;
         try {
-            const acc =  await prescription.save();        
+            const acc = await prescription.save();
             return {
-                appointmentdetails:acc,
-            };         
+                appointmentdetails: acc,
+            };
         } catch (error) {
             this.logger.error(`Unexpected prescription save error` + error.message);
             throw new InternalServerErrorException();

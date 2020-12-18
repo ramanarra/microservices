@@ -13,3 +13,4 @@ export * from './config/index';
 export * from './dto/dbQueries/query.dto';
 export * from './acknowledgement/index';
 export * from './dto/prescription.dto';
+export * from './dto/medicine.dto';

@@ -29,26 +29,6 @@ export class Prescription extends BaseEntity{
     hospitalName : string;
 
     @Column({
-        name : 'name_of_medicine'
-    })
-    nameOfMedicine : string;
-
-    @Column({
-        name : 'frequency_of_each_dose'
-    })
-    frequencyOfEachDose : string;
-
-    @Column({
-        name : 'type_of_medicine'
-    })
-    typeOfMedicine : string;
-
-    @Column({
-        name : 'count_of_days'
-    })
-    countOfDays : string;
-
-    @Column({
         name : 'doctor_name'
     })
     doctorName : string;
@@ -64,7 +44,8 @@ export class Prescription extends BaseEntity{
     patientName : string;
 
     @Column({
-        name : 'dose_of_medicine'
+        name : 'prescription_url'
     })
-    doseOfMedicine : string;
+    prescriptionUrl : string;
+
 }

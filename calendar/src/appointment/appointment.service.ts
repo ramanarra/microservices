@@ -38,6 +38,7 @@ import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameS
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import * as config from 'config';
 import { identity } from 'rxjs';
+import { MedicineRepository } from './medicine.repository';
 var async = require('async');
 var moment = require('moment');
 var request = require('request');
@@ -63,6 +64,7 @@ export class AppointmentService {
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
         private prescriptionRepository: PrescriptionRepository,
+        private medicineRepository: MedicineRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
         private appointmentDocConfigRepository: AppointmentDocConfigRepository,
@@ -1989,34 +1991,70 @@ export class AppointmentService {
     }
 
     async prescriptionInsertion(user: any): Promise<any> {
-        const details = await this.appointmentRepository.findOne({id: user.prescriptionDto.appointmentId});
-        const pat = await this.patientDetailsRepository.findOne({patientId: details.patientId});
-        const doc = await this.doctorRepository.findOne({doctorId: details.doctorId});
-        const hosp = await this.accountDetailsRepository.findOne({accountKey:doc.accountKey});
-        if(doc.doctorKey==user.doctor_key){
-            const prescriptionDetails = {
-                appointmentId:details.id,
-                appointmentDate:details.appointmentDate,
-                hospitalLogo:null,
-                hospitalName:hosp.hospitalName,
-                nameOfMedicine:user.prescriptionDto.nameOfMedicine,
-                frequencyOfEachDose:user.prescriptionDto.frequencyOfEachDose,
-                doseOfMedicine:user.prescriptionDto.doseOfMedicine,
-                typeOfMedicine:user.prescriptionDto.typeOfMedicine,
-                countOfDays:user.prescriptionDto.countOfDays,
-                doctorName:doc.firstName+" "+doc.lastName,
-                doctorSignature:doc.signature,
-                patientName:pat.firstName+" "+pat.lastName
+        const details = await this.appointmentRepository.findOne({ id: user.prescriptionDto.appointmentId });
+        const pat = await this.patientDetailsRepository.findOne({ patientId: details.patientId });
+        const doc = await this.doctorRepository.findOne({ doctorId: details.doctorId });
+        const hosp = await this.accountDetailsRepository.findOne({ accountKey: doc.accountKey });
+
+        let result = [];
+        if (doc.doctorKey == user.doctor_key) {
+
+            let prescriptionMedicineDetail = [];
+            for (let i = 0; i < user.prescriptionDto.prescriptionList.length ; i++) {
+                
+                prescriptionMedicineDetail = [];
+                
+                // Add prescription
+                const prescriptionDetails = {
+                    appointmentId: details.id,
+                    appointmentDate: details.appointmentDate,
+                    hospitalLogo: null,
+                    hospitalName: hosp.hospitalName,
+                    doctorName: doc.firstName + " " + doc.lastName,
+                    doctorSignature: doc.signature,
+                    patientName: pat.firstName + " " + pat.lastName
+                }
+                const prescriptionDetail = await this.prescriptionRepository.prescriptionInsertion(prescriptionDetails);
+
+                prescriptionMedicineDetail.push(prescriptionDetail.appointmentdetails);
+                prescriptionMedicineDetail[0].medicineList = [];
+                // Add medicine for prescription
+
+                for (let j = 0; j< user.prescriptionDto.prescriptionList[i].medicineList.length; j++) {
+                    const medicineData = {
+                        prescriptionId: prescriptionDetail.appointmentdetails.id,
+                        nameOfMedicine: user.prescriptionDto.prescriptionList[i].medicineList[j].nameOfMedicine,
+                        frequencyOfEachDose: user.prescriptionDto.prescriptionList[i].medicineList[j].frequencyOfEachDose,
+                        doseOfMedicine: user.prescriptionDto.prescriptionList[i].medicineList[j].doseOfMedicine,
+                        typeOfMedicine: user.prescriptionDto.prescriptionList[i].medicineList[j].typeOfMedicine,
+                        countOfDays: user.prescriptionDto.prescriptionList[i].medicineList[j].countOfDays,
+                    }
+
+                    const medicineDetail = await this.medicineRepository.medicineInsertion(medicineData);
+                    prescriptionMedicineDetail[0].medicineList.push(medicineData);
+                }
+
+                // Generate pdf to store in cloud
+                let generatePdfPrescription = await this.htmlToPdf(prescriptionMedicineDetail,
+                     prescriptionDetails.patientName, prescriptionMedicineDetail[0].id);
+
+                if (i === user.prescriptionDto.prescriptionList.length - 1) {
+                    result.push(prescriptionDetail);
+                    return result;
+                } else {
+                    result.push(prescriptionDetail);
+                }
+                    
             }
-            const insert = this.prescriptionRepository.prescriptionInsertion(prescriptionDetails);
-            return insert;
-        }else{
+            
+            
+        } else {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
                 message: CONSTANT_MSG.INVALID_REQUEST
             }
         }
-  
+
     }
 
     async prescriptionDownload(user: any): Promise<any> {
@@ -2028,7 +2066,7 @@ export class AppointmentService {
                 //const prescription = this.prescriptionRepository.find({appointmentId:user.appointmentId});    
                 //console.log(prescription);
                 prescription.name = pat.name;
-                return this.htmlToPdf(prescription,pat.name,user.appointmentId);
+                return this.htmlToPdf(prescription,pat.name, prescription.id);
             }else{
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
@@ -2319,7 +2357,7 @@ export class AppointmentService {
         }
     }
 
-    async htmlToPdf(prescription, patientName, appointmentId){
+    async htmlToPdf(prescription, patientName, prescriptionId) {
         const params: any = {};
         const AWS = require('aws-sdk');
         let htmlPdf : any = '';
@@ -2332,6 +2370,7 @@ export class AppointmentService {
             accessKeyId: ID,
             secretAccessKey: SECRET
         });
+
         params.htmlTemplate = '<div style="height: 7px; background-color: #535353;">\
         </div>\
         <div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Prescription</div>\
@@ -2347,15 +2386,16 @@ export class AppointmentService {
           </tr>\
           {tabledata}\
         </table>';
-        params.htmlTemplate = params.htmlTemplate.replace('{prescription}', prescription);
+
         let tabledata = '';
-        console.log('prescription', prescription);
-        prescription.forEach(element => {
+
+        prescription[0].medicineList.forEach(element => {
             tabledata +=  ' <tr><td>' + element.name_of_medicine + '</td>' + '<td>' + element.type_of_medicine + '</td>'
             + '<td>' + element.frequency_of_each_dose + '</td>' + '<td>' + element.dose_of_medicine + '</td>'
             + '<td>' + element.count_of_days + '</td></tr>'
         });
         params.htmlTemplate = params.htmlTemplate.replace('{tabledata}', tabledata);
+
         var options = { 
             format: 'Letter',
             orientation: "portrait", // portrait or landscape
@@ -2371,7 +2411,8 @@ export class AppointmentService {
                 type: "pdf",
                 quality: "75",
          };
-        pdf.create(params.htmlTemplate, options).toFile('./prescription.pdf', function(err, res) {
+
+        pdf.create(params.htmlTemplate, options).toFile('./temp/prescription.pdf', (err, res) =>{
             if (err) return console.log(err);
             console.log(res);
             htmlPdf = res.filename;
@@ -2379,18 +2420,26 @@ export class AppointmentService {
             
             // Setting up S3 upload parameters
             const parames = {
+                ACL: 'public-read',
                 Bucket: BUCKET_NAME,
-                Key: `virujh/${patientName}/prescription/${appointmentId}.pdf`, // File name you want to save as in S3
-                Body: fileContent
+                Key: `virujh/${patientName}/prescription/prescription-${prescriptionId}.pdf`, // File name you want to save as in S3
+                Body: fileContent,
             };
         
             // Uploading files to the bucket
-            s3.upload(parames, function(err, data) {
+
+            s3.upload(parames, (err, data) => {
                 if (err) {
-                    throw err;
+                    console.log('Unable to upload prescription ' + prescriptionId + ' ', err);
+                } else {
+                    
+                    // store prescription URL into database
+                    console.log(`File uploaded successfully. ${data.Location}`);
+                    this.prescriptionRepository.update({
+                        id: prescription[0].id,
+                    },  {prescriptionUrl: data.Location});
                 }
-                console.log(data);
-                console.log(`File uploaded successfully. ${data.Location}`);
+                
             });   
         });
         
