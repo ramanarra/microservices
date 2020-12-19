@@ -4,4 +4,8 @@ export class AccountDto {
     noOfUsers: number;
     receipt: string;
     payment_capture: number;
+    table: string;
+    type: string;
+    column:any;
+    id:number;
   }

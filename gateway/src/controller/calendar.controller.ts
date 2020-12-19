@@ -38,6 +38,7 @@ import {
     DoctorConfigCanReschDto,
     DoctorDto,
     DocConfigDto,
+    PrescriptionDto,
     WorkScheduleDto,
     PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
 } from 'common-dto';
@@ -956,7 +957,7 @@ export class CalendarController {
     }
 
     @Get('admin/reports')
-    @ApiOkResponse({description: 'patientList API'})
+    @ApiOkResponse({description: 'reportsList API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -1285,5 +1286,30 @@ export class CalendarController {
         return await this.calendarService.listOfHospitals(req.user);
     }
 
+    @Post('doctor/prescription/add')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
+    @ApiBody({ type: PrescriptionDto })
+    @ApiOkResponse({ description: 'request body example:    {"appointmentId": "251", "prescriptionList" : [{"medicineList": [{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"},{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"}]},{"medicineList": [{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"}]}]}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    async prescriptionInsertion(@selfUserSettingWrite() check: boolean, @accountUsersSettingsWrite() check2: boolean, @Request() req, @Body() prescriptionDto: any) {
+        // N number of prescription allowed for an appointment
+        if (!check)
+            return { statusCode: HttpStatus.BAD_REQUEST, message: CONSTANT_MSG.NO_PERMISSION }
+        if (req.user.role == CONSTANT_MSG.ROLES.DOCTOR) {
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        
+        // Checking medicine is added or not
+        if (prescriptionDto && prescriptionDto.prescriptionList && prescriptionDto.prescriptionList.length 
+            && prescriptionDto.prescriptionList[0].medicineList && prescriptionDto.prescriptionList[0].medicineList.length) {
+            this.logger.log(`Doctor prescriptionInsertion  Api -> Request data ${JSON.stringify(prescriptionDto)}`);
+            return await this.calendarService.prescriptionInsertion(req.user, prescriptionDto);    
+        } else {
+            return { statusCode: HttpStatus.NO_CONTENT, message: CONSTANT_MSG.NO_PRESCRIPTION }
+        }
+        
+    }
 
 }

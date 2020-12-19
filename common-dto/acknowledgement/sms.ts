@@ -13,7 +13,6 @@ export class Sms {
     sendSms (params:any) {        
         try {
             // Construct data
-            //let apiKey:string = "apikey=" + textLocalConfig.apiKey;
             let apiKey = params.apiKey;
             let message:string = "&message=" + params.message;
             let sender:string = "&sender=" + params.sender;
