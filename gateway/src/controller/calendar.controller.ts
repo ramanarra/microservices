@@ -1270,25 +1270,6 @@ export class CalendarController {
         return this.calendarService.createPaymentLink(accountDto, req.user);
     }
 
-    @Post('table/data')
-    @ApiOkResponse({
-        description: 'requestBody example :   {"table": "patient","type": "view/edit","column": "id","id": "1"}'
-    })
-    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    @ApiBearerAuth('JWT')
-    @UseGuards(AuthGuard())
-    @ApiTags('Admin')
-    @ApiBody({type: AccountDto})
-    tableDataViewOrDelete(@Request() req, @Body() accountDto: AccountDto) {
-        if(!accountDto.table){
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: 'Please provide table'}
-        }
-        if(!accountDto.type){
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: 'Please provide type'}
-        }
-        return this.calendarService.tableDataViewOrDelete(accountDto, req.user);
-    }
-
     @Get('patient/listOfHospitals')
     @ApiOkResponse({description: 'listOfHospitals API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})

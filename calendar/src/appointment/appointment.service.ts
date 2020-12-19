@@ -41,7 +41,6 @@ import { identity } from 'rxjs';
 import { MedicineRepository } from './medicine.repository';
 var async = require('async');
 var moment = require('moment');
-var request = require('request');
 var fs = require('fs');
 var pdf = require('html-pdf');
 
@@ -2293,21 +2292,6 @@ export class AppointmentService {
             secretAccessKey: SECRET
         });
 
-        // params.htmlTemplate = '<div style="height: 7px; background-color: #535353;">\
-        // </div>\
-        // <div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Prescription</div>\
-        //   <div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">Appointment created through VIRUJH. Please find the prescription details Below</div>\
-        // </div>\
-        // <table>\
-        //   <tr>\
-        //     <th>Name of Medicine </th>\
-        //     <th> Type of Medicine </th>\
-        //     <th> Frequency of Each dose </th>\
-        //     <th> Dose of Medicine </th>\
-        //     <th> Count of Days </th>\
-        //   </tr>\
-        //   {tabledata}\
-        // </table>';
 
         let tabledata = '';
 

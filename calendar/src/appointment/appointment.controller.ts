@@ -1279,10 +1279,4 @@ export class AppointmentController {
         return doc;
     }
 
-    @MessagePattern({cmd: 'doctor_prescription_download'})
-    async prescriptionDownload(user:any): Promise<any> {
-        const pat = await this.appointmentService.prescriptionDownload(user);
-        return pat;
-    }
-
 }
