@@ -11781,11 +11781,11 @@ export class AppointmentService {
                 }
                 
                 label.lbl-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 label.lbl-txt {
-                    font-size: 14px;
+                    font-size: 12px;
                     padding-left: 10px;
                 }
                 
@@ -11795,12 +11795,12 @@ export class AppointmentService {
                 
                 .detail-tbl .table thead th {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 
                 .detail-tbl .table td {
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .detail-tbl .tbody tr {
                     height: 40px;
@@ -11808,7 +11808,7 @@ export class AppointmentService {
                 
                 .doc-signanture {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                     padding-left: 10px;
                 }
@@ -11839,11 +11839,11 @@ export class AppointmentService {
                 }
                 
                 label.lbl-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 label.lbl-txt {
-                    font-size: 14px;
+                    font-size: 12px;
                     padding-left: 10px;
                 }
                 
@@ -11853,12 +11853,12 @@ export class AppointmentService {
                 
                 .detail-tbl .table thead th {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 
                 .detail-tbl .table td {
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .detail-tbl .tbody tr {
                     height: 40px;
@@ -11866,7 +11866,7 @@ export class AppointmentService {
                 
                 .doc-signanture {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                     padding-left: 10px;
                 }
@@ -11901,10 +11901,8 @@ export class AppointmentService {
                                     <thead class="thead">
                                         <tr>
                                         <th>Name of medicine</th>
-                                        <th>Type of medicine</th>
-                                        <th>Frequency of each dose</th>
-                                        <th>Does of each medicine</th>
-                                        <th>Count of days</th>
+                                        <th>Dosage/Count</th>
+                                        <th>Consumption comments</th>
                                     </tr>
                                     </thead>
                                     <tbody class="tbody">
@@ -11929,10 +11927,10 @@ export class AppointmentService {
 
         prescription[0].medicineList.forEach(element => {
             tabledata +=  ' <tr><td>' + (element.nameOfMedicine ? element.nameOfMedicine : '-') +
-             '</td>' + '<td>' + (element.typeOfMedicine ? element.typeOfMedicine : '-') + '</td>' +
-            '<td>' + (element.frequencyOfEachDose ? element.frequencyOfEachDose : '-') + '</td>' +
-             '<td>' + (element.doseOfMedicine ? element.doseOfMedicine : '-') + '</td>' +
-              '<td>' + (element.countOfDays ? element.countOfDays : '-') + '</td></tr>'
+            //  '</td>' + '<td>' + (element.typeOfMedicine ? element.typeOfMedicine : '-') + '</td>' +
+            // '<td>' + (element.frequencyOfEachDose ? element.frequencyOfEachDose : '-') + '</td>' +
+             '<td>' + (element.countOfDays ? element.countOfDays : '-') + '</td>' +
+              '<td>' + (element.doseOfMedicine ? element.doseOfMedicine : '-') + '</td></tr>'
         });
 
         params.htmlTemplate = params.htmlTemplate.replace('{doctor_name}', prescription[0].doctorName);
