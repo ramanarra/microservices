@@ -18,6 +18,8 @@ import {AppointmentDocConfig} from "../appointment/appointmentDocConfig/appointm
 import {Prescription} from "../appointment/prescription.entity";
 import {AppointmentCancelReschedule} from "../appointment/appointmentCancelReschedule/appointmentCancelReschedule.entity";
 import { Medicine } from 'src/appointment/medicine.entity';
+import { patientReportDto } from 'common-dto';
+import { PatientReport } from 'src/appointment/patientReport.entity';
 
 const dbConfig = config.get('database');
 
@@ -29,8 +31,9 @@ export const databaseConfig : TypeOrmModuleOptions = {
     username : dbConfig.username,
     password : dbConfig.password,
     database : dbConfig.database,
+    
     entities : [Appointment,AccountDetails,DoctorConfigPreConsultation, Doctor, DoctorConfigCanResch, docConfig,DocConfigScheduleDay,DocConfigScheduleInterval,WorkScheduleDay,WorkScheduleInterval,PatientDetails,PaymentDetails,AppointmentDocConfig,AppointmentCancelReschedule, OpenViduSession,OpenViduSessionToken,
-        Prescription, Medicine],
+        Prescription, Medicine, PatientReport],
     synchronize : dbConfig.synchronize
 
 } 
