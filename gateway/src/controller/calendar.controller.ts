@@ -13,8 +13,9 @@ import {
     ValidationPipe,
     Request,
     ClassSerializerInterceptor,
-    UnauthorizedException, HttpStatus
+    UnauthorizedException, HttpStatus, UploadedFile, UseInterceptors
 } from '@nestjs/common';
+import { FilesInterceptor,FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import {
@@ -40,7 +41,7 @@ import {
     DocConfigDto,
     PrescriptionDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -1311,5 +1312,41 @@ export class CalendarController {
         }
         
     }
+
+    
+  //Patient report upload
+
+  @Post('patient/report/upload')
+  @ApiOkResponse({
+    description:
+      'requestBody example :   {\n' +
+      '"files":"fileList",\n'+
+      '"patientId":560,\n' +
+      '}',
+  })
+  @ApiBody({ type: patientReportDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+  @Roles('patient')
+  @UseInterceptors(FileInterceptor('files'))
+  async uploadFile(@UploadedFile() file, @Body() body) {
+    console.log(file);
+    console.log(body);
+    const reports = {
+      file: file,
+      data : body
+    }
+    if (!body.patientId) {
+      console.log('Provide patientId');
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Provide patientId',
+      };
+    } else {
+
+      return await this.calendarService.patientReport(reports);
+    }
+  }
 
 }
