@@ -1279,4 +1279,10 @@ export class AppointmentController {
         return doc;
     }
 
+    // Update doctor consultation status
+    @MessagePattern({cmd : 'consultation_status_update'})
+    async consultationStatusUpdate(appointmentObject: any): Promise<any> {
+        console.log('appointmen tObject')
+        return await this.appointmentService.consultationStatusUpdate(appointmentObject);
+    }
 }

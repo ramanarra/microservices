@@ -63,4 +63,15 @@ export class VideoService {
         }
         return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user);
     }
+
+    @UseFilters(AllClientServiceException)
+    public updateConsultationStatus(docKey, appointmentId): Promise <any> {
+
+        let dataObject = {
+            docKey : docKey,
+            appointmentId: appointmentId
+        }
+        console.log('dataObject ', dataObject)
+        return this.redisClient.send({ cmd : 'consultation_status_update'}, dataObject).toPromise();
+    }
 }

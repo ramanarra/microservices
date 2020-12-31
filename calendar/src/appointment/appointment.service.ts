@@ -3947,8 +3947,9 @@ export class AppointmentService {
         }
         .table td,
         .table th {
-            padding: 0.75rem;
-            vertical-align: top;
+            padding: 5px;
+            width: 33.33%;
+            text-align: left;
             border-top: 1px solid #dee2e6;
         }
         .table thead th {
@@ -11744,7 +11745,7 @@ export class AppointmentService {
         /*# sourceMappingURL=bootstrap.min.css.map */
         
                 .app-main {
-                    width: 100%;
+                    width: 60%;
                     position: relative;
                 }
 
@@ -11775,10 +11776,6 @@ export class AppointmentService {
                     padding-top: 20px;
                     padding-left: 725px;
                 }
-
-                .content-wrapper {
-                    padding: 20px;
-                }
                 
                 label.lbl-name {
                     font-size: 12px;
@@ -11787,11 +11784,7 @@ export class AppointmentService {
                 label.lbl-txt {
                     font-size: 12px;
                     padding-left: 10px;
-                }
-                
-                .detail-tbl {
-                    padding: 20px 0;
-                }
+                }   
                 
                 .detail-tbl .table thead th {
                     color: #00a2e8;
@@ -11833,11 +11826,7 @@ export class AppointmentService {
                     z-index: 1;
                     opacity: 0.7;
                 }
-                
-                .content-wrapper {
-                    padding: 20px;
-                }
-                
+
                 label.lbl-name {
                     font-size: 12px;
                     font-weight: 500;
@@ -11986,4 +11975,51 @@ export class AppointmentService {
     }
     
     
+    // update consultation status
+    async consultationStatusUpdate(appointmentObject :any) {
+        console.log('appointmentObject', appointmentObject)
+        if (appointmentObject.appointmentId) {
+            const appointmentDetails = await this.appointmentRepository.findOne({id: appointmentObject.appointmentId});
+
+            if (appointmentDetails) {
+                // Update consultation status
+                var condition = {
+                    id: appointmentObject.appointmentId
+                }
+                var values: any = {
+                    hasConsultation : true,
+                }
+                
+                const consultationStatus = await this.appointmentRepository.update(condition, values);
+
+                console.log('consultationStatus', consultationStatus)
+                if (consultationStatus.affected) {
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.SUCCESS_UPDATE_APPO,
+                        data : appointmentDetails
+                    }
+                } else {
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.FAILED_UPDATE_APPO
+                    }
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: CONSTANT_MSG.NO_APPOINTMENT
+                }
+            }
+            
+
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: CONSTANT_MSG.NO_APPOINTMENT
+            }
+        }
+            
+        
+    }
 }
