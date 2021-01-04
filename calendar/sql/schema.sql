@@ -2654,6 +2654,8 @@ ALTER TABLE public.medicine
     OWNER to postgres;
 
 ALTER TABLE public.prescription
+ADD COLUMN prescription_url character varying;
+
 CREATE TABLE public.patient_report
 (
     id integer NOT NULL DEFAULT nextval('patient_report_id_seq'::regclass),

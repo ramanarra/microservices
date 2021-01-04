@@ -10,6 +10,6 @@ export class  patientReportDto {
     fileName : string;
     fileType : string;
     reportURL : string;
-    reportDate : Date
+    reportDate : Date;
     comments : string;
 }
