@@ -45,7 +45,6 @@ var async = require('async');
 var moment = require('moment');
 var fs = require('fs');
 var pdf = require('html-pdf');
-var pg = require('pg');
 var moment = require('moment');
 
 @Injectable()
