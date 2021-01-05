@@ -548,6 +548,22 @@ export class CalendarController {
             patientDto.lastName = "";
             patientDto.name =  req.body.firstName+ " "+patientDto.lastName;
         }
+         
+        function validateEmail(email){
+            return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
+        }
+
+        if(patientDto.email){ 
+            if((patientDto.email).trim()!==""){
+
+               if(!(validateEmail(patientDto.email)))
+               {
+                  return {statusCode:HttpStatus.BAD_REQUEST ,message: "Invalid Email"}
+               }
+           
+              }
+           }
+
         function validatePincode (pin) {
             if(  pin.length === 6 ) {
               if( /[0-9]/.test(pin))  {
@@ -784,6 +800,42 @@ export class CalendarController {
             console.log("Provide accountKey");
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide accountKey"}
         }
+
+        function validateEmail(email){
+            return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
+        }
+
+        if(hospitalDto.supportEmail){ 
+            if((hospitalDto.supportEmail).trim()!==""){
+
+               if(!(validateEmail(hospitalDto.supportEmail)))
+               {
+                  return {statusCode:HttpStatus.BAD_REQUEST ,message: "Invalid Email"}
+               }
+           
+              }
+           }
+
+        function validatePincode (pin) {
+            if(  pin.length === 6 ) {
+              if( /[0-9]/.test(pin))  {
+                return true;
+              }else {return false;}
+            }else {
+                return false;
+                }
+          }
+            if(hospitalDto.pincode){ 
+             if((hospitalDto.pincode).trim()!==""){
+
+                if(!(validatePincode(hospitalDto.pincode)))
+                {
+                   return {statusCode:HttpStatus.BAD_REQUEST ,message: "Invalid PinCode"}
+                }
+            
+               }
+            }
+
         this.logger.log(`Doctor View  Api -> Request data ${JSON.stringify(hospitalDto)}`);
         return await this.calendarService.hospitaldetailsEdit(req.user,hospitalDto);
     }
