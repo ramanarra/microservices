@@ -2675,18 +2675,22 @@ ALTER TABLE public.account_details
 
 CREATE TABLE public.patient_report
 (
-    id integer NOT NULL DEFAULT nextval('patient_report_id_seq'::regclass),
+    id serial NOT NULL,
     patient_id bigint NOT NULL,
     appointment_id bigint,
-    file_name character varying COLLATE pg_catalog."default" NOT NULL,
-    file_type character varying COLLATE pg_catalog."default" NOT NULL,
-    report_url character varying COLLATE pg_catalog."default" NOT NULL,
-    comments character varying COLLATE pg_catalog."default",
+    "file_name " character varying NOT NULL,
+    file_type character varying NOT NULL,
+    report_url character varying NOT NULL,
+    comments character varying,
     report_date date,
     CONSTRAINT patient_report_id PRIMARY KEY (id)
 )
-
-TABLESPACE pg_default;
+WITH (
+    OIDS = FALSE
+);
 
 ALTER TABLE public.patient_report
     OWNER to postgres;
+
+ALTER TABLE public.patient_report
+    RENAME "file_name " TO file_name;

@@ -47,8 +47,6 @@ var fs = require('fs');
 var pdf = require('html-pdf');
 var pg = require('pg');
 var moment = require('moment');
-require('pg-essential').patch(pg);
-
 
 @Injectable()
 export class AppointmentService {
