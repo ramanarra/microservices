@@ -1,4 +1,5 @@
 import {IsEmail,IsNumber,IsPhoneNumber,IsOptional } from 'class-validator';
+import {IsNumber,IsPhoneNumber,IsOptional } from 'class-validator';
 
 export class HospitalDto {
     @IsOptional ()
@@ -7,10 +8,10 @@ export class HospitalDto {
     accountKey: string;
     hospitalName: string;
     street1: string;
-    street2: string;
     city: string;
     state: string;
     pincode: string;
+    cityState: string;
     @IsOptional ()
     @IsEmail()
     supportEmail: string;

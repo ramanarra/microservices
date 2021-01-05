@@ -2655,3 +2655,19 @@ ALTER TABLE public.medicine
 
 ALTER TABLE public.prescription
 ADD COLUMN prescription_url character varying;
+ALTER TABLE public.account_details DROP COLUMN street2;
+
+ALTER TABLE public.account_details
+    RENAME support_email TO "supportEmail";
+
+
+ALTER TABLE public.account_details DROP COLUMN city;
+
+ALTER TABLE public.account_details
+    ADD COLUMN city character varying(100);
+
+ALTER TABLE public.account_details
+    ALTER COLUMN state DROP NOT NULL;
+
+ALTER TABLE public.account_details
+    ADD COLUMN "cityState" character varying;
