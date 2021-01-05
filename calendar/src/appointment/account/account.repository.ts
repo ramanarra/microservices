@@ -9,21 +9,22 @@ export class AccountDetailsRepository extends Repository<AccountDetails> {
     private logger = new Logger('AccountDetailsRepository');
     async accountdetailsInsertion(accountDto: any): Promise<any> {
 
-        const { accountKey, hospitalName, state, pincode, phone, supportEmail } = accountDto;
+        const { accountKey, hospitalName, state, pincode, phone, supportEmail,cityState } = accountDto;
 
         const account = new AccountDetails();
         account.accountKey = accountDto.accountKey;
         account.hospitalName =accountDto.hospitalName ;
         account.street1 = accountDto.street1 ? accountDto.street1 : null;
-        account.street2 = accountDto.street2 ? accountDto.street2 : null;
+       account.city = accountDto.city ? accountDto.city :null ;
         account.city = accountDto.city ? accountDto.city :null ;
-        account.state = accountDto.state;
+        account.state = accountDto.state? accountDto.state:null;
         account.pincode= accountDto.pincode;
         account.phone= accountDto.phone;
         account.supportEmail = accountDto.supportEmail ? accountDto.supportEmail : null;
         account.hospitalPhoto = accountDto.hospitalPhoto ? accountDto.hospitalPhoto : null;
         account.country = accountDto.country ? accountDto.country : null;
         account.landmark = accountDto.landmark ? accountDto.landmark : null;            
+        account.cityState = accountDto.cityState? accountDto.cityState: null;          
         try {
             const acc =  await account.save();        
             return {

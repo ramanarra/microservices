@@ -1279,6 +1279,18 @@ export class AppointmentController {
         return doc;
     }
 
+    @MessagePattern({cmd: 'patient_report'})
+    async addPatientRecord(reports: any): Promise<any> {
+        const patient = await this.appointmentService.patientFileUpload(reports);
+        return patient;  
+    }
+   
+    @MessagePattern({cmd: 'report_list'})
+    async report(data: any): Promise<any> {
+        const report = await this.appointmentService.report(data);
+        return report;
+    }
+
     // Update doctor consultation status
     @MessagePattern({cmd : 'consultation_status_update'})
     async consultationStatusUpdate(appointmentObject: any): Promise<any> {

@@ -18,6 +18,7 @@ import {OpenViduSessionRepository} from "./openviduSession/openviduSession.repos
 import {OpenViduSessionTokenRepository} from "./openviduSession/openviduSessionToken.repository";
 import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
 import {PrescriptionRepository} from "./prescription.repository";
+import {PatientReportRepository} from "./patientReport.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 
 import { VideoService } from './video.service';
@@ -33,7 +34,7 @@ import { MedicineRepository } from './medicine.repository';
       DoctorConfigPreConsultationRepository,DoctorConfigCanReschRepository, docConfigRepository,DocConfigScheduleDayRepository,
       DocConfigScheduleIntervalRepository,WorkScheduleDayRepository,WorkScheduleIntervalRepository ,PatientDetailsRepository,
       PaymentDetailsRepository,AppointmentDocConfigRepository,AppointmentCancelRescheduleRepository,
-      PrescriptionRepository, MedicineRepository,
+      PrescriptionRepository,PatientReportRepository, MedicineRepository,
       OpenViduSessionRepository,OpenViduSessionTokenRepository])
 
   ],

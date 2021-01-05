@@ -2656,6 +2656,44 @@ ALTER TABLE public.medicine
 ALTER TABLE public.prescription
 ADD COLUMN prescription_url character varying;
 
+ALTER TABLE public.account_details DROP COLUMN street2;
+
+ALTER TABLE public.account_details
+    RENAME support_email TO "supportEmail";
+
+
+ALTER TABLE public.account_details DROP COLUMN city;
+
+ALTER TABLE public.account_details
+    ADD COLUMN city character varying(100);
+
+ALTER TABLE public.account_details
+    ALTER COLUMN state DROP NOT NULL;
+
+ALTER TABLE public.account_details
+    ADD COLUMN "cityState" character varying;
+
+CREATE TABLE public.patient_report
+(
+    id serial NOT NULL,
+    patient_id bigint NOT NULL,
+    appointment_id bigint,
+    "file_name " character varying NOT NULL,
+    file_type character varying NOT NULL,
+    report_url character varying NOT NULL,
+    comments character varying,
+    report_date date,
+    CONSTRAINT patient_report_id PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+);
+
+ALTER TABLE public.patient_report
+    OWNER to postgres;
+
+ALTER TABLE public.patient_report
+    RENAME "file_name " TO file_name;
 ALTER TABLE public.appointment
     ADD COLUMN "hasConsultation" boolean NOT NULL DEFAULT False;
 

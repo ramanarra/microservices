@@ -15,6 +15,7 @@ import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
 import {AccountDetailsRepository} from './account/account.repository';
 import {PrescriptionRepository} from './prescription.repository';
+import {PatientReportRepository} from './patientReport.repository'
 import {AccountDetails} from './account/account_details.entity';
 import {DoctorConfigPreConsultationRepository} from './doctorConfigPreConsultancy/doctor_config_preconsultation.repository';
 import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_config_preconsultation.entity';
@@ -39,11 +40,12 @@ import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointme
 import * as config from 'config';
 import { identity } from 'rxjs';
 import { MedicineRepository } from './medicine.repository';
+import { FilesInterceptor } from '@nestjs/platform-express';
 var async = require('async');
 var moment = require('moment');
 var fs = require('fs');
 var pdf = require('html-pdf');
-
+var moment = require('moment');
 
 @Injectable()
 export class AppointmentService {
@@ -63,6 +65,7 @@ export class AppointmentService {
         private workScheduleIntervalRepository: WorkScheduleIntervalRepository,
         private patientDetailsRepository: PatientDetailsRepository,
         private prescriptionRepository: PrescriptionRepository,
+        private patientReportRepository : PatientReportRepository,
         private medicineRepository: MedicineRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
@@ -11973,7 +11976,101 @@ export class AppointmentService {
         });
         
     }
+          
+
+    //patientFileUploading
     
+    async patientFileUpload(reports: any): Promise<any> {
+        
+        const AWS = require('aws-sdk');
+        let htmlPdf : any = '';
+        const ID = 'AKIAISEHN3PDMNBWK2UA';
+        const SECRET = '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';
+        const BUCKET_NAME = 'virujh-cloud';
+        const date = new Date();
+        const ReportDate=moment().format('YYYY-MM-DD');
+             
+        // s3 bucket creation
+         const s3 = new AWS.S3({
+            accessKeyId: ID,
+            secretAccessKey: SECRET
+
+        });
+
+        
+        console.log(reports);
+
+        if(reports.file.mimetype === "application/pdf")
+        {
+        var base64data = new Buffer(reports.file.buffer, 'base64');
+        }
+        else{
+            var base64data = new Buffer(reports.file.buffer, 'binary');  
+        }
+
+        const parames = {
+            ACL: 'public-read',
+            Bucket: BUCKET_NAME,
+            Key: `virujh/testreport/` + reports.file.originalname,// File name you want to save as in S3
+            Body: base64data
+        };
+    
+        // Uploading files to the bucket
+
+        s3.upload( parames,async  (err, data) => {
+            if (err) {
+                console.log(err);
+                console.log('Unable to upload prescription ' );
+            } else {
+                
+                // store prescription URL into database
+                console.log(`File uploaded successfully. ${data.Location}`);
+
+                  await  this.patientReportRepository.patientReportInsertion({
+                    patientId: reports.data.patientId,
+                    appointmentId :reports.data.appointmentId ? reports.data.appointmentId :null,
+                    fileName:reports.file.originalname,
+                    fileType: reports.file.mimetype,
+                    reportURL:data.Location,
+                    reportDate : date,
+                    comments : reports.data.comments
+                    })
+                
+            }
+        });
+
+      
+   }
+
+   //report Data
+   async report(data : any): Promise<any> {
+    const patientId = data.patientId;
+    const offset = data.paginationStart;
+    const endset = data.paginationLimit;
+    const searchText = data.searchText;
+    let response = {};
+
+    if(searchText){
+        const app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
+        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+        console.log(response)
+        return response;
+    }
+    else{
+        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
+        const app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+        console.log(response)
+         return response;
+    }
+   
+    
+}
+
+
     
     // update consultation status
     async consultationStatusUpdate(appointmentObject :any) {

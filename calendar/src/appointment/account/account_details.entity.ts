@@ -23,10 +23,6 @@ export class AccountDetails extends BaseEntity{
     })
     street1 : string;
 
-    @Column({
-        name : 'street2'
-    })
-    street2 : string;
 
     @Column({
         name : 'city'
@@ -49,7 +45,7 @@ export class AccountDetails extends BaseEntity{
     phone : string;
 
     @Column({
-        name : 'support_email'
+        name : 'supportEmail'
     })
     supportEmail : string;
 
@@ -67,4 +63,9 @@ export class AccountDetails extends BaseEntity{
         name : 'landmark'
     })
     landmark : string;
+
+    @Column({
+        name : 'cityState'
+    })
+    cityState : string;
 }

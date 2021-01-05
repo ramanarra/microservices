@@ -13,8 +13,9 @@ import {
     ValidationPipe,
     Request,
     ClassSerializerInterceptor,
-    UnauthorizedException, HttpStatus
+    UnauthorizedException, HttpStatus, UploadedFile, UseInterceptors
 } from '@nestjs/common';
+import { FilesInterceptor,FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import {
@@ -40,7 +41,7 @@ import {
     DocConfigDto,
     PrescriptionDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -513,14 +514,14 @@ export class CalendarController {
     @Post('patient/detailsEdit')
     @ApiOkResponse({
         description: 'requestBody example :   {\n' +
-            '"patientId":"5",\n' +
+            '"patientId":5,\n' +
             '"email":"nirmala@gmail.com",\n' +
             '"landmark":"landmark", \n' +
             '"country":"country", \n' +
             '"firstName":"name", \n' +
             '"address":"address", \n' +
             '"state":"state", \n' +
-            '"pincode":"pincode", \n' +
+            '"pincode":"IN-pincode", \n' +
             '"dateOfBirth":"dateOfBirth", \n' +
             '"photo":"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU" \n' +
             '}'
@@ -547,6 +548,25 @@ export class CalendarController {
             patientDto.lastName = "";
             patientDto.name =  req.body.firstName+ " "+patientDto.lastName;
         }
+        function validatePincode (pin) {
+            if(  pin.length === 6 ) {
+              if( /[0-9]/.test(pin))  {
+                return true;
+              }else {return false;}
+            }else {
+                return false;
+                }
+          }
+            if(patientDto.pincode){ 
+             if((patientDto.pincode).trim()!==""){
+
+                if(!(validatePincode(patientDto.pincode)))
+                {
+                   return {statusCode:HttpStatus.BAD_REQUEST ,message: "Invalid PinCode"}
+                }
+            
+               }
+            }
         this.logger.log(`Patient Details Edit Api -> Request data ${JSON.stringify(patientDto)}`);
         return await this.calendarService.patientDetailsEdit(patientDto);
     }
@@ -752,7 +772,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Admin')
     @ApiBody({type: DoctorDto})
-    @ApiOkResponse({description: 'request body example:   {"accountKey":"Acc_1","hospitalName":"Apollo Hospitals", "city":"Chennai","state":"Tamil Nadu","pincode":"600006","country":"India","street1":"Thousand lights","street2":"Greams Lane","phone":"9623456256","supportEmail":"chennaiapollo@gmail.com","hospitalPhoto":"https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50","landmark":"Thousand Lights"}'})
+    @ApiOkResponse({description: 'request body example:   {"accountKey":"Acc_1","hospitalName":"Apollo Hospitals", cityState":"Tamil Nadu","pincode":"600006","country":"India","street1":"Thousand lights","phone":"9623456256","supportEmail":"chennaiapollo@gmail.com","hospitalPhoto":"https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50","landmark":"Thousand Lights"}'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async hospitaldetailsEdit(@accountSettingsWrite() check:boolean, @Request() req, @Body() hospitalDto: HospitalDto) {
         if (!check)
@@ -1311,5 +1331,65 @@ export class CalendarController {
         }
         
     }
+
+    
+  //Patient report upload
+
+  @Post('patient/report/upload')
+  @ApiOkResponse({
+    description:
+      'requestBody example :   {\n' +
+      '"files":"fileList",\n'+
+      '"patientId":560,\n' +
+      '}',
+  })
+  @ApiBody({ type: patientReportDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+  @Roles('patient')
+  @UseInterceptors(FileInterceptor('files'))
+  async uploadFile(@UploadedFile() file, @Body() body) {
+    console.log(file);
+    console.log(body);
+    const reports = {
+      file: file,
+      data : body
+    }
+    if (!body.patientId) {
+      console.log('Provide patientId');
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Provide patientId',
+      };
+    } else {
+
+      return await this.calendarService.patientReport(reports);
+    }
+  }
+
+   //patient report list
+   @Get('patient/report/list')
+   @ApiOkResponse({description: 'reportList API'})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Patient')
+   async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
+    @Query('paginationLimit') paginationLimit: number  ) {
+      const data={
+        user : req.user,
+        paginationStart : paginationStart,
+        paginationLimit : paginationLimit,
+        patientId : req.user.patientId,
+        searchText : searchText
+       } 
+        if (!check){
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+            this.logger.log(`admin reports Api -> Request data }`);
+        } else{
+          return this.calendarService.reportList(data);
+        }
+   }
 
 }
