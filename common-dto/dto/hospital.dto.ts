@@ -1,5 +1,4 @@
-import {IsEmail,IsNumber,IsPhoneNumber,IsOptional } from 'class-validator';
-import {IsNumber,IsPhoneNumber,IsOptional } from 'class-validator';
+import {IsNumber,IsOptional } from 'class-validator';
 
 export class HospitalDto {
     @IsOptional ()
@@ -13,10 +12,8 @@ export class HospitalDto {
     pincode: string;
     cityState: string;
     @IsOptional ()
-    @IsEmail()
     supportEmail: string;
     hospitalPhoto: string;
     @IsOptional ()
-    @IsPhoneNumber('IN')
     phone: string;
 }
