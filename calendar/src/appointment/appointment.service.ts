@@ -12007,7 +12007,7 @@ export class AppointmentService {
         const SECRET = 'TJ2zD8LR3iWoPIDS/NXuoyxyLsPsEJ4CvJOdikd2';
         const BUCKET_NAME = 'virujh-cloud';
         const date = new Date();
-        const ReportDate=moment(date).format('MMMM Do YYYY, h:mm:ss a');
+        const ReportDate=moment().format('YYYY-MM-DD');
              
         // s3 bucket creation
          const s3 = new AWS.S3({
@@ -12060,6 +12060,34 @@ export class AppointmentService {
 
       
    }
+
+   //report Data
+   async report(data : any): Promise<any> {
+    const patientId = data.patientId;
+    const offset = data.paginationStart;
+    const endset = data.paginationLimit;
+    const searchText = data.searchText;
+    let response = {};
+
+    if(searchText){
+        const app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
+        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+        console.log(response)
+        return response;
+    }
+    else{
+        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
+        const app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+        console.log(response)
+         return response;
+    }
+   
+    
+}
 
 
     

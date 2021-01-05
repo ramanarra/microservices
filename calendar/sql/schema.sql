@@ -2655,6 +2655,7 @@ ALTER TABLE public.medicine
 
 ALTER TABLE public.prescription
 ADD COLUMN prescription_url character varying;
+
 ALTER TABLE public.account_details DROP COLUMN street2;
 
 ALTER TABLE public.account_details
@@ -2671,3 +2672,21 @@ ALTER TABLE public.account_details
 
 ALTER TABLE public.account_details
     ADD COLUMN "cityState" character varying;
+
+CREATE TABLE public.patient_report
+(
+    id integer NOT NULL DEFAULT nextval('patient_report_id_seq'::regclass),
+    patient_id bigint NOT NULL,
+    appointment_id bigint,
+    file_name character varying COLLATE pg_catalog."default" NOT NULL,
+    file_type character varying COLLATE pg_catalog."default" NOT NULL,
+    report_url character varying COLLATE pg_catalog."default" NOT NULL,
+    comments character varying COLLATE pg_catalog."default",
+    report_date date,
+    CONSTRAINT patient_report_id PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.patient_report
+    OWNER to postgres;

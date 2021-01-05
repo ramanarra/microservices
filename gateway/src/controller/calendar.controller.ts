@@ -1368,4 +1368,28 @@ export class CalendarController {
     }
   }
 
+   //patient report list
+   @Get('patient/report/list')
+   @ApiOkResponse({description: 'reportList API'})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Patient')
+   async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
+    @Query('paginationLimit') paginationLimit: number  ) {
+      const data={
+        user : req.user,
+        paginationStart : paginationStart,
+        paginationLimit : paginationLimit,
+        patientId : req.user.patientId,
+        searchText : searchText
+       } 
+        if (!check){
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+            this.logger.log(`admin reports Api -> Request data }`);
+        } else{
+          return this.calendarService.reportList(data);
+        }
+   }
+
 }
