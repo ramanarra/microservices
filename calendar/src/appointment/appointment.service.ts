@@ -1530,7 +1530,6 @@ export class AppointmentService {
        let dateForm = Helper.getDayMonthYearFromDate(date);
        let dtForm = Helper.getDayMonthYearFromDate(dt);
 
-       console.log('slotview ', slotview, slotview.slots.length);
        if(slotview !== undefined)
        if(dateForm == dtForm){
         for(let j=0;j<slotview.slots.length;j++){
@@ -3952,8 +3951,9 @@ export class AppointmentService {
         }
         .table td,
         .table th {
-            padding: 0.75rem;
-            vertical-align: top;
+            padding: 5px;
+            width: 33.33%;
+            text-align: left;
             border-top: 1px solid #dee2e6;
         }
         .table thead th {
@@ -11749,7 +11749,7 @@ export class AppointmentService {
         /*# sourceMappingURL=bootstrap.min.css.map */
         
                 .app-main {
-                    width: 100%;
+                    width: 60%;
                     position: relative;
                 }
 
@@ -11780,32 +11780,24 @@ export class AppointmentService {
                     padding-top: 20px;
                     padding-left: 725px;
                 }
-
-                .content-wrapper {
-                    padding: 20px;
-                }
                 
                 label.lbl-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 label.lbl-txt {
-                    font-size: 14px;
+                    font-size: 12px;
                     padding-left: 10px;
-                }
-                
-                .detail-tbl {
-                    padding: 20px 0;
-                }
+                }   
                 
                 .detail-tbl .table thead th {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 
                 .detail-tbl .table td {
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .detail-tbl .tbody tr {
                     height: 40px;
@@ -11813,7 +11805,7 @@ export class AppointmentService {
                 
                 .doc-signanture {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                     padding-left: 10px;
                 }
@@ -11838,17 +11830,13 @@ export class AppointmentService {
                     z-index: 1;
                     opacity: 0.7;
                 }
-                
-                .content-wrapper {
-                    padding: 20px;
-                }
-                
+
                 label.lbl-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 label.lbl-txt {
-                    font-size: 14px;
+                    font-size: 12px;
                     padding-left: 10px;
                 }
                 
@@ -11858,12 +11846,12 @@ export class AppointmentService {
                 
                 .detail-tbl .table thead th {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
                 
                 .detail-tbl .table td {
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .detail-tbl .tbody tr {
                     height: 40px;
@@ -11871,7 +11859,7 @@ export class AppointmentService {
                 
                 .doc-signanture {
                     color: #00a2e8;
-                    font-size: 16px;
+                    font-size: 12px;
                     font-weight: 500;
                     padding-left: 10px;
                 }
@@ -11906,17 +11894,13 @@ export class AppointmentService {
                                     <thead class="thead">
                                         <tr>
                                         <th>Name of medicine</th>
-                                        <th>Type of medicine</th>
-                                        <th>Frequency of each dose</th>
-                                        <th>Does of each medicine</th>
-                                        <th>Count of days</th>
+                                        <th>Dosage/Count</th>
+                                        <th>Consumption comments</th>
                                     </tr>
                                     </thead>
                                     <tbody class="tbody">
                         {tabledata}
                                         <tr>
-                                            <td></td>
-                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -11934,10 +11918,10 @@ export class AppointmentService {
 
         prescription[0].medicineList.forEach(element => {
             tabledata +=  ' <tr><td>' + (element.nameOfMedicine ? element.nameOfMedicine : '-') +
-             '</td>' + '<td>' + (element.typeOfMedicine ? element.typeOfMedicine : '-') + '</td>' +
-            '<td>' + (element.frequencyOfEachDose ? element.frequencyOfEachDose : '-') + '</td>' +
-             '<td>' + (element.doseOfMedicine ? element.doseOfMedicine : '-') + '</td>' +
-              '<td>' + (element.countOfDays ? element.countOfDays : '-') + '</td></tr>'
+            //  '</td>' + '<td>' + (element.typeOfMedicine ? element.typeOfMedicine : '-') + '</td>' +
+            // '<td>' + (element.frequencyOfEachDose ? element.frequencyOfEachDose : '-') + '</td>' +
+             '<td>' + (element.countOfDays ? element.countOfDays : '-') + '</td>' +
+              '<td>' + (element.doseOfMedicine ? element.doseOfMedicine : '-') + '</td></tr>'
         });
 
         params.htmlTemplate = params.htmlTemplate.replace('{doctor_name}', prescription[0].doctorName);
@@ -12089,4 +12073,51 @@ export class AppointmentService {
 
 
     
+    // update consultation status
+    async consultationStatusUpdate(appointmentObject :any) {
+        console.log('appointmentObject', appointmentObject)
+        if (appointmentObject.appointmentId) {
+            const appointmentDetails = await this.appointmentRepository.findOne({id: appointmentObject.appointmentId});
+
+            if (appointmentDetails) {
+                // Update consultation status
+                var condition = {
+                    id: appointmentObject.appointmentId
+                }
+                var values: any = {
+                    hasConsultation : true,
+                }
+                
+                const consultationStatus = await this.appointmentRepository.update(condition, values);
+
+                console.log('consultationStatus', consultationStatus)
+                if (consultationStatus.affected) {
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.SUCCESS_UPDATE_APPO,
+                        data : appointmentDetails
+                    }
+                } else {
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.FAILED_UPDATE_APPO
+                    }
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: CONSTANT_MSG.NO_APPOINTMENT
+                }
+            }
+            
+
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: CONSTANT_MSG.NO_APPOINTMENT
+            }
+        }
+            
+        
+    }
 }

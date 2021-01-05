@@ -92,4 +92,8 @@ export class Appointment extends BaseEntity{
     })
     createdTime : Date; 
 
+    @Column({
+        name: 'hasConsultation'
+    })
+    hasConsultation: boolean
 }

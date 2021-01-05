@@ -1311,7 +1311,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiBody({ type: PrescriptionDto })
-    @ApiOkResponse({ description: 'request body example:    {"appointmentId": "251", "prescriptionList" : [{"medicineList": [{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"},{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"}]},{"medicineList": [{"typeOfMedicine":"syrup","nameOfMedicine":"Cypon", "frequencyOfEachDose":"BD", "countOfDays":"30", "doseOfMedicine":"10 ml"}]}]}' })
+    @ApiOkResponse({ description: 'request body example:    {"appointmentId": "251", "prescriptionList" : [{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"},{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]},{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]}]}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async prescriptionInsertion(@selfUserSettingWrite() check: boolean, @accountUsersSettingsWrite() check2: boolean, @Request() req, @Body() prescriptionDto: any) {
         // N number of prescription allowed for an appointment

@@ -1284,11 +1284,17 @@ export class AppointmentController {
         const patient = await this.appointmentService.patientFileUpload(reports);
         return patient;  
     }
-
    
     @MessagePattern({cmd: 'report_list'})
     async report(data: any): Promise<any> {
         const report = await this.appointmentService.report(data);
         return report;
+    }
+
+    // Update doctor consultation status
+    @MessagePattern({cmd : 'consultation_status_update'})
+    async consultationStatusUpdate(appointmentObject: any): Promise<any> {
+        console.log('appointmen tObject')
+        return await this.appointmentService.consultationStatusUpdate(appointmentObject);
     }
 }

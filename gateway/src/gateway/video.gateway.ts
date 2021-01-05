@@ -125,6 +125,22 @@ export class VideoGateway {
     }
   }
 
+  // Updated consultation status for appoitment
+  @SubscribeMessage('updateAppointmentStatus')
+  async updateAppointmentStatus(client: AuthenticatedSocket, data :{appointmentId: string}) {
 
+    this.logger.log(`Socket request to update consultationStatus By Doctor from Doc-key => ${client.auth.data.doctor_key}${data.appointmentId}`);
+    const response: any = await this.videoService.updateConsultationStatus(client.auth.data.doctor_key, data.appointmentId);
+    console.log("response >>" + JSON.stringify(response));
+
+    // After successfull updatation emit to all patient to block appointment details change
+    if (response && response.statusCode === 200) {
+      let patientSocketList: Socket[] = this.socketStateService.get("CUSTOMER_" + response.data.patientId);
+      patientSocketList.forEach((val: Socket) => {
+        val.emit("updateConsultationStatus", {hasConsultation: true});
+      });
+    }
+  
+  }
 
 }
