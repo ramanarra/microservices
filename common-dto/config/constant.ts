@@ -42,6 +42,9 @@ export const CONSTANT_MSG = {
     ACC_NOT_FOUND: 'Unable to find hospital, Please contact admin',
     DOC_REG_HOS_RES : 'Other hospital Doctor cannot register in your hospital',
     NO_PRESCRIPTION: 'Please add prescription',
+    NO_APPOINTMENT: 'Please select appointment',
+    FAILED_UPDATE_APPO: 'Unable update appointment',
+    SUCCESS_UPDATE_APPO: 'Appointment updated successfully',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',

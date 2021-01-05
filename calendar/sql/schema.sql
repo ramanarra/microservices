@@ -2638,7 +2638,7 @@ CREATE TABLE public.medicine
     count_of_medicine_for_each_dose bigint,
     type_of_medicine character varying,
     dose_of_medicine character varying,
-    count_of_days bigint,
+    count_of_days character varying,
     PRIMARY KEY (id),
     CONSTRAINT prescription_id_medicine FOREIGN KEY (prescription_id)
         REFERENCES public.prescription (id) MATCH SIMPLE
@@ -2694,3 +2694,8 @@ ALTER TABLE public.patient_report
 
 ALTER TABLE public.patient_report
     RENAME "file_name " TO file_name;
+ALTER TABLE public.appointment
+    ADD COLUMN "hasConsultation" boolean NOT NULL DEFAULT False;
+
+COMMENT ON COLUMN public.appointment."hasConsultation"
+    IS 'true means consultation started';

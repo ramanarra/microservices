@@ -29,4 +29,5 @@ export class AppointmentDto {
   paymentOption:string;
   consultationMode:string;
   confirmation:boolean;
+  hasConsultation: boolean;
 }
