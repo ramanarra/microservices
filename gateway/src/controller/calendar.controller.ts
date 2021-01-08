@@ -1428,13 +1428,14 @@ export class CalendarController {
    @UseGuards(AuthGuard())
    @ApiTags('Patient')
    async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
-    @Query('paginationLimit') paginationLimit: number  ) {
+    @Query('paginationLimit') paginationLimit: number,@Query('appointmentId') appointmentId : number  ) {
       const data={
         user : req.user,
         paginationStart : paginationStart,
         paginationLimit : paginationLimit,
         patientId : req.user.patientId,
-        searchText : searchText
+        searchText : searchText,
+        appointmentId : appointmentId
        } 
         if (!check){
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}

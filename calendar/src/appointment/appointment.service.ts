@@ -11992,7 +11992,7 @@ export class AppointmentService {
         const parames = {
             ACL: 'public-read',
             Bucket: BUCKET_NAME,
-            Key: `virujh/testreport/` + reports.file.originalname,// File name you want to save as in S3
+            Key: `virujh/report/` + reports.file.originalname,// File name you want to save as in S3
             Body: base64data
         };
     
@@ -12027,24 +12027,36 @@ export class AppointmentService {
     const offset = data.paginationStart;
     const endset = data.paginationLimit;
     const searchText = data.searchText;
+    const appointmentId = data.appointmentId;
     let response = {};
-
+    let app = [], reportList = [];
+    
     if(searchText){
-        const app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
-        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
-        response['totalCount'] = reportList.length;
-        response['list'] = app;
-        console.log(response)
-        return response;
+
+        if(appointmentId) {
+            app = await this.patientReportRepository.query(queries.getSearchReportByAppointmentId, [appointmentId,offset,endset, '%'+searchText+'%']); 
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitAppointmentIdSearch, [appointmentId, '%'+searchText+'%']);
+               
+        } else {
+            app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
+        }
+
+    } else {
+        if(appointmentId) {
+            app = await this.patientReportRepository.query(queries.getReportByAppointmentId, [appointmentId,offset,endset]);
+            reportList = await this.patientReportRepository.query(queries.getReportWithAppointmentId, [appointmentId]);
+
+        } else {
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
+            app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
+        }
+        
+         
     }
-    else{
-        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
-        const app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
-        response['totalCount'] = reportList.length;
-        response['list'] = app;
-        console.log(response)
-         return response;
-    }
+    response['totalCount'] = reportList.length;
+    response['list'] = app;
+    return response;
    
     
 }
