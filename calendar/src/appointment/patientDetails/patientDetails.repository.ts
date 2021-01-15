@@ -17,12 +17,13 @@ export class PatientDetailsRepository extends Repository<PatientDetails> {
        // patient.doctorId = patientDto.doctorId;
         patient.patientId =patientDto.patientId ;
        // patient.appointmentDate =new Date(patientDto.appointmentDate);
-        patient.name = patientDto.name;
+        patient.name = patientDto.firstName+ " " + patientDto.lastName;
         patient.landmark = patientDto.landmark;
         patient.country= patientDto.country;
         patient.address=patientDto.address;
         patient.state = patientDto.state;
         patient.pincode = patientDto.pincode;
+        patient.city = patientDto.city;
         patient.email = patientDto.email;
         patient.photo = patientDto.photo;
         patient.registrationNumber= patientDto.registrationNumber;

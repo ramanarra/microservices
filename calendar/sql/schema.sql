@@ -815,6 +815,37 @@ CREATE TABLE public.patient_details (
 
 ALTER TABLE public.patient_details OWNER TO postgres;
 
+-- updated patient_details table
+
+CREATE TABLE public.patient_details
+(
+    id integer NOT NULL DEFAULT nextval('patient_details_patient_details_id_seq'::regclass),
+    name character varying(100) COLLATE pg_catalog."default",
+    landmark character varying(100) COLLATE pg_catalog."default",
+    country character varying(100) COLLATE pg_catalog."default",
+    registration_number character varying(200) COLLATE pg_catalog."default",
+    address character varying(400) COLLATE pg_catalog."default",
+    state character varying(100) COLLATE pg_catalog."default",
+    pincode character varying(100) COLLATE pg_catalog."default",
+    email character varying(100) COLLATE pg_catalog."default",
+    photo character varying(600) COLLATE pg_catalog."default",
+    phone character varying(100) COLLATE pg_catalog."default",
+    patient_id bigint,
+    "firstName" character varying(100) COLLATE pg_catalog."default",
+    "lastName" character varying(100) COLLATE pg_catalog."default",
+    "dateOfBirth" character varying(100) COLLATE pg_catalog."default",
+    "alternateContact" character varying(100) COLLATE pg_catalog."default",
+    age bigint,
+    live_status live_statuses DEFAULT 'online'::live_statuses,
+    last_active timestamp without time zone,
+    city character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT patient_details_id PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.patient_details
+    OWNER to postgres;
 --
 -- TOC entry 224 (class 1259 OID 24689)
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres

@@ -522,6 +522,7 @@ export class CalendarController {
             '"address":"address", \n' +
             '"state":"state", \n' +
             '"pincode":"IN-pincode", \n' +
+            '"city":"city", \n' +
             '"dateOfBirth":"dateOfBirth", \n' +
             '"photo":"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU" \n' +
             '}'

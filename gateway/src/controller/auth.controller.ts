@@ -149,6 +149,7 @@ export class AuthController {
                 address:patientDto.address,
                 state:patientDto.state,
                 pincode:patientDto.pincode,
+                city:patientDto.city,
                 alternateContact:patientDto.alternateContact,
                 age:patientDto.age,
                 photo:patientDto.photo
