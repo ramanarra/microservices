@@ -12,6 +12,7 @@ export class PatientDto {
     state: string;
     @IsOptional()
     pincode: string;
+    city:string;
     @IsOptional()
     email: string;
     photo: string;
