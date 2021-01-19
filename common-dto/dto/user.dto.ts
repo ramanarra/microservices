@@ -11,4 +11,6 @@ export class UserDto {
     role:string;
     confirmPassword:string;
     passcode:string;
+    photo:string;
+    hospitalPhoto:string;
 }
