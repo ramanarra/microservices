@@ -13,8 +13,13 @@ import {
     ValidationPipe,
     Request,
     ClassSerializerInterceptor,
-    UnauthorizedException, HttpStatus
+    UnauthorizedException, HttpStatus,UseInterceptors,
+    UploadedFile,
+   
 } from '@nestjs/common';
+
+
+import { FilesInterceptor,FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from 'src/service/user.service';
 import {CalendarService} from 'src/service/calendar.service';
 import {
@@ -24,7 +29,7 @@ import {
     ApiBearerAuth,
     ApiCreatedResponse,
     ApiBadRequestResponse,
-    ApiTags
+    ApiTags,ApiConsumes
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Roles} from 'src/common/decorator/roles.decorator';
@@ -39,7 +44,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, DoctorSignDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -59,6 +64,7 @@ import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { report } from 'process';
 var moment = require('moment');
 
 
@@ -1259,11 +1265,65 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Payment')
-    @ApiBody({type: AccountDto})
+    @ApiBody({type:AccountDto})
     createPaymentLink(@Request() req, @Body() accountDto: any) {
         this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
         return this.calendarService.createPaymentLink(accountDto, req.user);
     }
+
+
+    // upload doctor signature    
+    @Post('dotor/signature/upload')
+    @ApiConsumes('multipart/form-data')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @UseInterceptors(FileInterceptor('file'))
+     @ApiBody({
+        schema: {
+        type: 'object',
+        properties: {
+            file: {
+            type: 'string',
+            format: 'binary',
+             },
+            "doctorId":{
+                "type":"string",
+                "description":"...",
+                "example":"1"
+             }
+        },
+        },
+    })
+    @ApiTags('Doctors')
+    @ApiOkResponse({
+          description:
+            'requestBody example :   {\n' +
+             '"file":"file",\n'+
+            '"doctorId":2,\n' +
+            '}',
+        })
+    async uploadFile(@UploadedFile() file, @Body() body) {
+    console.log("file",file);
+    console.log("body",body.doctorId);
     
+    const reports = {
+        file: file,
+       data : body
+     }
+
+     if (!body.doctorId) {
+        console.log('Provide doctorId');
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Provide doctorId',
+        };
+      } else {
+       
+        
+        return this.calendarService.addDoctorSinature(reports);
+            
+              
+        }
+  }
 
 }

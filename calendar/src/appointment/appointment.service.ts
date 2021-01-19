@@ -10,6 +10,7 @@ import {
     WorkScheduleDto,
     PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email,Sms
 } from 'common-dto';
+
 import {Appointment} from './appointment.entity';
 import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
@@ -1925,8 +1926,71 @@ export class AppointmentService {
         }
         
     }
+    
+    async addDoctorSignature(reports: any): Promise<any> {
+       
+        const AWS = require('aws-sdk');
+        const ID = 'AKIAISEHN3PDMNBWK2UA';
+        const SECRET = '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';
+        const BUCKET_NAME = 'virujh-cloud';
+        
+        // s3 bucket creation
+         const s3 = new AWS.S3({
+            accessKeyId: ID,
+            secretAccessKey: SECRET
+
+        });
 
 
+        if(reports.file.mimetype === "application/pdf")
+        {
+        var base64data =  Buffer.from(reports.file.buffer, 'base64');
+        }
+        else{
+            var base64data = Buffer.from(reports.file.buffer, 'binary');  
+        }
+
+        const parames = {
+            ACL: 'public-read',
+            Bucket: BUCKET_NAME,
+            Key: `virujh/signature/` + reports.file.originalname,// File name you want to save as in S3
+            Body: base64data
+        };
+    
+        // Uploading files to the bucket
+
+        s3.upload( parames,async  (err, data) => {
+            if (err) {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.UPDATE_FAILED
+                }
+            } else {
+               
+                let queryRes=await this.doctorRepository.query(queries.updateSignature, [reports.data.doctorId,data.Location])
+                if(queryRes.length){
+                   
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.UPDATE_OK
+                    }
+                }
+                  
+              
+                else{
+                    return {
+                        statusCode: HttpStatus.BAD_REQUEST,
+                        message: CONSTANT_MSG.UPDATE_FAILED
+                    }
+                }
+                    
+                
+    
+            }
+        });
+
+      
+   }
 
     // common functions below===============================================================
 

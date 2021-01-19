@@ -1234,5 +1234,12 @@ export class AppointmentController {
         return doctor;
     }
 
+    @MessagePattern({cmd: 'doctor_signature'})
+    async addDoctorSignature(reports: any): Promise<any> {
+       
+        return await this.appointmentService.addDoctorSignature(reports);
+       
+        //return doctor;  
+    }
 
 }

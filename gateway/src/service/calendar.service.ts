@@ -339,5 +339,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'doctor_details_insertion'},doctorDto).toPromise();
     }
 
+    @UseFilters(AllClientServiceException)
+     public addDoctorSinature(reports: any) : Observable <any> {
+        
+        return  this.redisClient.send({ cmd : 'doctor_signature'},reports);
+    }
 
 }
