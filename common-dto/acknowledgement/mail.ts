@@ -16,8 +16,8 @@ export class Email {
         
     }
     sendEmail (params:any) {
-        var smtpUser = "dharani@softsuave.com";
-        var smtpPass = "softsuave@123";
+        var smtpUser = "rohitsachin311@gmail.com";
+        var smtpPass = "rohit311";
         var smtpHost = "smtp.gmail.com";
         var smtpPort = 465;
         // var smtpUser = params.smtpUser;
