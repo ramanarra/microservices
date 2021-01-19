@@ -44,7 +44,7 @@ import {
     DoctorDto,
     DocConfigDto,
     WorkScheduleDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, DoctorSignDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
