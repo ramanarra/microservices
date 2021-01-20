@@ -80,6 +80,7 @@ export class AuthController {
       if(doc.accountKey){
         const details = await this.calendarService.getHospitalDetails(doc.accountKey);
         doc.hospitalPhoto = details.hospitalPhoto;
+        doc.hospitalName = details.hospitalName;
       }  
       return doc;
     }

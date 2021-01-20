@@ -13,4 +13,5 @@ export class UserDto {
     passcode:string;
     photo:string;
     hospitalPhoto:string;
+    hospitalName:string;
 }
