@@ -1,0 +1,77 @@
+version: '3.0'
+
+services:
+
+  redis-loc-server:
+    image: "redis:alpine"
+    container_name: rediscache
+    networks:
+      - redis-net
+    ports:
+      - "6379:6379"
+    restart: always 
+  
+  calendar:
+    build: calendar
+    container_name: calendar_service
+    environment:
+       - REDIS_HOST=redis-loc-server
+       - POSTGRES_HOST=db_auth
+       - NODE_ENV=default
+    networks:
+       - redis-net
+    depends_on:
+       - redis-loc-server
+       - db_calendar
+    command: "npm run start"
+
+  auth:
+    build: auth
+    container_name: auth_service
+    environment:
+       - REDIS_HOST=redis-loc-server
+       - POSTGRES_HOST=db_auth
+       - NODE_ENV=default
+    networks:
+       - redis-net
+    depends_on:
+       - redis-loc-server
+       - db_auth
+    command: "npm run start"
+
+  gateway:
+    build: gateway
+    container_name: gateway_service
+    environment:
+       - REDIS_HOST=redis-loc-server
+       - NODE_ENV=default
+    ports:
+       - "3000:3000"
+    networks:
+       - redis-net
+    depends_on:
+       - redis-loc-server
+       - auth
+       - calendar
+    command: "npm run start"
+
+  db_auth:
+    build: auth-db
+    container_name: auth_db
+    ports:
+       - "5432:5432"
+    networks:
+       - redis-net
+    restart: always
+
+  db_calendar:
+    build: calendar-db
+    container_name: calendar_db
+    ports:
+       - "5433:5432"
+    networks:
+       - redis-net
+    restart: always
+
+networks:
+  redis-net: null

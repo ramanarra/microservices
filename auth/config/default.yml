@@ -1,11 +1,12 @@
 server :
-  URL : 'redis://localhost:6379'
+  #URL : 'redis://localhost:6379'
+   URL : 'redis://redis-loc-server:6379'
 
 database :
   type : 'postgres'
   username : 'postgres'
   password : 'postgres'
-  host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
+  host: 'db_auth'
   database : 'liveauth'
   port : 5432
   synchronize : false
@@ -13,4 +14,3 @@ database :
 JWT :
   expiresIn : 36000000
   secret : 'topSecret51'
-  defaultStrategy : 'jwt'
