@@ -6,4 +6,4 @@ ENV POSTGRES_PASSWORD postgres
 ENV POSTGRES_DB liveauth
 
 # when container will be started, we'll have `` database created with this schema
-COPY ./plainauth.sql /docker-entrypoint-initdb.d/
+COPY ./plain-auth.sql /docker-entrypoint-initdb.d/

@@ -26,6 +26,7 @@ RUN npm run build
 
 
 WORKDIR /usr/src/app/auth
+#RUN npm uninstall -S common-dto
 RUN npm install
 RUN npm run build
 
@@ -36,5 +37,5 @@ COPY . /usr/src/app/auth
 
 
 
-#CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"]
 

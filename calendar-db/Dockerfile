@@ -6,4 +6,4 @@ ENV POSTGRES_PASSWORD postgres
 ENV POSTGRES_DB livecalendar
 
 # when container will be started, we'll have `test` database created with this schema
-COPY ./plaincalendar.sql /docker-entrypoint-initdb.d/
+COPY ./plain-calendar.sql /docker-entrypoint-initdb.d/

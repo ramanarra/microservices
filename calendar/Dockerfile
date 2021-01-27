@@ -35,7 +35,7 @@ COPY . /usr/src/app/calendar
 
 #RUN $env:NODE_ENV=default
 
-#CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"]
 
 
 

@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.1
--- Dumped by pg_dump version 13.0
-
--- Started on 2021-01-20 15:35:43
+-- Dumped from database version 11.8
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,10 +18,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
-
 --
--- TOC entry 200 (class 1259 OID 16395)
 -- Name: account; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -43,7 +38,6 @@ CREATE TABLE public.account (
 ALTER TABLE public.account OWNER TO postgres;
 
 --
--- TOC entry 201 (class 1259 OID 16398)
 -- Name: account_account_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -59,8 +53,6 @@ CREATE SEQUENCE public.account_account_id_seq
 ALTER TABLE public.account_account_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3066 (class 0 OID 0)
--- Dependencies: 201
 -- Name: account_account_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -68,7 +60,6 @@ ALTER SEQUENCE public.account_account_id_seq OWNED BY public.account.account_id;
 
 
 --
--- TOC entry 202 (class 1259 OID 16400)
 -- Name: patient; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -85,7 +76,6 @@ CREATE TABLE public.patient (
 ALTER TABLE public.patient OWNER TO postgres;
 
 --
--- TOC entry 203 (class 1259 OID 16406)
 -- Name: patient_login_patient_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -101,8 +91,6 @@ CREATE SEQUENCE public.patient_login_patient_id_seq
 ALTER TABLE public.patient_login_patient_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3067 (class 0 OID 0)
--- Dependencies: 203
 -- Name: patient_login_patient_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -110,7 +98,6 @@ ALTER SEQUENCE public.patient_login_patient_id_seq OWNED BY public.patient.patie
 
 
 --
--- TOC entry 204 (class 1259 OID 16408)
 -- Name: permissions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -124,7 +111,6 @@ CREATE TABLE public.permissions (
 ALTER TABLE public.permissions OWNER TO postgres;
 
 --
--- TOC entry 205 (class 1259 OID 16414)
 -- Name: permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -140,8 +126,6 @@ CREATE SEQUENCE public.permissions_id_seq
 ALTER TABLE public.permissions_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3068 (class 0 OID 0)
--- Dependencies: 205
 -- Name: permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -149,7 +133,6 @@ ALTER SEQUENCE public.permissions_id_seq OWNED BY public.permissions.id;
 
 
 --
--- TOC entry 206 (class 1259 OID 16416)
 -- Name: player_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -164,7 +147,6 @@ CREATE SEQUENCE public.player_id_seq
 ALTER TABLE public.player_id_seq OWNER TO postgres;
 
 --
--- TOC entry 207 (class 1259 OID 16418)
 -- Name: role_permissions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -178,7 +160,6 @@ CREATE TABLE public.role_permissions (
 ALTER TABLE public.role_permissions OWNER TO postgres;
 
 --
--- TOC entry 208 (class 1259 OID 16421)
 -- Name: role_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -194,8 +175,6 @@ CREATE SEQUENCE public.role_permissions_id_seq
 ALTER TABLE public.role_permissions_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3069 (class 0 OID 0)
--- Dependencies: 208
 -- Name: role_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -203,7 +182,6 @@ ALTER SEQUENCE public.role_permissions_id_seq OWNED BY public.role_permissions.i
 
 
 --
--- TOC entry 209 (class 1259 OID 16423)
 -- Name: roles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -216,7 +194,6 @@ CREATE TABLE public.roles (
 ALTER TABLE public.roles OWNER TO postgres;
 
 --
--- TOC entry 210 (class 1259 OID 16426)
 -- Name: roles_roles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -232,8 +209,6 @@ CREATE SEQUENCE public.roles_roles_id_seq
 ALTER TABLE public.roles_roles_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3070 (class 0 OID 0)
--- Dependencies: 210
 -- Name: roles_roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -241,7 +216,6 @@ ALTER SEQUENCE public.roles_roles_id_seq OWNED BY public.roles.roles_id;
 
 
 --
--- TOC entry 211 (class 1259 OID 16428)
 -- Name: user_role; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -255,7 +229,6 @@ CREATE TABLE public.user_role (
 ALTER TABLE public.user_role OWNER TO postgres;
 
 --
--- TOC entry 212 (class 1259 OID 16431)
 -- Name: user_role_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -271,8 +244,6 @@ CREATE SEQUENCE public.user_role_id_seq
 ALTER TABLE public.user_role_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3071 (class 0 OID 0)
--- Dependencies: 212
 -- Name: user_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -280,7 +251,6 @@ ALTER SEQUENCE public.user_role_id_seq OWNED BY public.user_role.id;
 
 
 --
--- TOC entry 213 (class 1259 OID 16433)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -301,7 +271,6 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 2889 (class 2604 OID 24587)
 -- Name: account account_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -309,7 +278,6 @@ ALTER TABLE ONLY public.account ALTER COLUMN account_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 2890 (class 2604 OID 24588)
 -- Name: patient patient_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -317,7 +285,6 @@ ALTER TABLE ONLY public.patient ALTER COLUMN patient_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 2891 (class 2604 OID 24589)
 -- Name: permissions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -325,7 +292,6 @@ ALTER TABLE ONLY public.permissions ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 2892 (class 2604 OID 24590)
 -- Name: role_permissions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -333,7 +299,6 @@ ALTER TABLE ONLY public.role_permissions ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 2893 (class 2604 OID 24591)
 -- Name: roles roles_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -341,7 +306,6 @@ ALTER TABLE ONLY public.roles ALTER COLUMN roles_id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 2894 (class 2604 OID 24592)
 -- Name: user_role id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -349,8 +313,6 @@ ALTER TABLE ONLY public.user_role ALTER COLUMN id SET DEFAULT nextval('public.us
 
 
 --
--- TOC entry 3047 (class 0 OID 16395)
--- Dependencies: 200
 -- Data for Name: account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -365,8 +327,6 @@ COPY public.account (account_id, no_of_users, sub_start_date, sub_end_date, acco
 
 
 --
--- TOC entry 3049 (class 0 OID 16400)
--- Dependencies: 202
 -- Data for Name: patient; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -375,6 +335,7 @@ COPY public.patient (patient_id, phone, password, salt, "createdBy", passcode) F
 2	9999999994	$2b$10$5FIBLAhc8ZWPzzT3MVYNK.lur.6976HnuXQT.DrvNrM1ciey6FZ92	$2b$10$5FIBLAhc8ZWPzzT3MVYNK.	\N	\N
 3	9999999995	$2b$10$Wek0rqGs9QkvLOyLvdz8X.dv87RD6UTr8tvuOQfTC/H8v.hM7Cd62	$2b$10$Wek0rqGs9QkvLOyLvdz8X.	\N	\N
 4	9999999995	$2b$10$0GbIZnsPXhUJTX/EDIFGPuz0QcUI34m18emSQSnxxne1VzwcyfUCa	$2b$10$0GbIZnsPXhUJTX/EDIFGPu	\N	\N
+5	9999999996	$2b$10$uURxkKPBX0sjopE6lfQwHeEZgUmhyAZqMb5NskDI8D.UkZAcbU0du	$2b$10$uURxkKPBX0sjopE6lfQwHe	\N	\N
 6	9999999992	$2b$10$TP2dB6oh4oPiYDfUl/OJXu56LbgEj9w1G7LDHsE87pI8i4W0LrtjS	$2b$10$TP2dB6oh4oPiYDfUl/OJXu	\N	\N
 7	9999999992	$2b$10$OKQ4DUQ67bukOaioxkK/pekQdo3E/pQgEJmSMk5zjoETc.L3luOty	$2b$10$OKQ4DUQ67bukOaioxkK/pe	\N	\N
 8	9999999992	$2b$10$AMhkZkRI5Lo/HtFjJSqps.3hSK5CYRqmBf/yJ8GsRZV.Gls0Xr6su	$2b$10$AMhkZkRI5Lo/HtFjJSqps.	\N	\N
@@ -726,17 +687,13 @@ COPY public.patient (patient_id, phone, password, salt, "createdBy", passcode) F
 355	7418529639	$2b$10$yvwf/lj2YXZUn2aUpHJIlOS/q17PA6xjy9QqgtbzO3e2MmbG57tD2	$2b$10$yvwf/lj2YXZUn2aUpHJIlO	PATIENT	\N
 356	8072389917	$2b$10$2Z.v9kba5NNFhB2M4YB76uvxvMPyIcB0utAVzgz1cFJmIrQTuXLbG	$2b$10$2Z.v9kba5NNFhB2M4YB76u	PATIENT	\N
 352	8940833838	$2b$10$/Cp1fgkKZ/gDbMksRC5q9uuZ6uWnnC.3KsceVCsa5/tRLFo1Ww0OS	$2b$10$/Cp1fgkKZ/gDbMksRC5q9u	PATIENT	\N
-363	7695057707	$2b$10$NUNja/y4tOWNB22EmCKKZO4hl2zctrtQzODRR.GTBFMY7EhiBrL8O	$2b$10$NUNja/y4tOWNB22EmCKKZO	PATIENT	\N
-364	7695057705	$2b$10$gYkPVPy00rrigb14xqjT4OTUuHSS.LfNJqszUI/Dix7zIgS9GQzCW	$2b$10$gYkPVPy00rrigb14xqjT4O	PATIENT	\N
-365	8508021240	$2b$10$DXP1/IzZ6xGNvpLYYhtQq.aW/um51fbOnDCzoUl8BVSSkyQWnqSSy	$2b$10$DXP1/IzZ6xGNvpLYYhtQq.	PATIENT	\N
-5	9999999996	$2b$10$uURxkKPBX0sjopE6lfQwHeEZgUmhyAZqMb5NskDI8D.UkZAcbU0du	$2b$10$uURxkKPBX0sjopE6lfQwHe	\N	\N
-366	7695057701	$2b$10$izI5fuHxTZOlbFrDWgQ0G.1WG.8X91vrRTOIiP.874dXgxQuZS.na	$2b$10$izI5fuHxTZOlbFrDWgQ0G.	PATIENT	8478
+357	9555544447	$2b$10$O3mB/ytL2tzK2IEGe/9BIuQIuJ0zW7PLQzimvnMIzqUtrA1ung4pa	$2b$10$O3mB/ytL2tzK2IEGe/9BIu	PATIENT	\N
+358	9995243654	\N	\N	DOCTOR	\N
+359	9456242154	$2b$10$t.gmi1DdowKAMbdOZP3IuuqvMD5j4YRkEE0um1rFDvyWkdTsUtoBi	$2b$10$t.gmi1DdowKAMbdOZP3Iuu	PATIENT	\N
 \.
 
 
 --
--- TOC entry 3051 (class 0 OID 16408)
--- Dependencies: 204
 -- Data for Name: permissions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -757,8 +714,6 @@ COPY public.permissions (id, name, description) FROM stdin;
 
 
 --
--- TOC entry 3054 (class 0 OID 16418)
--- Dependencies: 207
 -- Data for Name: role_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -786,8 +741,6 @@ COPY public.role_permissions (id, "roleId", "permissionId") FROM stdin;
 
 
 --
--- TOC entry 3056 (class 0 OID 16423)
--- Dependencies: 209
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -800,8 +753,6 @@ COPY public.roles (roles_id, roles) FROM stdin;
 
 
 --
--- TOC entry 3058 (class 0 OID 16428)
--- Dependencies: 211
 -- Data for Name: user_role; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -864,8 +815,6 @@ COPY public.user_role (id, user_id, role_id) FROM stdin;
 
 
 --
--- TOC entry 3060 (class 0 OID 16433)
--- Dependencies: 213
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -923,13 +872,11 @@ COPY public.users (id, name, email, password, salt, account_id, doctor_key, is_a
 80	Dharani Antharvedi	fgdgrfgd@gmail.com	$2b$10$k3JCjLIc1eyOjWvTrXbGzOxiY.GHoLDGaVm8IpLwLhvWebHAT366.	$2b$10$k3JCjLIc1eyOjWvTrXbGzO	1	Doc_43	\N	\N	\N
 81	Ponni Nov	ponsundaram@softsuave.com	$2b$10$FGH2HWde917SEnDswgIgjejTATi2AxU9GSccvjti0Wq2/t3RGJaVK	$2b$10$FGH2HWde917SEnDswgIgje	1	Doc_44	\N	\N	\N
 35	Kumar Thulasi Dass	thulasidass@gmail.com	$2b$10$JGdUPwCYPtdme.LDkHJzuOMEwLXeCxHCbq028DniNeALB4PALLhQC	$2b$10$JGdUPwCYPtdme.LDkHJzuO	2	Doc_8	t	16:16:03.452535	\N
-32	Shalini shetty	test@apollo.com	$2b$10$uURxkKPBX0sjopE6lfQwHesY8iWyFaEpw836CKlyFFtkdlP7NQfZq	$2b$10$uURxkKPBX0sjopE6lfQwHe	1	Doc_5	t	15:15:08.858754	\N
+32	Shalini shetty	test@apollo.com	$2b$10$po2RLupHjujggAO0rGFks.d72p3CPUOeHoiCpYvGdf2n8EcSoQURO	$2b$10$po2RLupHjujggAO0rGFks.	1	Doc_5	t	15:15:08.858754	\N
 \.
 
 
 --
--- TOC entry 3072 (class 0 OID 0)
--- Dependencies: 201
 -- Name: account_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -937,17 +884,13 @@ SELECT pg_catalog.setval('public.account_account_id_seq', 1, true);
 
 
 --
--- TOC entry 3073 (class 0 OID 0)
--- Dependencies: 203
 -- Name: patient_login_patient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.patient_login_patient_id_seq', 366, true);
+SELECT pg_catalog.setval('public.patient_login_patient_id_seq', 359, true);
 
 
 --
--- TOC entry 3074 (class 0 OID 0)
--- Dependencies: 205
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -955,8 +898,6 @@ SELECT pg_catalog.setval('public.permissions_id_seq', 11, true);
 
 
 --
--- TOC entry 3075 (class 0 OID 0)
--- Dependencies: 206
 -- Name: player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -964,8 +905,6 @@ SELECT pg_catalog.setval('public.player_id_seq', 28, true);
 
 
 --
--- TOC entry 3076 (class 0 OID 0)
--- Dependencies: 208
 -- Name: role_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -973,8 +912,6 @@ SELECT pg_catalog.setval('public.role_permissions_id_seq', 9, true);
 
 
 --
--- TOC entry 3077 (class 0 OID 0)
--- Dependencies: 210
 -- Name: roles_roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -982,8 +919,6 @@ SELECT pg_catalog.setval('public.roles_roles_id_seq', 1, false);
 
 
 --
--- TOC entry 3078 (class 0 OID 0)
--- Dependencies: 212
 -- Name: user_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -991,7 +926,6 @@ SELECT pg_catalog.setval('public.user_role_id_seq', 54, true);
 
 
 --
--- TOC entry 2896 (class 2606 OID 16446)
 -- Name: account account_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1000,7 +934,6 @@ ALTER TABLE ONLY public.account
 
 
 --
--- TOC entry 2898 (class 2606 OID 16448)
 -- Name: patient patient_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1009,7 +942,6 @@ ALTER TABLE ONLY public.patient
 
 
 --
--- TOC entry 2900 (class 2606 OID 16450)
 -- Name: permissions permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1018,7 +950,6 @@ ALTER TABLE ONLY public.permissions
 
 
 --
--- TOC entry 2904 (class 2606 OID 16452)
 -- Name: role_permissions role_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1027,7 +958,6 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- TOC entry 2906 (class 2606 OID 16454)
 -- Name: roles roles_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1036,7 +966,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 2908 (class 2606 OID 16456)
 -- Name: user_role user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1045,7 +974,6 @@ ALTER TABLE ONLY public.user_role
 
 
 --
--- TOC entry 2911 (class 2606 OID 16458)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1054,7 +982,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 2913 (class 2606 OID 16460)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1063,7 +990,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 2901 (class 1259 OID 16461)
 -- Name: fki_permissionId; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1071,7 +997,6 @@ CREATE INDEX "fki_permissionId" ON public.role_permissions USING btree ("permiss
 
 
 --
--- TOC entry 2902 (class 1259 OID 16462)
 -- Name: fki_roleId; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1079,7 +1004,6 @@ CREATE INDEX "fki_roleId" ON public.role_permissions USING btree ("roleId");
 
 
 --
--- TOC entry 2909 (class 1259 OID 16463)
 -- Name: fki_user_to_account; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1087,7 +1011,6 @@ CREATE INDEX fki_user_to_account ON public.users USING btree (account_id);
 
 
 --
--- TOC entry 2914 (class 2606 OID 16464)
 -- Name: role_permissions permissionId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1096,7 +1019,6 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- TOC entry 2915 (class 2606 OID 16469)
 -- Name: role_permissions roleId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1105,7 +1027,6 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- TOC entry 2916 (class 2606 OID 16474)
 -- Name: users user_to_account; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1113,7 +1034,15 @@ ALTER TABLE ONLY public.users
     ADD CONSTRAINT user_to_account FOREIGN KEY (account_id) REFERENCES public.account(account_id) NOT VALID;
 
 
--- Completed on 2021-01-20 15:35:44
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM rdsadmin;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
 
 --
 -- PostgreSQL database dump complete

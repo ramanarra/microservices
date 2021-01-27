@@ -16,7 +16,7 @@ services:
     container_name: calendar_service
     environment:
        - REDIS_HOST=redis-loc-server
-       - POSTGRES_HOST=db_auth
+       - POSTGRES_HOST=db_calendar
        - NODE_ENV=default
     networks:
        - redis-net

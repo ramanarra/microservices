@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.1
--- Dumped by pg_dump version 13.0
-
--- Started on 2021-01-20 15:37:21
+-- Dumped from database version 11.8
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +17,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 678 (class 1247 OID 25527)
 -- Name: consultations; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -32,7 +29,6 @@ CREATE TYPE public.consultations AS ENUM (
 ALTER TYPE public.consultations OWNER TO postgres;
 
 --
--- TOC entry 681 (class 1247 OID 25532)
 -- Name: live_statuses; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -47,7 +43,6 @@ CREATE TYPE public.live_statuses AS ENUM (
 ALTER TYPE public.live_statuses OWNER TO postgres;
 
 --
--- TOC entry 684 (class 1247 OID 25542)
 -- Name: overbookingtype; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -60,7 +55,6 @@ CREATE TYPE public.overbookingtype AS ENUM (
 ALTER TYPE public.overbookingtype OWNER TO postgres;
 
 --
--- TOC entry 687 (class 1247 OID 25548)
 -- Name: payment_statuses; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -75,7 +69,6 @@ CREATE TYPE public.payment_statuses AS ENUM (
 ALTER TYPE public.payment_statuses OWNER TO postgres;
 
 --
--- TOC entry 690 (class 1247 OID 25558)
 -- Name: payments; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -89,7 +82,6 @@ CREATE TYPE public.payments AS ENUM (
 ALTER TYPE public.payments OWNER TO postgres;
 
 --
--- TOC entry 693 (class 1247 OID 25566)
 -- Name: preconsultations; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -102,7 +94,6 @@ CREATE TYPE public.preconsultations AS ENUM (
 ALTER TYPE public.preconsultations OWNER TO postgres;
 
 --
--- TOC entry 696 (class 1247 OID 25572)
 -- Name: statuses; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -117,10 +108,7 @@ ALTER TYPE public.statuses OWNER TO postgres;
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
-
 --
--- TOC entry 200 (class 1259 OID 25579)
 -- Name: account_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -144,7 +132,6 @@ CREATE TABLE public.account_details (
 ALTER TABLE public.account_details OWNER TO postgres;
 
 --
--- TOC entry 201 (class 1259 OID 25585)
 -- Name: account_details_account_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -160,8 +147,6 @@ CREATE SEQUENCE public.account_details_account_details_id_seq
 ALTER TABLE public.account_details_account_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3368 (class 0 OID 0)
--- Dependencies: 201
 -- Name: account_details_account_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -169,7 +154,6 @@ ALTER SEQUENCE public.account_details_account_details_id_seq OWNED BY public.acc
 
 
 --
--- TOC entry 202 (class 1259 OID 25587)
 -- Name: appointment; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -199,8 +183,6 @@ CREATE TABLE public.appointment (
 ALTER TABLE public.appointment OWNER TO postgres;
 
 --
--- TOC entry 3369 (class 0 OID 0)
--- Dependencies: 202
 -- Name: COLUMN appointment."hasConsultation"; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -208,7 +190,6 @@ COMMENT ON COLUMN public.appointment."hasConsultation" IS 'true means consultati
 
 
 --
--- TOC entry 203 (class 1259 OID 25598)
 -- Name: appointment_cancel_reschedule; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -227,7 +208,6 @@ CREATE TABLE public.appointment_cancel_reschedule (
 ALTER TABLE public.appointment_cancel_reschedule OWNER TO postgres;
 
 --
--- TOC entry 204 (class 1259 OID 25601)
 -- Name: appointment_cancel_reschedule_appointment_cancel_reschedule_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -243,8 +223,6 @@ CREATE SEQUENCE public.appointment_cancel_reschedule_appointment_cancel_reschedu
 ALTER TABLE public.appointment_cancel_reschedule_appointment_cancel_reschedule_seq OWNER TO postgres;
 
 --
--- TOC entry 3370 (class 0 OID 0)
--- Dependencies: 204
 -- Name: appointment_cancel_reschedule_appointment_cancel_reschedule_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -252,7 +230,6 @@ ALTER SEQUENCE public.appointment_cancel_reschedule_appointment_cancel_reschedul
 
 
 --
--- TOC entry 205 (class 1259 OID 25603)
 -- Name: appointment_doc_config; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -280,7 +257,6 @@ CREATE TABLE public.appointment_doc_config (
 ALTER TABLE public.appointment_doc_config OWNER TO postgres;
 
 --
--- TOC entry 206 (class 1259 OID 25609)
 -- Name: appointment_doc_config_appointment_doc_config_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -296,8 +272,6 @@ CREATE SEQUENCE public.appointment_doc_config_appointment_doc_config_id_seq
 ALTER TABLE public.appointment_doc_config_appointment_doc_config_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3371 (class 0 OID 0)
--- Dependencies: 206
 -- Name: appointment_doc_config_appointment_doc_config_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -305,7 +279,6 @@ ALTER SEQUENCE public.appointment_doc_config_appointment_doc_config_id_seq OWNED
 
 
 --
--- TOC entry 207 (class 1259 OID 25611)
 -- Name: appointment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -321,8 +294,6 @@ CREATE SEQUENCE public.appointment_id_seq
 ALTER TABLE public.appointment_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3372 (class 0 OID 0)
--- Dependencies: 207
 -- Name: appointment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -330,7 +301,6 @@ ALTER SEQUENCE public.appointment_id_seq OWNED BY public.appointment.id;
 
 
 --
--- TOC entry 208 (class 1259 OID 25613)
 -- Name: appointment_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -345,7 +315,6 @@ CREATE SEQUENCE public.appointment_seq
 ALTER TABLE public.appointment_seq OWNER TO postgres;
 
 --
--- TOC entry 209 (class 1259 OID 25615)
 -- Name: communication_type; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -358,7 +327,6 @@ CREATE TABLE public.communication_type (
 ALTER TABLE public.communication_type OWNER TO postgres;
 
 --
--- TOC entry 210 (class 1259 OID 25618)
 -- Name: communication_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -374,8 +342,6 @@ CREATE SEQUENCE public.communication_type_id_seq
 ALTER TABLE public.communication_type_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3373 (class 0 OID 0)
--- Dependencies: 210
 -- Name: communication_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -383,7 +349,6 @@ ALTER SEQUENCE public.communication_type_id_seq OWNED BY public.communication_ty
 
 
 --
--- TOC entry 211 (class 1259 OID 25620)
 -- Name: doc_config; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -418,7 +383,6 @@ CREATE TABLE public.doc_config (
 ALTER TABLE public.doc_config OWNER TO postgres;
 
 --
--- TOC entry 212 (class 1259 OID 25642)
 -- Name: doctor_config_can_resch; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -445,7 +409,6 @@ CREATE TABLE public.doctor_config_can_resch (
 ALTER TABLE public.doctor_config_can_resch OWNER TO postgres;
 
 --
--- TOC entry 213 (class 1259 OID 25648)
 -- Name: doc_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -461,8 +424,6 @@ CREATE SEQUENCE public.doc_config_can_resch_doc_config_can_resch_id_seq
 ALTER TABLE public.doc_config_can_resch_doc_config_can_resch_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3374 (class 0 OID 0)
--- Dependencies: 213
 -- Name: doc_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -470,7 +431,6 @@ ALTER SEQUENCE public.doc_config_can_resch_doc_config_can_resch_id_seq OWNED BY 
 
 
 --
--- TOC entry 214 (class 1259 OID 25650)
 -- Name: doc_config_schedule_day; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -485,7 +445,6 @@ CREATE TABLE public.doc_config_schedule_day (
 ALTER TABLE public.doc_config_schedule_day OWNER TO postgres;
 
 --
--- TOC entry 215 (class 1259 OID 25656)
 -- Name: doc_config_schedule_day_doc_config_schedule_day_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -501,8 +460,6 @@ CREATE SEQUENCE public.doc_config_schedule_day_doc_config_schedule_day_id_seq
 ALTER TABLE public.doc_config_schedule_day_doc_config_schedule_day_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3375 (class 0 OID 0)
--- Dependencies: 215
 -- Name: doc_config_schedule_day_doc_config_schedule_day_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -510,7 +467,6 @@ ALTER SEQUENCE public.doc_config_schedule_day_doc_config_schedule_day_id_seq OWN
 
 
 --
--- TOC entry 216 (class 1259 OID 25658)
 -- Name: doc_config_schedule_interval; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -526,7 +482,6 @@ CREATE TABLE public.doc_config_schedule_interval (
 ALTER TABLE public.doc_config_schedule_interval OWNER TO postgres;
 
 --
--- TOC entry 217 (class 1259 OID 25664)
 -- Name: doc_config_schedule_interval_doc_config_schedule_interval_i_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -542,8 +497,6 @@ CREATE SEQUENCE public.doc_config_schedule_interval_doc_config_schedule_interval
 ALTER TABLE public.doc_config_schedule_interval_doc_config_schedule_interval_i_seq OWNER TO postgres;
 
 --
--- TOC entry 3376 (class 0 OID 0)
--- Dependencies: 217
 -- Name: doc_config_schedule_interval_doc_config_schedule_interval_i_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -551,7 +504,6 @@ ALTER SEQUENCE public.doc_config_schedule_interval_doc_config_schedule_interval_
 
 
 --
--- TOC entry 218 (class 1259 OID 25666)
 -- Name: docconfigid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -566,8 +518,6 @@ CREATE SEQUENCE public.docconfigid_seq
 ALTER TABLE public.docconfigid_seq OWNER TO postgres;
 
 --
--- TOC entry 3377 (class 0 OID 0)
--- Dependencies: 218
 -- Name: docconfigid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -575,7 +525,6 @@ ALTER SEQUENCE public.docconfigid_seq OWNED BY public.doc_config.id;
 
 
 --
--- TOC entry 219 (class 1259 OID 25668)
 -- Name: doctor; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -602,7 +551,6 @@ CREATE TABLE public.doctor (
 ALTER TABLE public.doctor OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 25675)
 -- Name: doctor_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -618,8 +566,6 @@ CREATE SEQUENCE public.doctor_config_can_resch_doc_config_can_resch_id_seq
 ALTER TABLE public.doctor_config_can_resch_doc_config_can_resch_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3378 (class 0 OID 0)
--- Dependencies: 220
 -- Name: doctor_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -627,7 +573,6 @@ ALTER SEQUENCE public.doctor_config_can_resch_doc_config_can_resch_id_seq OWNED 
 
 
 --
--- TOC entry 221 (class 1259 OID 25677)
 -- Name: doctor_config_pre_consultation; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -647,7 +592,6 @@ CREATE TABLE public.doctor_config_pre_consultation (
 ALTER TABLE public.doctor_config_pre_consultation OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 25683)
 -- Name: doctor_config_pre_consultation_doctor_config_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -663,8 +607,6 @@ CREATE SEQUENCE public.doctor_config_pre_consultation_doctor_config_id_seq
 ALTER TABLE public.doctor_config_pre_consultation_doctor_config_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3379 (class 0 OID 0)
--- Dependencies: 222
 -- Name: doctor_config_pre_consultation_doctor_config_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -672,7 +614,6 @@ ALTER SEQUENCE public.doctor_config_pre_consultation_doctor_config_id_seq OWNED 
 
 
 --
--- TOC entry 223 (class 1259 OID 25685)
 -- Name: doctor_config_preconsultation_doctor_config_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -688,8 +629,6 @@ CREATE SEQUENCE public.doctor_config_preconsultation_doctor_config_id_seq
 ALTER TABLE public.doctor_config_preconsultation_doctor_config_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3380 (class 0 OID 0)
--- Dependencies: 223
 -- Name: doctor_config_preconsultation_doctor_config_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -697,7 +636,6 @@ ALTER SEQUENCE public.doctor_config_preconsultation_doctor_config_id_seq OWNED B
 
 
 --
--- TOC entry 224 (class 1259 OID 25687)
 -- Name: doctor_details_doctor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -713,8 +651,6 @@ CREATE SEQUENCE public.doctor_details_doctor_id_seq
 ALTER TABLE public.doctor_details_doctor_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3381 (class 0 OID 0)
--- Dependencies: 224
 -- Name: doctor_details_doctor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -722,7 +658,6 @@ ALTER SEQUENCE public.doctor_details_doctor_id_seq OWNED BY public.doctor."docto
 
 
 --
--- TOC entry 225 (class 1259 OID 25689)
 -- Name: doctor_doctor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -738,8 +673,6 @@ CREATE SEQUENCE public.doctor_doctor_id_seq
 ALTER TABLE public.doctor_doctor_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3382 (class 0 OID 0)
--- Dependencies: 225
 -- Name: doctor_doctor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -747,7 +680,6 @@ ALTER SEQUENCE public.doctor_doctor_id_seq OWNED BY public.doctor."doctorId";
 
 
 --
--- TOC entry 226 (class 1259 OID 25691)
 -- Name: interval_days; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -762,7 +694,6 @@ CREATE TABLE public.interval_days (
 ALTER TABLE public.interval_days OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 25694)
 -- Name: interval_days_interval_days_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -778,8 +709,6 @@ CREATE SEQUENCE public.interval_days_interval_days_id_seq
 ALTER TABLE public.interval_days_interval_days_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3383 (class 0 OID 0)
--- Dependencies: 227
 -- Name: interval_days_interval_days_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -787,7 +716,6 @@ ALTER SEQUENCE public.interval_days_interval_days_id_seq OWNED BY public.interva
 
 
 --
--- TOC entry 228 (class 1259 OID 25696)
 -- Name: medicine; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -806,7 +734,6 @@ CREATE TABLE public.medicine (
 ALTER TABLE public.medicine OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 25702)
 -- Name: medicine_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -822,8 +749,6 @@ CREATE SEQUENCE public.medicine_id_seq
 ALTER TABLE public.medicine_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3384 (class 0 OID 0)
--- Dependencies: 229
 -- Name: medicine_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -831,7 +756,6 @@ ALTER SEQUENCE public.medicine_id_seq OWNED BY public.medicine.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 25704)
 -- Name: message_metadata; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -846,7 +770,6 @@ CREATE TABLE public.message_metadata (
 ALTER TABLE public.message_metadata OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 25707)
 -- Name: message_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -862,8 +785,6 @@ CREATE SEQUENCE public.message_metadata_id_seq
 ALTER TABLE public.message_metadata_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3385 (class 0 OID 0)
--- Dependencies: 231
 -- Name: message_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -871,7 +792,6 @@ ALTER SEQUENCE public.message_metadata_id_seq OWNED BY public.message_metadata.i
 
 
 --
--- TOC entry 232 (class 1259 OID 25709)
 -- Name: message_template; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -886,7 +806,6 @@ CREATE TABLE public.message_template (
 ALTER TABLE public.message_template OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 25715)
 -- Name: message_template_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -902,8 +821,6 @@ CREATE SEQUENCE public.message_template_id_seq
 ALTER TABLE public.message_template_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3386 (class 0 OID 0)
--- Dependencies: 233
 -- Name: message_template_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -911,7 +828,6 @@ ALTER SEQUENCE public.message_template_id_seq OWNED BY public.message_template.i
 
 
 --
--- TOC entry 234 (class 1259 OID 25717)
 -- Name: message_template_placeholders; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -926,7 +842,6 @@ CREATE TABLE public.message_template_placeholders (
 ALTER TABLE public.message_template_placeholders OWNER TO postgres;
 
 --
--- TOC entry 235 (class 1259 OID 25720)
 -- Name: message_template_placeholders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -942,8 +857,6 @@ CREATE SEQUENCE public.message_template_placeholders_id_seq
 ALTER TABLE public.message_template_placeholders_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3387 (class 0 OID 0)
--- Dependencies: 235
 -- Name: message_template_placeholders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -951,7 +864,6 @@ ALTER SEQUENCE public.message_template_placeholders_id_seq OWNED BY public.messa
 
 
 --
--- TOC entry 236 (class 1259 OID 25722)
 -- Name: message_type; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -964,7 +876,6 @@ CREATE TABLE public.message_type (
 ALTER TABLE public.message_type OWNER TO postgres;
 
 --
--- TOC entry 237 (class 1259 OID 25725)
 -- Name: message_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -980,8 +891,6 @@ CREATE SEQUENCE public.message_type_id_seq
 ALTER TABLE public.message_type_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3388 (class 0 OID 0)
--- Dependencies: 237
 -- Name: message_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -989,7 +898,6 @@ ALTER SEQUENCE public.message_type_id_seq OWNED BY public.message_type.id;
 
 
 --
--- TOC entry 238 (class 1259 OID 25727)
 -- Name: openvidu_session; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1004,7 +912,6 @@ CREATE TABLE public.openvidu_session (
 ALTER TABLE public.openvidu_session OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 25730)
 -- Name: openvidu_session_openvidu_session_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1020,8 +927,6 @@ CREATE SEQUENCE public.openvidu_session_openvidu_session_id_seq
 ALTER TABLE public.openvidu_session_openvidu_session_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3389 (class 0 OID 0)
--- Dependencies: 239
 -- Name: openvidu_session_openvidu_session_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1029,7 +934,6 @@ ALTER SEQUENCE public.openvidu_session_openvidu_session_id_seq OWNED BY public.o
 
 
 --
--- TOC entry 240 (class 1259 OID 25732)
 -- Name: openvidu_session_token; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1045,7 +949,6 @@ CREATE TABLE public.openvidu_session_token (
 ALTER TABLE public.openvidu_session_token OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 25738)
 -- Name: openvidu_session_token_openvidu_session_token_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1061,8 +964,6 @@ CREATE SEQUENCE public.openvidu_session_token_openvidu_session_token_id_seq
 ALTER TABLE public.openvidu_session_token_openvidu_session_token_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3390 (class 0 OID 0)
--- Dependencies: 241
 -- Name: openvidu_session_token_openvidu_session_token_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1070,7 +971,6 @@ ALTER SEQUENCE public.openvidu_session_token_openvidu_session_token_id_seq OWNED
 
 
 --
--- TOC entry 242 (class 1259 OID 25740)
 -- Name: patient_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1100,7 +1000,6 @@ CREATE TABLE public.patient_details (
 ALTER TABLE public.patient_details OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1259 OID 25747)
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1116,8 +1015,6 @@ CREATE SEQUENCE public.patient_details_patient_details_id_seq
 ALTER TABLE public.patient_details_patient_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3391 (class 0 OID 0)
--- Dependencies: 243
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1125,7 +1022,6 @@ ALTER SEQUENCE public.patient_details_patient_details_id_seq OWNED BY public.pat
 
 
 --
--- TOC entry 244 (class 1259 OID 25749)
 -- Name: patient_report; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1144,7 +1040,6 @@ CREATE TABLE public.patient_report (
 ALTER TABLE public.patient_report OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1259 OID 25755)
 -- Name: patient_report_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1160,8 +1055,6 @@ CREATE SEQUENCE public.patient_report_id_seq
 ALTER TABLE public.patient_report_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3392 (class 0 OID 0)
--- Dependencies: 245
 -- Name: patient_report_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1169,7 +1062,6 @@ ALTER SEQUENCE public.patient_report_id_seq OWNED BY public.patient_report.id;
 
 
 --
--- TOC entry 246 (class 1259 OID 25757)
 -- Name: payment_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1186,7 +1078,6 @@ CREATE TABLE public.payment_details (
 ALTER TABLE public.payment_details OWNER TO postgres;
 
 --
--- TOC entry 247 (class 1259 OID 25764)
 -- Name: payment_details_payment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1202,8 +1093,6 @@ CREATE SEQUENCE public.payment_details_payment_id_seq
 ALTER TABLE public.payment_details_payment_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3393 (class 0 OID 0)
--- Dependencies: 247
 -- Name: payment_details_payment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1211,7 +1100,6 @@ ALTER SEQUENCE public.payment_details_payment_id_seq OWNED BY public.payment_det
 
 
 --
--- TOC entry 248 (class 1259 OID 25766)
 -- Name: prescription; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1231,7 +1119,6 @@ CREATE TABLE public.prescription (
 ALTER TABLE public.prescription OWNER TO postgres;
 
 --
--- TOC entry 249 (class 1259 OID 25772)
 -- Name: prescription_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1247,8 +1134,6 @@ CREATE SEQUENCE public.prescription_id_seq
 ALTER TABLE public.prescription_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3394 (class 0 OID 0)
--- Dependencies: 249
 -- Name: prescription_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1256,7 +1141,6 @@ ALTER SEQUENCE public.prescription_id_seq OWNED BY public.prescription.id;
 
 
 --
--- TOC entry 250 (class 1259 OID 25774)
 -- Name: tabesample; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1270,7 +1154,6 @@ CREATE TABLE public.tabesample (
 ALTER TABLE public.tabesample OWNER TO postgres;
 
 --
--- TOC entry 251 (class 1259 OID 25777)
 -- Name: tabesample_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1286,8 +1169,6 @@ CREATE SEQUENCE public.tabesample_id_seq
 ALTER TABLE public.tabesample_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3395 (class 0 OID 0)
--- Dependencies: 251
 -- Name: tabesample_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1295,7 +1176,6 @@ ALTER SEQUENCE public.tabesample_id_seq OWNED BY public.tabesample.id;
 
 
 --
--- TOC entry 252 (class 1259 OID 25779)
 -- Name: work_schedule_day; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1311,7 +1191,6 @@ CREATE TABLE public.work_schedule_day (
 ALTER TABLE public.work_schedule_day OWNER TO postgres;
 
 --
--- TOC entry 253 (class 1259 OID 25782)
 -- Name: work_schedule_day_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1327,8 +1206,6 @@ CREATE SEQUENCE public.work_schedule_day_id_seq
 ALTER TABLE public.work_schedule_day_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3396 (class 0 OID 0)
--- Dependencies: 253
 -- Name: work_schedule_day_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1336,7 +1213,6 @@ ALTER SEQUENCE public.work_schedule_day_id_seq OWNED BY public.work_schedule_day
 
 
 --
--- TOC entry 254 (class 1259 OID 25784)
 -- Name: work_schedule_interval; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1352,7 +1228,6 @@ CREATE TABLE public.work_schedule_interval (
 ALTER TABLE public.work_schedule_interval OWNER TO postgres;
 
 --
--- TOC entry 255 (class 1259 OID 25787)
 -- Name: work_schedule_interval_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1368,8 +1243,6 @@ CREATE SEQUENCE public.work_schedule_interval_id_seq
 ALTER TABLE public.work_schedule_interval_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3397 (class 0 OID 0)
--- Dependencies: 255
 -- Name: work_schedule_interval_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -1377,7 +1250,6 @@ ALTER SEQUENCE public.work_schedule_interval_id_seq OWNED BY public.work_schedul
 
 
 --
--- TOC entry 3045 (class 2604 OID 25789)
 -- Name: account_details account_details_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1385,7 +1257,6 @@ ALTER TABLE ONLY public.account_details ALTER COLUMN account_details_id SET DEFA
 
 
 --
--- TOC entry 3051 (class 2604 OID 25790)
 -- Name: appointment id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1393,7 +1264,6 @@ ALTER TABLE ONLY public.appointment ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 3052 (class 2604 OID 25791)
 -- Name: appointment_cancel_reschedule appointment_cancel_reschedule_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1401,7 +1271,6 @@ ALTER TABLE ONLY public.appointment_cancel_reschedule ALTER COLUMN appointment_c
 
 
 --
--- TOC entry 3053 (class 2604 OID 25792)
 -- Name: appointment_doc_config appointment_doc_config_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1409,7 +1278,6 @@ ALTER TABLE ONLY public.appointment_doc_config ALTER COLUMN appointment_doc_conf
 
 
 --
--- TOC entry 3054 (class 2604 OID 25793)
 -- Name: communication_type id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1417,7 +1285,6 @@ ALTER TABLE ONLY public.communication_type ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3071 (class 2604 OID 25794)
 -- Name: doc_config id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1425,7 +1292,6 @@ ALTER TABLE ONLY public.doc_config ALTER COLUMN id SET DEFAULT nextval('public.d
 
 
 --
--- TOC entry 3073 (class 2604 OID 25795)
 -- Name: doc_config_schedule_day id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1433,7 +1299,6 @@ ALTER TABLE ONLY public.doc_config_schedule_day ALTER COLUMN id SET DEFAULT next
 
 
 --
--- TOC entry 3074 (class 2604 OID 25796)
 -- Name: doc_config_schedule_interval id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1441,7 +1306,6 @@ ALTER TABLE ONLY public.doc_config_schedule_interval ALTER COLUMN id SET DEFAULT
 
 
 --
--- TOC entry 3076 (class 2604 OID 25797)
 -- Name: doctor doctorId; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1449,7 +1313,6 @@ ALTER TABLE ONLY public.doctor ALTER COLUMN "doctorId" SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3072 (class 2604 OID 25798)
 -- Name: doctor_config_can_resch doc_config_can_resch_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1457,7 +1320,6 @@ ALTER TABLE ONLY public.doctor_config_can_resch ALTER COLUMN doc_config_can_resc
 
 
 --
--- TOC entry 3077 (class 2604 OID 25799)
 -- Name: doctor_config_pre_consultation doctor_config_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1465,7 +1327,6 @@ ALTER TABLE ONLY public.doctor_config_pre_consultation ALTER COLUMN doctor_confi
 
 
 --
--- TOC entry 3078 (class 2604 OID 25800)
 -- Name: interval_days interval_days_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1473,7 +1334,6 @@ ALTER TABLE ONLY public.interval_days ALTER COLUMN interval_days_id SET DEFAULT 
 
 
 --
--- TOC entry 3079 (class 2604 OID 25801)
 -- Name: medicine id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1481,7 +1341,6 @@ ALTER TABLE ONLY public.medicine ALTER COLUMN id SET DEFAULT nextval('public.med
 
 
 --
--- TOC entry 3080 (class 2604 OID 25802)
 -- Name: message_metadata id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1489,7 +1348,6 @@ ALTER TABLE ONLY public.message_metadata ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3081 (class 2604 OID 25803)
 -- Name: message_template id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1497,7 +1355,6 @@ ALTER TABLE ONLY public.message_template ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3082 (class 2604 OID 25804)
 -- Name: message_template_placeholders id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1505,7 +1362,6 @@ ALTER TABLE ONLY public.message_template_placeholders ALTER COLUMN id SET DEFAUL
 
 
 --
--- TOC entry 3083 (class 2604 OID 25805)
 -- Name: message_type id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1513,7 +1369,6 @@ ALTER TABLE ONLY public.message_type ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 3084 (class 2604 OID 25806)
 -- Name: openvidu_session openvidu_session_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1521,7 +1376,6 @@ ALTER TABLE ONLY public.openvidu_session ALTER COLUMN openvidu_session_id SET DE
 
 
 --
--- TOC entry 3085 (class 2604 OID 25807)
 -- Name: openvidu_session_token openvidu_session_token_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1529,7 +1383,6 @@ ALTER TABLE ONLY public.openvidu_session_token ALTER COLUMN openvidu_session_tok
 
 
 --
--- TOC entry 3087 (class 2604 OID 25808)
 -- Name: patient_details id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1537,7 +1390,6 @@ ALTER TABLE ONLY public.patient_details ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3088 (class 2604 OID 25809)
 -- Name: patient_report id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1545,7 +1397,6 @@ ALTER TABLE ONLY public.patient_report ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3090 (class 2604 OID 25810)
 -- Name: payment_details id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1553,7 +1404,6 @@ ALTER TABLE ONLY public.payment_details ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3091 (class 2604 OID 25811)
 -- Name: prescription id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1561,7 +1411,6 @@ ALTER TABLE ONLY public.prescription ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 3092 (class 2604 OID 25812)
 -- Name: tabesample id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1569,7 +1418,6 @@ ALTER TABLE ONLY public.tabesample ALTER COLUMN id SET DEFAULT nextval('public.t
 
 
 --
--- TOC entry 3093 (class 2604 OID 25813)
 -- Name: work_schedule_day id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1577,7 +1425,6 @@ ALTER TABLE ONLY public.work_schedule_day ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 3094 (class 2604 OID 25814)
 -- Name: work_schedule_interval id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1585,8 +1432,6 @@ ALTER TABLE ONLY public.work_schedule_interval ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 3307 (class 0 OID 25579)
--- Dependencies: 200
 -- Data for Name: account_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1596,13 +1441,11 @@ Acc_3	Dr Mehtas Hospital	Nichols road	Tamil Nadu	600031	9623456258	drmehtashospi
 Acc_4	HCG Cancer Centre	Luz church	Tamil Nadu	600004	9623456259	hcgcancercentre@gmail.com	4	\N	India	Luz church	\N	\N
 Acc_5	Kauvery Hospital	TTK road	Tamil Nadu	600018	9623456270	kauveryhospital@gmail.com	5	\N	India	TTK road	\N	\N
 Acc_6	Frontier Lifeline Hospital	Ambattur Industrial Estate Road	Tamil Nadu	600101	9623656270	frontierlifeline@gmail.com	6	\N	India	Industrial Estate	\N	\N
-Acc_1	Apollo Hospitals		Tamil Nadu	600116	9623456259	chennai@apollohospitals.com	1	https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50	India	Greams Lane2	\N	\N
+Acc_1	Apollo Hospitals	porur	Tamil Nadu	600116	962345626	test@apollo.com	1	https://s.ndtvimg.com//images/entities/300/apollo-hospital-chennai_636408444078079763_108400.jpg?q=50	Indian	Greams Lane4	\N	Chennai, TamilNadu
 \.
 
 
 --
--- TOC entry 3309 (class 0 OID 25587)
--- Dependencies: 202
 -- Data for Name: appointment; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1629,32 +1472,48 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 2306	5	85	2021-01-19	23:40:00	23:55:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	paused	2021-01-19 10:06:55.527	f
 2250	6	85	2021-01-04	18:00:00	18:10:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	notCompleted	2021-01-04 17:53:21.528	f
 2290	5	356	2021-01-15	19:00:00	19:15:00	\N	t	f	PATIENT	356	\N	\N	15	onlineCollection	online	paused	2021-01-15 17:31:23.285	f
+2307	5	85	2021-01-20	22:45:00	23:00:00	\N	t	f	PATIENT	85	\N	\N	15	directPayment	online	paused	2021-01-20 09:51:05.133	f
 2251	6	85	2021-01-04	18:20:00	18:30:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	notCompleted	2021-01-04 18:18:23.646	f
 2291	5	284	2021-01-16	13:00:00	13:15:00	\N	t	f	DOCTOR	32	\N	\N	15	directPayment	online	notCompleted	2021-01-15 23:32:50.108	f
+2308	5	358	2021-01-20	19:15:00	19:35:00	\N	f	t	DOCTOR	32	DOCTOR	32	20	directPayment	online	notCompleted	2021-01-20 18:51:23.546	f
+2309	5	358	2021-01-20	19:55:00	20:15:00	\N	f	t	DOCTOR	32	DOCTOR	32	20	directPayment	online	notCompleted	2021-01-20 18:51:46.447	f
 2252	6	85	2021-01-04	19:00:00	19:10:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	paused	2021-01-04 18:43:12.696	f
 2292	5	446	2021-01-16	13:15:00	13:30:00	\N	t	f	DOCTOR	32	\N	\N	15	directPayment	online	notCompleted	2021-01-15 23:46:53.22	f
 2293	5	352	2021-01-16	13:30:00	13:45:00	\N	t	f	DOCTOR	32	\N	\N	15	directPayment	online	notCompleted	2021-01-15 23:47:12.938	f
 2253	6	85	2021-01-04	19:40:00	19:50:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	paused	2021-01-04 19:22:36.48	f
 2294	6	85	2021-01-16	03:10:00	03:20:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	notCompleted	2021-01-16 00:06:41.135	f
+2310	5	312	2021-01-20	19:55:00	20:15:00	\N	t	f	DOCTOR	32	\N	\N	20	directPayment	online	\N	2021-01-20 18:52:39.57	f
+2311	6	359	2021-01-20	19:10:00	19:20:00	\N	t	f	PATIENT	359	\N	\N	10	onlineCollection	online	completed	2021-01-20 19:05:03.456	f
 2254	6	85	2021-01-04	20:20:00	20:30:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	completed	2021-01-04 19:57:33.013	f
 2295	5	258	2021-01-16	17:15:00	17:30:00	\N	t	f	DOCTOR	32	\N	\N	15	directPayment	online	notCompleted	2021-01-16 16:16:49.989	f
 2255	6	85	2021-01-05	16:50:00	17:00:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	\N	2021-01-05 16:20:43.348	f
+2312	6	359	2021-01-20	19:20:00	19:30:00	\N	f	t	PATIENT	359	DOCTOR	33	10	onlineCollection	online	notCompleted	2021-01-20 19:12:06.276	f
 2296	5	85	2021-01-16	18:00:00	18:15:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	\N	2021-01-16 16:34:29.901	f
 2256	6	86	2021-01-05	16:40:00	16:50:00	\N	t	f	DOCTOR	33	\N	\N	10	directPayment	online	notCompleted	2021-01-05 16:22:32.837	f
 2297	5	85	2021-01-16	21:30:00	21:45:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	\N	2021-01-16 17:00:23.144	f
+2313	6	359	2021-01-20	19:40:00	19:50:00	\N	t	f	DOCTOR	33	\N	\N	10	directPayment	online	paused	2021-01-20 19:12:30.181	f
 2257	5	258	2021-01-05	22:55:00	23:10:00	\N	t	f	PATIENT	258	\N	\N	15	onlineCollection	online	notCompleted	2021-01-05 17:07:38.618	f
 2298	5	85	2021-01-16	21:15:00	21:30:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	\N	2021-01-16 17:01:55.348	f
+2314	5	85	2021-01-21	23:20:00	23:40:00	\N	t	f	PATIENT	85	\N	\N	20	onlineCollection	online	paused	2021-01-21 09:53:35.029	f
 2258	5	85	2021-01-05	21:25:00	21:40:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	notCompleted	2021-01-05 21:09:10.771	f
 2299	6	85	2021-01-16	22:00:00	22:10:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	paused	2021-01-16 17:15:15.081	f
+2315	5	105	2021-01-21	16:20:00	16:40:00	\N	t	f	PATIENT	105	\N	\N	20	directPayment	online	paused	2021-01-21 16:06:58.795	f
 2259	6	347	2021-01-06	19:20:00	19:30:00	\N	t	f	PATIENT	347	\N	\N	10	onlineCollection	online	paused	2021-01-06 19:18:59.484	f
 2300	5	85	2021-01-18	19:10:00	19:25:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	paused	2021-01-18 10:12:28.205	f
+2316	6	85	2021-01-21	22:50:00	23:00:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	paused	2021-01-21 18:02:34.311	f
+2317	5	258	2021-01-22	16:20:00	16:40:00	\N	t	f	PATIENT	258	\N	\N	20	onlineCollection	online	completed	2021-01-22 11:45:17.951	f
 2260	6	85	2021-01-06	20:00:00	20:10:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	paused	2021-01-06 19:28:24.438	f
 540	1	1	2020-08-17	01:19:00	02:04:00	\N	t	f	ADMIN	53	\N	\N	\N	directPayment	online	notCompleted	2020-08-09 15:29:00.59	t
 2261	5	140	2021-01-09	13:00:00	13:15:00	\N	t	f	DOCTOR	32	\N	\N	15	directPayment	online	notCompleted	2021-01-08 19:43:32.739	f
+2318	5	258	2021-01-22	17:00:00	17:20:00	\N	t	f	PATIENT	258	\N	\N	20	onlineCollection	online	completed	2021-01-22 11:53:37.09	f
 2262	5	258	2021-01-10	13:00:00	13:15:00	\N	t	f	PATIENT	258	\N	\N	15	onlineCollection	online	notCompleted	2021-01-10 10:59:05.651	f
+2319	5	258	2021-01-22	18:00:00	18:20:00	\N	t	f	PATIENT	258	\N	\N	20	onlineCollection	online	paused	2021-01-22 12:18:49.826	f
 2263	5	258	2021-01-12	21:55:00	22:10:00	\N	t	f	PATIENT	258	\N	\N	15	onlineCollection	online	completed	2021-01-11 12:35:58.23	f
+2320	5	258	2021-01-22	17:20:00	17:40:00	\N	t	f	PATIENT	258	\N	\N	20	onlineCollection	online	completed	2021-01-22 12:22:54.706	f
 2264	5	258	2021-01-12	12:15:00	12:30:00	\N	t	f	PATIENT	258	\N	\N	15	onlineCollection	online	completed	2021-01-11 12:38:06.912	f
+2321	5	258	2021-01-22	17:40:00	18:00:00	\N	t	f	PATIENT	258	\N	\N	20	onlineCollection	online	completed	2021-01-22 12:30:18.959	f
 2265	5	258	2021-01-11	13:55:00	14:10:00	\N	t	f	PATIENT	258	\N	\N	15	onlineCollection	online	paused	2021-01-11 12:42:05.972	f
+2322	5	105	2021-01-22	16:40:00	17:00:00	\N	t	f	PATIENT	105	\N	\N	20	directPayment	online	\N	2021-01-22 15:43:59.312	f
 2266	5	85	2021-01-11	14:40:00	14:55:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	paused	2021-01-11 13:04:58.491	f
 2267	22	351	2021-01-11	18:00:00	18:30:00	\N	t	f	PATIENT	351	\N	\N	30	onlineCollection	online	notCompleted	2021-01-11 15:15:00.747	f
 2268	5	351	2021-01-11	15:40:00	15:55:00	\N	t	f	PATIENT	351	\N	\N	15	onlineCollection	online	notCompleted	2021-01-11 15:28:13.76	f
@@ -1662,7 +1521,6 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 642	5	151	2020-08-20	12:00:00	12:45:00	\N	t	f	ADMIN	53	\N	\N	\N	directPayment	online	notCompleted	2020-08-18 19:46:00.389	t
 2270	5	85	2021-01-12	21:10:00	21:25:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	completed	2021-01-11 22:35:51.957	f
 2271	6	85	2021-01-12	20:50:00	21:00:00	\N	t	f	PATIENT	85	\N	\N	10	onlineCollection	online	\N	2021-01-12 13:21:01.675	f
-197	5	110	2020-07-31	14:30:00	15:15:00	\N	t	f	DOCTOR	32	\N	\N	45	directPayment	online	notCompleted	\N	t
 1631	3	397	2020-09-22	21:30:00	21:45:00	\N	t	f	DOCTOR	30	\N	\N	15	notRequired	online	paused	2020-09-22 20:58:59.541	t
 2272	5	85	2021-01-12	22:10:00	22:25:00	\N	t	f	PATIENT	85	\N	\N	15	onlineCollection	online	\N	2021-01-12 15:37:39.821	f
 643	5	151	2020-08-21	09:45:00	10:30:00	\N	t	f	ADMIN	53	\N	\N	\N	directPayment	online	notCompleted	2020-08-18 19:46:18.377	t
@@ -1721,6 +1579,7 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 177	5	93	2020-07-29	03:00:00	03:30:00	\N	f	t	DOCTOR	32	DOCTOR	32	30	directPayment	online	notCompleted	\N	t
 193	5	105	2020-07-28	05:30:00	06:00:00	\N	t	f	DOCTOR	32	\N	\N	30	directPayment	online	notCompleted	\N	t
 167	5	1	2020-08-04	02:30:00	03:00:00	\N	f	t	DOCTOR	32	DOCTOR	32	30	directPayment	online	notCompleted	\N	t
+197	5	110	2020-07-31	14:30:00	15:15:00	\N	t	f	DOCTOR	32	\N	\N	45	directPayment	online	notCompleted	\N	t
 195	5	112	2020-07-28	13:00:00	13:45:00	\N	f	t	DOCTOR	32	DOCTOR	32	45	directPayment	online	notCompleted	\N	t
 199	5	112	2020-07-28	13:45:00	14:30:00	\N	t	f	DOCTOR	32	\N	\N	45	directPayment	online	notCompleted	\N	t
 201	5	1	2020-07-29	10:45:00	11:30:00	\N	f	t	DOCTOR	32	DOCTOR	32	45	directPayment	online	notCompleted	\N	t
@@ -2862,7 +2721,6 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 1309	6	151	2020-09-09	19:15:00	19:30:00	\N	t	f	DOCTOR	33	\N	\N	15	directPayment	online	notCompleted	2020-09-09 19:04:13.329	t
 1299	6	257	2020-09-09	18:00:00	18:15:00	\N	t	f	PATIENT	257	\N	\N	15	onlineCollection	online	completed	2020-09-09 17:23:40.459	t
 1290	5	151	2020-09-09	17:15:00	17:30:00	\N	f	t	DOCTOR	32	DOCTOR	32	15	notRequired	online	completed	2020-09-09 15:26:32.665	t
-1939	5	258	2020-11-30	17:40:00	18:10:00	\N	t	f	ADMIN	53	\N	\N	\N	directPayment	online	notCompleted	2020-11-30 13:08:11.99	t
 1295	5	151	2020-09-09	20:00:00	20:15:00	\N	f	t	DOCTOR	32	DOCTOR	32	15	notRequired	online	completed	2020-09-09 17:09:14.691	t
 1300	6	85	2020-09-09	17:45:00	18:00:00	\N	t	f	DOCTOR	33	\N	\N	15	directPayment	online	completed	2020-09-09 17:34:29.766	t
 1301	6	162	2020-09-09	18:15:00	18:30:00	\N	t	f	DOCTOR	33	\N	\N	15	directPayment	online	completed	2020-09-09 17:39:38.345	t
@@ -3501,6 +3359,7 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 1934	5	262	2020-11-30	13:50:00	14:05:00	\N	f	t	PATIENT	262	DOCTOR	32	15	directPayment	online	completed	2020-11-30 08:13:11.89	t
 1938	5	258	2020-11-30	17:10:00	17:40:00	\N	f	t	DOCTOR	32	DOCTOR	32	30	directPayment	online	notCompleted	2020-11-30 12:02:18.085	t
 1937	5	192	2020-11-30	19:10:00	19:40:00	\N	f	t	DOCTOR	32	DOCTOR	32	30	directPayment	online	notCompleted	2020-11-30 11:10:09.096	t
+1939	5	258	2020-11-30	17:40:00	18:10:00	\N	t	f	ADMIN	53	\N	\N	\N	directPayment	online	notCompleted	2020-11-30 13:08:11.99	t
 1940	5	258	2020-11-30	20:20:00	20:40:00	\N	t	f	DOCTOR	32	\N	\N	20	directPayment	online	paused	2020-11-30 19:22:13.42	t
 1941	6	85	2020-11-30	20:00:00	20:30:00	\N	t	f	PATIENT	85	\N	\N	30	directPayment	online	notCompleted	2020-11-30 14:03:56.498	t
 1942	5	85	2020-12-01	09:00:00	09:20:00	\N	f	t	PATIENT	85	PATIENT	\N	20	directPayment	online	notCompleted	2020-11-30 14:05:21.531	t
@@ -3803,8 +3662,6 @@ COPY public.appointment (id, "doctorId", patient_id, appointment_date, "startTim
 
 
 --
--- TOC entry 3310 (class 0 OID 25598)
--- Dependencies: 203
 -- Data for Name: appointment_cancel_reschedule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -3813,8 +3670,6 @@ COPY public.appointment_cancel_reschedule (appointment_cancel_reschedule_id, can
 
 
 --
--- TOC entry 3312 (class 0 OID 25603)
--- Dependencies: 205
 -- Data for Name: appointment_doc_config; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -4235,7 +4090,7 @@ COPY public.appointment_doc_config (appointment_doc_config_id, appointment_id, c
 16	267	2000	f	0	\N	f	0	3	\N	f	0	4	\N	1	3	\N
 428	679	500	t	1	0	f	\N	\N	\N	f	\N	\N	\N	0	\N	\N
 433	685	1000	t	5	30	t	2	3	\N	t	26	5	\N	1	4	\N
-434	686	7.879495e+15	t	5	30	f	2	3	\N	f	2	4	\N	1	3	\N
+434	686	7.87949492e+15	t	5	30	f	2	3	\N	f	2	4	\N	1	3	\N
 435	687	1000	t	5	30	t	2	3	\N	t	26	5	\N	1	4	\N
 436	688	2500	t	5	30	t	2	3	\N	t	2	4	\N	1	3	\N
 437	689	400	t	2	12	f	2	2	\N	f	3	2	\N	1	2	\N
@@ -5866,12 +5721,26 @@ COPY public.appointment_doc_config (appointment_doc_config_id, appointment_id, c
 2045	2304	1000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
 2046	2305	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0
 2047	2306	1000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2048	2307	1000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2049	2308	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2050	2309	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2051	2310	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2052	2311	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0
+2053	2312	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0
+2054	2313	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0
+2055	2314	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2056	2315	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2057	2316	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0
+2058	2317	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2059	2318	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2060	2319	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2061	2320	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2062	2321	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
+2063	2322	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10
 \.
 
 
 --
--- TOC entry 3316 (class 0 OID 25615)
--- Dependencies: 209
 -- Data for Name: communication_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5880,8 +5749,6 @@ COPY public.communication_type (id, name) FROM stdin;
 
 
 --
--- TOC entry 3318 (class 0 OID 25620)
--- Dependencies: 211
 -- Data for Name: doc_config; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5967,17 +5834,15 @@ COPY public.doc_config (id, doctor_key, consultation_cost, is_pre_consultation_a
 34	Doc_50	2500	t	2	\N	t	0	0	10	t	0	0	10	5	3	15	f	\N	\N	\N	f	\N	\N
 35	Doc_50	2500	f	2	\N	t	0	0	10	t	0	0	10	5	3	15	f	\N	\N	\N	f	\N	\N
 37	Doc_52	1200	f	2	\N	t	0	0	10	t	0	0	10	5	3	15	f	\N	\N	\N	f	\N	\N
-9	Doc_6	1000	t	2	10	t	0	0	10	t	0	0	15	1	0	0	t	\N	\N	5	f	Per Hour	10
+9	Doc_6	1000	t	2	10	t	0	0	10	t	0	0	10	1	0	0	t	\N	\N	5	f	Per Hour	10
 40	Doc_54	0	t	2	\N	t	5	2	30	t	6	8	40	5	3	15	f	\N	\N	\N	f	\N	\N
 41	Doc_54	100	f	2	\N	f	5	2	30	f	6	8	40	5	3	15	f	\N	\N	\N	f	\N	\N
 8	Doc_4	5000	t	5	45	t	0	0	10	t	0	0	10	1	3	18	f	\N	\N	2	t	Per Hour	15
-1	Doc_5	1000	t	5	30	t	0	0	10	t	0	0	10	0	0	10	f	\N	\N	5	f	Per Hour	15
+1	Doc_5	2000	t	5	30	t	0	0	10	t	0	0	10	0	0	10	f	\N	\N	5	f	Per Hour	20
 \.
 
 
 --
--- TOC entry 3321 (class 0 OID 25650)
--- Dependencies: 214
 -- Data for Name: doc_config_schedule_day; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6505,12 +6370,11 @@ COPY public.doc_config_schedule_day (doctor_id, "dayOfWeek", id, doctor_key) FRO
 
 
 --
--- TOC entry 3323 (class 0 OID 25658)
--- Dependencies: 216
 -- Data for Name: doc_config_schedule_interval; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.doc_config_schedule_interval ("startTime", "endTime", "docConfigScheduleDayId", id, doctorkey) FROM stdin;
+18:55:00	23:50:00	3	578	\N
 00:00:00	12:00:00	42	187	\N
 05:00:00	06:00:00	13	162	\N
 18:00:00	23:00:00	33	179	\N
@@ -6616,10 +6480,8 @@ COPY public.doc_config_schedule_interval ("startTime", "endTime", "docConfigSche
 14:00:00	19:00:00	47	193	\N
 09:00:00	14:00:00	45	190	\N
 12:00:00	15:00:00	22	148	\N
-23:00:00	00:00:00	3	564	\N
 22:00:00	00:00:00	17	465	\N
 17:00:00	23:50:00	38	463	\N
-00:00:00	01:00:00	3	565	\N
 14:00:00	18:00:00	8	427	\N
 09:00:00	12:00:00	8	105	Doc_1
 03:00:00	06:00:00	41	471	\N
@@ -6630,8 +6492,6 @@ COPY public.doc_config_schedule_interval ("startTime", "endTime", "docConfigSche
 09:00:00	12:00:00	47	192	\N
 19:55:00	08:54:00	47	276	\N
 17:00:00	21:00:00	23	171	\N
-01:00:00	02:00:00	3	566	\N
-02:00:00	03:00:00	3	567	\N
 10:00:00	12:00:00	7	419	\N
 16:00:00	17:00:00	7	448	\N
 12:40:00	20:40:00	1	576	\N
@@ -6701,13 +6561,10 @@ COPY public.doc_config_schedule_interval ("startTime", "endTime", "docConfigSche
 16:27:00	17:27:00	190	533	\N
 16:28:00	12:28:00	187	534	\N
 16:45:00	21:45:00	222	535	\N
-16:00:00	23:00:00	3	540	\N
 \.
 
 
 --
--- TOC entry 3326 (class 0 OID 25668)
--- Dependencies: 219
 -- Data for Name: doctor; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6751,9 +6608,9 @@ COPY public.doctor ("doctorId", doctor_name, account_key, doctor_key, experience
 31	Dharani Antharvedi	Acc_1	Doc_42	\N	\N	\N	\N	\N	\N	Dharani	Antharvedi	RegD_30	\N	offline	\N
 32	Dharani Antharvedi	Acc_1	Doc_43	\N	\N	\N	\N	\N	\N	Dharani	Antharvedi	RegD_31	\N	offline	\N
 33	Ponni Doctor	Acc_1	Doc_44	\N	\N	\N	\N	\N	\N	Ponni	Doctor	RegD_32	\N	offline	2020-09-19 07:33:38.823
+6	Sreeram Valluri	Acc_1	Doc_6	7	ENT	MBBS MD ENT	https://image.freepik.com/free-photo/portrait-cheerful-smiling-young-doctor-with-stethoscope-neck-medical-coat_255757-1414.jpg	9856425889	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Sreeram	Valluri	RegD_6	sreeram@apollo.com	offline	2021-01-22 14:43:12.556
 56	Dharani Antharvedi	Acc_1	Doc_108	5	ENT	MBBS	\N	7845127845	\N	Dharani	Antharvedi	RegD_51	dharani1@gmail.com	offline	\N
 4	Sree Kumar Reddy	Acc_1	Doc_4	26	Ophthamologist	MBBS MD Ophthamology	https://image.freepik.com/free-photo/handsome-smiling-medicine-doctor-sitting-office_151013-2102.jpg	9856425887	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Sree Kumar	Reddy	RegD_4	sreekumarreddy@apollo.com	offline	2021-01-11 21:31:49.694
-6	Sreeram Valluri	Acc_1	Doc_6	7	ENT	MBBS MD ENT	https://image.freepik.com/free-photo/portrait-cheerful-smiling-young-doctor-with-stethoscope-neck-medical-coat_255757-1414.jpg	9856425889	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Sreeram	Valluri	RegD_6	sreeram@apollo.com	offline	2021-01-19 10:12:03.017
 3	Sheetal Desai	Acc_1	Doc_3	7	General Physician	MBBS	https://image.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7781.jpg	9856425847	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Sheetal	Desai	RegD_3	sheetal@gmail.com	offline	2020-10-31 15:04:36.452
 1	Adithya K	Acc_1	Doc_1	7	Cardiologist	MBBS MD Cardiology	https://image.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-5055.jpg	9856325647	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Adithya	K	RegD_1	adithya@apollo.com	offline	2020-12-01 08:52:05.498
 17	Balaji.J	Acc_4	Doc_17	21	Medical oncologist	DMRT, DNB(RT),DM (ONCOLOGY)	https://img.freepik.com/free-photo/friendly-afro-american-doctor-holding-clipboard-smiling-camera-isolated-gray-background_231208-2232.jpg?size=626&ext=jpg&ga=GA1.2.335809809.1576926003	9556727899	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Balaji	J	RegD_17	balajij@gmail.com	offline	2020-10-16 06:09:33.952
@@ -6766,6 +6623,7 @@ COPY public.doctor ("doctorId", doctor_name, account_key, doctor_key, experience
 57	Dharani Antharvedi	Acc_1	Doc_109	5	ENT	MBBS	\N	7845127845	\N	Dharani	Antharvedi	RegD_52	test33@gmail.com	offline	\N
 58	Dr. TEST	Acc_1	Doc_110	5	ENT	MBBS	\N	7845127845	\N	Dr.	TEST	RegD_53	test32@gmail.com	offline	\N
 59	Dr. Edward	Acc_2	Doc_111	5	Cardiologist	MBBS	\N	8787878752	\N	Dr.	Edward	RegD_54	edward@gmail.com	offline	\N
+5	Shalini Shetty	Acc_1	Doc_5	6	Ophthamologist	MBBS MD Ophthamology	https://image.freepik.com/free-photo/beautiful-doctor-raising-his-hands_23-2148396672.jpg	9856425888	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Shalini	Shetty	RegD_5	test@apollo.com	online	2021-01-22 16:47:34.67
 88	firstName lastName	Acc_2	Doc_104	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_72	rtergdrrrr@gmail.com	offline	\N
 89	firstName lastName	Acc_2	Doc_105	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_73	trtwetw@gmail.com	offline	\N
 90	firstName lastName	Acc_2	Doc_106	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_74	asdasd@gmail.com	offline	\N
@@ -6795,13 +6653,10 @@ COPY public.doctor ("doctorId", doctor_name, account_key, doctor_key, experience
 106	firstName lastName	Acc_2	Doc_121	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_80	eetrt@gmail.com	offline	\N
 107	firstName lastName	Acc_2	Doc_122	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_81	anand12@gmail.com	offline	\N
 108	firstName lastName	Acc_2	Doc_123	5	ENT	MBBS	photo.jpg	7845127845	signature	firstName	lastName	RegD_82	anand1345@gmail.com	offline	\N
-5	Shalini Shetty	Acc_1	Doc_5	6	Ophthamologist	MBBS MD Ophthamology	https://image.freepik.com/free-photo/beautiful-doctor-raising-his-hands_23-2148396672.jpg	9856425888	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	Shalini	Shetty	RegD_5	test@apollo.com	online	2021-01-19 19:06:39.276
 \.
 
 
 --
--- TOC entry 3319 (class 0 OID 25642)
--- Dependencies: 212
 -- Data for Name: doctor_config_can_resch; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6812,8 +6667,6 @@ COPY public.doctor_config_can_resch (doc_config_can_resch_id, doc_key, is_patien
 
 
 --
--- TOC entry 3328 (class 0 OID 25677)
--- Dependencies: 221
 -- Data for Name: doctor_config_pre_consultation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6825,8 +6678,6 @@ COPY public.doctor_config_pre_consultation (doctor_config_id, doctor_key, consul
 
 
 --
--- TOC entry 3333 (class 0 OID 25691)
--- Dependencies: 226
 -- Data for Name: interval_days; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -6835,12 +6686,11 @@ COPY public.interval_days (interval_days_id, start_time, end_time, wrk_sched_id)
 
 
 --
--- TOC entry 3335 (class 0 OID 25696)
--- Dependencies: 228
 -- Data for Name: medicine; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.medicine (id, prescription_id, name_of_medicine, frequency_of_each_dose, count_of_medicine_for_each_dose, type_of_medicine, dose_of_medicine, count_of_days) FROM stdin;
+609	392	Fhjii	\N	0	\N	Vghjj	566
 10	16	Chrosin	\N	0	\N	10ml/ 2	Morning only
 11	16	Paracetomal	\N	0	\N	20ml/2	After food
 12	16	dxcfd	\N	0	\N	fdfdfdfd	fdfdf
@@ -7156,7 +7006,6 @@ COPY public.medicine (id, prescription_id, name_of_medicine, frequency_of_each_d
 322	143	dddddddd	\N	0	\N	dsdsdsds	ds
 323	144	ddd	\N	0	\N	dsdsdsds	dsds
 324	144	dddd	\N	0	\N	55555555	fdfdfd
-389	242	Dolodgbhsdgjkbdkbjsldkbjodsfjbdljbndnbvnb	\N	0	\N	dhsg\nfhgsh\ndhdg\ndghgn\nghkm vl;	53
 325	145	Dolo	\N	0	\N	Test tesy gsbsbbd d bdhdd ddhd d jdbd djd did d jrbrbr d  rjr f ff f jrr rf  r rijrh r r r rjrjjrjrjrrjrjjrjrjrjr fjrjrjrjr r r rrnjrjrjrjrjr jrjrjrjrnr fjrjrjrjrjrjr krkrkrkrjrjrjr rnrjkrkrkrr tktkktkr	10
 326	145	Dolo1	\N	0	\N	Gdrbbrb	10
 327	145	Hdhrhr	\N	0	\N	Dhrbrbbrbr4b	59955992
@@ -7221,6 +7070,7 @@ COPY public.medicine (id, prescription_id, name_of_medicine, frequency_of_each_d
 386	239	fghnfg	\N	0	\N	nhj\nghkjmgc\nhgmjhg\nfxhjx\nhkxhk\nhxkxhkf	65
 387	240	Dolodgbhsdgjkbdkbjsldkbjodsfjbdljbndnbvnb	\N	0	\N	dhsg\nfhgsh\ndhdg\ndghgn\nghkm vl;	53
 388	241	fghnfg	\N	0	\N	nhj\nghkjmgc\nhgmjhg\nfxhjx\nhkxhk\nhxkxhkf	65
+389	242	Dolodgbhsdgjkbdkbjsldkbjodsfjbdljbndnbvnb	\N	0	\N	dhsg\nfhgsh\ndhdg\ndghgn\nghkm vl;	53
 390	243	mjghk gjkuuk jporhjpor ihjijop ijhp	\N	0	\N	nkfmnf nokfnkf nklbds iofvha;gvfbgouafgvoihgiodfhgaiodhgiod\n diubgdobgdi\ndbuihgdiobgdjibfdjosthijoigjhgkbiopsbz ls	65
 391	244	nxfhmh mjgfsgbsjukjhmxbv eyagezjysjku	\N	0	\N	jj ldbnlknbhshSh\neblkdgn bkhiptebjps\npbgk;hnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhngbdgbdgbdgbdgbdhzg, bnihpteaaaaakjb 	45
 392	245	abcdefghijklmnopqrstuvwxyz	\N	0	\N	aaaaaaaaabbbbbbbbbbbbbbcccccccccccccddddddddddddeeeeeeeeefffffffffggggggggghhhhhhhiiiijjjjjjkkkkkllmmmnnnnnoooopppppppqqqqrsssttt	1234567890
@@ -7444,8 +7294,6 @@ COPY public.medicine (id, prescription_id, name_of_medicine, frequency_of_each_d
 
 
 --
--- TOC entry 3337 (class 0 OID 25704)
--- Dependencies: 230
 -- Data for Name: message_metadata; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7454,8 +7302,6 @@ COPY public.message_metadata (id, message_type_id, communication_type_id, messag
 
 
 --
--- TOC entry 3339 (class 0 OID 25709)
--- Dependencies: 232
 -- Data for Name: message_template; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7464,8 +7310,6 @@ COPY public.message_template (id, sender, subject, body) FROM stdin;
 
 
 --
--- TOC entry 3341 (class 0 OID 25717)
--- Dependencies: 234
 -- Data for Name: message_template_placeholders; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7474,8 +7318,6 @@ COPY public.message_template_placeholders (id, message_template_id, placeholder_
 
 
 --
--- TOC entry 3343 (class 0 OID 25722)
--- Dependencies: 236
 -- Data for Name: message_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7484,8 +7326,6 @@ COPY public.message_type (id, name) FROM stdin;
 
 
 --
--- TOC entry 3345 (class 0 OID 25727)
--- Dependencies: 238
 -- Data for Name: openvidu_session; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7495,22 +7335,20 @@ COPY public.openvidu_session (openvidu_session_id, doctor_key, session_name, ses
 2710	Doc_57	Ponni Dharani_1600518262209	ses_Pon2q0zKrA
 1621	Doc_48	Ponni Doctor_1599920413099	ses_D5JI9MBEsU
 3017	Doc_55	Sekhar Kasi_1600857714180	ses_LC5nE8Y3AI
+10482	Doc_6	Sreeram Valluri_1611299457986	ses_R3ekYB1Ink
 1989	Doc_50	Sekhar Kasi_1600160725196	ses_Xh7l3bRMoS
 2534	Doc_56	Madhu K_1600439634799	ses_GpeyvHxFeU
 5193	Doc_2	Prof Narendranath Kanna_1607505481881	ses_A5WwcMQ18C
 3934	Doc_3	Sheetal Desai_1604151598908	ses_Z1yRUplgK4
 2987	Doc_7	Indhumathi R_1600802859943	ses_RQ5zg3Z10g
 3890	Doc_17	Balaji.J_1602828557162	ses_STLqoOWYvW
-10137	Doc_5	Shalini Shetty_1611063398959	ses_KJ3XPUHSXF
 9750	Doc_4	Sree Kumar Reddy_1610379803491	ses_WZN6v7KGNb
-10058	Doc_6	Sreeram Valluri_1611030441158	ses_SysUzDekxy
+10522	Doc_5	Shalini Shetty_1611314246721	ses_DKXHb7jvmH
 4504	Doc_1	Adithya K_1606812621974	ses_BOLZuGMstP
 \.
 
 
 --
--- TOC entry 3347 (class 0 OID 25732)
--- Dependencies: 240
 -- Data for Name: openvidu_session_token; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7519,24 +7357,21 @@ COPY public.openvidu_session_token (openvidu_session_token_id, openvidu_session_
 3034	1989	wss://devideo.virujh.com?sessionId=ses_Xh7l3bRMoS&token=tok_GOqfDghMcHfMvZlh&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=YQXJ5R&turnCredential=vwncbe	39	\N
 3346	2270	wss://devideo.virujh.com?sessionId=ses_YuNRjlH2KF&token=tok_ZupVzZ9FeOb0K3pb&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=LLXA5U&turnCredential=8o4aht	38	\N
 4180	2987	wss://devideo.virujh.com?sessionId=ses_RQ5zg3Z10g&token=tok_DmQtIh2jdt5C0V3u&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=MTGZPT&turnCredential=up1ff9	7	\N
+12546	10522	wss://devideo.virujh.com?sessionId=ses_DKXHb7jvmH&token=tok_PPQcz6L5GmI3OhOL&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=72DZRY&turnCredential=nijgr9	5	\N
 3667	2534	wss://devideo.virujh.com?sessionId=ses_GpeyvHxFeU&token=tok_Xi3QCdbimQmaGniI&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=3SMTUL&turnCredential=zxm5md	44	\N
 2602	1621	wss://devideo.virujh.com?sessionId=ses_D5JI9MBEsU&token=tok_AZuewAR5PFugYYd3&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=FQUMHZ&turnCredential=lc4d4m	37	\N
 4210	3017	wss://devideo.virujh.com?sessionId=ses_LC5nE8Y3AI&token=tok_VikUKM2pwF14ZLYE&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=DNTZOJ&turnCredential=3fw9d8	43	\N
 3229	2177	wss://devideo.virujh.com?sessionId=ses_YSm69hBqlO&token=tok_YoDpDf7HPgiwhLQP&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=Y8MRPT&turnCredential=ffhgzt	41	\N
+12499	10482	wss://devideo.virujh.com?sessionId=ses_R3ekYB1Ink&token=tok_WAihdmpvOWJmyyNg&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=BGAEML&turnCredential=cn3sc5	6	\N
 5847	4504	wss://devideo.virujh.com?sessionId=ses_BOLZuGMstP&token=tok_K2XoHfKHp5svRQJT&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=FGIEHE&turnCredential=5guw6y	1	\N
-12034	10137	wss://devideo.virujh.com?sessionId=ses_KJ3XPUHSXF&token=tok_YyEIV3UtYdwWdBZ5&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=TX8NXL&turnCredential=6rq3rf	5	\N
-12035	10137	wss://devideo.virujh.com?sessionId=ses_KJ3XPUHSXF&token=tok_VKRpijBy50ejCZEG&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=PB6FSO&turnCredential=ujx0qw	5	85
 5221	3934	wss://devideo.virujh.com?sessionId=ses_Z1yRUplgK4&token=tok_Ku6cM8f77aSouwLK&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=JCSCED&turnCredential=yt9szl	3	\N
 6718	5193	wss://devideo.virujh.com?sessionId=ses_A5WwcMQ18C&token=tok_XfCX3MnHX2YtaS58&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=OW9TUC&turnCredential=msusfw	2	\N
 5175	3890	wss://devideo.virujh.com?sessionId=ses_STLqoOWYvW&token=tok_KyrOhQ1Qgl0pzXyl&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=G7LFY6&turnCredential=5gfsgy	17	\N
-11897	10058	wss://devideo.virujh.com?sessionId=ses_SysUzDekxy&token=tok_DcwDswuKHJPOJpaX&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=LY8DDG&turnCredential=ctrnza	6	\N
 11495	9750	wss://devideo.virujh.com?sessionId=ses_WZN6v7KGNb&token=tok_A5E5vRcig3T4jICx&role=PUBLISHER&version=2.14.0&coturnIp=3.7.245.106&turnUsername=3WZRVM&turnCredential=zpk4vv	4	\N
 \.
 
 
 --
--- TOC entry 3349 (class 0 OID 25740)
--- Dependencies: 242
 -- Data for Name: patient_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -7722,6 +7557,7 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 894	\N	\N	\N	\N	Hsha	\N	\N	\N	\N	9855555555	295	S	R H	01-01-1985	9457213484	35	offline	2020-12-03 21:25:25.52
 914	\N	\N	\N	\N	chennai	\N	\N	\N	\N	6677889901	315	varun	kumar	2020-12-09T09:09:00.000Z	7689012341	0	offline	2020-12-19 15:09:16.925
 909	\N	\N	\N	\N	Chennai	\N	\N	\N	\N	9542786666	310	Jay	P	1984-12-08T14:24:00.000Z	9542147854	36	offline	2020-12-08 21:19:39.296
+73	stest 	\N	\N	\N	d	\N	\N	artemis@gmail.com	\N	9876543210	105	stest	s	2014-11-12T08:02:00.000Z	9876543210	5	offline	2021-01-22 16:22:51.982
 923	\N	\N	\N	\N	test@apollo.com	\N	\N	\N	\N	9623456259	324	Hari	balaji	2010-12-21T14:24:22.004Z	9623456258	10	offline	2020-12-21 19:59:43.047
 948	\N	\N	\N	\N	P 303 Bhaggyam Pragathi 	\N	\N	\N	\N	9701322000	349	Anand	Paramasivan	17-06-1976	9445409137	44	offline	2021-01-11 15:35:39.168
 955	\N	\N	\N	\N	Porur	\N	\N	\N	\N	8072389917	356	Ramesh 2	Patient	01-01-1985	8682866222	36	offline	2021-01-15 17:34:58.521
@@ -7729,7 +7565,6 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 904	\N	\N	\N	\N	Gxhxj	\N	\N	\N	\N	9457842434	305	Hsks	Tsusi	01-01-1985	9457843494	35	offline	2020-12-03 23:28:42.436
 946	\N	\N	\N	\N	Chennai	\N	\N	\N	\N	9456454216	347	Gdhs	Gsjs	01-01-1985	9457215487	36	offline	2021-01-06 19:25:14.98
 918	\N	\N	\N	\N	KhclgclHciiv	\N	\N	\N	\N	9544525664	319	Txhcuc	Ufuvi	01-01-1985	6554654566	35	offline	2020-12-11 21:04:21.193
-54	Sunder 	porur junction	india	-	porur	Tamil Nadu	522002	vijyalakshmi@gmail.com		9999999999	85	Sunder				\N	inSession	2021-01-19 19:06:53.766
 910	Vhj Ghk	\N	\N	\N	\N	\N	\N	Fhj@gmail.com	\N	6254856845	311	Vhj	Ghk	1994-01-01	\N	\N	online	\N
 850	\N	\N	\N	\N	madurai	\N	\N	\N	\N	6577889900	247	Ram	kumar	2017-11-02T11:13:00.000Z	6576890123	3	offline	2020-12-09 22:26:18.711
 831	jtgs mishra	\N	\N	\N	\N	\N	\N	subhadardjgdfg@softsuave.com	\N	9957217317	210	jtgs	mishra	2006-11-26T12:27:01.008Z	\N	\N	online	\N
@@ -7745,12 +7580,14 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 845	K M	\N	\N	\N	\N	\N	\N	sekhar1@softsuave.com	\N	4578545545	237	K	M	2020-11-27T10:21:00.000Z	\N	\N	online	\N
 895	\N	\N	\N	\N	Vzbsj	\N	\N	\N	\N	9755555555	296	R	J	01-01-1985	9457213459	35	offline	2020-12-03 21:53:44.994
 924	rre wef	\N	\N	\N	\N	\N	\N	test@apollo.com	\N	7889655465	325	rre	wef	2017-12-22T17:36:52.965Z	\N	\N	online	\N
+956	abcd 	\N	india	\N	abcd	tamilnadu	600016	\N	\N	9555544447	357	abcd		2011-01-20T12:06:16.335Z		10	offline	2021-01-20 17:47:37.432
 915	\N	\N	\N	\N	Chennai	\N	\N	\N	\N	6542789456	316	John	D	1994-12-11T10:24:00.000Z	9547854124	26	offline	2020-12-11 16:25:21.335
 888	\N	\N	\N	\N	12,fgyf	\N	\N	\N	\N	4342342345	289	hgeg	we	08-01-1985	4545453453	35	online	\N
 368	\N	\N	\N	\N	madurai	\N	\N	\N	\N	6678777123	389	Kumar	Kumar	2020-09-01T13:47:00.000Z	7766684561	12	offline	2020-09-23 15:46:01.746
 925	gf gfg	\N	\N	\N	\N	\N	\N	test@apollo.com	\N	9988774411	326	gf	gfg	1993-12-23T05:12:07.289Z	\N	\N	online	\N
 919	David D	Lake View Estate	India	123456	Chennai	T N	524132	david@gmail.com	\N	9547845214	320	David	D	1995-12-12T07:23:00.000Z	9578452145	25	offline	2020-12-12 17:11:06.337
 896	\N	\N	\N	\N	Vzbsj	\N	\N	\N	\N	9454675464	297	Vahaj	Hahai	01-01-1985	6457945784	35	offline	2020-12-04 18:58:45.877
+957	Fshsj Gshsj	\N	\N	\N	\N	\N	\N	Gshsj@gmail.com	\N	9995243654	358	Fshsj	Gshsj	1994-01-01	\N	\N	online	\N
 911	\N	\N	\N	\N	Hhsjs	\N	\N	\N	\N	9457243154	312	A	P K	01-01-1985	9124548721	35	offline	2020-12-09 10:20:46.733
 871	\N	\N	\N	\N	chennai	\N	\N	\N	\N	7892709916	273	anbhu	mani	1998-05-14T09:31:00.000Z	9164079737	22	offline	2020-12-01 09:35:23.878
 862	\N	\N	\N	\N	Chennai	\N	\N	\N	\N	9550185642	264	sdfsdf	sdfds	2005-11-30T13:09:00.000Z	6547854124	15	online	\N
@@ -7780,6 +7617,7 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 763	\N	landmark	India	\N	address	state	\N	gayatri@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9898523100	3	gayatri	anand	16-06-1995	alternateContact	21	online	\N
 833	dgfds sbbs	\N	\N	\N	\N	\N	\N	ssss@gmail.com	\N	9178365147	213	dgfds	sbbs	1986-11-26T13:41:59.342Z	\N	\N	online	\N
 847	v sdgsdg	\N	\N	\N	\N	\N	\N	sekhar@softsuave.com	\N	6478541254	241	v	sdgsdg	2020-11-27T10:28:17.957Z	\N	\N	online	\N
+958	John 	M	M	\N	John	M	\N	\N		9456242154	359	John			9157243154	36	offline	2021-01-20 19:47:36.998
 951		\N	\N	\N		\N	\N	\N		8940833838	352		Viju		8940852360	23	offline	2021-01-13 00:32:03.914
 762	\N	landmark	India	\N	address	state	826004	abcd@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	8529631470	2	gayatri	A	16-06-1995	alternateContact	21	online	\N
 755	\N	landmark	India	\N	address	state	826004	abcd@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	8765431001	11	gayatri	A	16-06-1995	alternateContact	21	online	\N
@@ -7805,6 +7643,7 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 891	\N	\N	\N	\N	Chennai 	\N	\N	\N	\N	9423115555	292	C	S K	01-01-1985	8404648764	35	offline	2020-12-03 21:23:14.426
 867	\N	\N	\N	\N	Chennai	\N	\N	\N	\N	7564896412	269	Kelvin	C	1996-12-01T07:39:00.000Z	9547845214	24	online	2021-01-18 17:47:44.995
 943	\N	\N	\N	\N	132,jhjhvuuhsd,cnjhuihsf	\N	\N	\N	\N	8754945148	344	abc	xyz	2018-01-02T11:21:00.000Z	8546354846	3	offline	2021-01-04 17:08:57.867
+54	vijaya lakshmi 	rado labs	chennai	-	lake view estates	tamil nadu	600116	vijyalakshmi@gmail.com		9999999999	85	vijaya lakshmi				\N	online	2021-01-22 15:06:33.401
 877	\N	\N	\N	\N	Fghu	\N	\N	\N	\N	7568456855	279	K	P	01-01-1985	5688598458	35	offline	2020-12-01 13:00:26.51
 567	\N	\N	\N	\N		\N	\N	\N	\N	1231234167	424	qqqqasas	qqqasas	\N	1313142498	23	online	\N
 952	Chakka 	\N	\N	\N	Kundrathur Main Road	\N	600116	\N		7894561239	353	Chakka				22	offline	2021-01-15 15:00:59.947
@@ -7920,7 +7759,6 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 713	\N	landmark	country	\N	address	state	533274	nirmala@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	7984561301	3	firstName	lastName	DOB	alternateContact	21	online	\N
 796	\N	landmark	country	\N	address	state	\N	nirmala@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9543684236	13	firstName	lastName	DOB	alternateContact	21	online	\N
 748	\N	landmark	India	\N	address	state	\N	gayatri@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9999999982	4	gayatri	anand	16-06-1995	alternateContact	21	online	\N
-73	stest 	\N	\N	\N	d	\N	\N	artemis@gmail.com	\N	9876543210	105	stest	s	2014-11-12T08:02:00.000Z	9876543210	5	offline	2021-01-11 12:49:21.514
 721	\N	landmark	country	\N	address	state	826004	nirmala@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9999999971	13	firstName	lastName	DOB	alternateContact	21	online	\N
 799	\N	landmark	country	\N	address	state	560066	nirmala@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9874563210	15	firstName	lastName	DOB	alternateContact	21	online	\N
 678	\N	landmark	country	\N	address	state	533274	nirmala@gmail.com	https://homepages.cae.wisc.edu/~ece533/images/airplane.png	9098970221	462	firstName	lastName	DOB	alternateContact	21	online	\N
@@ -7965,8 +7803,8 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 769	nirmala S	landmark	India	\N	address	state	\N	nirmala@gmail.com	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU	9857461220	1	firstName	lastName	dateOfBirth	alternateContact	21	online	2020-10-08 19:41:32.773
 775	nirmala S	landmark	India	\N	address	state	560066	nirmala@gmail.com	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU	6201002989	1	firstName	lastName	dateOfBirth	alternateContact	21	online	2020-10-08 19:41:32.773
 881	\N	\N	\N	\N	chennai	\N	\N	\N	\N	7892709911	282	srinivas	yadav	1996-12-03T06:44:32.730Z	7892709912	24	offline	2021-01-18 17:36:00.381
-857	Ponni	Kundrathur	\N	\N	softsuave technologies			\N		7894561237	258	Ponni	pa		9876543219	0	online	2021-01-19 14:04:09.718
 861	\N	\N	\N	\N	sdsdafsdf	\N	\N	\N	\N	7894561230	263	Kevin	O	1991-11-30T12:57:00.000Z	5784214789	29	online	\N
+857	Ponni	Kundrathur	\N	\N	softsuave technologies			\N		7894561237	258	Ponni	pa		9876543219	0	offline	2021-01-22 12:54:43.109
 825	D K	\N	\N	\N	\N	\N	\N	sekhar@softsuave.com	\N	9874512456	198	D	K	1997-11-26T11:43:07.791Z	\N	\N	online	\N
 842	abc def	\N	\N	\N	\N	\N	\N	abc@gmail.com	\N	8732765832	231	abc	def	1998-11-27T05:26:49.017Z	\N	\N	online	\N
 854	Haua Bshau	\N	\N	\N	\N	\N	\N	Gahau@gmail.com	\N	9464976464	254	Haua	Bshau	1994-01-20	\N	\N	online	\N
@@ -7993,13 +7831,11 @@ COPY public.patient_details (id, name, landmark, country, registration_number, a
 852	zxzv xvxcv	\N	\N	\N	\N	\N	\N	sekhar11@softsuave.com	\N	9875412447	251	zxzv	xvxcv	2020-11-27T11:28:48.723Z	\N	\N	online	\N
 860	\N	\N	\N	\N	csfsf	\N	\N	\N	\N	9623456256	262	Dom	zsc	2007-11-30T08:10:00.000Z	5465466465	13	online	2020-11-30 08:43:20.625
 866	D L	\N	\N	\N	\N	\N	\N	sfsdf@gmail.com	\N	9654785412	268	D	L	2007-11-30T15:03:37.779Z	\N	\N	online	\N
-5	Gowthami	bcd	india	-	address	karnataka	560066	divya@gmail.com	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU	1234567890	5	Jack	Reacher	2020-08-02T23:15:30.000Z	\N	\N	offline	2021-01-11 14:05:57.259
+5	Gowthami	bcd	india	-	address	karnataka	560066	divya@gmail.com	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU	1234567890	5	Jack	Reacher	2020-08-02T23:15:30.000Z	\N	\N	online	2021-01-11 14:05:57.259
 \.
 
 
 --
--- TOC entry 3351 (class 0 OID 25749)
--- Dependencies: 244
 -- Data for Name: patient_report; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8057,8 +7893,6 @@ COPY public.patient_report (id, patient_id, appointment_id, file_name, file_type
 
 
 --
--- TOC entry 3353 (class 0 OID 25757)
--- Dependencies: 246
 -- Data for Name: payment_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -10232,6 +10066,7 @@ COPY public.payment_details (id, appointment_id, order_id, receipt_id, amount, p
 2271	2301	order_GQjbpvgVXzS1f4	6GioBcDdM	1000	fullyPaid
 2214	2250	order_GLECpwt3zshFsG	r1bpwQLLV	1000	fullyPaid
 2231	2266	order_GNv1sfdb93NSZ6	RoPyLbcRp	1000	fullyPaid
+2285	2315	order_GRvU8ZHZ8UCuKR	gh1A10ra_	2000	fullyPaid
 2215	2251	order_GLEdjnuMS4PsGx	tdleiEeao	1000	fullyPaid
 2264	2294	order_GPgS2Sr9W0UYP0	2a0xfyJFT	1000	fullyPaid
 2232	2267	order_GNxDsTWQ0d0EQu	HKSERO13V	200	fullyPaid
@@ -10262,6 +10097,7 @@ COPY public.payment_details (id, appointment_id, order_id, receipt_id, amount, p
 2276	2305	order_GQoXgtXBa8BRbR	xlHqiNnhG	1000	fullyPaid
 2228	2263	order_GNuXj56hdbEDkH	lCdOLXrmq	1000	fullyPaid
 2239	2273	order_GOQEntEb4nsWBB	jUXG4Bkgt	1000	fullyPaid
+2286	2316	order_GRxS7Nzvr1FYKe	1r_vitmzu	1000	fullyPaid
 2229	2264	order_GNua98J2ayZr5B	wrlm8gimd	1000	fullyPaid
 2267	2297	order_GPxiLDCebIVT2S	mw2ygbKIr	1000	fullyPaid
 2240	2274	order_GOQH2Y9xB4NS7S	4oqwHbtTY	1000	fullyPaid
@@ -10270,31 +10106,46 @@ COPY public.payment_details (id, appointment_id, order_id, receipt_id, amount, p
 2242	\N	order_GOUMLqRJjdDmu3	Z52uRJMoe	3000	notPaid
 2243	\N	order_GOUpQ0QlXPdsMQ	N4_H_HX_N	5000	notPaid
 2244	\N	order_GOUqby9KT8AgVp	pX-qAYwCZ	5000	notPaid
+2278	2307	order_GRQXinmj0n6rar	JZKuycmQU	1000	fullyPaid
 2245	2276	order_GOUrzdZV1QOtJM	ym7cSdxcT	200	fullyPaid
 2268	2298	order_GPxkI60q10Kxft	oXLu86SGc	1000	fullyPaid
 2246	2277	order_GOVJUucbbEUei0	ljL8LreDS	1000	fullyPaid
+2279	2309	\N	\N	2000	fullyPaid
+2280	2310	\N	\N	2000	fullyPaid
 2247	2278	order_GOVKcOKq5ibm0V	inaMZaYse	1000	fullyPaid
 2248	\N	order_GOVTbXbgzXH2Ie	BEBv0q5w3	2000	notPaid
 2249	2279	order_GOVUGxVm0sJ7sZ	M4vqPtOxu	2000	fullyPaid
+2281	2311	order_GRZyBMJDdhPSxW	CyyXCoP-4	1000	fullyPaid
 2269	2299	order_GPxyK018wwcaK2	6JsWTXiRp	1000	fullyPaid
 2250	2280	order_GOVrlWC05pJzmR	7xjFHAoiX	1000	fullyPaid
+2287	2317	order_GSFX0HuK9WwR2Q	UovfOlP0g	2000	fullyPaid
 2251	2281	order_GOcVqJnBznnrIb	LWenkisNW	100	fullyPaid
+2282	2313	order_GRa69WzP5mq3f2	SkdCwCFdS	1000	fullyPaid
 2254	2284	order_GOfGHapgxL44Pm	PHuk01ywA	1000	fullyPaid
 2270	2300	order_GQdpXNPouXI3EW	TVmbfubH-	1000	fullyPaid
 2255	2285	order_GOfjmos56vjcne	D8mmKaQPQ	1000	fullyPaid
+2288	\N	order_GSFfSDEGr8zyk2	_le7-nuww	2000	notPaid
+2283	2314	order_GRp7GRYZRRhlqv	0NsDL3m0_	2000	fullyPaid
 2256	2286	order_GOfypznIgS1rCL	3NsIqVIl0	1000	fullyPaid
+2284	\N	order_GRvU7vD9MFTz1L	j-zLsjNyi	2000	notPaid
 2257	2287	order_GPZ6bloDVXKsFA	2Fx3tlyXC	1000	fullyPaid
+2293	2321	order_GSGKEuaRzYaLIW	uAsxbPga_	2000	fullyPaid
+2289	\N	order_GSFggLcSFEYnIC	BJJib0iOh	2000	notPaid
 2259	2289	order_GPZAfkLWyAkXEk	3cLL3kYie	1000	fullyPaid
+2294	\N	order_GSJct8mNDjcPGd	5ScntV1rP	2000	notPaid
 2260	2290	order_GPZi6Tgc23F4Pl	54SWG2RqW	1000	fullyPaid
 2261	2291	\N	\N	1000	fullyPaid
 2262	2292	\N	\N	1000	fullyPaid
 2263	2293	\N	\N	1000	fullyPaid
+2290	2318	order_GSFhLivBBDdV2r	LLKBzTtTW	2000	fullyPaid
+2295	\N	order_GSJctVPPXXr2GU	sQXMkqsHh	2000	notPaid
+2291	2319	order_GSG7xTeelIpt7g	NqKFfNjy7	2000	fullyPaid
+2292	2320	order_GSGCSRSg9ejVR7	ZsdEsWizW	2000	fullyPaid
+2296	2322	order_GSJctmPu1vW1JA	-RdrYbnzl0	2000	fullyPaid
 \.
 
 
 --
--- TOC entry 3355 (class 0 OID 25766)
--- Dependencies: 248
 -- Data for Name: prescription; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -10345,6 +10196,7 @@ COPY public.prescription (id, appointment_id, appointment_date, hospital_logo, h
 59	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-59.pdf
 60	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.amazonaws.com/virujh/gayatri%20A/prescription/prescription-60.pdf
 61	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.amazonaws.com/virujh/gayatri%20A/prescription/prescription-61.pdf
+392	2311	2021-01-20	\N	Apollo Hospitals	Sreeram Valluri	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	John Wick	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/John%20Wick/prescription/prescription-392.pdf
 63	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-63.pdf
 62	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-62.pdf
 65	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-65.pdf
@@ -10378,7 +10230,6 @@ COPY public.prescription (id, appointment_id, appointment_date, hospital_logo, h
 92	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-92.pdf
 94	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-94.pdf
 93	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-93.pdf
-204	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 95	2196	2020-12-24	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	firstName lastName	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/firstName%20lastName/prescription/prescription-95.pdf
 96	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-96.pdf
 97	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/gayatri%20A/prescription/prescription-97.pdf
@@ -10488,6 +10339,7 @@ COPY public.prescription (id, appointment_id, appointment_date, hospital_logo, h
 201	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 202	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 203	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
+204	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 205	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 206	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
 207	251	2020-07-29	\N	Apollo hospitalss	Shalini Shetty	https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTGHomN6o3VHRvm-lllm5B0zWqbOQwdggippA&usqp=CAU	gayatri A	\N
@@ -10679,8 +10531,6 @@ COPY public.prescription (id, appointment_id, appointment_date, hospital_logo, h
 
 
 --
--- TOC entry 3357 (class 0 OID 25774)
--- Dependencies: 250
 -- Data for Name: tabesample; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -10689,8 +10539,6 @@ COPY public.tabesample (id, name, place) FROM stdin;
 
 
 --
--- TOC entry 3359 (class 0 OID 25779)
--- Dependencies: 252
 -- Data for Name: work_schedule_day; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -10699,8 +10547,6 @@ COPY public.work_schedule_day (id, doctor_id, date, is_active, doctor_key) FROM 
 
 
 --
--- TOC entry 3361 (class 0 OID 25784)
--- Dependencies: 254
 -- Data for Name: work_schedule_interval; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -10709,8 +10555,6 @@ COPY public.work_schedule_interval (id, start_time, end_time, work_schedule_day_
 
 
 --
--- TOC entry 3398 (class 0 OID 0)
--- Dependencies: 201
 -- Name: account_details_account_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10718,8 +10562,6 @@ SELECT pg_catalog.setval('public.account_details_account_details_id_seq', 1, fal
 
 
 --
--- TOC entry 3399 (class 0 OID 0)
--- Dependencies: 204
 -- Name: appointment_cancel_reschedule_appointment_cancel_reschedule_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10727,26 +10569,20 @@ SELECT pg_catalog.setval('public.appointment_cancel_reschedule_appointment_cance
 
 
 --
--- TOC entry 3400 (class 0 OID 0)
--- Dependencies: 206
 -- Name: appointment_doc_config_appointment_doc_config_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.appointment_doc_config_appointment_doc_config_id_seq', 2047, true);
+SELECT pg_catalog.setval('public.appointment_doc_config_appointment_doc_config_id_seq', 2063, true);
 
 
 --
--- TOC entry 3401 (class 0 OID 0)
--- Dependencies: 207
 -- Name: appointment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.appointment_id_seq', 2306, true);
+SELECT pg_catalog.setval('public.appointment_id_seq', 2322, true);
 
 
 --
--- TOC entry 3402 (class 0 OID 0)
--- Dependencies: 208
 -- Name: appointment_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10754,8 +10590,6 @@ SELECT pg_catalog.setval('public.appointment_seq', 17, true);
 
 
 --
--- TOC entry 3403 (class 0 OID 0)
--- Dependencies: 210
 -- Name: communication_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10763,8 +10597,6 @@ SELECT pg_catalog.setval('public.communication_type_id_seq', 1, false);
 
 
 --
--- TOC entry 3404 (class 0 OID 0)
--- Dependencies: 213
 -- Name: doc_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10772,8 +10604,6 @@ SELECT pg_catalog.setval('public.doc_config_can_resch_doc_config_can_resch_id_se
 
 
 --
--- TOC entry 3405 (class 0 OID 0)
--- Dependencies: 215
 -- Name: doc_config_schedule_day_doc_config_schedule_day_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10781,17 +10611,13 @@ SELECT pg_catalog.setval('public.doc_config_schedule_day_doc_config_schedule_day
 
 
 --
--- TOC entry 3406 (class 0 OID 0)
--- Dependencies: 217
 -- Name: doc_config_schedule_interval_doc_config_schedule_interval_i_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.doc_config_schedule_interval_doc_config_schedule_interval_i_seq', 577, true);
+SELECT pg_catalog.setval('public.doc_config_schedule_interval_doc_config_schedule_interval_i_seq', 578, true);
 
 
 --
--- TOC entry 3407 (class 0 OID 0)
--- Dependencies: 218
 -- Name: docconfigid_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10799,8 +10625,6 @@ SELECT pg_catalog.setval('public.docconfigid_seq', 86, true);
 
 
 --
--- TOC entry 3408 (class 0 OID 0)
--- Dependencies: 220
 -- Name: doctor_config_can_resch_doc_config_can_resch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10808,8 +10632,6 @@ SELECT pg_catalog.setval('public.doctor_config_can_resch_doc_config_can_resch_id
 
 
 --
--- TOC entry 3409 (class 0 OID 0)
--- Dependencies: 222
 -- Name: doctor_config_pre_consultation_doctor_config_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10817,8 +10639,6 @@ SELECT pg_catalog.setval('public.doctor_config_pre_consultation_doctor_config_id
 
 
 --
--- TOC entry 3410 (class 0 OID 0)
--- Dependencies: 223
 -- Name: doctor_config_preconsultation_doctor_config_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10826,8 +10646,6 @@ SELECT pg_catalog.setval('public.doctor_config_preconsultation_doctor_config_id_
 
 
 --
--- TOC entry 3411 (class 0 OID 0)
--- Dependencies: 224
 -- Name: doctor_details_doctor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10835,8 +10653,6 @@ SELECT pg_catalog.setval('public.doctor_details_doctor_id_seq', 109, true);
 
 
 --
--- TOC entry 3412 (class 0 OID 0)
--- Dependencies: 225
 -- Name: doctor_doctor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10844,8 +10660,6 @@ SELECT pg_catalog.setval('public.doctor_doctor_id_seq', 1, false);
 
 
 --
--- TOC entry 3413 (class 0 OID 0)
--- Dependencies: 227
 -- Name: interval_days_interval_days_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10853,17 +10667,13 @@ SELECT pg_catalog.setval('public.interval_days_interval_days_id_seq', 1, false);
 
 
 --
--- TOC entry 3414 (class 0 OID 0)
--- Dependencies: 229
 -- Name: medicine_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.medicine_id_seq', 608, true);
+SELECT pg_catalog.setval('public.medicine_id_seq', 609, true);
 
 
 --
--- TOC entry 3415 (class 0 OID 0)
--- Dependencies: 231
 -- Name: message_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10871,8 +10681,6 @@ SELECT pg_catalog.setval('public.message_metadata_id_seq', 1, false);
 
 
 --
--- TOC entry 3416 (class 0 OID 0)
--- Dependencies: 233
 -- Name: message_template_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10880,8 +10688,6 @@ SELECT pg_catalog.setval('public.message_template_id_seq', 1, false);
 
 
 --
--- TOC entry 3417 (class 0 OID 0)
--- Dependencies: 235
 -- Name: message_template_placeholders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10889,8 +10695,6 @@ SELECT pg_catalog.setval('public.message_template_placeholders_id_seq', 1, false
 
 
 --
--- TOC entry 3418 (class 0 OID 0)
--- Dependencies: 237
 -- Name: message_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10898,35 +10702,27 @@ SELECT pg_catalog.setval('public.message_type_id_seq', 1, false);
 
 
 --
--- TOC entry 3419 (class 0 OID 0)
--- Dependencies: 239
 -- Name: openvidu_session_openvidu_session_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.openvidu_session_openvidu_session_id_seq', 10137, true);
+SELECT pg_catalog.setval('public.openvidu_session_openvidu_session_id_seq', 10522, true);
 
 
 --
--- TOC entry 3420 (class 0 OID 0)
--- Dependencies: 241
 -- Name: openvidu_session_token_openvidu_session_token_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.openvidu_session_token_openvidu_session_token_id_seq', 12035, true);
+SELECT pg_catalog.setval('public.openvidu_session_token_openvidu_session_token_id_seq', 12546, true);
 
 
 --
--- TOC entry 3421 (class 0 OID 0)
--- Dependencies: 243
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.patient_details_patient_details_id_seq', 955, true);
+SELECT pg_catalog.setval('public.patient_details_patient_details_id_seq', 958, true);
 
 
 --
--- TOC entry 3422 (class 0 OID 0)
--- Dependencies: 245
 -- Name: patient_report_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10934,26 +10730,20 @@ SELECT pg_catalog.setval('public.patient_report_id_seq', 51, true);
 
 
 --
--- TOC entry 3423 (class 0 OID 0)
--- Dependencies: 247
 -- Name: payment_details_payment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.payment_details_payment_id_seq', 2277, true);
+SELECT pg_catalog.setval('public.payment_details_payment_id_seq', 2296, true);
 
 
 --
--- TOC entry 3424 (class 0 OID 0)
--- Dependencies: 249
 -- Name: prescription_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.prescription_id_seq', 391, true);
+SELECT pg_catalog.setval('public.prescription_id_seq', 392, true);
 
 
 --
--- TOC entry 3425 (class 0 OID 0)
--- Dependencies: 251
 -- Name: tabesample_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10961,8 +10751,6 @@ SELECT pg_catalog.setval('public.tabesample_id_seq', 1, false);
 
 
 --
--- TOC entry 3426 (class 0 OID 0)
--- Dependencies: 253
 -- Name: work_schedule_day_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10970,8 +10758,6 @@ SELECT pg_catalog.setval('public.work_schedule_day_id_seq', 1, false);
 
 
 --
--- TOC entry 3427 (class 0 OID 0)
--- Dependencies: 255
 -- Name: work_schedule_interval_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10979,7 +10765,6 @@ SELECT pg_catalog.setval('public.work_schedule_interval_id_seq', 1, false);
 
 
 --
--- TOC entry 3096 (class 2606 OID 25816)
 -- Name: account_details account_details_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -10988,7 +10773,6 @@ ALTER TABLE ONLY public.account_details
 
 
 --
--- TOC entry 3098 (class 2606 OID 25818)
 -- Name: account_details account_key_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -10997,7 +10781,6 @@ ALTER TABLE ONLY public.account_details
 
 
 --
--- TOC entry 3102 (class 2606 OID 25820)
 -- Name: appointment_cancel_reschedule appointment_cancel_reschedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11006,7 +10789,6 @@ ALTER TABLE ONLY public.appointment_cancel_reschedule
 
 
 --
--- TOC entry 3105 (class 2606 OID 25822)
 -- Name: appointment_doc_config appointment_doc_config_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11015,7 +10797,6 @@ ALTER TABLE ONLY public.appointment_doc_config
 
 
 --
--- TOC entry 3100 (class 2606 OID 25824)
 -- Name: appointment appointment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11024,7 +10805,6 @@ ALTER TABLE ONLY public.appointment
 
 
 --
--- TOC entry 3108 (class 2606 OID 25826)
 -- Name: communication_type communication_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11033,7 +10813,6 @@ ALTER TABLE ONLY public.communication_type
 
 
 --
--- TOC entry 3112 (class 2606 OID 25828)
 -- Name: doctor_config_can_resch doc_config_can_resch_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11042,7 +10821,6 @@ ALTER TABLE ONLY public.doctor_config_can_resch
 
 
 --
--- TOC entry 3110 (class 2606 OID 25830)
 -- Name: doc_config doc_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11051,7 +10829,6 @@ ALTER TABLE ONLY public.doc_config
 
 
 --
--- TOC entry 3114 (class 2606 OID 25832)
 -- Name: doc_config_schedule_day doc_config_schedule_day_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11060,7 +10837,6 @@ ALTER TABLE ONLY public.doc_config_schedule_day
 
 
 --
--- TOC entry 3117 (class 2606 OID 25834)
 -- Name: doc_config_schedule_interval doc_config_schedule_interval_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11069,7 +10845,6 @@ ALTER TABLE ONLY public.doc_config_schedule_interval
 
 
 --
--- TOC entry 3126 (class 2606 OID 25836)
 -- Name: doctor_config_pre_consultation doctor_config_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11078,7 +10853,6 @@ ALTER TABLE ONLY public.doctor_config_pre_consultation
 
 
 --
--- TOC entry 3121 (class 2606 OID 25838)
 -- Name: doctor doctor_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11087,7 +10861,6 @@ ALTER TABLE ONLY public.doctor
 
 
 --
--- TOC entry 3123 (class 2606 OID 25840)
 -- Name: doctor doctor_key_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11096,7 +10869,6 @@ ALTER TABLE ONLY public.doctor
 
 
 --
--- TOC entry 3130 (class 2606 OID 25842)
 -- Name: interval_days interval_days_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11105,7 +10877,6 @@ ALTER TABLE ONLY public.interval_days
 
 
 --
--- TOC entry 3132 (class 2606 OID 25844)
 -- Name: medicine medicine_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11114,7 +10885,6 @@ ALTER TABLE ONLY public.medicine
 
 
 --
--- TOC entry 3134 (class 2606 OID 25846)
 -- Name: message_metadata message_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11123,7 +10893,6 @@ ALTER TABLE ONLY public.message_metadata
 
 
 --
--- TOC entry 3136 (class 2606 OID 25848)
 -- Name: message_template message_template_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11132,7 +10901,6 @@ ALTER TABLE ONLY public.message_template
 
 
 --
--- TOC entry 3138 (class 2606 OID 25850)
 -- Name: message_template_placeholders message_template_placeholders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11141,7 +10909,6 @@ ALTER TABLE ONLY public.message_template_placeholders
 
 
 --
--- TOC entry 3140 (class 2606 OID 25852)
 -- Name: message_type message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11150,7 +10917,6 @@ ALTER TABLE ONLY public.message_type
 
 
 --
--- TOC entry 3142 (class 2606 OID 25854)
 -- Name: openvidu_session openvidu_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11159,7 +10925,6 @@ ALTER TABLE ONLY public.openvidu_session
 
 
 --
--- TOC entry 3144 (class 2606 OID 25856)
 -- Name: openvidu_session_token openvidu_session_token_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11168,7 +10933,6 @@ ALTER TABLE ONLY public.openvidu_session_token
 
 
 --
--- TOC entry 3146 (class 2606 OID 25858)
 -- Name: patient_details patient_details_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11177,7 +10941,6 @@ ALTER TABLE ONLY public.patient_details
 
 
 --
--- TOC entry 3148 (class 2606 OID 25860)
 -- Name: patient_report patient_report_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11186,7 +10949,6 @@ ALTER TABLE ONLY public.patient_report
 
 
 --
--- TOC entry 3151 (class 2606 OID 25862)
 -- Name: payment_details payment_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11195,7 +10957,6 @@ ALTER TABLE ONLY public.payment_details
 
 
 --
--- TOC entry 3153 (class 2606 OID 25864)
 -- Name: prescription prescriptionId; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11204,7 +10965,6 @@ ALTER TABLE ONLY public.prescription
 
 
 --
--- TOC entry 3155 (class 2606 OID 25866)
 -- Name: tabesample tabesample_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11213,7 +10973,6 @@ ALTER TABLE ONLY public.tabesample
 
 
 --
--- TOC entry 3157 (class 2606 OID 25868)
 -- Name: work_schedule_day work_schedule_day_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11222,7 +10981,6 @@ ALTER TABLE ONLY public.work_schedule_day
 
 
 --
--- TOC entry 3160 (class 2606 OID 25870)
 -- Name: work_schedule_interval work_schedule_interval_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11231,7 +10989,6 @@ ALTER TABLE ONLY public.work_schedule_interval
 
 
 --
--- TOC entry 3106 (class 1259 OID 25871)
 -- Name: fki_app_doc_con_to_app_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11239,7 +10996,6 @@ CREATE INDEX fki_app_doc_con_to_app_id ON public.appointment_doc_config USING bt
 
 
 --
--- TOC entry 3103 (class 1259 OID 25872)
 -- Name: fki_can_resch_to_app_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11247,7 +11003,6 @@ CREATE INDEX fki_can_resch_to_app_id ON public.appointment_cancel_reschedule USI
 
 
 --
--- TOC entry 3127 (class 1259 OID 25873)
 -- Name: fki_doc_config_to_doc_key; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11255,7 +11010,6 @@ CREATE INDEX fki_doc_config_to_doc_key ON public.doctor_config_pre_consultation 
 
 
 --
--- TOC entry 3115 (class 1259 OID 25874)
 -- Name: fki_doc_sched_to_doc_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11263,7 +11017,6 @@ CREATE INDEX fki_doc_sched_to_doc_id ON public.doc_config_schedule_day USING btr
 
 
 --
--- TOC entry 3124 (class 1259 OID 25875)
 -- Name: fki_doctor_to_account; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11271,7 +11024,6 @@ CREATE INDEX fki_doctor_to_account ON public.doctor USING btree (account_key);
 
 
 --
--- TOC entry 3128 (class 1259 OID 25876)
 -- Name: fki_int_days_to_wrk_sched_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11279,7 +11031,6 @@ CREATE INDEX fki_int_days_to_wrk_sched_id ON public.interval_days USING btree (w
 
 
 --
--- TOC entry 3118 (class 1259 OID 25877)
 -- Name: fki_interval_to_wrk_sched_con_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11287,7 +11038,6 @@ CREATE INDEX fki_interval_to_wrk_sched_con_id ON public.doc_config_schedule_inte
 
 
 --
--- TOC entry 3119 (class 1259 OID 25878)
 -- Name: fki_interval_to_wrk_sched_config_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11295,7 +11045,6 @@ CREATE INDEX fki_interval_to_wrk_sched_config_id ON public.doc_config_schedule_i
 
 
 --
--- TOC entry 3149 (class 1259 OID 25879)
 -- Name: fki_payment_to_app_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11303,7 +11052,6 @@ CREATE INDEX fki_payment_to_app_id ON public.payment_details USING btree (appoin
 
 
 --
--- TOC entry 3158 (class 1259 OID 25880)
 -- Name: fki_workScheduleIntervalToDay; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -11311,7 +11059,6 @@ CREATE INDEX "fki_workScheduleIntervalToDay" ON public.work_schedule_interval US
 
 
 --
--- TOC entry 3162 (class 2606 OID 25881)
 -- Name: appointment_doc_config app_doc_con_to_app_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11320,7 +11067,6 @@ ALTER TABLE ONLY public.appointment_doc_config
 
 
 --
--- TOC entry 3175 (class 2606 OID 25886)
 -- Name: prescription appointmentId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11329,7 +11075,6 @@ ALTER TABLE ONLY public.prescription
 
 
 --
--- TOC entry 3161 (class 2606 OID 25891)
 -- Name: appointment_cancel_reschedule can_resch_to_app_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11338,7 +11083,6 @@ ALTER TABLE ONLY public.appointment_cancel_reschedule
 
 
 --
--- TOC entry 3168 (class 2606 OID 25896)
 -- Name: message_metadata communication_type_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11347,7 +11091,6 @@ ALTER TABLE ONLY public.message_metadata
 
 
 --
--- TOC entry 3165 (class 2606 OID 25901)
 -- Name: doc_config_schedule_interval doc_sched_interval_to_day; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11356,7 +11099,6 @@ ALTER TABLE ONLY public.doc_config_schedule_interval
 
 
 --
--- TOC entry 3164 (class 2606 OID 25906)
 -- Name: doc_config_schedule_day doc_sched_to_doc_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11365,7 +11107,6 @@ ALTER TABLE ONLY public.doc_config_schedule_day
 
 
 --
--- TOC entry 3163 (class 2606 OID 25911)
 -- Name: doc_config doctor_key; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11374,7 +11115,6 @@ ALTER TABLE ONLY public.doc_config
 
 
 --
--- TOC entry 3166 (class 2606 OID 25916)
 -- Name: doctor doctor_to_account; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11383,7 +11123,6 @@ ALTER TABLE ONLY public.doctor
 
 
 --
--- TOC entry 3171 (class 2606 OID 25921)
 -- Name: message_template_placeholders message_template_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11392,7 +11131,6 @@ ALTER TABLE ONLY public.message_template_placeholders
 
 
 --
--- TOC entry 3169 (class 2606 OID 25926)
 -- Name: message_metadata message_template_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11401,7 +11139,6 @@ ALTER TABLE ONLY public.message_metadata
 
 
 --
--- TOC entry 3172 (class 2606 OID 25931)
 -- Name: message_template_placeholders message_type_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11410,7 +11147,6 @@ ALTER TABLE ONLY public.message_template_placeholders
 
 
 --
--- TOC entry 3170 (class 2606 OID 25936)
 -- Name: message_metadata message_type_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11419,7 +11155,6 @@ ALTER TABLE ONLY public.message_metadata
 
 
 --
--- TOC entry 3173 (class 2606 OID 25941)
 -- Name: openvidu_session_token openvidu_session_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11428,7 +11163,6 @@ ALTER TABLE ONLY public.openvidu_session_token
 
 
 --
--- TOC entry 3174 (class 2606 OID 25946)
 -- Name: payment_details payment_to_app_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11437,7 +11171,6 @@ ALTER TABLE ONLY public.payment_details
 
 
 --
--- TOC entry 3167 (class 2606 OID 25951)
 -- Name: medicine prescription_id_medicine; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -11446,15 +11179,12 @@ ALTER TABLE ONLY public.medicine
 
 
 --
--- TOC entry 3176 (class 2606 OID 25956)
 -- Name: work_schedule_interval workScheduleIntervalToDay; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.work_schedule_interval
     ADD CONSTRAINT "workScheduleIntervalToDay" FOREIGN KEY (work_schedule_day_id) REFERENCES public.work_schedule_day(id) NOT VALID;
 
-
--- Completed on 2021-01-20 15:37:21
 
 --
 -- PostgreSQL database dump complete
