@@ -45,6 +45,12 @@ export const CONSTANT_MSG = {
     NO_APPOINTMENT: 'Please select appointment',
     FAILED_UPDATE_APPO: 'Unable update appointment',
     SUCCESS_UPDATE_APPO: 'Appointment updated successfully',
+    PASSWORD_UPDATION_SUCCESS: 'Password updated Successfully',
+    PASSWORD_UPDATION_FAILED: 'Password Updation Failed',
+    OTP_VERIFICATION_SUCCESS: 'OTP Verification Succesfully',
+    OTP_VERIFICATION_FAILED: 'OTP Verification Failed',
+    NO_MESSAGE_TEMPLATE: 'No Message Template',
+    MESSAGE_TEMPLATE_FETCH_SUCCESS: 'Message Template Fetched Successfully',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',
@@ -70,5 +76,10 @@ export const CONSTANT_MSG = {
     },
     USER_NOT_FOUND : 'No user registered with this email',
     PASSWORD_CHANGED : 'Successfully updated password',
-    PASSCODE_NOT_MATCHED:'Passcode not matched'
+    PASSCODE_NOT_MATCHED:'Passcode not matched',
+    MAIL: {
+        FORGOT_PASSWORD: 'FORGOT_PASSWORD',
+        RESET_PASSWORD: 'RESET_PASSWORD'
+    }
+
 }

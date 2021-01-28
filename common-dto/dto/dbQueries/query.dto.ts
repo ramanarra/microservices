@@ -65,5 +65,6 @@ export const queries = {
     getTodayAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" = $2 AND ("status"= $3 OR "status"=$4)  AND "is_cancel"=false',
     getAccountKey:"SELECT replace(account.account_key, 'Acc_', '') AS maxAcc FROM account WHERE account_key notnull order by replace(account.account_key, 'Acc_', '')::int desc limit 1",
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
-    getTableData:'SELECT * FROM '
+    getTableData:'SELECT * FROM ',
+    getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2'
 }

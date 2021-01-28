@@ -15,9 +15,9 @@ export class Email {
     constructor(){
         
     }
-    sendEmail (params:any) {
-        var smtpUser = "rohitsachin311@gmail.com";
-        var smtpPass = "rohit311";
+    async sendEmail(params:any): Promise<any> {
+        var smtpUser = "support@virujh.com";
+        var smtpPass = "Virujh!2Yda";
         var smtpHost = "smtp.gmail.com";
         var smtpPort = 465;
         // var smtpUser = params.smtpUser;
@@ -42,7 +42,7 @@ export class Email {
         });
 
         let mailOptions = {
-            from: smtpUser,
+            from: '"notification@virujh.com" <support@virujh.com>',
             to: params.recipient,
             // cc: params.cc,
             // bcc: params.bcc,
@@ -50,16 +50,16 @@ export class Email {
             html: params.template,
         };
 
-        transporter.sendMail(mailOptions, async (error, info) => {
-            if (error) {
-                console.log(error);
+        transporter.sendMail(mailOptions, async(err, info) => {
+            if (err) {
+                console.log("line ==> 55", err);
                 return{
                     statusCode:501,
                     message: CONSTANT_MSG.MAIL_ERROR
                 }
             } else {
                 return{
-                    statusCode:200,
+                    statusCode: 200,
                     message: CONSTANT_MSG.MAIL_OK
                 }
             }

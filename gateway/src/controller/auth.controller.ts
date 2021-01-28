@@ -242,6 +242,8 @@ export class AuthController {
         console.log("password and confirmPassword are not matching");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"password and confirmPassword are not matching"}
       }
+      userDto.role = CONSTANT_MSG.ROLES.DOCTOR;
+
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any =await this.userService.doctorsResetPassword(userDto);
       return doc;
@@ -320,29 +322,60 @@ export class AuthController {
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: UserDto })
     @ApiTags('Doctors')
-    async doctorForgotPassword(@Body() userDto : UserDto) {
+    async doctorsForgotPassword(@Body() userDto : UserDto) {
       if(!userDto.email){
-        console.log("Provide email");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
+        console.log("Provide confirmPassword");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide Email"}
       }
-      this.logger.log(`Doctor forgot password  Api -> Request data ${JSON.stringify(userDto)}`);
-      const doc:any =await this.userService.doctorForgotPassword(userDto);
+      userDto.role = CONSTANT_MSG.ROLES.DOCTOR;
+
+      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      const doc:any = await this.userService.doctorsForgotPassword(userDto);
+      if(doc.statusCode === HttpStatus.OK){
+        const template = await this.calendarService.getMessageTemplate({messageType: 'FORGOT_PASSWORD', communicationType: 'Email'});
+        
+        if(template && template.data){
+          let data = {
+            email: userDto.email,
+            password: doc.password,
+            template: template.data.body,
+            subject: template.data.subject,
+            type: CONSTANT_MSG.MAIL.FORGOT_PASSWORD,
+            sender: template.data.sender,
+            user_name: doc.name
+          };
+
+          const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+          if(sendMail && sendMail.statusCode === HttpStatus.OK){
+            delete doc.password;
+            delete doc.name;
+            return doc;
+          } else {
+            return sendMail;
+          }
+
+        }
+      }
       return doc;
     }
 
     @Post('patient/forgotPassword')
-    @ApiOkResponse({ description: ' { "phone": "9999999994"}' })
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"phone":"9999999996"\n' +
+          '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    @ApiBody({ type: UserDto })
+    @ApiBody({ type: PatientDto })
     @ApiTags('Patient')
     async patientForgotPassword(@Body() patientDto : PatientDto) {
+    
       if(!patientDto.phone){
-        console.log("Provide phone");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide phone"}
+        console.log("Provide Phone");
+        return{statusCode:HttpStatus.BAD_REQUEST, message:"Provide Phone"}
       }
-      this.logger.log(`Patient forgot password  Api -> Request data ${JSON.stringify(patientDto)}`);
-      const pat:any =await this.userService.patientForgotPassword(patientDto);
-      return pat;
+      this.logger.log(`Patient Forgot Password Api -> Request data ${JSON.stringify(patientDto)}`);
+      const patient = await this.userService.patientForgotPassword(patientDto);
+      return patient;
     }
 
     @Post('patient/resetPassword')
@@ -435,6 +468,44 @@ export class AuthController {
       this.logger.log(`Doctor change password  Api -> Request data ${JSON.stringify(patientDto)}`);
       const pat:any =await this.userService.doctorChangePassword(patientDto,req.user);
       return pat;
+    }
+
+    @Post('admin/forgotPassword')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"email":"test@admin.com"\n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiTags('Admin')
+    async adminForgotPassword(@Body() adminDto : UserDto) {
+      if(!adminDto.email){
+        console.log("Provide Email");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide Email"}
+      }
+      adminDto.role = CONSTANT_MSG.ROLES.ADMIN;
+      this.logger.log(`Admin Forgot Password Api -> Request data ${JSON.stringify(adminDto)}`);
+      const admin = await this.userService.doctorsForgotPassword(adminDto);
+      return admin;
+    }
+
+    @Post('patient/OTPVerification')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"phone": "9999999321"\n' +
+          '"passcode":"1234"\n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiTags('Patient')
+    async OTPVerification(@Body() patientDto : PatientDto) {
+    
+      if(!patientDto.passcode){
+        console.log("Provide passcode");
+        return{statusCode:HttpStatus.BAD_REQUEST, message:"Provide passcode"}
+      } else if(!patientDto.phone){
+        console.log("Provide Phone");
+        return{statusCode:HttpStatus.BAD_REQUEST, message:"Provide Phone"}
+      }
+      this.logger.log(`Patient OTP Verification Api -> Request data ${JSON.stringify(patientDto)}`);
+      const patient = await this.userService.OTPVerification(patientDto);
+      return patient;
     }
 
 }

@@ -1297,4 +1297,9 @@ export class AppointmentController {
         console.log('appointmen tObject')
         return await this.appointmentService.consultationStatusUpdate(appointmentObject);
     }
+
+    @MessagePattern({cmd: 'get_message_template'})
+    async getMessageTemplate(data: any): Promise<any> {
+        return await this.appointmentService.getMessageTemplate(data.messageType, data.communicationType);
+    }
 }
