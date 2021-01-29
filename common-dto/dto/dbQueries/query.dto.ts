@@ -26,6 +26,11 @@ export const queries = {
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
     getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (comments LIKE $2 OR file_name LIKE $2) Order by id DESC',
     getSearchReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (comments LIKE $4 OR file_name LIKE $4) Order by id DESC offset $2 limit $3',
+    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1 AND (comments LIKE $4 OR file_name LIKE $4) Order by id DESC offset $2 limit $3',
+    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1  Order by id DESC offset $2 limit $3',
+
+    getReportWithoutLimitAppointmentIdSearch:'SELECT * FROM patient_report  WHERE appointment_id = $1 AND (comments LIKE $2 OR file_name LIKE $2) Order by id DESC',
+    getReportWithAppointmentId: 'SELECT * FROM patient_report  WHERE appointment_id = $1 Order by id DESC',
 
     getAppListForPatient:'SELECT * from appointment WHERE "patient_id" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',

@@ -811,7 +811,6 @@ export class AppointmentService {
                 if (type === 'todaysAvailabilitySeats') {
                     return [];
                 } else {
-                    console.log("Error in appointmentSlotsView api 1")
                     return {
                         statusCode: HttpStatus.NO_CONTENT,
                         message: CONSTANT_MSG.CONTENT_NOT_AVAILABLE
@@ -887,7 +886,7 @@ export class AppointmentService {
                 const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
                 if (!appoint.message) {
                     const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
-                    console.log(appDocConfig);
+
                     return {
                         appointment: appoint,
                         appointmentDocConfig: appDocConfig
@@ -932,6 +931,16 @@ export class AppointmentService {
             const appointmentDetails = await this.appointmentRepository.findOne({id: id});
             const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
             const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            // get patient report
+            const report = await this.patientReportRepository.find({
+                order: {
+                    id: "DESC"
+                },
+                where: {
+                    appointmentId: id
+                }
+            });
+
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
@@ -942,7 +951,8 @@ export class AppointmentService {
             let res = {
                 appointmentDetails: appointmentDetails,
                 patientDetails: patient,
-                paymentDetails: pay
+                paymentDetails: pay,
+                reportDetails: report
             }
             return res;
         } catch (e) {
@@ -1271,7 +1281,6 @@ export class AppointmentService {
                                 preConsultationMins = config.preconsultationMins;
                             }
 
-                            console.log('appointmentList.doctor = >', appointmentList.doctorId);
                             let res = {
                                 appointmentDate: appointmentList.appointment_date,
                                 appointmentId: appointmentList.id,
@@ -1298,7 +1307,7 @@ export class AppointmentService {
                             preConsultationHours = config.preconsultationHours;
                             preConsultationMins = config.preconsultationMinutes;
                         }
-                        console.log('appointmentList.doctor = >', appointmentList.doctorId);
+
                         let res = {
                             appointmentDate: appointmentList.appointment_date,
                             appointmentId: appointmentList.id,
@@ -1435,6 +1444,7 @@ export class AppointmentService {
         const config = await this.getAppDoctorConfigDetails(details.appointmentId);
         const patient = await this.getPatientDetails(app.appointmentDetails.patientId);
         const prescriptionUrl = await this.getprescriptionUrl(details.appointmentId);
+
         let preHours = null;
         let preMins = null;
         let canDays = null;
@@ -1458,6 +1468,7 @@ export class AppointmentService {
             reschMins = config.rescheduleMinutes;
         }
         var res = {
+            reportDetail: app.reportDetails,
             email: doctor.email,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
@@ -1490,7 +1501,6 @@ export class AppointmentService {
         const doctor = await this.doctorDetails(user.doctorKey);
         const app = await this.appointmentRepository.query(queries.getAppointments, [doctor.doctorId, user.appointmentDate]);
        
-        console.log(app);
         const config = await this.getDoctorConfigDetails(user.doctorKey)
         let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         let dt = new Date(user.appointmentDate);
@@ -1981,33 +1991,6 @@ export class AppointmentService {
         }
 
     }
-
-    async prescriptionDownload(user: any): Promise<any> {
-        try{
-            const details = await this.appointmentRepository.findOne({id: user.appointmentId});
-            const pat = await this.patientDetailsRepository.findOne({patientId: details.patientId});
-            if(pat.patientId==user.patientId){
-                const prescription = await this.prescriptionRepository.query(queries.getPrescription, [user.appointmentId])
-                //const prescription = this.prescriptionRepository.find({appointmentId:user.appointmentId});    
-                //console.log(prescription);
-                prescription.name = pat.name;
-                return this.htmlToPdf(prescription,pat.name, prescription.id);
-            }else{
-                return {
-                    statusCode: HttpStatus.BAD_REQUEST,
-                    message: CONSTANT_MSG.INVALID_REQUEST
-                }
-            }    
-        } catch (e) {
-            console.log(e);
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.DB_ERROR
-            }
-        }
-       
-    }
-
 
     // common functions below===============================================================
 
@@ -11966,7 +11949,6 @@ export class AppointmentService {
                 } else {
                     
                     // store prescription URL into database
-                    console.log(`File uploaded successfully. ${data.Location}`);
                     this.prescriptionRepository.update({
                         id: prescription[0].id,
                     },  {prescriptionUrl: data.Location});
@@ -11998,7 +11980,6 @@ export class AppointmentService {
         });
 
         
-        console.log(reports);
 
         if(reports.file.mimetype === "application/pdf")
         {
@@ -12011,21 +11992,22 @@ export class AppointmentService {
         const parames = {
             ACL: 'public-read',
             Bucket: BUCKET_NAME,
-            Key: `virujh/testreport/` + reports.file.originalname,// File name you want to save as in S3
+            Key: `virujh/report/` + reports.file.originalname,// File name you want to save as in S3
             Body: base64data
         };
     
         // Uploading files to the bucket
-
+        const result = new Promise((resolve, reject) => {
         s3.upload( parames,async  (err, data) => {
             if (err) {
-                console.log(err);
-                console.log('Unable to upload prescription ' );
-            } else {
+                reject({
+                statusCode: HttpStatus.NO_CONTENT,
+                message: "Image Uploaded Failed",
+               })
+            } else{
+                
                 
                 // store prescription URL into database
-                console.log(`File uploaded successfully. ${data.Location}`);
-
                   await  this.patientReportRepository.patientReportInsertion({
                     patientId: reports.data.patientId,
                     appointmentId :reports.data.appointmentId ? reports.data.appointmentId :null,
@@ -12035,9 +12017,16 @@ export class AppointmentService {
                     reportDate : date,
                     comments : reports.data.comments
                     })
-                
+                    resolve({
+                        statusCode: HttpStatus.OK,
+                        message: "Image Uploaded Successfully",
+                        data: data.Location,
+                    })
             }
-        });
+        })
+    })
+
+    return result;
 
       
    }
@@ -12048,24 +12037,36 @@ export class AppointmentService {
     const offset = data.paginationStart;
     const endset = data.paginationLimit;
     const searchText = data.searchText;
+    const appointmentId = data.appointmentId;
     let response = {};
-
+    let app = [], reportList = [];
+    
     if(searchText){
-        const app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
-        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
-        response['totalCount'] = reportList.length;
-        response['list'] = app;
-        console.log(response)
-        return response;
+
+        if(appointmentId) {
+            app = await this.patientReportRepository.query(queries.getSearchReportByAppointmentId, [appointmentId,offset,endset, '%'+searchText+'%']); 
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitAppointmentIdSearch, [appointmentId, '%'+searchText+'%']);
+               
+        } else {
+            app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
+        }
+
+    } else {
+        if(appointmentId) {
+            app = await this.patientReportRepository.query(queries.getReportByAppointmentId, [appointmentId,offset,endset]);
+            reportList = await this.patientReportRepository.query(queries.getReportWithAppointmentId, [appointmentId]);
+
+        } else {
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
+            app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
+        }
+        
+         
     }
-    else{
-        const reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
-        const app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
-        response['totalCount'] = reportList.length;
-        response['list'] = app;
-        console.log(response)
-         return response;
-    }
+    response['totalCount'] = reportList.length;
+    response['list'] = app;
+    return response;
    
     
 }
@@ -12074,7 +12075,7 @@ export class AppointmentService {
     
     // update consultation status
     async consultationStatusUpdate(appointmentObject :any) {
-        console.log('appointmentObject', appointmentObject)
+
         if (appointmentObject.appointmentId) {
             const appointmentDetails = await this.appointmentRepository.findOne({id: appointmentObject.appointmentId});
 
@@ -12119,4 +12120,75 @@ export class AppointmentService {
             
         
     }
+
+    //upload files
+
+   async uploadFile(files: any){
+    try {
+        const AWS = require('aws-sdk');
+        let htmlPdf : any = '';
+        const ID = 'AKIAISEHN3PDMNBWK2UA';
+        const SECRET = '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';
+        const BUCKET_NAME = 'virujh-cloud'; 
+        var profileURL = "";     
+        // s3 bucket creation
+         const s3 = new AWS.S3({
+            accessKeyId: ID,
+            secretAccessKey: SECRET
+
+        });
+
+        if(files.file.mimetype === "application/pdf")
+        {
+        var base64data = new Buffer(files.file.buffer, 'base64');
+        }
+        else{
+            var base64data = new Buffer(files.file.buffer, 'binary');  
+        }
+
+        const parames = {
+            ACL: 'public-read',
+            Bucket: BUCKET_NAME,
+            Key: `virujh/files/` + files.file.originalname,// File name you want to save as in S3
+            Body: base64data
+        };
+        var location;
+
+
+        const result = new Promise((resolve, reject) => {
+            s3.upload( parames,async (err, data) => { 
+                if (err) {
+                    reject({
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: "Image Uploaded Failed"
+                    });
+                } else {
+                    resolve({
+                        statusCode: HttpStatus.OK,
+                        message: "Image Uploaded Successfully",
+                        data: data.Location,
+                        // url: path
+                    })
+                }
+            });
+        });
+        return result
+    } catch(err) {
+        return {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: err.message,
+            error: err
+        };
+    }
+   }
+
+   async getDoctorDetails(doctorKey: any) {
+    const doctor = await this.doctorRepository.findOne({doctorKey: doctorKey});
+    return doctor;
+      }
+
+    async getHospitalDetails(accountKey: any) {
+      const hospital = await this.accountDetailsRepository.findOne({accountKey: accountKey});
+      return hospital;
+     }
 }

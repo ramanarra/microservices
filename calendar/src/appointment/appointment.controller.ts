@@ -1297,4 +1297,25 @@ export class AppointmentController {
         console.log('appointmen tObject')
         return await this.appointmentService.consultationStatusUpdate(appointmentObject);
     }
+    
+    //upload file
+    @MessagePattern({cmd: 'upload_file'})
+    async uploadFile(files: any): Promise<any> {
+        const profileURL = await this.appointmentService.uploadFile(files) 
+        return profileURL;
+        
+    }
+
+    
+    @MessagePattern({cmd: 'get_doctor_details'})
+    async doctorDetailsEdit(doctorKey: any): Promise<any> {
+        const doctor = await this.appointmentService.getDoctorDetails(doctorKey);
+        return doctor;
+    }
+
+    @MessagePattern({cmd: 'get_hospital_details'})
+    async doctorHospitalEdit(accountKey: any): Promise<any> {
+        const hospital = await this.appointmentService.getHospitalDetails(accountKey);
+        return hospital;
+    }
 }

@@ -61,6 +61,9 @@ export class AuthController {
         console.log("Provide password");
         return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide password"}
       }
+      if(userDto.email){
+      userDto.email = userDto.email.toLowerCase();
+      }
       this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any =await this.userService.doctorsLogin(userDto);
       console.log('returning doc login 0 ', doc);
@@ -70,6 +73,15 @@ export class AuthController {
         console.log('returning doc login 2 status ', status);
       }
       console.log('returning doc login 1', doc);
+      if(doc.doctorKey){
+        const details = await this.calendarService.getDoctorDetails(doc.doctorKey);
+        doc.photo = details.photo;
+      }  
+      if(doc.accountKey){
+        const details = await this.calendarService.getHospitalDetails(doc.accountKey);
+        doc.hospitalPhoto = details.hospitalPhoto;
+        doc.hospitalName = details.hospitalName;
+      }  
       return doc;
     }
 
@@ -149,6 +161,7 @@ export class AuthController {
                 address:patientDto.address,
                 state:patientDto.state,
                 pincode:patientDto.pincode,
+                city:patientDto.city,
                 alternateContact:patientDto.alternateContact,
                 age:patientDto.age,
                 photo:patientDto.photo
@@ -255,7 +268,9 @@ export class AuthController {
     @ApiOkResponse({ description: 'requestBody example :{"isNewAccount":false,"email":"dharani@gmail.com","firstName":"Dharani","lastName":"Antharvedi","accountId":1, "qualification": "MBBS", "speciality": "ENT", "experience": "5", "password": "123456", "consultationCost" : "100", "number":"7845127845", "consultationSessionTimings":10}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async doctorRegistration(@Request() req, @reports() check:boolean, @Body() doctorDto : DoctorDto) {
-
+      if(doctorDto.email){
+        doctorDto.email = doctorDto.email.toLowerCase();
+      }
       if (doctorDto['isNewAccount']) {
         return {
           statusCode: HttpStatus.NO_CONTENT,

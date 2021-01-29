@@ -522,15 +522,16 @@ export class CalendarController {
             '"address":"address", \n' +
             '"state":"state", \n' +
             '"pincode":"IN-pincode", \n' +
+            '"city":"city", \n' +
             '"dateOfBirth":"dateOfBirth", \n' +
             '"photo":"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwHKqjyz6NY7C4rDUDSn61fPOhtjT9ifC84w&usqp=CAU" \n' +
             '}'
     })
+    @ApiBody({type: PatientDto})
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Patient')
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
-    @ApiBody({type: PatientDto})
     async patientDetailsEdit(@Request() req,@patient() check:boolean, @Body() patientDto: PatientDto) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -545,10 +546,21 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
         }
         if(req.body.firstName){
-            patientDto.lastName = "";
-            patientDto.name =  req.body.firstName+ " "+patientDto.lastName;
+            // patientDto.lastName = "";
+            patientDto.name =  req.body.firstName+ " " + patientDto.lastName;
         }
+        if(req.body.firstName){
+                patientDto.firstName =  req.body.firstName;
+                patientDto.name =  req.body.name;
+            }
          
+        if(req.body.lastName){
+                patientDto.lastName =  req.body.lastName;
+                patientDto.name =  req.body.name;
+            }
+        if(req.body.email){
+            patientDto.email = req.body.email.toLowerCase()
+        }
         function validateEmail(email){
             return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
         }
@@ -1428,13 +1440,14 @@ export class CalendarController {
    @UseGuards(AuthGuard())
    @ApiTags('Patient')
    async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
-    @Query('paginationLimit') paginationLimit: number  ) {
+    @Query('paginationLimit') paginationLimit: number,@Query('appointmentId') appointmentId : number  ) {
       const data={
         user : req.user,
         paginationStart : paginationStart,
         paginationLimit : paginationLimit,
         patientId : req.user.patientId,
-        searchText : searchText
+        searchText : searchText,
+        appointmentId : appointmentId
        } 
         if (!check){
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -1443,5 +1456,34 @@ export class CalendarController {
           return this.calendarService.reportList(data);
         }
    }
+
+   //file upload
+
+  @Post('patient/fileupload')
+  @ApiOkResponse({
+    description:
+      'requestBody example :   {\n' +
+      '"files":"fileList",\n'+
+      '"patientId":560,\n' +
+      '}',
+  })
+  @ApiBody({ type: patientReportDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+  @Roles('patient')
+  @UseInterceptors(FileInterceptor('files'))
+  async fileUpload(@UploadedFile() file, @Body() body) {
+    console.log(file);
+    console.log(body);
+    const files = {
+      file: file,
+      data : body
+    }
+        let data = await this.calendarService.uploadFile(files);
+        console.log(data)
+      return data;
+  }
+
 
 }
