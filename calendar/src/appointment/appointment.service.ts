@@ -12121,8 +12121,68 @@ export class AppointmentService {
         
     }
 
-    //upload files
+    async addDoctorSignature(reports: any): Promise<any> {
+       try{ 
+        const AWS = require('aws-sdk');
+        const ID = 'AKIAISEHN3PDMNBWK2UA';
+        const SECRET = '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';
+        const BUCKET_NAME = 'virujh-cloud';
+        
+        // s3 bucket creation
+         const s3 = new AWS.S3({
+            accessKeyId: ID,
+            secretAccessKey: SECRET
 
+        });
+
+
+        if(reports.file.mimetype === "application/pdf")
+        {
+        var base64data =  Buffer.from(reports.file.buffer, 'base64');
+        }
+        else{
+            var base64data = Buffer.from(reports.file.buffer, 'binary');  
+        }
+
+        const parames = {
+            ACL: 'public-read',
+            Bucket: BUCKET_NAME,
+            Key: `virujh/signature/` + reports.file.originalname,// File name you want to save as in S3
+            Body: base64data
+        };
+    
+        // Uploading files to the bucket
+        const result = new Promise((resolve, reject) => {
+            let queryRes;
+            s3.upload( parames,async (err, data) => { 
+                if (err) {
+                    reject({
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: "Image Uploaded Failed"
+                    });
+                } else {
+                     queryRes=await this.doctorRepository.query(queries.updateSignature, [reports.data.doctorId,data.Location])
+                    resolve({
+                        statusCode: HttpStatus.OK,
+                        message: "Image Uploaded Successfully",
+                        data: data.Location,
+                        // url: path
+                    })
+                }
+            });
+        });
+        return result;
+    }catch(err) {
+        return {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: err.message,
+            error: err
+        };
+    }
+      
+   }
+
+    //upload files
    async uploadFile(files: any){
     try {
         const AWS = require('aws-sdk');
@@ -12182,13 +12242,13 @@ export class AppointmentService {
     }
    }
 
-   async getDoctorDetails(doctorKey: any) {
-    const doctor = await this.doctorRepository.findOne({doctorKey: doctorKey});
-    return doctor;
-      }
+    async getDoctorDetails(doctorKey: any) {
+        const doctor = await this.doctorRepository.findOne({ doctorKey: doctorKey });
+        return doctor;
+    }
 
     async getHospitalDetails(accountKey: any) {
-      const hospital = await this.accountDetailsRepository.findOne({accountKey: accountKey});
-      return hospital;
-     }
+        const hospital = await this.accountDetailsRepository.findOne({ accountKey: accountKey });
+        return hospital;
+    }
 }

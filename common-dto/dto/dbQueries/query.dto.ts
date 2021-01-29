@@ -70,5 +70,6 @@ export const queries = {
     getTodayAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" = $2 AND ("status"= $3 OR "status"=$4)  AND "is_cancel"=false',
     getAccountKey:"SELECT replace(account.account_key, 'Acc_', '') AS maxAcc FROM account WHERE account_key notnull order by replace(account.account_key, 'Acc_', '')::int desc limit 1",
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
-    getTableData:'SELECT * FROM '
+    getTableData:'SELECT * FROM ',
+    updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`
 }
