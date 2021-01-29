@@ -27,7 +27,7 @@ export class HelperService {
 
                 if(messageType === CONSTANT_MSG.MAIL.PATIENT_REGISTRATION){
                     templateBody = templateBody.replace('{full_name}', data.name);
-                } else if(messageType === CONSTANT_MSG.MAIL.DOCTOR_REGISTRATION){
+                } else if(messageType === CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR){
                     templateBody = templateBody.replace('{full_name}', data.name);
                 }
 
