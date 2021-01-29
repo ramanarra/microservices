@@ -162,6 +162,18 @@ export class AuthController {
           }else {
             const details = await this.calendarService.patientInsertion(patientDto,patient.patientId);
             const status = await this.calendarService.updatePatOnline(patient.patientId);
+
+
+            /* // confirmation email
+            let data = {
+              email: patientDto.email,
+              messageType: CONSTANT_MSG.MAIL.PATIENT_REGISTRATION,
+              commType: CONSTANT_MSG.COMM_TYPE.EMAIL,
+              name: patientDto.firstName + " " + patientDto.lastName
+            }
+            const sendEmail = await this.calendarService.sendConfirmationMailOrSMS(data);
+            this.logger.log(`Patient registration -> confirmation mail -> Response data ${JSON.stringify(sendEmail)}`); */
+            
             return {
               patient:patient,
               details:details
@@ -285,6 +297,17 @@ export class AuthController {
             doctorDto.doctorKey = signUp.doctorKey;
 
             const doctor = await this.calendarService.doctorInsertion(doctorDto);
+
+           /* //confirmation email
+            let data = {
+              email: doctorDto.email,
+              messageType: CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR,
+              commType: CONSTANT_MSG.COMM_TYPE.EMAIL,
+              name: doctorDto.firstName + " " + doctorDto.lastName
+            }
+            const sendEmail = await this.calendarService.sendConfirmationMailOrSMS(data);
+            this.logger.log(`Doctor registration -> confirmation mail -> Response data ${JSON.stringify(sendEmail)}`); */
+            
             return doctor;
           } else {
 

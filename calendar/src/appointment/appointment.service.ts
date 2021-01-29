@@ -1037,7 +1037,9 @@ export class AppointmentService {
     }
 
     async patientRegistration(patientDto: PatientDto): Promise<any> {
-        return await this.patientDetailsRepository.patientRegistration(patientDto);
+        const patient = await this.patientDetailsRepository.patientRegistration(patientDto);
+        return patient;
+        // return await this.patientDetailsRepository.patientRegistration(patientDto);
     }
 
 

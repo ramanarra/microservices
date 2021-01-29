@@ -12,6 +12,7 @@ import { PaymentService } from './payment.service';
 import * as config from 'config';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
+import { HelperService } from 'src/utility/helper.service';
 //import * as moment from 'moment';
 
 //import {DoctorService} from './doctor/doctor.service';
@@ -26,7 +27,8 @@ export class AppointmentController {
         private readonly videoService : VideoService,
         private readonly paymentService : PaymentService,
         private patientDetailsRepository : PatientDetailsRepository,
-        private paymentDetailsRepository: PaymentDetailsRepository) {
+        private paymentDetailsRepository: PaymentDetailsRepository,
+        private helperService: HelperService) {
         //    this.textLocal = config.get('textLocal');
     }
 
@@ -1301,5 +1303,10 @@ export class AppointmentController {
     @MessagePattern({cmd: 'get_message_template'})
     async getMessageTemplate(data: any): Promise<any> {
         return await this.appointmentService.getMessageTemplate(data.messageType, data.communicationType);
+    }
+
+    @MessagePattern({cmd: 'send_confirmation_email_or_sms'})
+    async sendConfirmationEmailOrSMS(data: any): Promise<any> {
+        return await this.helperService.sendConfirmationMailOrSMS(data);
     }
 }

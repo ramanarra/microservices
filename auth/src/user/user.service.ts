@@ -14,8 +14,8 @@ import {UserRoleRepository} from './user_role.repository';
 import {PatientRepository} from './patient.repository';
 import * as bcrypt from "bcrypt";
 var generator = require('generate-password');
-import * as config from 'config';
-const textLocal = config.get('textLocal');
+// import * as config from 'config';
+// const textLocal = config.get('textLocal');
 
 @Injectable()
 export class UserService {

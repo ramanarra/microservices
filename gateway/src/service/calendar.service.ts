@@ -376,5 +376,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'get_message_template'}, data).toPromise();
     }
     
+    @UseFilters(AllClientServiceException)
+    public sendConfirmationMailOrSMS(data: any): Promise<any> {
+        return this.redisClient.send({ cmd: 'send_confirmation_email_or_sms'}, data).toPromise();
+    }
 
 }

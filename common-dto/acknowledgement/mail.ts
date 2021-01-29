@@ -6,27 +6,14 @@ export class Email {
     smtpPass:any;
     smtpHost:any;
     smtpPort:any;
-    // constructor(private params: any) {
-    //     this.smtpUser = params.smtpUser;
-    //     this.smtpPass = params.smtpPass;
-    //     this.smtpHost = params.smtpHost;
-    //     this.smtpPort = params.smtpPort;
-    //  }
-    constructor(){
-        
-    }
+
+    constructor(){}
+
     async sendEmail(params:any): Promise<any> {
         var smtpUser = "support@virujh.com";
         var smtpPass = "Virujh!2Yda";
         var smtpHost = "smtp.gmail.com";
         var smtpPort = 465;
-        // var smtpUser = params.smtpUser;
-        // var smtpPass = params.smtpPass;
-        // var smtpHost = "smtp.gmail.com";
-        // var smtpPort = 465;
-
-        //const nodemailer = MailerModule;
-        //const nodemailer = require('nodemailer')
 
         let transporter = nodemailer.createTransport({
             host: smtpHost,
@@ -54,7 +41,7 @@ export class Email {
             if (err) {
                 console.log("line ==> 55", err);
                 return{
-                    statusCode:501,
+                    statusCode: 501,
                     message: CONSTANT_MSG.MAIL_ERROR
                 }
             } else {
