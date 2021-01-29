@@ -1273,6 +1273,12 @@ export class AppointmentController {
         return doctors;  
     }
 
+    @MessagePattern({cmd: 'doctor_signature'})
+    async addDoctorSignature(reports: any): Promise<any> {
+        return await this.appointmentService.addDoctorSignature(reports);
+     }
+
+
     @MessagePattern({cmd: 'doctor_prescription_insertion'})
     async prescriptionInsertion(user:any): Promise<any> {
         const doc = await this.appointmentService.prescriptionInsertion(user);
@@ -1296,5 +1302,12 @@ export class AppointmentController {
     async consultationStatusUpdate(appointmentObject: any): Promise<any> {
         console.log('appointmen tObject')
         return await this.appointmentService.consultationStatusUpdate(appointmentObject);
+    }
+
+    @MessagePattern({cmd: 'upload_file'})
+    async uploadFile(files: any): Promise<any> {
+        const profileURL = await this.appointmentService.uploadFile(files) 
+        return profileURL;
+        
     }
 }

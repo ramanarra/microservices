@@ -25,7 +25,7 @@ import {
     ApiBearerAuth,
     ApiCreatedResponse,
     ApiBadRequestResponse,
-    ApiTags
+    ApiTags,ApiConsumes
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Roles} from 'src/common/decorator/roles.decorator';
@@ -61,6 +61,7 @@ import { AnyARecord } from 'dns';
 import {IsMilitaryTime, isMilitaryTime} from 'class-validator';
 import { retryWhen } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { report } from 'process';
 var moment = require('moment');
 
 
@@ -1443,5 +1444,77 @@ export class CalendarController {
           return this.calendarService.reportList(data);
         }
    }
+
+    // upload doctor signature    
+    @Post('dotor/signature/upload')
+    @ApiConsumes('multipart/form-data')
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @UseInterceptors(FileInterceptor('file'))
+     @ApiBody({
+        schema: {
+        type: 'object',
+        properties: {
+            file: {
+            type: 'string',
+            format: 'binary',
+             },
+            "doctorId":{
+                "type":"string",
+                "description":"...",
+                "example":"1"
+             }
+        },
+        },
+    })
+    @ApiTags('Doctors')
+    @ApiOkResponse({
+          description:
+            'requestBody example :   {\n' +
+             '"file":"file",\n'+
+            '"doctorId":2,\n' +
+            '}',
+        })
+    async uploadedFile(@UploadedFile() file, @Body() body) {
+    
+    const reports = {
+        file: file,
+       data : body
+     }
+
+     if (!body.doctorId) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Provide doctorId',
+        };
+      } else {
+       
+        
+        let data = await this.calendarService.addDoctorSinature(reports);
+         return data;
+        }
+  }
+  @Post('patient/fileupload')
+  @ApiOkResponse({
+    description:
+      'requestBody example :   {\n' +
+      '"files":"fileList",\n'+
+      '"patientId":560,\n' +
+      '}',
+  })
+  @ApiBody({ type: patientReportDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+  @Roles('patient')
+  @UseInterceptors(FileInterceptor('files'))
+  async fileUpload(@UploadedFile() file, @Body() body) {
+    const files = {
+      file: file,
+      data : body
+    }
+        let data = await this.calendarService.uploadFile(files);
+      return data;
+  }
 
 }
