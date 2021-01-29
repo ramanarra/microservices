@@ -11997,12 +11997,15 @@ export class AppointmentService {
         };
     
         // Uploading files to the bucket
-
+        const result = new Promise((resolve, reject) => {
         s3.upload( parames,async  (err, data) => {
             if (err) {
-                console.log(err);
-                console.log('Unable to upload prescription ' );
-            } else {
+                reject({
+                statusCode: HttpStatus.NO_CONTENT,
+                message: "Image Uploaded Failed",
+               })
+            } else{
+                
                 
                 // store prescription URL into database
                   await  this.patientReportRepository.patientReportInsertion({
@@ -12014,9 +12017,16 @@ export class AppointmentService {
                     reportDate : date,
                     comments : reports.data.comments
                     })
-                
+                    resolve({
+                        statusCode: HttpStatus.OK,
+                        message: "Image Uploaded Successfully",
+                        data: data.Location,
+                    })
             }
-        });
+        })
+    })
+
+    return result;
 
       
    }
