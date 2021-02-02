@@ -1245,6 +1245,20 @@ export class CalendarController {
     @ApiBody({type: AccountDto})
     paymentVerification(@Request() req, @Body() accountDto: AccountDto) {
         this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
+
+        if(!req.email) {
+            const updateEmail = async () => {
+                const pymntRecipt = await this.calendarService.paymentReciptDetails(req.body.razorpay_payment_id)
+                if(!!pymntRecipt?.email) {
+                    this.calendarService.patientDetailsEdit({
+                        patientId: req.body?.patientId,
+                        email: pymntRecipt?.email
+                    })
+                }
+            }
+            updateEmail()
+        }
+
         return this.calendarService.paymentVerification(accountDto, req.user);
     }
 

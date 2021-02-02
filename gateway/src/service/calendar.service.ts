@@ -328,6 +328,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
+    public paymentReciptDetails(pymntId: String) : Promise<any> {
+        return this.redisClient.send({ cmd: 'payment_recipt_details' }, pymntId).toPromise()
+    }
+
+    @UseFilters(AllClientServiceException)
     public accountPatientsList(user:any, accountKey:any) : Promise <any> {
         user.accountKey = accountKey;
         return this.redisClient.send({ cmd : 'account_patients_list'},user).toPromise();
