@@ -97,7 +97,8 @@ export class AppointmentService {
                         message: CONSTANT_MSG.TIME_OVERLAP
                     }
                 } else {
-                    let end = Helper.getTimeInMilliSeconds(appointmentDto.endTime);
+                    let endValue = appointmentDto.endTime === '00:00' ? '24:00' : appointmentDto.endTime;
+                    let end = Helper.getTimeInMilliSeconds(endValue);
                     let start = Helper.getTimeInMilliSeconds(appointmentDto.startTime);
                     let config = Helper.getMinInMilliSeconds(appointmentDto.config.consultationSessionTimings);
                     let endTime = start + config;
@@ -566,18 +567,25 @@ export class AppointmentService {
                 }
                 doctorWorkSchedule.forEach(v => {
                     if (v.dayOfWeek === 'Monday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.monday.push(v);
                     } else if (v.dayOfWeek === 'Tuesday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.tuesday.push(v);
                     } else if (v.dayOfWeek === 'Wednesday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.wednesday.push(v);
                     } else if (v.dayOfWeek === 'Thursday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.thursday.push(v);
                     } else if (v.dayOfWeek === 'Friday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.friday.push(v);
                     } else if (v.dayOfWeek === 'Saturday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.saturday.push(v);
                     } else if (v.dayOfWeek === 'Sunday') {
+                        v.endTime === '00:00:00' ? v.endTime = '24:00:00' : '';
                         doctorWorkScheduleObj.sunday.push(v);
                     }
                 })
