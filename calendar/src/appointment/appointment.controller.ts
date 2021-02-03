@@ -1333,4 +1333,13 @@ export class AppointmentController {
             return patient;  
         }
     }
+     //appointment list report 
+     @MessagePattern({cmd: 'appointment_list_report'})
+     async appoinmentListReport(data: any): Promise<any> {
+         const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
+         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
+             const appointmentReport = await this.appointmentService.appointmentListReport(data);
+             return appointmentReport;  
+         }
+     }
 }

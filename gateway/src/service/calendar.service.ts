@@ -390,6 +390,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public addDoctorSinature(reports: any) : Observable <any> {
         return  this.redisClient.send({ cmd : 'doctor_signature'},reports);
     }
+
     //Getting patient report in patient detail page
     @UseFilters(AllClientServiceException)
     public patientDetailLabReport(user:any, patientId:any, doctorKey:any) : Observable <any> {
@@ -398,4 +399,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
         return this.redisClient.send({ cmd : 'patient_detail_labreport'},user);
     }
 
+   //Getting appointment list report 
+   @UseFilters(AllClientServiceException)
+   public appoinmentListReport(user:any) : Observable <any> {
+   return this.redisClient.send({ cmd : 'appointment_list_report'},user);
+   }
 }
