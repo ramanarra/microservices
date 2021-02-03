@@ -1,7 +1,7 @@
 import {Injectable, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserRepository} from './user.repository';
-import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG,queries} from 'common-dto';
+import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG, queries, Email, Sms} from 'common-dto';
 import {JwtPayLoad} from 'src/common/jwt/jwt-payload.interface';
 import {JwtPatientLoad} from 'src/common/jwt/jwt-patientload.interface';
 import {JwtService} from '@nestjs/jwt';
@@ -14,10 +14,14 @@ import {UserRoleRepository} from './user_role.repository';
 import {PatientRepository} from './patient.repository';
 import * as bcrypt from "bcrypt";
 var generator = require('generate-password');
+// import * as config from 'config';
+// const textLocal = config.get('textLocal');
 
 @Injectable()
 export class UserService {
 
+    email: Email;
+    sms: Sms;
     constructor(
         @InjectRepository(UserRepository) private userRepository: UserRepository, private accountRepository: AccountRepository,
         private rolesRepository: RolesRepository, private rolePersmissionRepository: RolePermissionRepository,
@@ -261,8 +265,54 @@ export class UserService {
             }
         }else{
             return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_REQUEST
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+
+    async doctorForgotPassword(email: string): Promise<any> {
+        try{
+            const users =  await this.userRepository.findOne({email: email});
+            if(users){
+                const salt = !users.salt ? await bcrypt.genSalt() : users.salt; 
+                users.salt = salt;
+                const password = await this.genPassword(6);
+                console.log(password);
+                users.password = await this.hashPassword(password.toString(), salt);
+                let value: any = {
+                    password: users.password, 
+                    salt: users.salt
+                };
+                let condition = {
+                    id: users.id
+                }
+                const updatePassword = await this.userRepository.update(condition, value);
+                console.log(updatePassword);
+                if(updatePassword.affected){
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: CONSTANT_MSG.PASSWORD_UPDATION_SUCCESS,
+                        password: password,
+                        name: users.name
+                    }
+                } else {
+                    return {
+                        statusCode: HttpStatus.NO_CONTENT,
+                        message: CONSTANT_MSG.PASSWORD_UPDATION_FAILED
+                    }
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
+            }
+        } catch(err){
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
             }
         }
     }
@@ -298,13 +348,58 @@ export class UserService {
         return accreg;
     }
 
-    async genPassword(): Promise<any> {
+    async genPassword(length: number): Promise<any> {
         try {
             var password = generator.generate({
-                length: 8,
+                length: length,
                 numbers: true
             });
             return password
+        } catch (e) {
+	        console.log(e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
+    async patientForgotPassword(patientDto: PatientDto): Promise<any> {
+        try{
+            const patient = await this.patientRepository.findOne({phone: patientDto.phone});
+            if(patient && patient.patient_id){
+                const salt = patient.salt ? patient.salt : await bcrypt.genSalt();
+                const password = await this.genPassword(6);
+                patient.password = await this.hashPassword(password.toString(), salt);
+                const updatePassword = await this.patientRepository.update({patient_id: patient.patient_id}, {password: patient.password, salt: salt});
+                console.log(updatePassword);
+                if(updatePassword.affected){
+                    // let data = {
+                    //     apiKey: textLocal.APIKey,
+                    //     message: "Your new password is " + password,
+                    //     sender: textLocal.sender,
+                    //     number: patientDto.phone,
+                    // }
+
+                    // const sendSMS = await this.sms.sendSms(data);
+                    // if(sendSMS && sendSMS.statusCode === '200'){
+                        return {
+                            statusCode: HttpStatus.OK,
+                            message: CONSTANT_MSG.PASSWORD_UPDATION_SUCCESS,
+                            password: password
+                        }
+                    // }
+                } 
+                return {
+                    statusCode: HttpStatus.NO_CONTENT,
+                    message: CONSTANT_MSG.PASSWORD_UPDATION_FAILED
+                }
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.INVALID_REQUEST
+                }
+            }
+
         } catch (e) {
 	        console.log(e);
             return {
@@ -421,5 +516,138 @@ export class UserService {
                 message: CONSTANT_MSG.INVALID_REQUEST
             }
         }
+    }
+    
+    async sendEmailWithTemplate(req: any): Promise<any> {
+        const {email, template, subject, password, type, user_name} = req;
+
+        var templateBody = template;
+        if(type === CONSTANT_MSG.MAIL.FORGOT_PASSWORD){
+            templateBody = templateBody.replace('{password}', password);
+            templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
+        }
+
+        let params: any = {
+            subject: subject,
+            recipient: email,
+            template: templateBody
+        };
+
+        try {
+            let email = new Email();
+            const sendMail = await email.sendEmail(params);
+            console.log("mail response", sendMail);
+            return {
+                statusCode: HttpStatus.OK,
+                message: CONSTANT_MSG.MAIL_OK
+            }
+        } catch (e) {
+            console.log("error=> ", e);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+
+    }
+
+    async getEmailTemplate(data: any): Promise<any> {
+        try{
+
+
+        } catch(err){
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+
+    }
+
+    async OTPVerification(patientDto: PatientDto): Promise<any> {
+        try {
+
+            const patient = await this.patientRepository.findOne({phone: patientDto.phone, passcode: patientDto.passcode});
+            if(patient && patient.patient_id){
+                 const jwtUserInfo: JwtPatientLoad = {
+                    phone: patient.phone,
+                    patientId: patient.patient_id,
+                    permission: 'CUSTOMER',
+                    role:CONSTANT_MSG.ROLES.PATIENT
+                };
+                console.log("=======jwtUserInfo", jwtUserInfo)
+                const accessToken = this.jwtService.sign(jwtUserInfo);
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.OTP_VERIFICATION_SUCCESS,
+                    patient_id: patient.patient_id,
+                    accessToken: accessToken,
+                    permission: "CUSTOMER",
+                    role: CONSTANT_MSG.ROLES.PATIENT
+                }
+
+            } else {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.OTP_VERIFICATION_FAILED
+                }
+            }
+
+        } catch(err){
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+
+    }
+
+    async patientLoginForPhone(phone: string): Promise<any> {
+
+        const patient = await this.patientRepository.findOne({phone: phone});
+        if(patient){
+
+            let passcode = await this.random(4);
+
+            //Update passcode in patient table
+            let updatePasscode = await this.patientRepository.update({phone: phone}, {passcode: passcode});
+            if(updatePasscode.affected){
+                //  let data = {
+                //     apiKey: textLocal.APIKey,
+                //     message: "[VIRUJH] Your verification code is " + passcode,
+                //     sender: textLocal.sender,
+                //     number: phone,
+                // }
+
+                // const sendSMS = await this.sms.sendSms(data);
+                // if(sendSMS && sendSMS.statusCode === '200'){
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: "OTP is sent successfully",
+                        passcode: passcode,
+                        phone: phone
+                    }
+                // } else {
+                //     return {
+                //         statusCode: HttpStatus.NO_CONTENT,
+                //         message: "OTP send failed"
+                //     }
+                // }
+            }
+           
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+
+    }
+
+    private async random(len: number){
+        const result = Math.floor(Math.random() * Math.pow(10, len));
+        return (result.toString().length < len) ? this.random(len) : result;
     }
 }

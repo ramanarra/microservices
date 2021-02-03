@@ -108,7 +108,7 @@ export class UserController {
                 message: CONSTANT_MSG.USER_NOT_FOUND
             }
         }
-    };
+    }
 
     @MessagePattern({ cmd: 'auth_doctor_registration' })
     async doctorRegistration(doctorDto: any): Promise<any> {
@@ -159,39 +159,15 @@ export class UserController {
     };
 
     @MessagePattern({cmd: 'auth_doctor_forgotpassword'})
-    async doctorForgotPassword(email: any): Promise<any> {
-        const user = await this.userService.findByEmail(email.email);
-        if(user){
-            const passcode = await this.userService.genPassword();
-            user.passcode = passcode;
-            await user.save();
-            return{
-                passcode : passcode
-            }
-        }else{
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.USER_NOT_FOUND
-            }
-        }
+    async doctorForgotPassword(user: any): Promise<any> {
+        const doctor = await this.userService.doctorForgotPassword(user.email);
+        return doctor;
     }
 
     @MessagePattern({cmd: 'auth_patient_forgotpassword'})
-    async patientForgotPassword(userDto: any): Promise<any> {
-        const user = await this.userService.findByPhone(userDto.phone);
-        if(user){
-            const passcode = await this.userService.genPassword();
-            user.passcode = passcode;
-            await user.save();
-            return{
-                passcode : passcode
-            }
-        }else{
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.USER_NOT_FOUND
-            }
-        }
+    async patientForgotPassword(patientDto: PatientDto): Promise<any> {
+        const forgotPassword = await this.userService.patientForgotPassword(patientDto);
+        return forgotPassword;
     }
 
     @MessagePattern({cmd: 'auth_patient_resetpassword'})
@@ -233,4 +209,21 @@ export class UserController {
         }
     }
 
+    @MessagePattern({cmd: 'auth_patient_otp_verification'})
+    async OTPVerification(patientDto: PatientDto): Promise<any> {
+        const otpVerification = await this.userService.OTPVerification(patientDto);
+        return otpVerification;
+    }
+
+    @MessagePattern({cmd: 'auth_patient_login_for_phone'})
+    async patientLoginForPhone(patientDto: PatientDto): Promise<any> {
+        const patient = await this.userService.patientLoginForPhone(patientDto.phone);
+        return patient;
+    }
+    
+    @MessagePattern({cmd: 'auth_send_email_with_template'})
+    async sendMailWithTemplate(data: any): Promise<any> {
+        const template = await this.userService.sendEmailWithTemplate(data);
+        return template;
+    }
 }

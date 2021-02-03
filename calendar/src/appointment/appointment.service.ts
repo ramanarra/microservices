@@ -1055,7 +1055,9 @@ export class AppointmentService {
     }
 
     async patientRegistration(patientDto: PatientDto): Promise<any> {
-        return await this.patientDetailsRepository.patientRegistration(patientDto);
+        const patient = await this.patientDetailsRepository.patientRegistration(patientDto);
+        return patient;
+        // return await this.patientDetailsRepository.patientRegistration(patientDto);
     }
 
 
@@ -12291,4 +12293,31 @@ export class AppointmentService {
     }
        
 
+    async getMessageTemplate(messageType: string, communicationType: string): Promise<any> {
+        try {
+
+            const template = await this.appointmentRepository.query(queries.getMessageTemplate, [messageType, communicationType]);
+            if(template && template.length) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.MESSAGE_TEMPLATE_FETCH_SUCCESS,
+                    data: template[0]
+                }
+
+            } else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: CONSTANT_MSG.NO_MESSAGE_TEMPLATE
+                }
+            }
+
+        } catch(err){
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+
+        }
+    }
 }

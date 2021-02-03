@@ -25,6 +25,7 @@ import { VideoService } from './video.service';
 import { PaymentService } from './payment.service';
 import { OpenViduService } from './open-vidu.service';
 import { MedicineRepository } from './medicine.repository';
+import { HelperService } from 'src/utility/helper.service';
 // import { DoctorController } from './doctor/doctor.controller';
 // import { DoctorService } from './doctor/doctor.service';
 
@@ -39,6 +40,6 @@ import { MedicineRepository } from './medicine.repository';
 
   ],
   controllers: [AppointmentController],
-  providers: [AppointmentService, VideoService, OpenViduService,PaymentService]
+  providers: [AppointmentService, VideoService, OpenViduService,PaymentService, HelperService]
 })
 export class AppointmentModule { }
