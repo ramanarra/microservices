@@ -25,7 +25,7 @@ import {
     ApiBearerAuth,
     ApiCreatedResponse,
     ApiBadRequestResponse,
-    ApiTags,ApiConsumes
+    ApiTags,ApiConsumes, ApiQuery
 } from '@nestjs/swagger';
 import {AuthGuard} from '@nestjs/passport';
 import {Roles} from 'src/common/decorator/roles.decorator';
@@ -1440,6 +1440,7 @@ export class CalendarController {
    @ApiBearerAuth('JWT')
    @UseGuards(AuthGuard())
    @ApiTags('Patient')
+   @ApiQuery({ name: 'searchText', required: false })
    async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
     @Query('paginationLimit') paginationLimit: number,@Query('appointmentId') appointmentId : number  ) {
       const data={
@@ -1532,4 +1533,51 @@ export class CalendarController {
       return data;
   }
 
+  
+   //patient report in patient detail page
+   @Get('doctor/patientDetailLabReport')
+   @ApiOkResponse({description: 'patientDetailLabReport API'})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Doctors')
+   async patientDetailLabReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number) {
+    if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        this.logger.log(`patientDetailLabReport Api -> Request data }`);
+        return await this.calendarService.patientDetailLabReport(req.user, patientId, req.user.doctor_key);
+    }
+
+   //Appointment list report 
+   @Get('doctor/appoinmentListReport')
+   @ApiOkResponse( {description:  'requestBody example :   {\n' +
+   '"paginationStart":0,\n'+
+   '"paginationLimit":15,\n' +
+   '"searchText":"name",\n '+
+   '}',})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Doctors')
+   @ApiQuery({ name: 'searchText', required: false })
+   async appoinmentListReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
+   @Query('paginationLimit') paginationLimit: number,) {
+    const data={
+        user : req.user,
+        paginationStart : paginationStart,
+        paginationLimit : paginationLimit,
+        searchText : searchText,
+       }
+    if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        this.logger.log(`appoinmentListReport Api -> Request data }`);
+        return await this.calendarService.appoinmentListReport(data);
+    }
+   
 }

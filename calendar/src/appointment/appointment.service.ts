@@ -12259,4 +12259,36 @@ export class AppointmentService {
         const hospital = await this.accountDetailsRepository.findOne({ accountKey: accountKey });
         return hospital;
     }
+
+    //Getting patient report in patient detail page
+    async patientDetailLabReport(patientId: any): Promise<any> {
+        const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
+        let patientDetailReport = patientReport;
+        return patientDetailReport;
+    }
+
+     //Getting appointment list report
+     async appointmentListReport(user: any): Promise<any> {
+        const offset = user.paginationStart;
+        const endset = user.paginationLimit;
+        const searchText = user.searchText;
+        let response = {};
+        let app = [], reportList = [];
+
+        if(searchText){
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%']); 
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%']);
+    
+        } else {
+            if(user.user.doctor_key) {
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key,offset,endset]);
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key]);  
+            } 
+        }
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+        return response;
+    }
+       
+
 }
