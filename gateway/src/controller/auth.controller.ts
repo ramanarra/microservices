@@ -510,6 +510,25 @@ export class AuthController {
       return admin;
     }
 
+    @Post('patient/Login')
+    @ApiOkResponse({ description: 'requestBody example :   {\n' +
+          '"phone":"9999999996",\n' +
+          '"password": "123456" \n' +
+          '}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBody({ type: PatientDto })
+    @ApiTags('Patient')
+    async patientLoginWithPhone(@Body() patientDto : PatientDto) {
+      if(!patientDto.phone || !(patientDto.phone.length == 10)){
+        console.log("Provide Valid Phone");
+        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide Valid Phone"}
+      }
+
+      const patient = await this.userService.patientLoginForPhone(patientDto);
+      return patient;
+
+    }
+
     @Post('patient/OTPVerification')
     @ApiOkResponse({ description: 'requestBody example :   {\n' +
           '"phone": "9999999321"\n' +

@@ -570,9 +570,21 @@ export class UserService {
 
             const patient = await this.patientRepository.findOne({phone: patientDto.phone, passcode: patientDto.passcode});
             if(patient && patient.patient_id){
+                 const jwtUserInfo: JwtPatientLoad = {
+                    phone: patient.phone,
+                    patientId: patient.patient_id,
+                    permission: 'CUSTOMER',
+                    role:CONSTANT_MSG.ROLES.PATIENT
+                };
+                console.log("=======jwtUserInfo", jwtUserInfo)
+                const accessToken = this.jwtService.sign(jwtUserInfo);
                 return {
                     statusCode: HttpStatus.OK,
-                    message: CONSTANT_MSG.OTP_VERIFICATION_SUCCESS
+                    message: CONSTANT_MSG.OTP_VERIFICATION_SUCCESS,
+                    patient_id: patient.patient_id,
+                    accessToken: accessToken,
+                    permission: "CUSTOMER",
+                    role: CONSTANT_MSG.ROLES.PATIENT
                 }
 
             } else {
@@ -590,5 +602,52 @@ export class UserService {
             }
         }
 
+    }
+
+    async patientLoginForPhone(phone: string): Promise<any> {
+
+        const patient = await this.patientRepository.findOne({phone: phone});
+        if(patient){
+
+            let passcode = await this.random(4);
+
+            //Update passcode in patient table
+            let updatePasscode = await this.patientRepository.update({phone: phone}, {passcode: passcode});
+            if(updatePasscode.affected){
+                //  let data = {
+                //     apiKey: textLocal.APIKey,
+                //     message: "[VIRUJH] Your verification code is " + passcode,
+                //     sender: textLocal.sender,
+                //     number: phone,
+                // }
+
+                // const sendSMS = await this.sms.sendSms(data);
+                // if(sendSMS && sendSMS.statusCode === '200'){
+                    return {
+                        statusCode: HttpStatus.OK,
+                        message: "OTP is sent successfully",
+                        passcode: passcode,
+                        phone: phone
+                    }
+                // } else {
+                //     return {
+                //         statusCode: HttpStatus.NO_CONTENT,
+                //         message: "OTP send failed"
+                //     }
+                // }
+            }
+           
+        } else {
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: CONSTANT_MSG.INVALID_REQUEST
+            }
+        }
+
+    }
+
+    private async random(len: number){
+        const result = Math.floor(Math.random() * Math.pow(10, len));
+        return (result.toString().length < len) ? this.random(len) : result;
     }
 }

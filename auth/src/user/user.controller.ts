@@ -214,6 +214,12 @@ export class UserController {
         const otpVerification = await this.userService.OTPVerification(patientDto);
         return otpVerification;
     }
+
+    @MessagePattern({cmd: 'auth_patient_login_for_phone'})
+    async patientLoginForPhone(patientDto: PatientDto): Promise<any> {
+        const patient = await this.userService.patientLoginForPhone(patientDto.phone);
+        return patient;
+    }
     
     @MessagePattern({cmd: 'auth_send_email_with_template'})
     async sendMailWithTemplate(data: any): Promise<any> {

@@ -133,6 +133,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     public OTPVerification(patientDto: PatientDto): Promise<any> {
         return this.redisClient.send({ cmd : 'auth_patient_otp_verification'}, patientDto).toPromise();
     }
+
+    public patientLoginForPhone(patientDto: PatientDto): Promise<any> {
+        return this.redisClient.send({cmd: 'auth_patient_login_for_phone'}, patientDto).toPromise();
+    }
     
     public sendEmailWithTemplate(data: any): Promise<any> {
         return this.redisClient.send({ cmd : 'auth_send_email_with_template'}, data).toPromise();
