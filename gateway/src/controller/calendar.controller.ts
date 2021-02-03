@@ -1532,4 +1532,23 @@ export class CalendarController {
       return data;
   }
 
+  
+   //patient report in patient detail page
+   @Get('doctor/patientDetailLabReport')
+   @ApiOkResponse({description: 'patientDetailLabReport API'})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Doctors')
+   async patientDetailLabReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('patientId') patientId: number) {
+    if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        this.logger.log(`patientDetailLabReport Api -> Request data }`);
+        console.log('patientDetailLabReport', req.user)
+        return await this.calendarService.patientDetailLabReport(req.user, patientId, req.user.doctor_key);
+    }
+   
 }

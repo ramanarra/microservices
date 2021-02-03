@@ -1323,4 +1323,14 @@ export class AppointmentController {
         const hospital = await this.appointmentService.getHospitalDetails(accountKey);
         return hospital;
     }
+    
+    //patient report in patient detail page
+    @MessagePattern({cmd: 'patient_detail_labreport'})
+    async patientDetailLabReport(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const patient = await this.appointmentService.patientDetailLabReport(user.patientId);
+            return patient;  
+        }
+    }
 }

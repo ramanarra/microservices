@@ -12251,4 +12251,11 @@ export class AppointmentService {
         const hospital = await this.accountDetailsRepository.findOne({ accountKey: accountKey });
         return hospital;
     }
+
+    //Getting patient report in patient detail page
+    async patientDetailLabReport(patientId: any): Promise<any> {
+        const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
+        let patientDetailReport = patientReport;
+        return patientDetailReport;
+    }
 }

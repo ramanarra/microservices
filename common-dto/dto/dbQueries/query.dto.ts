@@ -71,5 +71,6 @@ export const queries = {
     getAccountKey:"SELECT replace(account.account_key, 'Acc_', '') AS maxAcc FROM account WHERE account_key notnull order by replace(account.account_key, 'Acc_', '')::int desc limit 1",
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
     getTableData:'SELECT * FROM ',
-    updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`
+    updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`,
+    getPatientDetailLabReport:`SELECT  DISTINCT ON (appointment_id)report."appointment_id" , report."comments",report."file_type", report."file_name" from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`
 }
