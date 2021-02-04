@@ -18,14 +18,30 @@ export const queries = {
     getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >=  $2 group by appointment_date limit 7',
     getListOfAppointmentFromDates : 'select * from appointment where "doctorId" = $1 and  appointment_date in $2 order by appointment_date',
     getPatientList:'SELECT patient."firstName", patient."lastName", patient."email", patient."dateOfBirth", patient."phone" , app.* from appointment app left join patient_details patient on app."patient_id" = patient."patient_id" where app."doctorId" = $1 order by appointment_date',
+
+    //to retrive appointment with start & end times
+    getAvailableTime: `SELECT dcsi."startTime", dcsi."endTime", doctor_id, "dayOfWeek", dcsi."docConfigScheduleDayId"
+                            from doc_config_schedule_day dcsd 
+                            left join doc_config_schedule_interval dcsi on dcsi."docConfigScheduleDayId" = dcsd.id
+                        where dcsd.doctor_id = $1 
+                            and dcsi."startTime" notnull 
+                            and dcsi."endTime" notnull`,
+    getActiveAppointment: `select app."doctorId", app.appointment_date, app."startTime", app."endTime", app.is_active 
+                                from appointment app 
+                                where app.is_active = true 
+                                    and app."doctorId" = $1 
+                                    and app.appointment_date >= $2 
+                                    and app.appointment_date  <= $3`,
+
     getAppointments:'SELECT * from appointment where "doctorId" = $1 and "appointment_date" = $2 and "is_cancel"=false',
     //getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
-    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
+    //reports
+    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
     getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (comments LIKE $2 OR file_name LIKE $2) Order by id DESC',
-    getSearchReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (comments LIKE $4 OR file_name LIKE $4) Order by id DESC offset $2 limit $3',
+    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (comments LIKE $4 OR file_name LIKE $4) Order by id DESC offset $2 limit $3',
 
     getAppListForPatient:'SELECT * from appointment WHERE "patient_id" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
