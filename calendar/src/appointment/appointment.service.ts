@@ -11866,7 +11866,7 @@ export class AppointmentService {
                                     <img src="https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/common/images/healthcare-hospital-logo.png" alt="" />
                                 </div>
                                 <div class="logo-wrapper">
-                                    <img src="https://virujh-cloud.s3.amazonaws.com/virujh/common/images/viruj.jpng" alt="" />
+                                    <img src="https://virujh-cloud.s3.amazonaws.com/virujh/common/images/virujh.png" alt="" />
                                 </div>
                             </div>
                         </div>

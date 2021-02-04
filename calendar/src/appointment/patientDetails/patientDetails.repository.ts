@@ -23,7 +23,7 @@ export class PatientDetailsRepository extends Repository<PatientDetails> {
         patient.address=patientDto.address;
         patient.state = patientDto.state;
         patient.pincode = patientDto.pincode;
-        patient.city = patientDto.city;
+        // patient.city = patientDto.city;
         patient.email = patientDto.email;
         patient.photo = patientDto.photo;
         patient.registrationNumber= patientDto.registrationNumber;
