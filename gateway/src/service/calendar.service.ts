@@ -414,4 +414,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
    public appoinmentListReport(user:any) : Observable <any> {
    return this.redisClient.send({ cmd : 'appointment_list_report'},user);
    }
+   
+   //Getting amount list report 
+   @UseFilters(AllClientServiceException)
+   public amountListReport(user:any) : Observable <any> {
+   return this.redisClient.send({ cmd : 'amount_list_report'},user);
+   }
 }

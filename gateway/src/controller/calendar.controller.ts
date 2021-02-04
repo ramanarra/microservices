@@ -1548,7 +1548,8 @@ export class CalendarController {
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
         this.logger.log(`patientDetailLabReport Api -> Request data }`);
-        return await this.calendarService.patientDetailLabReport(req.user, patientId, req.user.doctor_key);
+        const PatientDetailReport = await this.calendarService.patientDetailLabReport(req.user, patientId, req.user.doctor_key);
+        return PatientDetailReport;
     }
 
    //Appointment list report 
@@ -1563,13 +1564,16 @@ export class CalendarController {
    @UseGuards(AuthGuard())
    @ApiTags('Doctors')
    @ApiQuery({ name: 'searchText', required: false })
+    @ApiQuery({ name: 'toDate', required: false })
    async appoinmentListReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
-   @Query('paginationLimit') paginationLimit: number,) {
+   @Query('paginationLimit') paginationLimit: number, @Query('fromDate') fromDate: string, @Query('toDate') toDate: string ) {
     const data={
         user : req.user,
         paginationStart : paginationStart,
         paginationLimit : paginationLimit,
         searchText : searchText,
+        fromDate : fromDate,
+        toDate : toDate,
        }
     if (!check && !check2)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
@@ -1578,6 +1582,38 @@ export class CalendarController {
         }
         this.logger.log(`appoinmentListReport Api -> Request data }`);
         return await this.calendarService.appoinmentListReport(data);
+    }
+   
+     //Amount list report 
+   @Get('doctor/amountListReport')
+   @ApiOkResponse( {description:  'requestBody example :   {\n' +
+   '"paginationStart":0,\n'+
+   '"paginationLimit":15,\n' +
+   '"searchText":"name",\n '+
+   '}',})
+   @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+   @ApiBearerAuth('JWT')
+   @UseGuards(AuthGuard())
+   @ApiTags('Doctors')
+   @ApiQuery({ name: 'searchText', required: false })
+   @ApiQuery({ name: 'toDate', required: false })
+   async amountListReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
+   @Query('paginationLimit') paginationLimit: number, @Query('fromDate') fromDate: string, @Query('toDate') toDate: string) {
+    const data={
+        user : req.user,
+        paginationStart : paginationStart,
+        paginationLimit : paginationLimit,
+        searchText : searchText,
+        fromDate : fromDate,
+        toDate : toDate,
+       }
+    if (!check && !check2)
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+        }
+        this.logger.log(`amountListReport Api -> Request data }`);
+        return await this.calendarService.amountListReport(data);
     }
    
 }

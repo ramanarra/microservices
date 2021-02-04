@@ -12266,30 +12266,67 @@ export class AppointmentService {
     async patientDetailLabReport(patientId: any): Promise<any> {
         const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
         let patientDetailReport = patientReport;
-        return patientDetailReport;
+        if(patientDetailReport.length){
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Patient Detail Report List fetched successfully',
+                data : patientDetailReport,
+            }
+        }
+        else{
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'No record found'
+            }
+        }
     }
 
-     //Getting appointment list report
+    //Getting appointment list report
      async appointmentListReport(user: any): Promise<any> {
         const offset = user.paginationStart;
         const endset = user.paginationLimit;
         const searchText = user.searchText;
+        const from = user.fromDate;
+        const to =user.toDate;
         let response = {};
         let app = [], reportList = [];
 
-        if(searchText){
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%']); 
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%']);
+        if(searchText && to === undefined){
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from]); 
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%', from]);
     
-        } else {
+        } 
+        else if(to){
+            if(searchText){
+                 app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilterSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from,to]); 
+                 reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%'+searchText+'%', from,to]);
+            }
+            else{
+                 app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilter, [user.user.doctor_key,offset,endset, from,to]); 
+                 reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilter, [user.user.doctor_key, from,to]);
+            }
+        }else {
             if(user.user.doctor_key) {
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key,offset,endset]);
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key]);  
+                app =  await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key,offset,endset,from]);
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key,from]);  
             } 
         }
         response['totalCount'] = reportList.length;
         response['list'] = app;
-        return response;
+
+        if(reportList.length){
+           return {
+            statusCode: HttpStatus.OK,
+            message: 'Appointment Report List fetched successfully',
+            data : response,
+              }
+        }
+        else {
+          return {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: 'No record found'
+            }
+        }   
     }
        
 
@@ -12320,4 +12357,53 @@ export class AppointmentService {
 
         }
     }
+
+      //Getting amount  list report
+      async amountListReport(user: any): Promise<any> {
+        const offset = user.paginationStart;
+        const endset = user.paginationLimit;
+        const searchText = user.searchText;
+        const from = user.fromDate;
+        const to = user.toDate;
+        let response = {};
+        let app = [], reportList = [];
+
+        if(searchText  && to === undefined ){
+                app = await this.patientReportRepository.query(queries.getAmountListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%',from]); 
+                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%',from]);
+    
+        } 
+        else if(to){
+            if(searchText){
+                 app = await this.patientReportRepository.query(queries.getAmountListReportWithFilterSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from,to]); 
+                 reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%'+searchText+'%', from,to]);
+            }
+            else{
+                 app = await this.patientReportRepository.query(queries.getAmountListReportWithFilter, [user.user.doctor_key,offset,endset, from,to]); 
+                 reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilter, [user.user.doctor_key, from,to]);
+            }
+        }else {
+            if(user.user.doctor_key) {
+                app = await this.patientReportRepository.query(queries.getAmountListReportWithLimit, [user.user.doctor_key,offset,endset,from]);
+                reportList = await this.patientReportRepository.query(queries.getAmountListReport, [user.user.doctor_key,from]);  
+            } 
+        }
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+
+        if(reportList.length){
+            return {
+             statusCode: HttpStatus.OK,
+             message: 'Amount Collection List fetched successfully',
+             data : response,
+               }
+         }
+         else {
+           return {
+             statusCode: HttpStatus.NOT_FOUND,
+             message: 'No record found'
+           }
+        }
+    }
+       
 }

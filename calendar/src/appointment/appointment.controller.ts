@@ -1355,4 +1355,14 @@ export class AppointmentController {
         return await this.helperService.sendConfirmationMailOrSMS(data);
     }
 
+    //amount list report 
+    @MessagePattern({cmd: 'amount_list_report'})
+    async amountListReport(data: any): Promise<any> {
+       const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
+         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
+            const amountListReport = await this.appointmentService.amountListReport(data);
+            return amountListReport;  
+           }
+       }
+
 }
