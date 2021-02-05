@@ -46,11 +46,6 @@ export class PatientDetails extends BaseEntity{
     pincode : string;
 
     @Column({
-        name : 'city'
-    })
-    city : string;
-
-    @Column({
         name : 'email'
     })
     email : string;
