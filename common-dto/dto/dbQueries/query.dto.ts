@@ -37,7 +37,7 @@ export const queries = {
     //getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
-    //reports
+    getReportVideoUsage: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
     getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (comments LIKE $2 OR file_name LIKE $2) Order by id DESC',

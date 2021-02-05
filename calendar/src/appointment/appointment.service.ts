@@ -12405,5 +12405,21 @@ export class AppointmentService {
            }
         }
     }
+
+    async getPrescriptionList(appointmentId: any): Promise<any> {
+        const response = await this.prescriptionRepository.query(
+          queries.getPrescription,
+          [appointmentId],
+        );
+        return response;
+    }
+    
+    async getReportList(patientId: any): Promise<any> {
+        const response = await this.patientReportRepository.query(
+          queries.getReportVideoUsage,
+          [patientId, 0, 5],
+        );
+        return response;
+    }
        
 }

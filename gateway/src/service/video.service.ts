@@ -55,6 +55,16 @@ export class VideoService {
     }
 
     @UseFilters(AllClientServiceException)
+    public getPrescription(doctorKey : string) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_prescription_list'}, doctorKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public getReport(patientId : any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_report_list'}, patientId).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
     public patientUpcomingAppointments(patientId:any,paginationNumber,limit:any) : Observable <any> {
         let user = {
             patientId:patientId,
