@@ -538,6 +538,12 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'payment_recipt_details'})
+    async paymentReciptDetails(pymntId: String) : Promise<any> {
+        const recipt = await this.paymentService.paymentReciptDetails(pymntId)
+        return recipt?.data
+    }
+
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
         const docId = await this.appointmentService.doctorDetails(patientDto.doctorKey);
