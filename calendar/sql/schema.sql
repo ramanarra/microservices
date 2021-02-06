@@ -2731,8 +2731,13 @@ ALTER TABLE public.appointment
 COMMENT ON COLUMN public.appointment."hasConsultation"
     IS 'true means consultation started';
 
+ALTER TABLE public.patient_details
+ADD COLUMN city character varying(100);
 
-    ---Email template
+---Email template
+ALTER TABLE public.message_template
+    ALTER COLUMN body TYPE  character varying(500000);
+
 INSERT INTO public.message_template (
 id, sender, subject, body) VALUES (
 '3'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Created'::character varying, ' <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>
@@ -2753,13 +2758,9 @@ id, name, description) VALUES (
 '3'::integer, 'APPOINTMENT_CREATED'::character varying, 'Appointment Created'::character varying)
  returning id;
 
- INSERT  INTO  public.message_metadata SET
-message_type_id = '3'::bigint, communication_type_id = '1'::bigint, message_template_id = '3'::bigint WHERE
-id = 3;
-
-INSERT INTO public.message_type (
-id, name, description) VALUES (
-'4'::integer, 'APPOINTMENT_RESCHEDULE'::character varying, 'Appointment Reschedule'::character varying)
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'3'::integer, '3'::bigint, '1'::bigint, '3'::bigint)
  returning id;
 
 INSERT INTO public.message_template (
@@ -2780,10 +2781,18 @@ id, sender, subject, body) VALUES (
 <div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  '::character varying)
  returning id;
 
+
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'4'::integer, 'APPOINTMENT_RESCHEDULE'::character varying, 'Appointment Reschedule'::character varying)
+ returning id;
+
 INSERT INTO public.message_metadata (
 id, message_type_id, communication_type_id, message_template_id) VALUES (
 '4'::integer, '4'::bigint, '1'::bigint, '4'::bigint)
  returning id;
+
 
  INSERT INTO public.message_template (
 id, sender, subject, body) VALUES (
@@ -2839,15 +2848,6 @@ id, message_type_id, communication_type_id, message_template_id) VALUES (
 '6'::integer, '6'::bigint, '1'::bigint, '6'::bigint)
  returning id;
 
- INSERT INTO public.message_metadata (
-message_type_id, communication_type_id, message_template_id, id) VALUES (
-'2'::bigint, '1'::bigint, '2'::bigint, '2'::integer)
- returning id;
-
- INSERT INTO public.message_type (
-id, name, description) VALUES (
-'2'::integer, 'REGISTRATION_FOR_DOCTOR'::character varying, 'Registration For Doctor'::character varying)
- returning id;
 
   INSERT INTO public.message_template (
 body, subject, sender, id) VALUES (
@@ -2858,3 +2858,16 @@ body, subject, sender, id) VALUES (
         <div><em>Thank You</em><div>
         <p><span>VIRUJH</span></p>'::character varying, 'Registration For Doctor'::character varying, 'notifiaction@virujh.com'::character varying, '2'::integer)
  returning id;
+
+
+ INSERT INTO public.message_type (
+id, name, description) VALUES (
+'2'::integer, 'REGISTRATION_FOR_DOCTOR'::character varying, 'Registration For Doctor'::character varying)
+ returning id;
+
+
+ INSERT INTO public.message_metadata (
+message_type_id, communication_type_id, message_template_id, id) VALUES (
+'2'::bigint, '1'::bigint, '2'::bigint, '2'::integer)
+ returning id;
+ 
