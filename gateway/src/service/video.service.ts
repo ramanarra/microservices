@@ -84,4 +84,20 @@ export class VideoService {
         console.log('dataObject ', dataObject)
         return this.redisClient.send({ cmd : 'consultation_status_update'}, dataObject).toPromise();
     }
+
+  @UseFilters(AllClientServiceException)
+  public getPrescription(doctorKey: string): Promise<any> {
+    return this.redisClient
+      .send({ cmd: 'get_prescription_list' }, doctorKey)
+      .toPromise();
+  }
+
+  @UseFilters(AllClientServiceException)
+  public getReport(doctor_key:any, patientId: any, appointmentId: any): Promise<any> {
+    let reqData = { doctor_key: doctor_key, patientId: patientId, appointmentId: appointmentId };
+    return this.redisClient
+      .send({ cmd: 'get_report_list' }, reqData)
+      .toPromise();
+  }
+
 }

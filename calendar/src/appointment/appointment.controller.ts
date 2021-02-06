@@ -1383,4 +1383,24 @@ export class AppointmentController {
            }
        }
 
+       @MessagePattern({ cmd: 'get_prescription_list' })
+       async getPrescriptionList(user: any): Promise<any> {
+         const response = await this.appointmentService.getPrescriptionList(user);
+         return response;
+       }
+     
+       @MessagePattern({ cmd: 'get_report_list' })
+       async getReport(reqData: any): Promise<any> {
+         let doctorId = await this.appointmentService.doctorDetails(
+           reqData.doctor_key,
+         );
+         const response = await this.appointmentService.getReportList(
+           doctorId.doctorId,
+           reqData.patientId,
+           reqData.appointmentId,
+         );
+     
+         return response;
+       }
+
 }

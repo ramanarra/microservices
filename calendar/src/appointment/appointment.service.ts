@@ -12414,10 +12414,10 @@ export class AppointmentService {
         return response;
     }
     
-    async getReportList(patientId: any): Promise<any> {
+    async getReportList(doctorId: number, patientId: any, appointmentId: any): Promise<any> { 
         const response = await this.patientReportRepository.query(
           queries.getReportVideoUsage,
-          [patientId, 0, 5],
+          [ doctorId , patientId, appointmentId, 0, 5],
         );
         return response;
     }
