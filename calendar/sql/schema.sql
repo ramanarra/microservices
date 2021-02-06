@@ -2730,3 +2730,6 @@ ALTER TABLE public.appointment
 
 COMMENT ON COLUMN public.appointment."hasConsultation"
     IS 'true means consultation started';
+
+ALTER TABLE public.patient_details
+ADD COLUMN city character varying(100);
