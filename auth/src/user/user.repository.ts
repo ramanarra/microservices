@@ -133,23 +133,23 @@ export class UserRepository extends Repository<Users> {
                 statusCode: HttpStatus.BAD_REQUEST,
                 message: CONSTANT_MSG.INVALID_CREDENTIALS
             }
-            //return null;
+            return null;
         }
 
     }
 
-    // async validatePhoneAndPassword(phone,password) : Promise<any> {
-    //     console.log("======test")
+    async validatePhoneAndPassword(phone,password) : Promise<any> {
+        console.log("======test")
 
-    //     const user = await this.findOne({email : phone});
-    //     if(user && await user.validatePassword(password)){
-    //         return user;
-    //     }else {
-    //         console.log("===",JSON.stringify(user))
-    //         return null;
-    //     }
+        const user = await this.findOne({email : phone});
+        if(user && await user.validatePassword(password)){
+            return user;
+        }else {
+            console.log("===",JSON.stringify(user))
+            return null;
+        }
 
-    // }
+    }
 
 
 }
