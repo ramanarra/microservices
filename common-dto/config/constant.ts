@@ -51,6 +51,8 @@ export const CONSTANT_MSG = {
     OTP_VERIFICATION_FAILED: 'OTP Verification Failed',
     NO_MESSAGE_TEMPLATE: 'No Message Template',
     MESSAGE_TEMPLATE_FETCH_SUCCESS: 'Message Template Fetched Successfully',
+    NO_ADVERTISEMENT_LIST: 'No Advertisement List',
+    ADVERTISEMENT_LIST_FETCH_SUCCESS: 'Advertisement List Fetched Successfully',
     ROLES:{
         DOCTOR:'DOCTOR',
         ADMIN:'ADMIN',
