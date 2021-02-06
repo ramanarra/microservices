@@ -179,16 +179,18 @@ export class UserService {
             }
             
             const user = await this.patientRepository.patientRegistration(patientDto);
+            const update = await this.patientForgotPassword(patientDto);
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id,
                 permission: 'CUSTOMER',
-                role:CONSTANT_MSG.ROLES.PATIENT
+                role:CONSTANT_MSG.ROLES.PATIENT,
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
             user.accessToken = accessToken;
             user.permission = 'CUSTOMER';
+            user.password = update.password;
             return user;
         } catch (e) {
 	        console.log(e);
@@ -519,12 +521,63 @@ export class UserService {
     }
     
     async sendEmailWithTemplate(req: any): Promise<any> {
-        const {email, template, subject, password, type, user_name} = req;
+        const {email, template, subject, password, type, user_name, Details} = req;
 
         var templateBody = template;
-        if(type === CONSTANT_MSG.MAIL.FORGOT_PASSWORD){
+        if(type === CONSTANT_MSG.MAIL.FORGOT_PASSWORD  || type === CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR){
             templateBody = templateBody.replace('{password}', password);
             templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
+        }
+        if(type === CONSTANT_MSG.MAIL.APPOINTMENT_CREATED){
+            
+            templateBody = templateBody.replace('{doctorFirstName}', Details.doctorFirstName);
+             templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
+             templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
+             templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
+             templateBody = templateBody.replace('{email}', email);
+             templateBody = templateBody.replace('{hospital}', Details.hospital);
+             templateBody = templateBody.replace('{startTime}', Details.startTime);
+             templateBody = templateBody.replace('{endTime}', Details.endTime);
+             templateBody = templateBody.replace('{role}', Details.role);
+             templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
+             templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+        }
+        if(type === CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE){
+
+             templateBody = templateBody.replace('{doctorFirstName}',Details.doctorFirstName);
+             templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
+             templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
+             templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
+             templateBody = templateBody.replace('{email}', email);
+             templateBody = templateBody.replace('{hospital}', Details.hospital);
+             templateBody = templateBody.replace('{startTime}', Details.startTime);
+             templateBody = templateBody.replace('{endTime}', Details.endTime);
+             templateBody = templateBody.replace('{role}', Details.role);
+             templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
+             templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+        }
+        if(type === CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL){
+
+            templateBody = templateBody.replace('{doctorFirstName}', Details.doctorFirstName);
+            templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
+            templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
+            templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
+            templateBody = templateBody.replace('{email}', email);
+            templateBody = templateBody.replace('{hospital}', Details.hospital);
+            templateBody = templateBody.replace('{startTime}', Details.startTime);
+            templateBody = templateBody.replace('{endTime}', Details.endTime);
+            templateBody = templateBody.replace('{role}', Details.role);
+            templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
+            templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+            templateBody = templateBody.replace('{cancelledOn}', Details.cancelledOn);
+
+        }
+        if(type === CONSTANT_MSG.MAIL.PATIENT_REGISTRATION){
+            
+            templateBody = templateBody.replace('{email}', email);
+            templateBody = templateBody.replace('{password}', Details.password);
+            templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
+            templateBody = templateBody.replace('{phone}', Details.phone);
         }
 
         let params: any = {
