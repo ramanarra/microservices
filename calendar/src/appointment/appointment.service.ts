@@ -12264,16 +12264,72 @@ export class AppointmentService {
 
     //Getting patient report in patient detail page
     async patientDetailLabReport(patientId: any): Promise<any> {
-        const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
-        let patientDetailReport = patientReport;
-        if(patientDetailReport.length){
+        try {
+            const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
+            let patientDetailReport = patientReport;
+            if (patientDetailReport.length) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: 'Patient Detail Report List fetched successfully',
+                    data: patientDetailReport,
+                }
+            }
+            else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: 'No record found'
+                }
+            }
+        } catch (err) {
+            console.log(err);
             return {
-                statusCode: HttpStatus.OK,
-                message: 'Patient Detail Report List fetched successfully',
-                data : patientDetailReport,
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
             }
         }
-        else{
+    }
+
+    //Getting appointment list report
+    async appointmentListReport(user: any): Promise<any> {
+        const offset = user.paginationStart;
+        const endset = user.paginationLimit;
+        const searchText = user.searchText;
+        const from = user.fromDate;
+        const to = user.toDate;
+        let response = {};
+        let app = [], reportList = [];
+
+        if (searchText && to === undefined) {
+            app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from]);
+            reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%' + searchText + '%', from]);
+
+        }
+        else if (to) {
+            if (searchText) {
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilterSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from, to]);
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%' + searchText + '%', from, to]);
+            }
+            else {
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilter, [user.user.doctor_key, offset, endset, from, to]);
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilter, [user.user.doctor_key, from, to]);
+            }
+        } else {
+            if (user.user.doctor_key) {
+                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key, offset, endset, from]);
+                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key, from]);
+            }
+        }
+        response['totalCount'] = reportList.length;
+        response['list'] = app;
+
+        if (reportList.length) {
+            return {
+                statusCode: HttpStatus.OK,
+                message: 'Appointment Report List fetched successfully',
+                data: response,
+            }
+        }
+        else {
             return {
                 statusCode: HttpStatus.NOT_FOUND,
                 message: 'No record found'
@@ -12281,60 +12337,12 @@ export class AppointmentService {
         }
     }
 
-    //Getting appointment list report
-     async appointmentListReport(user: any): Promise<any> {
-        const offset = user.paginationStart;
-        const endset = user.paginationLimit;
-        const searchText = user.searchText;
-        const from = user.fromDate;
-        const to =user.toDate;
-        let response = {};
-        let app = [], reportList = [];
-
-        if(searchText && to === undefined){
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from]); 
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%', from]);
-    
-        } 
-        else if(to){
-            if(searchText){
-                 app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilterSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from,to]); 
-                 reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%'+searchText+'%', from,to]);
-            }
-            else{
-                 app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilter, [user.user.doctor_key,offset,endset, from,to]); 
-                 reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilter, [user.user.doctor_key, from,to]);
-            }
-        }else {
-            if(user.user.doctor_key) {
-                app =  await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key,offset,endset,from]);
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key,from]);  
-            } 
-        }
-        response['totalCount'] = reportList.length;
-        response['list'] = app;
-
-        if(reportList.length){
-           return {
-            statusCode: HttpStatus.OK,
-            message: 'Appointment Report List fetched successfully',
-            data : response,
-              }
-        }
-        else {
-          return {
-            statusCode: HttpStatus.NOT_FOUND,
-            message: 'No record found'
-            }
-        }   
-    }
-       
 
     async getMessageTemplate(messageType: string, communicationType: string): Promise<any> {
         try {
 
             const template = await this.appointmentRepository.query(queries.getMessageTemplate, [messageType, communicationType]);
-            if(template && template.length) {
+            if (template && template.length) {
                 return {
                     statusCode: HttpStatus.OK,
                     message: CONSTANT_MSG.MESSAGE_TEMPLATE_FETCH_SUCCESS,
@@ -12348,7 +12356,7 @@ export class AppointmentService {
                 }
             }
 
-        } catch(err){
+        } catch (err) {
             console.log(err);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
@@ -12358,8 +12366,8 @@ export class AppointmentService {
         }
     }
 
-      //Getting amount  list report
-      async amountListReport(user: any): Promise<any> {
+    //Getting amount  list report
+    async amountListReport(user: any): Promise<any> {
         const offset = user.paginationStart;
         const endset = user.paginationLimit;
         const searchText = user.searchText;
@@ -12368,41 +12376,68 @@ export class AppointmentService {
         let response = {};
         let app = [], reportList = [];
 
-        if(searchText  && to === undefined ){
-                app = await this.patientReportRepository.query(queries.getAmountListReportWithSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%',from]); 
-                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitSearch, [user.user.doctor_key, '%'+searchText+'%',from]);
-    
-        } 
-        else if(to){
-            if(searchText){
-                 app = await this.patientReportRepository.query(queries.getAmountListReportWithFilterSearch, [user.user.doctor_key,offset,endset, '%'+searchText+'%' , from,to]); 
-                 reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%'+searchText+'%', from,to]);
+        if (searchText && to === undefined) {
+            app = await this.patientReportRepository.query(queries.getAmountListReportWithSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from]);
+            reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitSearch, [user.user.doctor_key, '%' + searchText + '%', from]);
+
+        }
+        else if (to) {
+            if (searchText) {
+                app = await this.patientReportRepository.query(queries.getAmountListReportWithFilterSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from, to]);
+                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%' + searchText + '%', from, to]);
             }
-            else{
-                 app = await this.patientReportRepository.query(queries.getAmountListReportWithFilter, [user.user.doctor_key,offset,endset, from,to]); 
-                 reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilter, [user.user.doctor_key, from,to]);
+            else {
+                app = await this.patientReportRepository.query(queries.getAmountListReportWithFilter, [user.user.doctor_key, offset, endset, from, to]);
+                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilter, [user.user.doctor_key, from, to]);
             }
-        }else {
-            if(user.user.doctor_key) {
-                app = await this.patientReportRepository.query(queries.getAmountListReportWithLimit, [user.user.doctor_key,offset,endset,from]);
-                reportList = await this.patientReportRepository.query(queries.getAmountListReport, [user.user.doctor_key,from]);  
-            } 
+        } else {
+            if (user.user.doctor_key) {
+                app = await this.patientReportRepository.query(queries.getAmountListReportWithLimit, [user.user.doctor_key, offset, endset, from]);
+                reportList = await this.patientReportRepository.query(queries.getAmountListReport, [user.user.doctor_key, from]);
+            }
         }
         response['totalCount'] = reportList.length;
         response['list'] = app;
 
-        if(reportList.length){
+        if (reportList.length) {
             return {
-             statusCode: HttpStatus.OK,
-             message: 'Amount Collection List fetched successfully',
-             data : response,
-               }
-         }
-         else {
-           return {
-             statusCode: HttpStatus.NOT_FOUND,
-             message: 'No record found'
-           }
+                statusCode: HttpStatus.OK,
+                message: 'Amount Collection List fetched successfully',
+                data: response,
+            }
+        }
+        else {
+            return {
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'No record found'
+            }
+        }
+    }
+
+    //Getting advertisement list
+    async advertisementList(user: any): Promise<any> {
+        try {
+            const advertisement = await this.patientDetailsRepository.query(queries.getAdvertisementList);
+            if (advertisement && advertisement.length) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.ADVERTISEMENT_LIST_FETCH_SUCCESS,
+                    data: advertisement[0]
+                }
+            }
+            else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: CONSTANT_MSG.NO_ADVERTISEMENT_LIST
+                }
+            }
+
+        } catch (err) {
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
         }
     }
 
