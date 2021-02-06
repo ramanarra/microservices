@@ -587,5 +587,5 @@ export class AuthController {
       const patient = await this.userService.OTPVerification(patientDto);
       return patient;
     }
-
+    
 }
