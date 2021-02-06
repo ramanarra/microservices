@@ -1958,5 +1958,21 @@ export class CalendarController {
         this.logger.log(`amountListReport Api -> Request data }`);
         return await this.calendarService.amountListReport(data);
     }
-   
+
+    //Getting advertisement list
+    @Get('advertisementList')
+    @ApiOkResponse({ description: 'advertisementList API' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    advertisementList(@Request() req) {
+
+        this.logger.log(`advertisement List Api -> Request data }`);
+        try {
+            return this.calendarService.advertisementList(req.user);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
 }

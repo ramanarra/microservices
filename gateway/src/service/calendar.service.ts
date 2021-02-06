@@ -427,4 +427,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     sendMail.user = user;
     return this.redisClient.send({cmd: 'send_mail_res'}, sendMail).toPromise();
    }
+
+    //Getting advertisment list
+    @UseFilters(AllClientServiceException)
+    public advertisementList(data: any): Promise<any> {
+        return this.redisClient.send({ cmd: 'advertisement_list' }, data).toPromise();
+    }
 }

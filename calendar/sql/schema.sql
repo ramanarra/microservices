@@ -2858,3 +2858,28 @@ body, subject, sender, id) VALUES (
         <div><em>Thank You</em><div>
         <p><span>VIRUJH</span></p>'::character varying, 'Registration For Doctor'::character varying, 'notifiaction@virujh.com'::character varying, '2'::integer)
  returning id;
+
+
+ --- Advertisement table
+
+ CREATE TABLE public.advertisement (
+     id integer NOT NULL,
+     name character varying(100) COLLATE pg_catalog."default",
+     content character varying(5000) COLLATE pg_catalog."default",
+     code character varying(1000)  COLLATE pg_catalog."default",
+     "createdTime" timestamp without time zone,
+     is_active boolean,
+     CONSTRAINT advertisement_pkey PRIMARY KEY (id)
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.advertisement 
+    OWNER to postgres;
+	
+INSERT INTO public.advertisement SET
+name = 'Medicine'::character varying, content = 'Save 50% offer for acetaminophen medicine up to 24 hours'::character varying, code = 'NB8ws6'::character varying WHERE
+id = 1;
+
+---Added description for message table
+ALTER TABLE public.message_type
+    ADD COLUMN description character varying;
