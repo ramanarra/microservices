@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Transport } from '@nestjs/microservices';
+import config from 'config';
 
 @Injectable()
 export class ConfigService {
@@ -7,10 +8,13 @@ export class ConfigService {
     private readonly envConfig: { [key: string]: any } = null;
 
     constructor() {
+      const redisConfig = config.get('redis'); 
+
       this.envConfig = {};
+
       this.envConfig.redisService = {
           options: {
-              url: 'redis://virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com:6379',
+              url: `redis://${redisConfig.host}:${redisConfig.port}`,
             },
         transport: Transport.REDIS
       };

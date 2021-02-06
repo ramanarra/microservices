@@ -12,6 +12,7 @@ import { PaymentService } from './payment.service';
 import * as config from 'config';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
+import { HelperService } from 'src/utility/helper.service';
 //import * as moment from 'moment';
 
 //import {DoctorService} from './doctor/doctor.service';
@@ -26,7 +27,8 @@ export class AppointmentController {
         private readonly videoService : VideoService,
         private readonly paymentService : PaymentService,
         private patientDetailsRepository : PatientDetailsRepository,
-        private paymentDetailsRepository: PaymentDetailsRepository) {
+        private paymentDetailsRepository: PaymentDetailsRepository,
+        private helperService: HelperService) {
         //    this.textLocal = config.get('textLocal');
     }
 
@@ -74,7 +76,8 @@ export class AppointmentController {
                 endTime:appointment.appointment.appointmentdetails.endTime,
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
-            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            appointment.patientDetail = data;
+            //const mail = await this.appointmentService.sendAppCreatedEmail(data)
             //let apiKey = new Sms(this.textLocal.apiKey);
             let params = {
             }
@@ -441,9 +444,11 @@ export class AppointmentController {
             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+            patientEmail: pat.email ? pat.email :'',
         }
-        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-        console.log(mail);
+        appointment.patientDetail = data
+        // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+        // console.log(mail);
     }
     return appointment;
     }
@@ -489,7 +494,8 @@ export class AppointmentController {
             role:appointmentDto.user.role,
             cancelledOn:date
         }
-        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+        appointment.patientDetail =data;
+       // const mail = await this.appointmentService.sendAppCancelledEmail(data)
     }
     return appointment;
     }
@@ -536,6 +542,12 @@ export class AppointmentController {
         return patient;
     }
 
+    @MessagePattern({cmd: 'payment_recipt_details'})
+    async paymentReciptDetails(pymntId: String) : Promise<any> {
+        const recipt = await this.paymentService.paymentReciptDetails(pymntId)
+        return recipt?.data
+    }
+
     @MessagePattern({cmd: 'patient_book_appointment'})
     async patientBookAppointment(patientDto: any): Promise<any> {
         const docId = await this.appointmentService.doctorDetails(patientDto.doctorKey);
@@ -566,8 +578,10 @@ export class AppointmentController {
                 startTime:app.appointment.appointmentdetails.startTime,
                 endTime:app.appointment.appointmentdetails.endTime,
                 role:app.appointment.appointmentdetails.createdBy,
+                patientEmail: pat.email ? pat.email : '',
             }
-            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            app.patientDetail = data;
+          //  const mail = await this.appointmentService.sendAppCreatedEmail(data)
         }
         return app;
     }
@@ -869,6 +883,18 @@ export class AppointmentController {
 
     }
 
+    @MessagePattern({cmd: 'get_prescription_list' })
+    async getPrescriptionList(user: any): Promise<any>{
+        const response = await this.appointmentService.getPrescriptionList( user.appointmentId );
+        return response;
+    }
+
+    @MessagePattern({cmd: 'get_report_list' })
+    async getReport(patientId: any): Promise<any>{
+        const response = await this.appointmentService.getReportList( patientId );
+        return response;
+    }
+
     @MessagePattern({cmd: 'list_of_doctors'})
     async listOfDoctorsInHospital(user: any): Promise<any> {
         const doctors = await this.appointmentService.listOfDoctorsInHospital(user.accountKey);
@@ -943,9 +969,11 @@ export class AppointmentController {
                         startTime:app.appointmentDetails.startTime,
                         endTime:app.appointmentDetails.endTime,
                         role:CONSTANT_MSG.ROLES.PATIENT,
-                        cancelledOn:date
+                        cancelledOn:date,
+                        patientEmail: pat.email? pat.email : '',
                     }
-                    const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                    appointment.patientDetail = data;
+                    //const mail = await this.appointmentService.sendAppCancelledEmail(data)
                 }
                 return appointment;
             }else if(moment().valueOf() == cancelAppointmentMinutes.valueOf()){
@@ -1120,9 +1148,11 @@ export class AppointmentController {
                             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
                             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
                             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                            patientEmail:pat.email? pat.email:'',
                         }
-                        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-                        console.log(mail);
+                        appointment.patientDetail = data;
+                        // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                        // console.log(mail);
                     }
                     return appointment;
 
@@ -1273,6 +1303,12 @@ export class AppointmentController {
         return doctors;  
     }
 
+    @MessagePattern({cmd: 'doctor_signature'})
+    async addDoctorSignature(reports: any): Promise<any> {
+        return await this.appointmentService.addDoctorSignature(reports);
+     }
+
+
     @MessagePattern({cmd: 'doctor_prescription_insertion'})
     async prescriptionInsertion(user:any): Promise<any> {
         const doc = await this.appointmentService.prescriptionInsertion(user);
@@ -1297,4 +1333,64 @@ export class AppointmentController {
         console.log('appointmen tObject')
         return await this.appointmentService.consultationStatusUpdate(appointmentObject);
     }
+    
+    //upload file
+    @MessagePattern({cmd: 'upload_file'})
+    async uploadFile(files: any): Promise<any> {
+        const profileURL = await this.appointmentService.uploadFile(files) 
+        return profileURL;
+        
+    }
+
+    @MessagePattern({cmd: 'get_doctor_details'})
+    async doctorDetailsEdit(doctorKey: any): Promise<any> {
+        const doctor = await this.appointmentService.getDoctorDetails(doctorKey);
+        return doctor;
+    }
+
+    @MessagePattern({cmd: 'get_hospital_details'})
+    async doctorHospitalEdit(accountKey: any): Promise<any> {
+        const hospital = await this.appointmentService.getHospitalDetails(accountKey);
+        return hospital;
+    }
+    
+    //patient report in patient detail page
+    @MessagePattern({cmd: 'patient_detail_labreport'})
+    async patientDetailLabReport(user: any): Promise<any> {
+        const doc = await this.appointmentService.doctorDetails(user.doctorKey);
+        if((user.role == CONSTANT_MSG.ROLES.DOCTOR && user.doctor_key == user.doctorKey) || ((user.role == CONSTANT_MSG.ROLES.ADMIN || user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && user.account_key == doc.accountKey)){
+            const patient = await this.appointmentService.patientDetailLabReport(user.patientId);
+            return patient;  
+        }
+    }
+     //appointment list report 
+     @MessagePattern({cmd: 'appointment_list_report'})
+     async appoinmentListReport(data: any): Promise<any> {
+         const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
+         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
+             const appointmentReport = await this.appointmentService.appointmentListReport(data);
+             return appointmentReport;  
+         }
+     }
+
+     @MessagePattern({cmd: 'get_message_template'})
+    async getMessageTemplate(data: any): Promise<any> {
+        return await this.appointmentService.getMessageTemplate(data.messageType, data.communicationType);
+    }
+
+    @MessagePattern({cmd: 'send_confirmation_email_or_sms'})
+    async sendConfirmationEmailOrSMS(data: any): Promise<any> {
+        return await this.helperService.sendConfirmationMailOrSMS(data);
+    }
+
+    //amount list report 
+    @MessagePattern({cmd: 'amount_list_report'})
+    async amountListReport(data: any): Promise<any> {
+       const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
+         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
+            const amountListReport = await this.appointmentService.amountListReport(data);
+            return amountListReport;  
+           }
+       }
+
 }

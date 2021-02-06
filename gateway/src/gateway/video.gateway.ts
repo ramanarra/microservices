@@ -143,4 +143,27 @@ export class VideoGateway {
   
   }
 
+  
+  @SubscribeMessage('getPrescriptionList')
+  async getPriscription(client: AuthenticatedSocket, appointmentId: any) {
+    this.logger.log(
+      `Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key}`,
+    );
+    const response: any = await this.videoService.getPrescription(
+      appointmentId.appointmentId,
+    );
+    client.emit('getPriscription', response);
+  }
+
+  @SubscribeMessage('getReportList')
+  async getReport(client: AuthenticatedSocket, patientId: any) {
+    this.logger.log(
+      `Socket request get appointments for Doctor from patientKey => ${patientId.patientId}`,
+    );
+    const response: any = await this.videoService.getReport(
+      patientId.patientId,
+    );
+    client.emit('getReport', response);
+  }
+
 }

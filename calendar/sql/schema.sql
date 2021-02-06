@@ -815,6 +815,37 @@ CREATE TABLE public.patient_details (
 
 ALTER TABLE public.patient_details OWNER TO postgres;
 
+-- updated patient_details table
+
+CREATE TABLE public.patient_details
+(
+    id integer NOT NULL DEFAULT nextval('patient_details_patient_details_id_seq'::regclass),
+    name character varying(100) COLLATE pg_catalog."default",
+    landmark character varying(100) COLLATE pg_catalog."default",
+    country character varying(100) COLLATE pg_catalog."default",
+    registration_number character varying(200) COLLATE pg_catalog."default",
+    address character varying(400) COLLATE pg_catalog."default",
+    state character varying(100) COLLATE pg_catalog."default",
+    pincode character varying(100) COLLATE pg_catalog."default",
+    email character varying(100) COLLATE pg_catalog."default",
+    photo character varying(600) COLLATE pg_catalog."default",
+    phone character varying(100) COLLATE pg_catalog."default",
+    patient_id bigint,
+    "firstName" character varying(100) COLLATE pg_catalog."default",
+    "lastName" character varying(100) COLLATE pg_catalog."default",
+    "dateOfBirth" character varying(100) COLLATE pg_catalog."default",
+    "alternateContact" character varying(100) COLLATE pg_catalog."default",
+    age bigint,
+    live_status live_statuses DEFAULT 'online'::live_statuses,
+    last_active timestamp without time zone,
+    city character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT patient_details_id PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.patient_details
+    OWNER to postgres;
 --
 -- TOC entry 224 (class 1259 OID 24689)
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -2699,3 +2730,131 @@ ALTER TABLE public.appointment
 
 COMMENT ON COLUMN public.appointment."hasConsultation"
     IS 'true means consultation started';
+
+
+    ---Email template
+INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'3'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Created'::character varying, ' <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>
+             <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Created By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  '::character varying)
+ returning id;
+ 
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'3'::integer, 'APPOINTMENT_CREATED'::character varying, 'Appointment Created'::character varying)
+ returning id;
+
+ INSERT  INTO  public.message_metadata SET
+message_type_id = '3'::bigint, communication_type_id = '1'::bigint, message_template_id = '3'::bigint WHERE
+id = 3;
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'4'::integer, 'APPOINTMENT_RESCHEDULE'::character varying, 'Appointment Reschedule'::character varying)
+ returning id;
+
+INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'4'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Reschedule'::character varying, '<div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Rescheduled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user rescheduled appointment through VIRUJH. Please find the appointment details Below</div></div>
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Old Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Date</div><div style="display: inline-block;">: {rescheduledAppointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Start time</div><div style="display: inline-block;">: {rescheduledStartTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Resheduled Appointment End time</div><div style="display: inline-block;">: {rescheduledEndTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled On</div><div style="display: inline-block;">: {rescheduledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  '::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'4'::integer, '4'::bigint, '1'::bigint, '4'::bigint)
+ returning id;
+
+ INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'5'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Cancel'::character varying, ' <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>
+      <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Cancelled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Cancelled On</div><div style="display: inline-block;">: {cancelledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div> 
+       '::character varying)
+ returning id;
+
+
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'5'::integer, 'APPOINTMENT_CANCEL'::character varying, 'Appointment Cancel '::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'5'::integer, '5'::bigint, '1'::bigint, '5'::bigint)
+ returning id;
+
+ INSERT INTO public.message_template (
+body, subject, sender, id) VALUES (
+'<div><p>Hello {user_name},</p></div>
+        <div><p>Your patient registration request has been process successfully.
+      </p>
+        </div>
+        <div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+          <div class="reset_titles" style="display: inline-block;">Phone</div><div style="display: inline-block;">: {phone}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+            <div class="reset_titles" style="display: inline-block;">Password</div>: <span style=" text-align: left; color: #0bb5ff; "><em><b> {password}</b></em></span>
+        <br><br>
+        <div><em>Thank You</em><div>
+        <p><span>VIRUJH</span></p>'::character varying, 'Patient Registration'::character varying, 'notifiaction@virujh.com'::character varying, '6'::integer)
+ returning id;
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'6'::integer, 'PATIENT_REGISTRATION'::character varying, 'Patient Registration'::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'6'::integer, '6'::bigint, '1'::bigint, '6'::bigint)
+ returning id;
+
+ INSERT INTO public.message_metadata (
+message_type_id, communication_type_id, message_template_id, id) VALUES (
+'2'::bigint, '1'::bigint, '2'::bigint, '2'::integer)
+ returning id;
+
+ INSERT INTO public.message_type (
+id, name, description) VALUES (
+'2'::integer, 'REGISTRATION_FOR_DOCTOR'::character varying, 'Registration For Doctor'::character varying)
+ returning id;
+
+  INSERT INTO public.message_template (
+body, subject, sender, id) VALUES (
+'<div><p>Hello {user_name},</p></div>
+        <div><p>Your registration has been process successfully.</p>
+        </div>
+        <br><br>
+        <div><em>Thank You</em><div>
+        <p><span>VIRUJH</span></p>'::character varying, 'Registration For Doctor'::character varying, 'notifiaction@virujh.com'::character varying, '2'::integer)
+ returning id;
