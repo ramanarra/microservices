@@ -1363,15 +1363,12 @@ export class AppointmentController {
             return patient;  
         }
     }
-     //appointment list report 
-     @MessagePattern({cmd: 'appointment_list_report'})
-     async appoinmentListReport(data: any): Promise<any> {
-         const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
-         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
-             const appointmentReport = await this.appointmentService.appointmentListReport(data);
-             return appointmentReport;  
-         }
-     }
+
+    //appointment list report 
+    @MessagePattern({ cmd: 'appointment_list_report' })
+    async appoinmentListReport(data: any): Promise<any> {
+        return await this.appointmentService.appointmentListReport(data);
+    }
 
      @MessagePattern({cmd: 'get_message_template'})
     async getMessageTemplate(data: any): Promise<any> {
@@ -1386,12 +1383,8 @@ export class AppointmentController {
     //amount list report 
     @MessagePattern({cmd: 'amount_list_report'})
     async amountListReport(data: any): Promise<any> {
-       const doc = await this.appointmentService.doctorDetails(data.user.doctor_key);
-         if((data.user.role == CONSTANT_MSG.ROLES.DOCTOR) || ((data.user.role == CONSTANT_MSG.ROLES.ADMIN || data.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT) && data.user.account_key == doc.accountKey)){
-            const amountListReport = await this.appointmentService.amountListReport(data);
-            return amountListReport;  
-           }
-       }
+        return await this.appointmentService.amountListReport(data);
+    }
 
     //Getting advertisement list
     @MessagePattern({ cmd: 'advertisement_list' })
