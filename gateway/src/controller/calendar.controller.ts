@@ -1922,8 +1922,24 @@ export class CalendarController {
    @ApiTags('Doctors')
    @ApiQuery({ name: 'searchText', required: false })
     @ApiQuery({ name: 'toDate', required: false })
-   async appoinmentListReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
-   @Query('paginationLimit') paginationLimit: number, @Query('fromDate') fromDate: string, @Query('toDate') toDate: string ) {
+   async appoinmentListReport(@Request() req, @selfAppointmentRead() check:boolean, 
+    @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number, 
+    @Query('searchText') searchText: string,
+    @Query('paginationLimit') paginationLimit: number, @Query('fromDate') fromDate: string, 
+    @Query('toDate') toDate: string ) {
+    
+    // check doctor & admin permission
+    if (!check && !check2 && 
+        (req.user.role == CONSTANT_MSG.ROLES.DOCTOR || req.user.role == CONSTANT_MSG.ROLES.ADMIN ||
+        req.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT)) {
+        return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+    }
+    
+    // Update last active status
+    if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR) {
+        await this.calendarService.updateDocLastActive(req.user.doctor_key);
+    }
+    
     const data={
         user : req.user,
         paginationStart : paginationStart,
@@ -1931,14 +1947,11 @@ export class CalendarController {
         searchText : searchText,
         fromDate : fromDate,
         toDate : toDate,
-       }
-    if (!check && !check2)
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-            await this.calendarService.updateDocLastActive(req.user.doctor_key);
-        }
-        this.logger.log(`appoinmentListReport Api -> Request data }`);
-        return await this.calendarService.appoinmentListReport(data);
+    }
+    
+    // Get appointment list
+    return await this.calendarService.appoinmentListReport(data);
+
     }
    
      //Amount list report 
@@ -1954,24 +1967,34 @@ export class CalendarController {
    @ApiTags('Doctors')
    @ApiQuery({ name: 'searchText', required: false })
    @ApiQuery({ name: 'toDate', required: false })
-   async amountListReport(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean,  @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
-   @Query('paginationLimit') paginationLimit: number, @Query('fromDate') fromDate: string, @Query('toDate') toDate: string) {
-    const data={
-        user : req.user,
-        paginationStart : paginationStart,
-        paginationLimit : paginationLimit,
-        searchText : searchText,
-        fromDate : fromDate,
-        toDate : toDate,
+   async amountListReport(@Request() req, @selfAppointmentRead() check: boolean, 
+    @accountUsersAppointmentRead() check2: boolean, @Query('paginationStart') paginationStart: number, 
+    @Query('searchText') searchText: string, @Query('paginationLimit') paginationLimit: number,
+    @Query('fromDate') fromDate: string, @Query('toDate') toDate: string) {
+
+       // check doctor & admin permission
+       if (!check && !check2 &&
+           (req.user.role == CONSTANT_MSG.ROLES.DOCTOR || req.user.role == CONSTANT_MSG.ROLES.ADMIN ||
+               req.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT)) {
+           return { statusCode: HttpStatus.BAD_REQUEST, message: CONSTANT_MSG.NO_PERMISSION }
        }
-    if (!check && !check2)
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-            await this.calendarService.updateDocLastActive(req.user.doctor_key);
-        }
-        this.logger.log(`amountListReport Api -> Request data }`);
-        return await this.calendarService.amountListReport(data);
-    }
+
+       // Update last active status
+       if (req.user.role == CONSTANT_MSG.ROLES.DOCTOR) {
+           await this.calendarService.updateDocLastActive(req.user.doctor_key);
+       }
+
+       const data = {
+           user: req.user,
+           paginationStart: paginationStart,
+           paginationLimit: paginationLimit,
+           searchText: searchText,
+           fromDate: fromDate,
+           toDate: toDate,
+       };
+       return await this.calendarService.amountListReport(data);
+
+   }
 
     //Getting advertisement list
     @Get('advertisementList')

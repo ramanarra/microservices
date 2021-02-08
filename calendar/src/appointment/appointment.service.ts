@@ -12299,24 +12299,30 @@ export class AppointmentService {
         let response = {};
         let app = [], reportList = [];
 
+        let query = queries.getDoctorReportField + queries.getDoctorReportFromField + queries.getAppointmentListReportJoinField;
+
+        query += user.user.doctor_key ? queries.getDoctorReportWhereForDoctor : queries.getDoctorReportWhereForAdmin;
+        let whereParam = user.user.doctor_key ? user.user.doctor_key : user.user.account_key;
+
         if (searchText && to === undefined) {
-            app = await this.patientReportRepository.query(queries.getAppointmentListReportWithSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from]);
-            reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitSearch, [user.user.doctor_key, '%' + searchText + '%', from]);
+
+            app = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithSearch, [whereParam, offset, endset, '%' + searchText + '%', from]);
+            reportList = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithoutLimitSearch, [whereParam,  '%' + searchText + '%', from]);
 
         }
         else if (to) {
             if (searchText) {
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilterSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from, to]);
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%' + searchText + '%', from, to]);
+                app = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithFilterSearch, [whereParam,  offset, endset, '%' + searchText + '%', from, to]);
+                reportList = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithoutLimitFilterSearch, [whereParam,  '%' + searchText + '%', from, to]);
             }
             else {
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithFilter, [user.user.doctor_key, offset, endset, from, to]);
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReportWithoutLimitFilter, [user.user.doctor_key, from, to]);
+                app = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithFilter, [whereParam,  offset, endset, from, to]);
+                reportList = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithoutLimitFilter, [whereParam,  from, to]);
             }
         } else {
             if (user.user.doctor_key) {
-                app = await this.patientReportRepository.query(queries.getAppointmentListReportWithLimit, [user.user.doctor_key, offset, endset, from]);
-                reportList = await this.patientReportRepository.query(queries.getAppointmentListReport, [user.user.doctor_key, from]);
+                app = await this.patientReportRepository.query(query + queries.getAppointmentListReportWithLimit, [whereParam,  offset, endset, from]);
+                reportList = await this.patientReportRepository.query(query + queries.getAppointmentListReport, [whereParam,  from]);
             }
         }
         response['totalCount'] = reportList.length;
@@ -12376,24 +12382,29 @@ export class AppointmentService {
         let response = {};
         let app = [], reportList = [];
 
+        let query = queries.getDoctorReportField + queries.getDoctorReportFromField + queries.getAmountListReportJoinField;
+
+        query += user.user.doctor_key ? queries.getDoctorReportWhereForDoctor : queries.getDoctorReportWhereForAdmin;
+        let whereParam = user.user.doctor_key ? user.user.doctor_key : user.user.account_key;
+
         if (searchText && to === undefined) {
-            app = await this.patientReportRepository.query(queries.getAmountListReportWithSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from]);
-            reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitSearch, [user.user.doctor_key, '%' + searchText + '%', from]);
+            app = await this.patientReportRepository.query(query + queries.getAmountListReportWithSearch, [whereParam,  offset, endset, '%' + searchText + '%', from]);
+            reportList = await this.patientReportRepository.query(query + queries.getAmountListReportWithoutLimitSearch, [whereParam,  '%' + searchText + '%', from]);
 
         }
         else if (to) {
             if (searchText) {
-                app = await this.patientReportRepository.query(queries.getAmountListReportWithFilterSearch, [user.user.doctor_key, offset, endset, '%' + searchText + '%', from, to]);
-                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilterSearch, [user.user.doctor_key, '%' + searchText + '%', from, to]);
+                app = await this.patientReportRepository.query(query + queries.getAmountListReportWithFilterSearch, [whereParam,  offset, endset, '%' + searchText + '%', from, to]);
+                reportList = await this.patientReportRepository.query(query + queries.getAmountListReportWithoutLimitFilterSearch, [whereParam,  '%' + searchText + '%', from, to]);
             }
             else {
-                app = await this.patientReportRepository.query(queries.getAmountListReportWithFilter, [user.user.doctor_key, offset, endset, from, to]);
-                reportList = await this.patientReportRepository.query(queries.getAmountListReportWithoutLimitFilter, [user.user.doctor_key, from, to]);
+                app = await this.patientReportRepository.query(query + queries.getAmountListReportWithFilter, [whereParam,  offset, endset, from, to]);
+                reportList = await this.patientReportRepository.query(query + queries.getAmountListReportWithoutLimitFilter, [whereParam,  from, to]);
             }
         } else {
             if (user.user.doctor_key) {
-                app = await this.patientReportRepository.query(queries.getAmountListReportWithLimit, [user.user.doctor_key, offset, endset, from]);
-                reportList = await this.patientReportRepository.query(queries.getAmountListReport, [user.user.doctor_key, from]);
+                app = await this.patientReportRepository.query(query + queries.getAmountListReportWithLimit, [whereParam,  offset, endset, from]);
+                reportList = await this.patientReportRepository.query(query + queries.getAmountListReport, [whereParam,  from]);
             }
         }
         response['totalCount'] = reportList.length;
