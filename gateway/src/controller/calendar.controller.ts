@@ -132,9 +132,59 @@ export class CalendarController {
         }
         this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
-            await this.calendarService.updateDocLastActive(req.user.doctor_key);
+           await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
-        return await this.calendarService.createAppointment(appointmentDto, req.user);
+        const appointment = await this.calendarService.createAppointment(appointmentDto, req.user);
+
+        //Send mail functionality
+        if (req.user.email && !appointment.message) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: req.user.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_CREATED,
+                    sender: template.data.sender,
+                    user_name: appointment.patientDetail.doctorFirstName + ' ' + appointment.patientDetail.doctorLastName,
+                    Details: appointment.patientDetail,
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (appointment.patientDetail.email) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: appointment.patientDetail.email,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_CREATED,
+                                sender: template.data.sender,
+                                user_name: appointment.patientDetail.patientFirstName + ' ' + appointment.patientDetail.patientLastName,
+                                Details: appointment.patientDetail,
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete req.user.name;
+                                delete appointment.patientDetail;
+                                return appointment;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+       
+        return appointment;
     }
 
     @Get('doctor/list')
@@ -406,7 +456,55 @@ export class CalendarController {
             }
         }
         this.logger.log(`Doctor config reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-        return await this.calendarService.appointmentReschedule(appointmentDto, req.user);
+        const rescheduleAppointment = await this.calendarService.appointmentReschedule(appointmentDto, req.user);
+
+        //Send mail functionality
+        if (req.user.email) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: req.user.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE,
+                    sender: template.data.sender,
+                    user_name: rescheduleAppointment.patientDetail.doctorFirstName + ' ' + rescheduleAppointment.patientDetail.doctorLastName,
+                    Details: rescheduleAppointment.patientDetail,
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data,);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (rescheduleAppointment.patientDetail.patientEmail) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: rescheduleAppointment.patientDetail.patientEmail,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE,
+                                sender: template.data.sender,
+                                user_name: rescheduleAppointment.patientDetail.patientFirstName + ' ' + rescheduleAppointment.patientDetail.patientLastName,
+                                Details: rescheduleAppointment.patientDetail
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete rescheduleAppointment.patientDetail;
+                                return rescheduleAppointment;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return rescheduleAppointment;
     }
 
     @Post('doctor/appointmentCancel')
@@ -427,7 +525,55 @@ export class CalendarController {
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
         this.logger.log(`Doctor config cancel  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-        return await this.calendarService.appointmentCancel(appointmentDto, req.user);
+        const cancelAppointment = await this.calendarService.appointmentCancel(appointmentDto, req.user);
+
+        //Send mail functionality
+        if (req.user.email) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: req.user.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL,
+                    sender: template.data.sender,
+                    user_name: cancelAppointment.patientDetail.doctorFirstName + ' ' + cancelAppointment.patientDetail.doctorLastName,
+                    Details: cancelAppointment.patientDetail,
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (cancelAppointment.patientDetail.email) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: cancelAppointment.patientDetail.email,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL,
+                                sender: template.data.sender,
+                                user_name: cancelAppointment.patientDetail.patientFirstName + ' ' + cancelAppointment.patientDetail.patientLastName,
+                                Details: cancelAppointment.patientDetail
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete cancelAppointment.patientDetail
+                                return cancelAppointment;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return cancelAppointment;
     }
 
     @Post('doctor/patientSearch')
@@ -663,7 +809,56 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
         }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
-        return await this.calendarService.patientBookAppointment(patientDto);
+        const patientAppointment:any = await this.calendarService.patientBookAppointment(patientDto);
+
+        //Send mail functionality
+        if (patientAppointment.patientDetail.email) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: patientAppointment.patientDetail.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_CREATED,
+                    sender: template.data.sender,
+                    user_name: patientAppointment.patientDetail.doctorFirstName + ' ' + patientAppointment.patientDetail.doctorLastName,
+                    Details: patientAppointment.patientDetail,
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (patientAppointment.patientDetail.patientEmail) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: patientAppointment.patientDetail.patientEmail,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_CREATED,
+                                sender: template.data.sender,
+                                user_name: patientAppointment.patientDetail.patientFirstName + ' ' + patientAppointment.patientDetail.patientLastName,
+                                Details: patientAppointment.patientDetail,
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete patientAppointment.patientDetail
+                                return patientAppointment;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+           
+        return patientAppointment;
     }
 
     @Post('patient/appointmentSlotsView')
@@ -1011,6 +1206,58 @@ export class CalendarController {
                 }
                 this.logger.log(`Appointment  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
                 const app = await this.calendarService.createAppointment(appointmentDto, req.user);
+
+                //Send mail functionality
+                if (req.user.email && !patient.message && !details.message && !app.message) {
+                    const template = await this.calendarService.getMessageTemplate({ messageType: 'PATIENT_REGISTRATION', communicationType: 'Email' });
+                    details.password = patient.password;
+                    details.phone = patient.phone;
+                    if (template && template.data) {
+                        let data = {
+                            email: req.user.email,
+                            template: template.data.body,
+                            subject: template.data.subject,
+                            type: CONSTANT_MSG.MAIL.PATIENT_REGISTRATION,
+                            sender: template.data.sender,
+                            user_name: app.patientDetail.doctorFirstName + ' ' + app.patientDetail.doctorLastName,
+                            Details: details,
+                        };
+
+                        const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                        if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                            if (details.email) {
+                                const template = await this.calendarService.getMessageTemplate({ messageType: 'PATIENT_REGISTRATION', communicationType: 'Email' });
+
+                                if (template && template.data) {
+                                    let data = {
+                                        email: details.email,
+                                        template: template.data.body,
+                                        subject: template.data.subject,
+                                        type: CONSTANT_MSG.MAIL.PATIENT_REGISTRATION,
+                                        sender: template.data.sender,
+                                        user_name: details.name,
+                                        Details: details,
+                                    };
+
+                                    const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                                    if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                        return {
+                                            patient: patient,
+                                            details: details,
+                                            appointment: app
+                                        }
+                                    } else {
+                                        return sendMail;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                
                 return {
                     patient:patient,
                     details:details,
@@ -1104,7 +1351,55 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide appointmentId"}
         }
         this.logger.log(`Patient Appointment cancel Api -> Request data }`);
-        return await this.calendarService.patientAppointmentCancel(appointmentDto, req.user);
+        const cancelAppointment = await this.calendarService.patientAppointmentCancel(appointmentDto, req.user);
+
+        //Send Mail functionality
+        if (cancelAppointment.patientDetail.email) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: cancelAppointment.patientDetail.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL,
+                    sender: template.data.sender,
+                    user_name: cancelAppointment.patientDetail.doctorFirstName + ' ' + cancelAppointment.patientDetail.doctorLastName,
+                    Details: cancelAppointment.patientDetail
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (cancelAppointment.patientDetail.patientEmail) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: cancelAppointment.patientDetail.patientEmail,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL,
+                                sender: template.data.sender,
+                                user_name: cancelAppointment.patientDetail.patientFirstName + ' ' + cancelAppointment.patientDetail.patientLastName,
+                                Details: cancelAppointment.patientDetail
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete cancelAppointment.patientDetail
+                                return cancelAppointment;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return cancelAppointment
     }
 
     @Get('doctor/detailsOfPatient')
@@ -1229,7 +1524,55 @@ export class CalendarController {
             }
         }
         this.logger.log(`patient reschedule  Api -> Request data ${JSON.stringify(appointmentDto, req.user)}`);
-        return await this.calendarService.patientAppointmentReschedule(appointmentDto, req.user);
+        const appointmentReschedule = await this.calendarService.patientAppointmentReschedule(appointmentDto, req.user);
+
+        //send mail functionality
+        if (appointmentReschedule.patientDetail.email) {
+            const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
+
+            if (template && template.data) {
+                let data = {
+                    email: appointmentReschedule.patientDetail.email,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE,
+                    sender: template.data.sender,
+                    user_name: appointmentReschedule.patientDetail.doctorFirstName + ' ' + appointmentReschedule.patientDetail.doctorLastName,
+                    Details: appointmentReschedule.patientDetail
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                    if (appointmentReschedule.patientDetail.patientEmail) {
+                        const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
+
+                        if (template && template.data) {
+                            let data = {
+                                email: appointmentReschedule.patientDetail.patientEmail,
+                                template: template.data.body,
+                                subject: template.data.subject,
+                                type: CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE,
+                                sender: template.data.sender,
+                                user_name: appointmentReschedule.patientDetail.patientFirstName + ' ' + appointmentReschedule.patientDetail.patientLastName,
+                                Details: appointmentReschedule.patientDetail
+                            };
+
+                            const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                            if (sendMail && sendMail.statusCode === HttpStatus.OK) {
+                                delete appointmentReschedule.patientDetail
+                                return appointmentReschedule;
+                            } else {
+                                return sendMail;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return appointmentReschedule;
     }
 
 
@@ -1629,5 +1972,21 @@ export class CalendarController {
         this.logger.log(`amountListReport Api -> Request data }`);
         return await this.calendarService.amountListReport(data);
     }
-   
+
+    //Getting advertisement list
+    @Get('advertisementList')
+    @ApiOkResponse({ description: 'advertisementList API' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    advertisementList(@Request() req) {
+
+        this.logger.log(`advertisement List Api -> Request data }`);
+        try {
+            return this.calendarService.advertisementList(req.user);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
 }

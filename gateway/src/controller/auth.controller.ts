@@ -307,7 +307,7 @@ export class AuthController {
 
           const signUp = await this.userService.doctorRegistration(doctorDto, req.user);
 
-          if (signUp && !signUp.statusCode) {
+          if (signUp && !signUp.statusCode && signUp.accountKey ) {
             doctorDto.accountKey = signUp.accountKey;
             doctorDto.doctorKey = signUp.doctorKey;
 
@@ -325,11 +325,34 @@ export class AuthController {
             
             return doctor;
           } else {
-
-            return  {
-              signUp
-            };
-
+           
+            //Send mail functionality
+              const template = await this.calendarService.getMessageTemplate({messageType: 'REGISTRATION_FOR_DOCTOR', communicationType: 'Email'});
+              
+              if(template && template.data){
+                let data = {
+                  email: signUp.email,
+                  password: signUp.password,
+                  template: template.data.body,
+                  subject: template.data.subject,
+                  type: CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR,
+                  sender: template.data.sender,
+                  user_name: signUp.name
+                };
+      
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+      
+                if(sendMail && sendMail.statusCode === HttpStatus.OK){
+                  delete signUp.password;
+                  delete signUp.name;
+                  return signUp;
+                } else {
+                  return sendMail;
+                }
+      
+              }
+            
+            return signUp;
           }
         }
       }
@@ -564,5 +587,5 @@ export class AuthController {
       const patient = await this.userService.OTPVerification(patientDto);
       return patient;
     }
-
+    
 }

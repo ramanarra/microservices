@@ -149,11 +149,12 @@ export class VideoGateway {
     this.logger.log(
       `Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key} ${ appointmentId.appointmentId} ${patientId.patientId}`,
     );
-    const response: any = await this.videoService.getPrescription(
-      appointmentId.appointmentId,
-    );
+    
     let patientSocketprescripList: Socket[] = this.socketStateService.get("PATIENT_" + patientId.patientId);
     patientSocketprescripList.forEach((val: Socket) => {
+      const response: any =  this.videoService.getPrescription(
+        appointmentId.appointmentId,
+      );
       client.emit('getPriscription', response);
     });
    

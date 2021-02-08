@@ -877,17 +877,7 @@ export class AppointmentController {
 
     }
 
-    @MessagePattern({cmd: 'get_prescription_list' })
-    async getPrescriptionList(user: any): Promise<any>{
-        const response = await this.appointmentService.getPrescriptionList( user.appointmentId );
-        return response;
-    }
-
-    @MessagePattern({cmd: 'get_report_list' })
-    async getReport(patientId: any): Promise<any>{
-        const response = await this.appointmentService.getReportList( patientId );
-        return response;
-    }
+   
 
     @MessagePattern({cmd: 'list_of_doctors'})
     async listOfDoctorsInHospital(user: any): Promise<any> {
