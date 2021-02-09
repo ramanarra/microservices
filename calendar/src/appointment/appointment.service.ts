@@ -12425,32 +12425,32 @@ export class AppointmentService {
         }
     }
 
-    //Getting advertisement list
-    // async advertisementList(user: any): Promise<any> {
-    //     try {
-    //         const advertisement = await this.patientDetailsRepository.query(queries.getAdvertisementList);
-    //         if (advertisement && advertisement.length) {
-    //             return {
-    //                 statusCode: HttpStatus.OK,
-    //                 message: CONSTANT_MSG.ADVERTISEMENT_LIST_FETCH_SUCCESS,
-    //                 data: advertisement[0]
-    //             }
-    //         }
-    //         else {
-    //             return {
-    //                 statusCode: HttpStatus.NOT_FOUND,
-    //                 message: CONSTANT_MSG.NO_ADVERTISEMENT_LIST
-    //             }
-    //         }
+    // Getting advertisement list
+    async advertisementList(user: any): Promise<any> {
+        try {
+            const advertisement = await this.patientReportRepository.query(queries.getAdvertisementList);
+            if (advertisement && advertisement.length) {
+                return {
+                    statusCode: HttpStatus.OK,
+                    message: CONSTANT_MSG.ADVERTISEMENT_LIST_FETCH_SUCCESS,
+                    data: advertisement[0]
+                }
+            }
+            else {
+                return {
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: CONSTANT_MSG.NO_ADVERTISEMENT_LIST
+                }
+            }
 
-    //     } catch (err) {
-    //         console.log(err);
-    //         return {
-    //             statusCode: HttpStatus.NO_CONTENT,
-    //             message: CONSTANT_MSG.DB_ERROR
-    //         }
-    //     }
-    // }
+        } catch (err) {
+            console.log(err);
+            return {
+                statusCode: HttpStatus.NO_CONTENT,
+                message: CONSTANT_MSG.DB_ERROR
+            }
+        }
+    }
 
     async getPrescriptionList(appointmentId: any): Promise<any> {
         const response = await this.prescriptionRepository.query(

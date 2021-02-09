@@ -2887,9 +2887,7 @@ TABLESPACE pg_default;
 ALTER TABLE public.advertisement 
     OWNER to postgres;
 	
-INSERT INTO public.advertisement SET
-name = 'Medicine'::character varying, content = 'Save 50% offer for acetaminophen medicine up to 24 hours'::character varying, code = 'NB8ws6'::character varying WHERE
-id = 1;
+INSERT INTO public.advertisement values(1,'Medicine', 'Save 50% offer for acetaminophen medicine up to 24 hours', 'NB8ws6');
 
 ---Added description for message table
 ALTER TABLE public.message_type

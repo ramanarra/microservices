@@ -2008,6 +2008,7 @@ export class CalendarController {
         try {
             return this.calendarService.advertisementList(req.user);
         } catch (e) {
+            return e;
             console.log(e);
         }
     }

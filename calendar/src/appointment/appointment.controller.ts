@@ -1386,4 +1386,10 @@ export class AppointmentController {
          return response;
        }
 
+       @MessagePattern({ cmd: 'advertisement_list' })
+       async advertisementList(data: any): Promise<any> {
+           const advertisement = await this.appointmentService.advertisementList(data);
+           return advertisement;
+       }
+
 }
