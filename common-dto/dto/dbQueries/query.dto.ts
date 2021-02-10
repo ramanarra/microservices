@@ -127,6 +127,5 @@ export const queries = {
     getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
 
     getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
-    getAdvertisementList:`SELECT * FROM advertisement` 
-    getReportVideoUsage: 'select app."doctorId", report.* FROM public.patient_report report left outer join public.appointment app on app.id = report.appointment_id left join public.doctor doc on doc."doctorId" = app."doctorId" where report.patient_id = $2 and (report.appointment_id = $3 or doc."doctorId" = $1 or report.appointment_id is null) Order by id DESC offset $4 limit $5'
+    getAdvertisementList:'SELECT * FROM public.advertisement'
 }
