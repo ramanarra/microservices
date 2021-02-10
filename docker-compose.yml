@@ -20,6 +20,7 @@ services:
        - NODE_ENV=default
     networks:
        - redis-net
+    restart: always
     depends_on:
        - redis-loc-server
        - db_calendar
@@ -34,6 +35,7 @@ services:
        - NODE_ENV=default
     networks:
        - redis-net
+    restart: always
     depends_on:
        - redis-loc-server
        - db_auth
@@ -62,6 +64,8 @@ services:
        - "5432:5432"
     networks:
        - redis-net
+    volumes: 
+       - postgre-data-auth:/var/lib/postgresql/data
     restart: always
 
   db_calendar:
@@ -71,7 +75,15 @@ services:
        - "5433:5432"
     networks:
        - redis-net
+    volumes: 
+       - postgre-data-calendar:/var/lib/postgresql/data
     restart: always
 
 networks:
   redis-net: null
+
+volumes:
+  postgre-data-auth:
+       driver : local
+  postgre-data-calendar:
+       driver : local  
