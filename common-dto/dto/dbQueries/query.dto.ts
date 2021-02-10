@@ -88,7 +88,7 @@ export const queries = {
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
     getTableData:'SELECT * FROM ',
     updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`,
-    getPatientDetailLabReport:`SELECT  DISTINCT ON (appointment_id)report."appointment_id" , report."comments",report."file_type", report."file_name" from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`,
+    getPatientDetailLabReport:`SELECT  DISTINCT ON (appointment_id)report."appointment_id" as appointmentId , report."comments" as comment, report."file_type" as fileType, report."file_name" as fileName, report."report_url" as attachment, report."report_date" as reportDate from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`,
 
     // Doctor report common fields 
     getDoctorReportField : `Select DISTINCT  appointment."appointment_date", appointment."patient_id" ,appointment."createdTime", 
@@ -127,5 +127,5 @@ export const queries = {
     getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
 
     getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
-    getAdvertisementList:'SELECT * FROM public.advertisement'
+    getAdvertisementList:`SELECT * FROM advertisement`
 }
