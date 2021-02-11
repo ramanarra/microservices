@@ -600,7 +600,7 @@ export class UserService {
 
         let params: any = {
             subject: subject,
-            recipient: 'neha@softsuave.com',
+            recipient: email,
             template: templateBody
         };
 
