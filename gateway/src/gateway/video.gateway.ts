@@ -175,4 +175,17 @@ export class VideoGateway {
   
   }
 
+  @SubscribeMessage('getPrescriptionDetails')
+  async getPrescriptionDetails(client: AuthenticatedSocket, appointmentId: number) {
+    this.logger.log(
+      `Socket request get prescription details for paitent from appointmentId => ${appointmentId}`
+    )
+    
+    const getPrescriptionDetailsSocket: Socket [] = this.socketStateService.get(`APPOINTMENT_${appointmentId}`)
+    getPrescriptionDetailsSocket.forEach((i: Socket) => {
+      const res: any = this.videoService.getPrescriptionDetails(appointmentId)
+      i.emit('getPrescriptionDetails', res)
+    })
+  }
+
 }

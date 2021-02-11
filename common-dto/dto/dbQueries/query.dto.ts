@@ -127,5 +127,11 @@ export const queries = {
     getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
 
     getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
-    getAdvertisementList:`SELECT * FROM advertisement`
+    getAdvertisementList:`SELECT * FROM advertisement`,
+
+    // get prescription
+    getPrescriptionDetails: `select med.name_of_medicine as medicine , med.dose_of_medicine as comment , med.count_of_days as dose, pres.prescription_url as attachment
+                            from medicine med 
+                            left join prescription pres on med.prescription_id = pres.id 
+                        where pres.appointment_id = $1;`
 }

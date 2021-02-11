@@ -1391,5 +1391,9 @@ export class AppointmentController {
            const advertisement = await this.appointmentService.advertisementList(data);
            return advertisement;
        }
-
+    
+    @MessagePattern({ cmd: 'get_prescription_details' })
+    async getPrescriptionDetails(appoinmnetId: number) {
+        return await this.appointmentService.getPrescriptionDetails(appoinmnetId)
+    }
 }

@@ -12467,5 +12467,8 @@ export class AppointmentService {
         );
         return response;
     }
-       
+
+    async getPrescriptionDetails(appoinmnetId: Number) : Promise<any> {
+        return await this.medicineRepository.query(queries.getPrescriptionDetails, [appoinmnetId])
+    }       
 }
