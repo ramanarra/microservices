@@ -76,7 +76,8 @@ export class AppointmentController {
                 endTime:appointment.appointment.appointmentdetails.endTime,
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
-            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            appointment.patientDetail=data;
+           // const mail = await this.appointmentService.sendAppCreatedEmail(data)
             //let apiKey = new Sms(this.textLocal.apiKey);
             let params = {
             }
@@ -443,9 +444,11 @@ export class AppointmentController {
             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+            patientEmail: pat.email ? pat.email : '',
         }
-        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-        console.log(mail);
+        appointment.patientDetail = data;
+        //const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+        //console.log(mail);
     }
     return appointment;
     }
@@ -489,9 +492,10 @@ export class AppointmentController {
             startTime:app.appointmentDetails.startTime,
             endTime:app.appointmentDetails.endTime,
             role:appointmentDto.user.role,
-            cancelledOn:date
+            cancelledOn:date,
         }
-        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+        appointment.patientDetail = data;
+        //const mail = await this.appointmentService.sendAppCancelledEmail(data)
     }
     return appointment;
     }
@@ -540,8 +544,8 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'payment_recipt_details'})
     async paymentReciptDetails(pymntId: String) : Promise<any> {
-        const recipt = await this.paymentService.paymentReciptDetails(pymntId)
-        return recipt?.data
+        // const recipt = await this.paymentService.paymentReciptDetails(pymntId)
+        // return recipt?.data
     }
 
     @MessagePattern({cmd: 'patient_book_appointment'})
@@ -574,8 +578,10 @@ export class AppointmentController {
                 startTime:app.appointment.appointmentdetails.startTime,
                 endTime:app.appointment.appointmentdetails.endTime,
                 role:app.appointment.appointmentdetails.createdBy,
+                patientEmail: pat.email? pat.email:'',
             }
-            const mail = await this.appointmentService.sendAppCreatedEmail(data)
+           app.patientDetail = data; 
+          // const mail = await this.appointmentService.sendAppCreatedEmail(data)
         }
         return app;
     }
@@ -953,9 +959,11 @@ export class AppointmentController {
                         startTime:app.appointmentDetails.startTime,
                         endTime:app.appointmentDetails.endTime,
                         role:CONSTANT_MSG.ROLES.PATIENT,
-                        cancelledOn:date
+                        cancelledOn:date,
+                        patientEmail: pat.email?pat.email:'',
                     }
-                    const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                    appointment.patientDetail=data;
+                   // const mail = await this.appointmentService.sendAppCancelledEmail(data)
                 }
                 return appointment;
             }else if(moment().valueOf() == cancelAppointmentMinutes.valueOf()){
@@ -974,9 +982,11 @@ export class AppointmentController {
                             startTime:app.appointmentDetails.startTime,
                             endTime:app.appointmentDetails.endTime,
                             role:CONSTANT_MSG.ROLES.PATIENT,
-                            cancelledOn:date
+                            cancelledOn:date,
+                            patientEmail: pat.email? pat.email:'',
                         }
-                        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                        appointment.patientDetail=data;
+                        //const mail = await this.appointmentService.sendAppCancelledEmail(data)
                     }
                     return appointment;
                 }else{
@@ -1130,9 +1140,11 @@ export class AppointmentController {
                             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
                             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
                             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                            patientEmail: pat.email? pat.email:'',
                         }
-                        const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-                        console.log(mail);
+                        appointment.patientDetail=data;
+                        //const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                        //console.log(mail);
                     }
                     return appointment;
 
@@ -1169,8 +1181,10 @@ export class AppointmentController {
                                 rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
                                 rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
                                 rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                                patientEmail: pat.email? pat.email:'',
                             }
-                            const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                            appointment.patientDetail = data;
+                           // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
                         }
                         return appointment;
                     // }
