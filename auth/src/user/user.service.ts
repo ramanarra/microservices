@@ -184,7 +184,7 @@ export class UserService {
                 phone: user.phone,
                 patientId: user.patient_id,
                 permission: 'CUSTOMER',
-                role:CONSTANT_MSG.ROLES.PATIENT,
+                role:CONSTANT_MSG.ROLES.PATIENT
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
@@ -523,14 +523,20 @@ export class UserService {
     async sendEmailWithTemplate(req: any): Promise<any> {
         const {email, template, subject, password, type, user_name, Details} = req;
 
+        let logo = 'https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/common/images/viruj-logo.png';
+        let plus = 'https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/common/images/plus.png';
+        let corner = 'https://virujh-cloud.s3.ap-south-1.amazonaws.com/virujh/common/images/corner-plus.png';
+     
         var templateBody = template;
         if(type === CONSTANT_MSG.MAIL.FORGOT_PASSWORD  || type === CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR){
             templateBody = templateBody.replace('{password}', password);
             templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
+            templateBody = templateBody.replace('{viruj-logo}', logo);
+            templateBody = templateBody.replace('{corner-plus}', corner);
         }
         if(type === CONSTANT_MSG.MAIL.APPOINTMENT_CREATED){
-            
-            templateBody = templateBody.replace('{doctorFirstName}', Details.doctorFirstName);
+
+             templateBody = templateBody.replace('{doctorFirstName}', Details.doctorFirstName);
              templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
              templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
              templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
@@ -541,20 +547,27 @@ export class UserService {
              templateBody = templateBody.replace('{role}', Details.role);
              templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
              templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+             templateBody = templateBody.replace('{viruj-logo}', logo);
+             templateBody = templateBody.replace('{corner-plus}', corner);
+             templateBody = templateBody.replace('{plus}', plus);
         }
         if(type === CONSTANT_MSG.MAIL.APPOINTMENT_RESCHEDULE){
 
-             templateBody = templateBody.replace('{doctorFirstName}',Details.doctorFirstName);
-             templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
-             templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
-             templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
-             templateBody = templateBody.replace('{email}', email);
-             templateBody = templateBody.replace('{hospital}', Details.hospital);
-             templateBody = templateBody.replace('{startTime}', Details.startTime);
-             templateBody = templateBody.replace('{endTime}', Details.endTime);
-             templateBody = templateBody.replace('{role}', Details.role);
-             templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
-             templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+            templateBody = templateBody.replace('{doctorFirstName}', Details.doctorFirstName);
+            templateBody = templateBody.replace('{doctorLastName}', Details.doctorLastName);
+            templateBody = templateBody.replace('{patientFirstName}', Details.patientFirstName);
+            templateBody = templateBody.replace('{patientLastName}', Details.patientLastName);
+            templateBody = templateBody.replace('{rescheduledAppointmentDate}', Details.rescheduledAppointmentDate);
+            templateBody = templateBody.replace('{rescheduledStartTime}', Details.rescheduledStartTime);
+            templateBody = templateBody.replace('{rescheduledEndTime}', Details.rescheduledEndTime);
+            templateBody = templateBody.replace('{hospital}', Details.hospital);
+            templateBody = templateBody.replace('{role}', Details.role);
+            templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
+            templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
+            templateBody = templateBody.replace('{rescheduledOn}', Details.rescheduledOn);
+            templateBody = templateBody.replace('{viruj-logo}', logo);
+            templateBody = templateBody.replace('{corner-plus}', corner);
+            templateBody = templateBody.replace('{plus}', plus);
         }
         if(type === CONSTANT_MSG.MAIL.APPOINTMENT_CANCEL){
 
@@ -570,6 +583,9 @@ export class UserService {
             templateBody = templateBody.replace('{appointmentId}', Details.appointmentId);
             templateBody = templateBody.replace('{appointmentDate}', Details.appointmentDate);
             templateBody = templateBody.replace('{cancelledOn}', Details.cancelledOn);
+            templateBody = templateBody.replace('{viruj-logo}', logo);
+            templateBody = templateBody.replace('{corner-plus}', corner);
+            templateBody = templateBody.replace('{plus}', plus);
 
         }
         if(type === CONSTANT_MSG.MAIL.PATIENT_REGISTRATION){
@@ -578,6 +594,8 @@ export class UserService {
             templateBody = templateBody.replace('{password}', Details.password);
             templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
             templateBody = templateBody.replace('{phone}', Details.phone);
+            templateBody = templateBody.replace('{viruj-logo}', logo);
+            templateBody = templateBody.replace('{corner-plus}', corner);
         }
 
         let params: any = {

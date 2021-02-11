@@ -154,7 +154,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (appointment.patientDetail.email) {
+                    if (appointment && appointment.patientDetail && appointment.patientDetail.email) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -459,7 +459,7 @@ export class CalendarController {
         const rescheduleAppointment = await this.calendarService.appointmentReschedule(appointmentDto, req.user);
 
         //Send mail functionality
-        if (req.user.email) {
+        if (req.user.email && !rescheduleAppointment.message) {
             const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
 
             if (template && template.data) {
@@ -476,7 +476,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data,);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (rescheduleAppointment.patientDetail.patientEmail) {
+                    if (rescheduleAppointment && rescheduleAppointment.patientDetail && rescheduleAppointment.patientDetail.patientEmail) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -528,7 +528,7 @@ export class CalendarController {
         const cancelAppointment = await this.calendarService.appointmentCancel(appointmentDto, req.user);
 
         //Send mail functionality
-        if (req.user.email) {
+        if (req.user.email && !cancelAppointment.message) {
             const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
 
             if (template && template.data) {
@@ -545,7 +545,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (cancelAppointment.patientDetail.email) {
+                    if (cancelAppointment && cancelAppointment.patientDetail && cancelAppointment.patientDetail.email) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -809,10 +809,10 @@ export class CalendarController {
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.INVALID_REQUEST}
         }
         this.logger.log(`Patient Book Appointment Api -> Request data ${JSON.stringify(patientDto)}`);
-        const patientAppointment:any = await this.calendarService.patientBookAppointment(patientDto);
+        const patientAppointment = await this.calendarService.patientBookAppointment(patientDto);
 
         //Send mail functionality
-        if (patientAppointment.patientDetail.email) {
+        if (patientAppointment && patientAppointment.patientDetail && patientAppointment.patientDetail.email) {
             const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
 
             if (template && template.data) {
@@ -829,7 +829,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (patientAppointment.patientDetail.patientEmail) {
+                    if (patientAppointment && patientAppointment.patientDetail && patientAppointment.patientDetail.patientEmail) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CREATED', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -1226,7 +1226,7 @@ export class CalendarController {
                         const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                         if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                            if (details.email) {
+                            if (details && details.email) {
                                 const template = await this.calendarService.getMessageTemplate({ messageType: 'PATIENT_REGISTRATION', communicationType: 'Email' });
 
                                 if (template && template.data) {
@@ -1354,7 +1354,7 @@ export class CalendarController {
         const cancelAppointment = await this.calendarService.patientAppointmentCancel(appointmentDto, req.user);
 
         //Send Mail functionality
-        if (cancelAppointment.patientDetail.email) {
+        if (cancelAppointment && cancelAppointment.patientDetail && cancelAppointment.patientDetail.email) {
             const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
 
             if (template && template.data) {
@@ -1371,7 +1371,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (cancelAppointment.patientDetail.patientEmail) {
+                    if (cancelAppointment && cancelAppointment.patientDetail && cancelAppointment.patientDetail.patientEmail) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_CANCEL', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -1527,7 +1527,7 @@ export class CalendarController {
         const appointmentReschedule = await this.calendarService.patientAppointmentReschedule(appointmentDto, req.user);
 
         //send mail functionality
-        if (appointmentReschedule.patientDetail.email) {
+        if (appointmentReschedule && appointmentReschedule.patientDetail && appointmentReschedule.patientDetail.email) {
             const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
 
             if (template && template.data) {
@@ -1544,7 +1544,7 @@ export class CalendarController {
                 const sendMail = await this.userService.sendEmailWithTemplate(data);
 
                 if (sendMail && sendMail.statusCode === HttpStatus.OK) {
-                    if (appointmentReschedule.patientDetail.patientEmail) {
+                    if (appointmentReschedule && appointmentReschedule.patientDetail && appointmentReschedule.patientDetail.patientEmail) {
                         const template = await this.calendarService.getMessageTemplate({ messageType: 'APPOINTMENT_RESCHEDULE', communicationType: 'Email' });
 
                         if (template && template.data) {
@@ -2008,6 +2008,7 @@ export class CalendarController {
         try {
             return this.calendarService.advertisementList(req.user);
         } catch (e) {
+            return e;
             console.log(e);
         }
     }

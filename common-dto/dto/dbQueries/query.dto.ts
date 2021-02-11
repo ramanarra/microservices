@@ -37,7 +37,7 @@ export const queries = {
     //getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
-    getReportVideoUsage: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
+    
     getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
     getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
@@ -52,7 +52,7 @@ export const queries = {
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
     getScheduleIntervalDays: 'select "docConfigScheduleDayId" from doc_config_schedule_interval  where doctorkey  =  $1 group by "docConfigScheduleDayId"',
    // getAppointByDocId: 'select * from appointment where "doctorId" = $1 and appointment_date >= $2  order by appointment_date limit 7 ',
-    //getAppointByDocId:'SELECT app.* , patient."id" as patientId, patient."name" as "patientName", payment."id" as paymentId, payment."is_paid" as isPaid, payment."refund" FROM appointment app left join patient_details patient on patient."id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and app."appointment_date" >= $2  order by appointment_date limit 7 ',
+    //getAppointByDocId:'SELECT app.* , patient."id" as patientId, patient."name" as patientName, payment."id" as paymentId, payment."is_paid" as isPaid, payment."refund" FROM appointment app left join patient_details patient on patient."id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and app."appointment_date" >= $2  order by appointment_date limit 7 ',
     getAppointByDocId:'SELECT app.* , patient."id" as patientId, patient."firstName" as "patientFirstName", patient."lastName" as "patientLastName", payment."id" as paymentId, payment."payment_status" as "fullyPaid" FROM appointment app left join patient_details patient on patient."patient_id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and appointment_date >= $2 and app."is_cancel"=false  order by appointment_date ',
     getSlots: 'SELECT schIntr."startTime", schIntr."endTime" from doc_config_schedule_day schDay left  join doc_config_schedule_interval schIntr on schIntr."docConfigScheduleDayId" = schDay."id" where schDay."dayOfWeek" = $1 and schDay."doctor_key" = $2',
     getPatient:'SELECT * FROM patient_details WHERE phone LIKE $1',
@@ -88,8 +88,7 @@ export const queries = {
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
     getTableData:'SELECT * FROM ',
     updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`,
-
-    getPatientDetailLabReport: `SELECT  DISTINCT ON (appointment_id)report."appointment_id" , report."comments",report."file_type", report."file_name" from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`,
+    getPatientDetailLabReport:`SELECT  DISTINCT ON (appointment_id)report."appointment_id" as appointmentId , report."comments" as comment, report."file_type" as fileType, report."file_name" as fileName, report."report_url" as attachment, report."report_date" as reportDate from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`,
 
     // Doctor report common fields 
     getDoctorReportField : `Select DISTINCT  appointment."appointment_date", appointment."patient_id" ,appointment."createdTime", 
@@ -113,6 +112,7 @@ export const queries = {
     getAppointmentListReportWithFilter:'  and appointment."appointment_date" BETWEEN $4 and $5  order by appointment."appointment_date"  DESC offset $2 limit $3',
     getAppointmentListReportWithoutLimitFilter: '  and appointment."appointment_date" BETWEEN $2 and $3  order by appointment."appointment_date"  DESC',
 
+    getReportVideoUsage: 'select app."doctorId", report.* FROM public.patient_report report left outer join public.appointment app on app.id = report.appointment_id left join public.doctor doc on doc."doctorId" = app."doctorId" where report.patient_id = $2 and (report.appointment_id = $3 or doc."doctorId" = $1 or report.appointment_id is null) Order by id DESC offset $4 limit $5',
     // Amount list report
     getAmountListReportJoinField: ` left join appointment on appointment."created_by" = 'PATIENT'
                                     left join patient_details patient on patient."patient_id"= appointment."patient_id" 
@@ -127,5 +127,5 @@ export const queries = {
     getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
 
     getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
-    getAdvertisementList:`SELECT * FROM advertisement` 
+    getAdvertisementList:`SELECT * FROM advertisement`
 }

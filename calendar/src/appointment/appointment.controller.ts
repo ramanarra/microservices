@@ -76,8 +76,8 @@ export class AppointmentController {
                 endTime:appointment.appointment.appointmentdetails.endTime,
                 role:appointment.appointment.appointmentdetails.createdBy,
             }
-            appointment.patientDetail = data;
-            //const mail = await this.appointmentService.sendAppCreatedEmail(data)
+            appointment.patientDetail=data;
+           // const mail = await this.appointmentService.sendAppCreatedEmail(data)
             //let apiKey = new Sms(this.textLocal.apiKey);
             let params = {
             }
@@ -444,11 +444,11 @@ export class AppointmentController {
             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
-            patientEmail: pat.email ? pat.email :'',
+            patientEmail: pat.email ? pat.email : '',
         }
-        appointment.patientDetail = data
-        // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-        // console.log(mail);
+        appointment.patientDetail = data;
+        //const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+        //console.log(mail);
     }
     return appointment;
     }
@@ -492,10 +492,10 @@ export class AppointmentController {
             startTime:app.appointmentDetails.startTime,
             endTime:app.appointmentDetails.endTime,
             role:appointmentDto.user.role,
-            cancelledOn:date
+            cancelledOn:date,
         }
-        appointment.patientDetail =data;
-       // const mail = await this.appointmentService.sendAppCancelledEmail(data)
+        appointment.patientDetail = data;
+        //const mail = await this.appointmentService.sendAppCancelledEmail(data)
     }
     return appointment;
     }
@@ -544,8 +544,8 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'payment_recipt_details'})
     async paymentReciptDetails(pymntId: String) : Promise<any> {
-        const recipt = await this.paymentService.paymentReciptDetails(pymntId)
-        return recipt?.data
+        // const recipt = await this.paymentService.paymentReciptDetails(pymntId)
+        // return recipt?.data
     }
 
     @MessagePattern({cmd: 'patient_book_appointment'})
@@ -578,10 +578,10 @@ export class AppointmentController {
                 startTime:app.appointment.appointmentdetails.startTime,
                 endTime:app.appointment.appointmentdetails.endTime,
                 role:app.appointment.appointmentdetails.createdBy,
-                patientEmail: pat.email ? pat.email : '',
+                patientEmail: pat.email? pat.email:'',
             }
-            app.patientDetail = data;
-          //  const mail = await this.appointmentService.sendAppCreatedEmail(data)
+           app.patientDetail = data; 
+          // const mail = await this.appointmentService.sendAppCreatedEmail(data)
         }
         return app;
     }
@@ -883,17 +883,7 @@ export class AppointmentController {
 
     }
 
-    @MessagePattern({cmd: 'get_prescription_list' })
-    async getPrescriptionList(user: any): Promise<any>{
-        const response = await this.appointmentService.getPrescriptionList( user.appointmentId );
-        return response;
-    }
-
-    @MessagePattern({cmd: 'get_report_list' })
-    async getReport(patientId: any): Promise<any>{
-        const response = await this.appointmentService.getReportList( patientId );
-        return response;
-    }
+   
 
     @MessagePattern({cmd: 'list_of_doctors'})
     async listOfDoctorsInHospital(user: any): Promise<any> {
@@ -970,10 +960,10 @@ export class AppointmentController {
                         endTime:app.appointmentDetails.endTime,
                         role:CONSTANT_MSG.ROLES.PATIENT,
                         cancelledOn:date,
-                        patientEmail: pat.email? pat.email : '',
+                        patientEmail: pat.email?pat.email:'',
                     }
-                    appointment.patientDetail = data;
-                    //const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                    appointment.patientDetail=data;
+                   // const mail = await this.appointmentService.sendAppCancelledEmail(data)
                 }
                 return appointment;
             }else if(moment().valueOf() == cancelAppointmentMinutes.valueOf()){
@@ -992,9 +982,11 @@ export class AppointmentController {
                             startTime:app.appointmentDetails.startTime,
                             endTime:app.appointmentDetails.endTime,
                             role:CONSTANT_MSG.ROLES.PATIENT,
-                            cancelledOn:date
+                            cancelledOn:date,
+                            patientEmail: pat.email? pat.email:'',
                         }
-                        const mail = await this.appointmentService.sendAppCancelledEmail(data)
+                        appointment.patientDetail=data;
+                        //const mail = await this.appointmentService.sendAppCancelledEmail(data)
                     }
                     return appointment;
                 }else{
@@ -1148,11 +1140,11 @@ export class AppointmentController {
                             rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
                             rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
                             rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
-                            patientEmail:pat.email? pat.email:'',
+                            patientEmail: pat.email? pat.email:'',
                         }
-                        appointment.patientDetail = data;
-                        // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
-                        // console.log(mail);
+                        appointment.patientDetail=data;
+                        //const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                        //console.log(mail);
                     }
                     return appointment;
 
@@ -1189,8 +1181,10 @@ export class AppointmentController {
                                 rescheduledAppointmentDate:appointment.appointment.appointmentdetails.appointmentDate,
                                 rescheduledStartTime:appointment.appointment.appointmentdetails.startTime,
                                 rescheduledEndTime:appointment.appointment.appointmentdetails.endTime,
+                                patientEmail: pat.email? pat.email:'',
                             }
-                            const mail = await this.appointmentService.sendAppRescheduleEmail(data);
+                            appointment.patientDetail = data;
+                           // const mail = await this.appointmentService.sendAppRescheduleEmail(data);
                         }
                         return appointment;
                     // }
@@ -1386,10 +1380,30 @@ export class AppointmentController {
         return await this.appointmentService.amountListReport(data);
     }
 
-    //Getting advertisement list
-    @MessagePattern({ cmd: 'advertisement_list' })
-    async advertisementList(data: any): Promise<any> {
-        const advertisement = await this.appointmentService.advertisementList(data);
-        return advertisement;
-    }
+       @MessagePattern({ cmd: 'get_prescription_list' })
+       async getPrescriptionList(user: any): Promise<any> {
+         const response = await this.appointmentService.getPrescriptionList(user);
+         return response;
+       }
+     
+       @MessagePattern({ cmd: 'get_report_list' })
+       async getReport(reqData: any): Promise<any> {
+         let doctorId = await this.appointmentService.doctorDetails(
+           reqData.doctor_key,
+         );
+         const response = await this.appointmentService.getReportList(
+           doctorId.doctorId,
+           reqData.patientId,
+           reqData.appointmentId,
+         );
+     
+         return response;
+       }
+
+       @MessagePattern({ cmd: 'advertisement_list' })
+       async advertisementList(data: any): Promise<any> {
+           const advertisement = await this.appointmentService.advertisementList(data);
+           return advertisement;
+       }
+
 }

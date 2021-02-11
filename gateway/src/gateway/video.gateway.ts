@@ -143,27 +143,36 @@ export class VideoGateway {
   
   }
 
-  
+  // Patient prescription data sent to patient in video consultation
   @SubscribeMessage('getPrescriptionList')
-  async getPriscription(client: AuthenticatedSocket, appointmentId: any) {
+  async getPriscription(client: AuthenticatedSocket, appointmentId: any, patientId: any) {
     this.logger.log(
-      `Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key}`,
+      `Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key} ${ appointmentId.appointmentId} ${patientId.patientId}`,
     );
-    const response: any = await this.videoService.getPrescription(
-      appointmentId.appointmentId,
-    );
-    client.emit('getPriscription', response);
+    
+    let patientSocketprescripList: Socket[] = this.socketStateService.get("PATIENT_" + patientId.patientId);
+    patientSocketprescripList.forEach((val: Socket) => {
+      const response: any =  this.videoService.getPrescription(
+        appointmentId.appointmentId,
+      );
+      client.emit('getPriscription', response);
+    });
+   
   }
 
+   // doctor get report list from db to video conference
   @SubscribeMessage('getReportList')
-  async getReport(client: AuthenticatedSocket, patientId: any) {
+  async getReport(client: AuthenticatedSocket, data:{patientId: number,appointmentId: number}) {
     this.logger.log(
-      `Socket request get appointments for Doctor from patientKey => ${patientId.patientId}`,
+      `Socket request get appointments for Doctor from patientKey => ${client.auth.data.doctor_key}${data.patientId, data.appointmentId}`,
     );
-    const response: any = await this.videoService.getReport(
-      patientId.patientId,
-    );
-    client.emit('getReport', response);
+   
+    let doctorRepSocketList : Socket[] = this.socketStateService.get("Doctor_"+ client.auth.data.doctor_key);
+       doctorRepSocketList.forEach(async(val : Socket) => { 
+      const response: any =  this.videoService.getReport( client.auth.data.doctor_key, data.patientId, data.appointmentId );
+      val.emit('getReport', response);
+      });
+  
   }
 
 }

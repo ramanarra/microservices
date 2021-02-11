@@ -12425,15 +12425,15 @@ export class AppointmentService {
         }
     }
 
-    //Getting advertisement list
+    // Getting advertisement list
     async advertisementList(user: any): Promise<any> {
         try {
-            const advertisement = await this.patientDetailsRepository.query(queries.getAdvertisementList);
+            const advertisement = await this.patientReportRepository.query(queries.getAdvertisementList);
             if (advertisement && advertisement.length) {
                 return {
                     statusCode: HttpStatus.OK,
                     message: CONSTANT_MSG.ADVERTISEMENT_LIST_FETCH_SUCCESS,
-                    data: advertisement[0]
+                    data: advertisement,
                 }
             }
             else {
@@ -12460,10 +12460,10 @@ export class AppointmentService {
         return response;
     }
     
-    async getReportList(patientId: any): Promise<any> {
+    async getReportList(doctorId: number, patientId: any, appointmentId: any): Promise<any> { 
         const response = await this.patientReportRepository.query(
           queries.getReportVideoUsage,
-          [patientId, 0, 5],
+          [ doctorId , patientId, appointmentId, 0, 5],
         );
         return response;
     }
