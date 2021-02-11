@@ -12433,7 +12433,7 @@ export class AppointmentService {
                 return {
                     statusCode: HttpStatus.OK,
                     message: CONSTANT_MSG.ADVERTISEMENT_LIST_FETCH_SUCCESS,
-                    data: advertisement[0]
+                    data: advertisement,
                 }
             }
             else {
