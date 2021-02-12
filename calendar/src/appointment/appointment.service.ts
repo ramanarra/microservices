@@ -12471,4 +12471,8 @@ export class AppointmentService {
     async getPrescriptionDetails(appoinmnetId: Number) : Promise<any> {
         return await this.medicineRepository.query(queries.getPrescriptionDetails, [appoinmnetId])
     }       
+
+    async getAppointmentDetails(appointmentId: Number) : Promise<any> {
+        return await this.appointmentRepository.query(queries.getAppointmentDetails)
+    }
 }
