@@ -101,7 +101,7 @@ export class VideoService {
   }
 
   @UseFilters(AllClientServiceException)
-    public getPrescriptionDetails(appoinmnetId: Number) {
+    public getPrescriptionDetails(appoinmnetId: Number): Promise<any>  {
         return this.redisClient.send({ cmd: 'get_prescription_details' }, appoinmnetId).toPromise()
     }
 }

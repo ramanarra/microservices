@@ -12473,6 +12473,6 @@ export class AppointmentService {
     }       
 
     async getAppointmentDetails(appointmentId: Number) : Promise<any> {
-        return await this.appointmentRepository.query(queries.getAppointmentDetails)
+        return await this.appointmentRepository.query(queries.getAppointmentDetails, [appointmentId])
     }
 }
