@@ -11,7 +11,7 @@ export const queries = {
     getConfig: 'SELECT "consultationSessionTimings","overBookingType","overBookingCount","overBookingEnabled" from doc_config where "doctor_key" = $1',
     getAppointment: 'SELECT * FROM appointment WHERE $1 <= "appointment_date" AND "appointment_date" <= $2 AND "doctorId" = $3 order by appointment_date',
     getAppointmentOnDate: 'SELECT * FROM appointment WHERE "appointment_date" = $1 order by appointment_date',
-    getPastAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "status"=$5 AND "is_cancel"=false order by appointment_date limit $4 offset $3',
+    getPastAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "status"=$5 AND "is_cancel"=false order by appointment_date desc limit $4 offset $3',
     getUpcomingAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND ("status"= $5 OR "status" = $6) AND "is_cancel"=false order by appointment_date limit $4 offset $3',
     getAppointmentForDoctor: 'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2 AND "is_cancel"=false',
     getAppointmentForDoctorAlongWithPatient: 'SELECT a."id" as "appointmentId",a."startTime",a."endTime",pd."patient_id" as "patientId",pd."firstName",pd."lastName",pd."photo",pd."live_status" as "patientLiveStatus", a."payment_status",a."paymentoption",a."consultationmode",a."status" FROM appointment a  join patient_details pd on pd."patient_id"=a."patient_id" WHERE a."appointment_date" = $1 AND a."doctorId" = $2 AND (a."status"= $3 OR a."status"= $4) AND a."consultationmode"= $5 AND a."is_cancel"=false',
