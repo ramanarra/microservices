@@ -11953,13 +11953,13 @@ export class AppointmentService {
         
             // Uploading files to the bucket
 
-            s3.upload(parames, (err, data) => {
+            s3.upload(parames, async (err, data) => {
                 if (err) {
                     console.log('Unable to upload prescription ' + prescriptionId + ' ', err);
                 } else {
                     
                     // store prescription URL into database
-                    this.prescriptionRepository.update({
+                    await this.prescriptionRepository.update({
                         id: prescription[0].id,
                     },  {prescriptionUrl: data.Location});
                 }
