@@ -185,8 +185,8 @@ export class VideoGateway {
     const appointmentDet = await this.calendarService.getAppointmentDetails(data.appointmentId)
     if(appointmentDet?.length && appointmentDet[0].patientid) {
       const getPrescriptionDetailsSocket: Socket [] = this.socketStateService.get(`CUSTOMER_${appointmentDet[0].patientid}`)
-      getPrescriptionDetailsSocket.forEach((i: Socket) => {
-        const res: any = this.videoService.getPrescriptionDetails(data.appointmentId)
+      getPrescriptionDetailsSocket.forEach(async(i: Socket) => {
+        const res: any = await this.videoService.getPrescriptionDetails(data.appointmentId)
         i.emit('getPrescriptionDetails', res)
       })
     }
