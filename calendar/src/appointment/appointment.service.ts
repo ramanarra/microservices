@@ -12478,8 +12478,12 @@ export class AppointmentService {
         return response;
     }
 
-    async getPrescriptionDetails(appoinmnetId: Number) : Promise<any> {
-        return await this.medicineRepository.query(queries.getPrescriptionDetails, [appoinmnetId])
+    async getPrescriptionDetails(appointmentId: Number) : Promise<any> {
+        const prescription = await this.medicineRepository.query(queries.getPrescriptionDetails, [appointmentId])
+        return {
+            appointmentId,
+            prescription
+        }
     }       
 
     async getAppointmentDetails(appointmentId: Number) : Promise<any> {
