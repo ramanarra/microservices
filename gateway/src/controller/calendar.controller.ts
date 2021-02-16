@@ -1798,6 +1798,7 @@ export class CalendarController {
    @UseGuards(AuthGuard())
    @ApiTags('Patient')
    @ApiQuery({ name: 'searchText', required: false })
+   @ApiQuery({ name: 'appointmentId', required: false })
    async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
     @Query('paginationLimit') paginationLimit: number,@Query('appointmentId') appointmentId : number  ) {
       const data={
