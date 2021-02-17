@@ -449,7 +449,7 @@ export class UserService {
     }
 
     async patientChangePassword(patientDto: any): Promise<any> {
-        const users =  await this.patientRepository.findOne({phone : patientDto.phone});
+        const users =  await this.patientRepository.findOne({phone : patientDto.user.phone});
         if(users && patientDto.user.patientId == users.patient_id){
             const salt = await bcrypt.genSalt();
             const pass = await this.hashPassword(patientDto.oldPassword, users.salt);
@@ -479,13 +479,13 @@ export class UserService {
         }else{
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_REQUEST
+                message: CONSTANT_MSG.Invalid_password
             }
         }
     }
 
     async doctorChangePassword(patientDto: any): Promise<any> {
-        const users =  await this.userRepository.findOne({email : patientDto.email});
+        const users =  await this.userRepository.findOne({email : patientDto.user.email});
         if(users && patientDto.user.email == users.email){
             const salt = await bcrypt.genSalt();
             const pass = await this.hashPassword(patientDto.oldPassword, users.salt);
@@ -515,7 +515,7 @@ export class UserService {
         }else{
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.INVALID_REQUEST
+                message: CONSTANT_MSG.Invalid_password
             }
         }
     }
