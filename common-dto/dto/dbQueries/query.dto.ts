@@ -18,14 +18,35 @@ export const queries = {
     getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >=  $2 group by appointment_date limit 7',
     getListOfAppointmentFromDates : 'select * from appointment where "doctorId" = $1 and  appointment_date in $2 order by appointment_date',
     getPatientList:'SELECT patient."firstName", patient."lastName", patient."email", patient."dateOfBirth", patient."phone" , app.* from appointment app left join patient_details patient on app."patient_id" = patient."patient_id" where app."doctorId" = $1 order by appointment_date',
+
+    //to retrive appointment with start & end times
+    getAvailableTime: `SELECT dcsi."startTime", dcsi."endTime", doctor_id, "dayOfWeek", dcsi."docConfigScheduleDayId"
+                            from doc_config_schedule_day dcsd 
+                            left join doc_config_schedule_interval dcsi on dcsi."docConfigScheduleDayId" = dcsd.id
+                        where dcsd.doctor_id = $1 
+                            and dcsi."startTime" notnull 
+                            and dcsi."endTime" notnull`,
+    getActiveAppointment: `select app."doctorId", app.appointment_date, app."startTime", app."endTime", app.is_active 
+                                from appointment app 
+                                where app.is_active = true 
+                                    and app."doctorId" = $1 
+                                    and app.appointment_date >= $2 
+                                    and app.appointment_date  <= $3`,
+
     getAppointments:'SELECT * from appointment where "doctorId" = $1 and "appointment_date" = $2 and "is_cancel"=false',
     //getAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
-    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
+    
+    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
-    getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (comments LIKE $2 OR file_name LIKE $2) Order by id DESC',
-    getSearchReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (comments LIKE $4 OR file_name LIKE $4) Order by id DESC offset $2 limit $3',
+    getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
+    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
+    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1  Order by id DESC offset $2 limit $3',
+
+    getReportWithoutLimitAppointmentIdSearch:'SELECT * FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
+    getReportWithAppointmentId: 'SELECT * FROM patient_report  WHERE appointment_id = $1 Order by id DESC',
+    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
 
     getAppListForPatient:'SELECT * from appointment WHERE "patient_id" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
@@ -65,5 +86,46 @@ export const queries = {
     getTodayAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" = $2 AND ("status"= $3 OR "status"=$4)  AND "is_cancel"=false',
     getAccountKey:"SELECT replace(account.account_key, 'Acc_', '') AS maxAcc FROM account WHERE account_key notnull order by replace(account.account_key, 'Acc_', '')::int desc limit 1",
     getPrescription:'SELECT * FROM prescription WHERE "appointment_id" = $1',
-    getTableData:'SELECT * FROM '
+    getTableData:'SELECT * FROM ',
+    updateSignature:`UPDATE doctor SET "signature" = $2 WHERE "doctorId" = $1`,
+    getPatientDetailLabReport:`SELECT  DISTINCT ON (appointment_id)report."appointment_id" as appointmentId , report."comments" as comment, report."file_type" as fileType, report."file_name" as fileName, report."report_url" as attachment, report."report_date" as reportDate from patient_report report  left join  appointment  on appointment."id" = report."appointment_id"  where report."patient_id" = $1 and (report."appointment_id" ! = NULL OR report."appointment_id"  IS not NULL)`,
+
+    // Doctor report common fields 
+    getDoctorReportField : `Select DISTINCT  appointment."appointment_date", appointment."patient_id" ,appointment."createdTime", 
+                            patient."name" as "patientName" , patient."phone" , payment."amount" , appointment."slotTiming" ,
+                            doctor."doctor_name" as "doctorName" `,
+    getDoctorReportFromField : ` from doctor `,
+    getDoctorReportWhereForDoctor: ` where doctor."doctor_key" = $1 `,
+    getDoctorReportWhereForAdmin: ` where doctor."account_key" = $1 `,
+
+    // Appointment list report
+    getAppointmentListReportJoinField : ` left join appointment on appointment."doctorId" = doctor."doctorId" 
+                                        left join patient_details patient on patient."patient_id"= appointment."patient_id" 
+                                        left join payment_details payment on payment."appointment_id" = appointment."id" `,
+
+    getAppointmentListReport: `  and appointment."appointment_date" =$2 order by appointment."appointment_date"  DESC `,
+    getAppointmentListReportWithLimit: `  and appointment."appointment_date" =$4  order by appointment."appointment_date"  DESC offset $2 limit $3`,
+    getAppointmentListReportWithSearch: `   AND (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4)) and appointment."appointment_date" =$5 order by appointment."appointment_date"  DESC offset $2 limit $3`,
+    getAppointmentListReportWithoutLimitSearch: `   AND (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2))  and appointment."appointment_date" = $3 order by appointment."appointment_date"  DESC`,
+    getAppointmentListReportWithFilterSearch: '  and appointment."appointment_date" BETWEEN $5 and $6  AND (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  order by appointment."appointment_date"  DESC offset $2 limit $3',
+    getAppointmentListReportWithoutLimitFilterSearch: '  and appointment."appointment_date" BETWEEN $3 and $4  AND (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2)) order by appointment."appointment_date"  DESC',
+    getAppointmentListReportWithFilter:'  and appointment."appointment_date" BETWEEN $4 and $5  order by appointment."appointment_date"  DESC offset $2 limit $3',
+    getAppointmentListReportWithoutLimitFilter: '  and appointment."appointment_date" BETWEEN $2 and $3  order by appointment."appointment_date"  DESC',
+
+    getReportVideoUsage: 'select app."doctorId", report.* FROM public.patient_report report left outer join public.appointment app on app.id = report.appointment_id left join public.doctor doc on doc."doctorId" = app."doctorId" where report.patient_id = $2 and (report.appointment_id = $3 or doc."doctorId" = $1 or report.appointment_id is null) Order by id DESC offset $4 limit $5',
+    // Amount list report
+    getAmountListReportJoinField: ` left join appointment on appointment."created_by" = 'PATIENT'
+                                    left join patient_details patient on patient."patient_id"= appointment."patient_id" 
+                                    left join payment_details payment on payment."appointment_id" = appointment."id" `,
+    getAmountListReport: ` and appointment."appointment_date" =$2  order by appointment."appointment_date" DESC `,
+    getAmountListReportWithLimit: `  and appointment."appointment_date" =$4 order by appointment."appointment_date" DESC offset $2 limit $3`,
+    getAmountListReportWithSearch: `  where doctor."doctor_key" =  $1   AND  (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  and appointment."appointment_date" =$5 order by appointment."appointment_date" DESC offset $2 limit $3`,
+    getAmountListReportWithoutLimitSearch:`    AND  (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2))  and appointment."appointment_date" = $3 order by appointment."appointment_date" DESC`,
+    getAmountListReportWithFilterSearch:`  where doctor."doctor_key" =  $1  and appointment."appointment_date" BETWEEN $5 and $6 AND  (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  order by appointment."appointment_date" DESC offset $2 limit $3`,
+    getAmountListReportWithoutLimitFilterSearch:`   and appointment."appointment_date" BETWEEN $3 and $4 AND (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2)) order by appointment."appointment_date" DESC`,
+    getAmountListReportWithFilter:`  and appointment."appointment_date" BETWEEN $4 and $5  order by appointment."appointment_date" DESC offset $2 limit $3`,
+    getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
+
+    getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
+    getAdvertisementList:`SELECT * FROM advertisement`
 }

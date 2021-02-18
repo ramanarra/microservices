@@ -1,10 +1,12 @@
 import { Repository, EntityRepository } from "typeorm";
 import { Users } from "./users.entity";
 import { Account } from "./account.entity";
-import { UserDto,PatientDto,CONSTANT_MSG } from "common-dto";
+import { UserDto,PatientDto,CONSTANT_MSG, Sms } from "common-dto";
 import * as bcrypt from "bcrypt";
 import { ConflictException, InternalServerErrorException, Logger,HttpStatus } from "@nestjs/common";
 import { Patient } from "./patient.entity";
+import * as config from 'config';
+const textLocal = config.get('textLocal');
 
 @EntityRepository(Patient)
 export class PatientRepository extends Repository<Patient> {
@@ -25,7 +27,30 @@ export class PatientRepository extends Repository<Patient> {
         patient.createdBy = patientDto.createdBy;
 
         try {
-            return await patient.save();
+            const response = await patient.save();
+            console.log(response);
+            //send OTP 
+            const pass = await this.random(4);
+            if(response && response.patient_id){
+                response.passcode = pass;
+
+                let where = {
+                    patient_id: response.patient_id
+                };
+                const updatePasscode = await this.update(where, {passcode: pass});
+                console.log(updatePasscode);
+                let sms = new Sms();
+                let param: any = {
+                    apiKey: textLocal.APIKey,
+                    message: 'OTP for verification ' + pass,
+                    sender: 'TXTLCL',
+                    number: phone
+                };
+                // const sendOtp = await sms.sendSms(param);
+                // console.log(sendOtp);
+            }
+            
+            return response;
         } catch (error) {
             if (error.code === "23505") {
                 this.logger.warn(`Phone number already exists, Phone number is ${phone}`);
@@ -41,6 +66,11 @@ export class PatientRepository extends Repository<Patient> {
 
     private async hashPassword(password: string, salt : string): Promise<string> {
         return bcrypt.hash(password, salt);
+    }
+
+    private async random(len: number){
+        const result = Math.floor(Math.random() * Math.pow(10, len));
+        return (result.toString().length < len) ? this.random(len) : result;
     }
 
     async validatePhoneAndPassword(phone,password) : Promise<any> {
