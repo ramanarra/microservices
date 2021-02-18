@@ -1401,4 +1401,9 @@ export class AppointmentController {
     async getAppointmentDetails(appoinmnetId: number): Promise<any> {
         return await this.appointmentService.getAppointmentDetails(appoinmnetId)
     }
+
+    @MessagePattern({ cmd: 'get_appointment_reports' })
+    async getAppointmentReports(appoinmentId: Number): Promise<any> {
+        return await this.appointmentService.getAppointmentReports(appoinmentId)
+    }
 }

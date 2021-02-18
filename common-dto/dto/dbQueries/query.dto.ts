@@ -136,5 +136,10 @@ export const queries = {
                         where pres.appointment_id = $1`,
     getAppointmentDetails: `select a.id as appointmentId, a.patient_id as patientId, a."doctorId"  as doctorId, a.status as status 
                                 from appointment a 
-                            where a.id = $1`
+                            where a.id = $1`,
+
+    // get report uploaded by patient for the appointment
+    getAppointmentReports: `select pr.patient_id as PatientId, pr.file_name as fileName, pr.report_url as attachment, pr.file_type as fileType, pr."comments", pr.report_date as reportDate 
+                                from patient_report pr 
+                             where appointment_id  = $1`
 }

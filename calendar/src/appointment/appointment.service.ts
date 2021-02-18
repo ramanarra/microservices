@@ -12489,4 +12489,15 @@ export class AppointmentService {
     async getAppointmentDetails(appointmentId: Number) : Promise<any> {
         return await this.appointmentRepository.query(queries.getAppointmentDetails, [appointmentId])
     }
+
+    async getAppointmentReports(appoinmentId: Number): Promise<any> {
+        const reports = await this.appointmentRepository.query(queries.getAppointmentReports, [appoinmentId])
+
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Fetched report successfully',
+            appoinmentId,
+            reports
+        }
+    }
 }
