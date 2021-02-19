@@ -11937,36 +11937,46 @@ export class AppointmentService {
                 quality: "75",
          };
 
-        pdf.create(params.htmlTemplate, options).toFile('./temp/prescription.pdf', (err, res) =>{
-            if (err) return console.log(err);
-            console.log(res);
-            htmlPdf = res.filename;
-            const fileContent = fs.readFileSync(htmlPdf);
-            
-            // Setting up S3 upload parameters
-            const parames = {
-                ACL: 'public-read',
-                Bucket: BUCKET_NAME,
-                Key: `virujh/${patientName}/prescription/prescription-${prescriptionId}.pdf`, // File name you want to save as in S3
-                Body: fileContent,
-            };
-        
-            // Uploading files to the bucket
-
-            s3.upload(parames, (err, data) => {
+         const attachment = new Promise((resolve, reject) => {
+            pdf.create(params.htmlTemplate, options).toFile('./temp/prescription.pdf', (err, res) =>{
                 if (err) {
-                    console.log('Unable to upload prescription ' + prescriptionId + ' ', err);
-                } else {
-                    
-                    // store prescription URL into database
-                    this.prescriptionRepository.update({
-                        id: prescription[0].id,
-                    },  {prescriptionUrl: data.Location});
+                    console.log(err);
+                    reject(err)
                 }
+                console.log(res);
+                htmlPdf = res.filename;
+                const fileContent = fs.readFileSync(htmlPdf);
                 
-            });   
-        });
+                // Setting up S3 upload parameters
+                const parames = {
+                    ACL: 'public-read',
+                    Bucket: BUCKET_NAME,
+                    Key: `virujh/${patientName}/prescription/prescription-${prescriptionId}.pdf`, // File name you want to save as in S3
+                    Body: fileContent,
+                };
+            
+                // Uploading files to the bucket
+
+                s3.upload(parames, async (err, data) => {
+                    if (err) {
+                        console.log('Unable to upload prescription ' + prescriptionId + ' ', err);
+                        reject(err)
+                    } else {
+                        try {
+                            // store prescription URL into database
+                            const updateDB = await this.prescriptionRepository.update({
+                                id: prescription[0].id,
+                            },  {prescriptionUrl: data.Location});
+                            resolve(updateDB)
+                        } catch (err) {
+                            reject(err)
+                        }
+                    }
+                });   
+            });
+        })
         
+        return attachment
     }
           
 
@@ -12467,5 +12477,27 @@ export class AppointmentService {
         );
         return response;
     }
-       
+
+    async getPrescriptionDetails(appointmentId: Number) : Promise<any> {
+        const prescription = await this.medicineRepository.query(queries.getPrescriptionDetails, [appointmentId])
+        return {
+            appointmentId,
+            prescription
+        }
+    }       
+
+    async getAppointmentDetails(appointmentId: Number) : Promise<any> {
+        return await this.appointmentRepository.query(queries.getAppointmentDetails, [appointmentId])
+    }
+
+    async getAppointmentReports(appoinmentId: Number): Promise<any> {
+        const reports = await this.appointmentRepository.query(queries.getAppointmentReports, [appoinmentId])
+
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Fetched report successfully',
+            appoinmentId,
+            reports
+        }
+    }
 }

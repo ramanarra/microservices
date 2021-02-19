@@ -93,6 +93,9 @@ export const CONSTANT_MSG = {
         EMAIL: 'Email',
         SMS: 'SMS',
         ON_SCREEN: 'ON_SCREEN'
+    },
+    APPPOINTMENT_REPORTS: {
+        NO_APPID: "Please send appointment id for which you want the reports",
+        SUCCESS: 'Fetched report successfully'
     }
-
 }

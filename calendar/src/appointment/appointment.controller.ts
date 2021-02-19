@@ -1405,5 +1405,19 @@ export class AppointmentController {
            const advertisement = await this.appointmentService.advertisementList(data);
            return advertisement;
        }
+    
+    @MessagePattern({ cmd: 'get_prescription_details' })
+    async getPrescriptionDetails(appoinmnetId: number): Promise<any> {
+        return await this.appointmentService.getPrescriptionDetails(appoinmnetId)
+    }
 
+    @MessagePattern({ cmd: 'get_appointment_details' })
+    async getAppointmentDetails(appoinmnetId: number): Promise<any> {
+        return await this.appointmentService.getAppointmentDetails(appoinmnetId)
+    }
+
+    @MessagePattern({ cmd: 'get_appointment_reports' })
+    async getAppointmentReports(appoinmentId: Number): Promise<any> {
+        return await this.appointmentService.getAppointmentReports(appoinmentId)
+    }
 }

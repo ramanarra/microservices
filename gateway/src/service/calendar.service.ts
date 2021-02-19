@@ -438,4 +438,16 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public advertisementList(data: any): Promise<any> {
         return this.redisClient.send({ cmd: 'advertisement_list' }, data).toPromise();
     }
+
+    //get appointment details using appointment id
+    @UseFilters(AllClientServiceException)
+    public getAppointmentDetails(appoinmnetId: Number): Promise<any>  {
+        return this.redisClient.send({ cmd: 'get_appointment_details' }, appoinmnetId).toPromise()
+    }
+
+    //get appoinment reports using appointment id
+    @UseFilters(AllClientServiceException)
+    public getAppointmentReports(appoinmnetId: Number) : Promise<any> {
+        return this.redisClient.send({ cmd: 'get_appointment_reports' }, appoinmnetId).toPromise()
+    }
 }
