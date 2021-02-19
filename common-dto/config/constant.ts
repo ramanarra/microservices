@@ -15,7 +15,7 @@ export const CONSTANT_MSG = {
     ALREADY_PRESENT:'Phone number already exists please login using the existing credentials',
     INVALID_REQUEST:'Invalid request',
     PHONE_EXISTS:"Phone number already exists",
-    TIME_OVERLAP:'Sorry, Now this time slot is not available. please choose other',
+    TIME_OVERLAP:'Someone has already booked this slot.Please select another.',
     APPOINT_ALREADY_CANCELLED:'Appointment already Cancelled',
     CONFIRMATION_REQUIRED:'Confirmation Required',
     NO_PERMISSION:'No Permission',
