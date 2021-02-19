@@ -20,6 +20,7 @@ export const CONSTANT_MSG = {
     CONFIRMATION_REQUIRED:'Confirmation Required',
     NO_PERMISSION:'No Permission',
     INVALID_PHONE:'Invalid Phone',
+   
     INVALID_PASSWORD:'Invalid Password',
     END_TIME_MISMATCHING:'End time is mismatching with respect to doctor session timing',
     INVALID_TIMINGS:'Start time should be less than End time',
@@ -77,8 +78,6 @@ export const CONSTANT_MSG = {
         REFUNDED :"refunded"
     },
     USER_NOT_FOUND : 'No user registered with this email',
-    PASSWORD_CHANGED : 'Successfully updated password',
-    PASSCODE_NOT_MATCHED:'Passcode not matched',
     MAIL: {
         FORGOT_PASSWORD: 'FORGOT_PASSWORD',
         RESET_PASSWORD: 'RESET_PASSWORD',
@@ -97,5 +96,15 @@ export const CONSTANT_MSG = {
     APPPOINTMENT_REPORTS: {
         NO_APPID: "Please send appointment id for which you want the reports",
         SUCCESS: 'Fetched report successfully'
-    }
+    },
+    PASSWORD_CHANGED : 'Password changed succesfully',
+    PASSCODE_NOT_MATCHED:'Passcode not matched',
+    PROVIDE_PHONE:'Provide Phone',
+    NEW_PASSWORD:'Please provide new password',
+    OLD_PASSWORD:'Please Provide old password',
+    CONFIRM_PASSWORD:'Please Provide confirm new password',
+    OLD_NEW_SAME_PASSWORD:'Old password and new password are same',
+    NEW_CONFIRM_NOT_SAME_PASSWORD:'New password and confirm new password are not same',
+    INVALID_PHONE_Number:'Please provide correct phone number',
+    Invalid_password:'Please provide correct password',
 }
