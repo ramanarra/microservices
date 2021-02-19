@@ -105,9 +105,11 @@ export class AuthController {
       const patient = await this.userService.patientLogin(patientDto);
       if(patient.patientId){
         const details = await this.calendarService.getPatientDetails(patient.patientId);
-        patient.firstName = details.firstName;
-        patient.lastName = details.lastName;
-        patient.photo = details.photo;
+        if(details) {
+          patient.firstName = details.firstName;
+          patient.lastName = details.lastName;
+          patient.photo = details.photo;
+        }
         const status = await this.calendarService.updatePatOnline(patient.patientId);
       }     
       return patient;
