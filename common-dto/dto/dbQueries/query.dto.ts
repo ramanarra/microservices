@@ -11,7 +11,7 @@ export const queries = {
     getConfig: 'SELECT "consultationSessionTimings","overBookingType","overBookingCount","overBookingEnabled" from doc_config where "doctor_key" = $1',
     getAppointment: 'SELECT * FROM appointment WHERE $1 <= "appointment_date" AND "appointment_date" <= $2 AND "doctorId" = $3 order by appointment_date',
     getAppointmentOnDate: 'SELECT * FROM appointment WHERE "appointment_date" = $1 order by appointment_date',
-    getPastAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "status"=$5 AND "is_cancel"=false order by appointment_date limit $4 offset $3',
+    getPastAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "status"=$5 AND "is_cancel"=false order by appointment_date desc limit $4 offset $3',
     getUpcomingAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND ("status"= $5 OR "status" = $6) AND "is_cancel"=false order by appointment_date limit $4 offset $3',
     getAppointmentForDoctor: 'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2 AND "is_cancel"=false',
     getAppointmentForDoctorAlongWithPatient: 'SELECT a."id" as "appointmentId",a."startTime",a."endTime",pd."patient_id" as "patientId",pd."firstName",pd."lastName",pd."photo",pd."live_status" as "patientLiveStatus", a."payment_status",a."paymentoption",a."consultationmode",a."status" FROM appointment a  join patient_details pd on pd."patient_id"=a."patient_id" WHERE a."appointment_date" = $1 AND a."doctorId" = $2 AND (a."status"= $3 OR a."status"= $4) AND a."consultationmode"= $5 AND a."is_cancel"=false',
@@ -127,5 +127,19 @@ export const queries = {
     getAmountListReportWithoutLimitFilter:`  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
 
     getMessageTemplate: 'SELECT template.* FROM message_metadata meta JOIN message_template template ON template.id = meta.message_template_id JOIN message_type type ON type.id = meta.message_type_id JOIN communication_type com ON com.id = meta.communication_type_id WHERE type.name = $1 AND com.name = $2',
-    getAdvertisementList:`SELECT * FROM advertisement`
+    getAdvertisementList:`SELECT * FROM advertisement`,
+
+    // get prescription
+    getPrescriptionDetails: `select med.name_of_medicine as medicine , med.dose_of_medicine as comment , med.count_of_days as dose, pres.prescription_url as attachment
+                            from medicine med 
+                            left join prescription pres on med.prescription_id = pres.id 
+                        where pres.appointment_id = $1`,
+    getAppointmentDetails: `select a.id as appointmentId, a.patient_id as patientId, a."doctorId"  as doctorId, a.status as status 
+                                from appointment a 
+                            where a.id = $1`,
+
+    // get report uploaded by patient for the appointment
+    getAppointmentReports: `select pr.patient_id as PatientId, pr.file_name as fileName, pr.report_url as attachment, pr.file_type as fileType, pr."comments", pr.report_date as reportDate 
+                                from patient_report pr 
+                             where appointment_id  = $1`
 }

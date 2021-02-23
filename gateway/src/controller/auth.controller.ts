@@ -105,9 +105,11 @@ export class AuthController {
       const patient = await this.userService.patientLogin(patientDto);
       if(patient.patientId){
         const details = await this.calendarService.getPatientDetails(patient.patientId);
-        patient.firstName = details.firstName;
-        patient.lastName = details.lastName;
-        patient.photo = details.photo;
+        if(details) {
+          patient.firstName = details.firstName;
+          patient.lastName = details.lastName;
+          patient.photo = details.photo;
+        }
         const status = await this.calendarService.updatePatOnline(patient.patientId);
       }     
       return patient;
@@ -468,7 +470,7 @@ export class AuthController {
     }
 
     @Post('patient/changePassword')
-    @ApiOkResponse({ description: ' { "phone": "9999999994","oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
+    @ApiOkResponse({ description: ' {"oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -477,22 +479,17 @@ export class AuthController {
     async patientChangePassword(@Request() req, @patient() check: boolean,  @Body() patientDto : PatientDto) {
       if (!check)
         return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-      if(!patientDto.phone){
-        console.log("Provide phone");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide phone"}
-      }else if(!patientDto.newPassword){
-        console.log("Provide newPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide newPassword"}
+      if(!patientDto.newPassword){
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.NEW_PASSWORD}
       }else if(!patientDto.oldPassword){
-        console.log("Provide oldPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide oldPassword"}
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.OLD_PASSWORD}
       }else if(!patientDto.confirmNewPassword){
-        console.log("Provide confirmNewPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmNewPassword"}
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.CONFIRM_PASSWORD}
+      }else if(patientDto.oldPassword==patientDto.newPassword){
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.OLD_NEW_SAME_PASSWORD}
       }
       if(patientDto.newPassword != patientDto.confirmNewPassword){
-        console.log("newPassword and confirmNewPassword are not same");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"newPassword and confirmNewPassword are not same"}
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.NEW_CONFIRM_NOT_SAME_PASSWORD}
       }
       this.logger.log(`Patient change password  Api -> Request data ${JSON.stringify(patientDto)}`);
       const pat:any =await this.userService.patientChangePassword(patientDto,req.user);
@@ -500,7 +497,7 @@ export class AuthController {
     }
 
     @Post('doctor/changePassword')
-    @ApiOkResponse({ description: ' { "email": "test22@gmail.com","oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
+    @ApiOkResponse({ description: ' { "oldPassword":"123456","newPassword":"123456","confirmNewPassword":"123456"}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
@@ -509,25 +506,20 @@ export class AuthController {
     async doctorChangePassword(@selfUserSettingRead() check: boolean, @accountUsersSettingsRead() check2: boolean, @Request() req,  @Body() patientDto : PatientDto) {
       if (!check && !check2)
         return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-      if(!patientDto.email){
-        console.log("Provide email");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide email"}
-      }else if(!patientDto.newPassword){
-        console.log("Provide newPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide newPassword"}
+      if(!patientDto.newPassword){
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.NEW_PASSWORD}
       }else if(!patientDto.oldPassword){
-        console.log("Provide oldPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide oldPassword"}
+         return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.OLD_PASSWORD}
       }else if(!patientDto.confirmNewPassword){
-        console.log("Provide confirmNewPassword");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"Provide confirmNewPassword"}
+         return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.CONFIRM_PASSWORD}
+      }else if(patientDto.oldPassword==patientDto.newPassword){
+         return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.OLD_NEW_SAME_PASSWORD}
       }
       if(patientDto.newPassword != patientDto.confirmNewPassword){
-        console.log("newPassword and confirmNewPassword are not same");
-        return{statusCode:HttpStatus.BAD_REQUEST,message:"newPassword and confirmNewPassword are not same"}
+        return{statusCode:HttpStatus.BAD_REQUEST,message:CONSTANT_MSG.NEW_CONFIRM_NOT_SAME_PASSWORD}
       }
       this.logger.log(`Doctor change password  Api -> Request data ${JSON.stringify(patientDto)}`);
-      const pat:any =await this.userService.doctorChangePassword(patientDto,req.user);
+       const pat:any =await this.userService.doctorChangePassword(patientDto,req.user);
       return pat;
     }
 

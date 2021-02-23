@@ -1798,6 +1798,7 @@ export class CalendarController {
    @UseGuards(AuthGuard())
    @ApiTags('Patient')
    @ApiQuery({ name: 'searchText', required: false })
+   @ApiQuery({ name: 'appointmentId', required: false })
    async reportList(@Request() req, @patient() check:boolean, @Query('paginationStart') paginationStart: number,@Query('searchText') searchText: string,
     @Query('paginationLimit') paginationLimit: number,@Query('appointmentId') appointmentId : number  ) {
       const data={
@@ -2011,6 +2012,30 @@ export class CalendarController {
             return e;
             console.log(e);
         }
+    }
+
+
+    @Get('getAppointmentReports')
+    @ApiOkResponse({ description: `Request body example: { appointmentId: 123 }`})
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Doctors')
+    @ApiQuery({ name: 'appointmentId', required: true })
+    async getAppointmentReports(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Query('appointmentId') appointmentId : Number) {
+        // check doctor & admin permission
+        if (!check && !check2 && 
+            (req.user.role == CONSTANT_MSG.ROLES.DOCTOR || req.user.role == CONSTANT_MSG.ROLES.ADMIN ||
+            req.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT)) {
+            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
+        }
+
+        if(!appointmentId) return {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: "Please send appointment id for which you want the reports"
+        }
+
+        return await this.calendarService.getAppointmentReports(appointmentId)
     }
 
 }

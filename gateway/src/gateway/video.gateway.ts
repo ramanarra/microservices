@@ -7,6 +7,7 @@ import socketio from 'socket.io';
 import { SocketStateService } from '@app/shared/socket-state/socket-state.service';
 import { CONSTANT_MSG } from 'common-dto';
 import { UserService } from '@src/service/user.service';
+import { CalendarService } from '@src/service/calendar.service'
 
 interface TokenPayload {
   readonly userId: string;
@@ -27,7 +28,7 @@ export class VideoGateway {
   private logger = new Logger('VideoGateway');
 
   constructor(private readonly videoService : VideoService, private readonly socketStateService : SocketStateService,
-    private readonly userService : UserService){
+    private readonly userService : UserService, private readonly calendarService : CalendarService ){
 
   }
 
@@ -173,6 +174,22 @@ export class VideoGateway {
       val.emit('getReport', response);
       });
   
+  }
+
+  @SubscribeMessage('getPrescriptionDetails')
+  async getPrescriptionDetails(client: AuthenticatedSocket, data: {appointmentId: Number}) {
+    this.logger.log(
+      `Socket request get prescription details for paitent from appointmentId => ${data.appointmentId}`
+    )
+
+    const appointmentDet = await this.calendarService.getAppointmentDetails(data.appointmentId)
+    if(appointmentDet?.length && appointmentDet[0].patientid) {
+      const getPrescriptionDetailsSocket: Socket [] = this.socketStateService.get(`CUSTOMER_${appointmentDet[0].patientid}`)
+      getPrescriptionDetailsSocket.forEach(async(i: Socket) => {
+        const res: any = await this.videoService.getPrescriptionDetails(data.appointmentId)
+        i.emit('getPrescriptionDetails', res)
+      })
+    }
   }
 
 }
