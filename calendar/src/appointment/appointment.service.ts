@@ -1480,6 +1480,9 @@ export class AppointmentService {
         var res = {
             reportDetail: app.reportDetails,
             email: doctor.email,
+            doctorPhoto:doctor.photo,
+            speciality:doctor.speciality,
+            consultationTimeSlot: app.appointmentDetails.slotTiming,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
             location: account.city,
