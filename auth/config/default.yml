@@ -14,7 +14,6 @@ database :
 JWT :
   expiresIn : 36000000
   secret : 'topSecret51'
-  secret : 'topSecret51'
   defaultStrategy : 'jwt'
 
 textLocal :
