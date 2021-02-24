@@ -4,9 +4,9 @@
 * Docker - [Installation](https://docs.docker.com/docker-for-windows/install/) .  
 * Wsl 2 - [Download page](https://docs.microsoft.com/en-us/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package).
 
-###Installation Steps
+### Installation Steps
 
-##Backend 
+## Backend 
 ```
 1)git clone git clone https://virujh@bitbucket.org/virujh/nest-microservice.git
 2)SSH setup in cmd:
@@ -18,11 +18,3 @@
   Development - docker-compose -f docker-compose-dev.yml up
   Production  - docker-compose -f docker-compose-prod.yml up
 ```
-
-##Front-end
-``` 
-1)git clone https://virujh@bitbucket.org/virujh/virujh-reactjs.git
-2)Navigate to front-end folder in command prompt and give docker run commands:
-  command : docker-compose up
-```
-
