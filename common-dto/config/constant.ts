@@ -107,4 +107,10 @@ export const CONSTANT_MSG = {
     NEW_CONFIRM_NOT_SAME_PASSWORD:'New password and confirm new password are not same',
     INVALID_PHONE_Number:'Please provide correct phone number',
     Invalid_password:'Please provide correct password',
+    message:'Payment key Feteched Sucessfully',
+    PAYMENT_KEY:{
+     
+        key_id:'rzp_test_7aIsTw8qZyCQOy',
+        key_secret:'Oec8MS34qSS2BVhGMND0ym3L'
+    }
 }
