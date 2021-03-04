@@ -1620,7 +1620,7 @@ export class CalendarController {
 
     @Get('payment/paymentKeys')
     @ApiOkResponse({
-    description: 'requestBody example :{" key_id":"rzp_test_7aIsTw8qZyCQOy","key_secret":"Oec8MS34qSS2BVhGMND0ym3L"}'
+    description: 'requestBody example :{" key_id":"rzp_test_yaoAQ9nmvuUZx4","key_secret":"tttY7AYPndi9cCEj549QkovH"}'
     })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     @ApiBearerAuth('JWT')

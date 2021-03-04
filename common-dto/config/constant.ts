@@ -110,7 +110,8 @@ export const CONSTANT_MSG = {
     message:'Payment key Feteched Sucessfully',
     PAYMENT_KEY:{
      
-        key_id:'rzp_test_7aIsTw8qZyCQOy',
-        key_secret:'Oec8MS34qSS2BVhGMND0ym3L'
+        key_id:'rzp_test_yaoAQ9nmvuUZx4',
+        key_secret:'tttY7AYPndi9cCEj549QkovH',
+        AndroidVersion:'2.5',
     }
 }
