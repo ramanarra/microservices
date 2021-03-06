@@ -2,107 +2,112 @@ import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, Unique } from 'type
 import { Exclude } from 'class-transformer';
 
 @Entity()
-export class PatientDetails extends BaseEntity{
+export class PatientDetails extends BaseEntity {
 
     @PrimaryGeneratedColumn({
-        name : 'id'
+        name: 'id'
     })
-    id : number;
+    id: number;
 
     @Column({
-        name : 'name'
+        name: 'honorific'
     })
-    name : string;
-
-  //  @Exclude()
-    @Column({
-        name : 'landmark'
-    })
-    landmark : string;
+    honorific: string;
 
     @Column({
-        name : 'country'
+        name: 'name'
     })
-    country : string;
+    name: string;
+
+    //  @Exclude()
+    @Column({
+        name: 'landmark'
+    })
+    landmark: string;
 
     @Column({
-        name : 'registration_number'
+        name: 'country'
     })
-    registrationNumber : string;
+    country: string;
 
     @Column({
-        name : 'address'
+        name: 'registration_number'
     })
-    address : string;
+    registrationNumber: string;
 
     @Column({
-        name : 'state'
+        name: 'address'
     })
-    state : string;
+    address: string;
 
     @Column({
-        name : 'pincode'
+        name: 'state'
     })
-    pincode : string;
+    state: string;
 
     @Column({
-        name : 'city'
+        name: 'pincode'
     })
-    city : string;
+    pincode: string;
 
     @Column({
-        name : 'email'
+        name: 'city'
     })
-    email : string;
+    city: string;
 
     @Column({
-        name : 'photo'
+        name: 'email'
     })
-    photo : string;
+    email: string;
 
     @Column({
-        name : 'phone'
+        name: 'photo'
     })
-    phone : string;
+    photo: string;
 
     @Column({
-        name : 'patient_id'
+        name: 'phone'
     })
-    patientId : number;
+    phone: string;
 
     @Column({
-        name : 'firstName'
+        name: 'patient_id'
     })
-    firstName : string;
+    patientId: number;
 
     @Column({
-        name : 'lastName'
+        name: 'firstName'
     })
-    lastName : string;
+    firstName: string;
 
     @Column({
-        name : 'dateOfBirth'
+        name: 'lastName'
     })
-    dateOfBirth : string;
+    lastName: string;
 
     @Column({
-        name : 'alternateContact'
+        name: 'dateOfBirth'
     })
-    alternateContact : string;
+    dateOfBirth: string;
 
     @Column({
-        name : 'age'
+        name: 'alternateContact'
     })
-    age : number;
+    alternateContact: string;
 
     @Column({
-        name : 'live_status'
+        name: 'age'
     })
-    liveStatus : string;
+    age: number;
 
     @Column({
-        name : 'last_active'
+        name: 'live_status'
     })
-    lastActive : Date;
+    liveStatus: string;
+
+    @Column({
+        name: 'last_active'
+    })
+    lastActive: Date;
 
 }
