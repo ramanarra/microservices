@@ -9,8 +9,8 @@ import Axios from 'axios'
 const shortid = require('shortid');
 const crypto = require('crypto');
 var instance = new RazorPay({
-    key_id:'rzp_test_7aIsTw8qZyCQOy',
-    key_secret:'Oec8MS34qSS2BVhGMND0ym3L'
+    key_id:'rzp_test_yaoAQ9nmvuUZx4',
+    key_secret:'tttY7AYPndi9cCEj549QkovH'
 })
 
 
@@ -45,8 +45,8 @@ export class PaymentService {
 
     async paymentReciptDetails(pymntId: String) : Promise<any> {
         //username & password for basic auth of razorpay
-        const username = 'rzp_test_7aIsTw8qZyCQOy'
-        const password = 'Oec8MS34qSS2BVhGMND0ym3L'
+        const username = 'rzp_test_yaoAQ9nmvuUZx4'
+        const password = 'tttY7AYPndi9cCEj549QkovH'
 
         try {
             return await Axios.get(`https://api.razorpay.com/v1/payments/${pymntId}`, {
@@ -61,7 +61,7 @@ export class PaymentService {
     }
 
     async paymentVerification(req): Promise<any> {
-        const secret = 'Oec8MS34qSS2BVhGMND0ym3L';
+        const secret = 'tttY7AYPndi9cCEj549QkovH';
         console.log(req);
         let data = req.razorpay_order_id+"|"+req.razorpay_payment_id;
         const digest = crypto.createHmac('SHA256', secret).update(data).digest('hex');

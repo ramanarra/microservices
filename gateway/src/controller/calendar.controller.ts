@@ -1618,6 +1618,18 @@ export class CalendarController {
         return this.calendarService.paymentVerification(accountDto, req.user);
     }
 
+    @Get('payment/paymentKeys')
+    @ApiOkResponse({
+    description: 'requestBody example :{" key_id":"rzp_test_yaoAQ9nmvuUZx4","key_secret":"tttY7AYPndi9cCEj549QkovH"}'
+    })
+    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiBearerAuth('JWT')
+    @UseGuards(AuthGuard())
+    @ApiTags('Payment')
+    paymentKey(){ 
+        return {statusCode:HttpStatus.OK,Message:CONSTANT_MSG.message,message:CONSTANT_MSG.PAYMENT_KEY}
+    }
+
     @Get('patient/viewPatientDetails')
     @ApiOkResponse({description: 'viewPatientDetails API'})
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})

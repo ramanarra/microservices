@@ -38,15 +38,15 @@ export const queries = {
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
     
-    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
+    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , "report_url" as "attachment",comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
     getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
     getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
-    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
-    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", comments FROM patient_report  WHERE appointment_id = $1  Order by id DESC offset $2 limit $3',
+    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
+    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE appointment_id = $1  Order by id DESC offset $2 limit $3',
 
     getReportWithoutLimitAppointmentIdSearch:'SELECT * FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
     getReportWithAppointmentId: 'SELECT * FROM patient_report  WHERE appointment_id = $1 Order by id DESC',
-    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate", comments FROM patient_report  WHERE patient_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
+    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate","report_url" as "attachment", comments FROM patient_report  WHERE patient_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
 
     getAppListForPatient:'SELECT * from appointment WHERE "patient_id" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
