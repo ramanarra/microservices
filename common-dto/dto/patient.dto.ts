@@ -1,9 +1,10 @@
-import {IsNumber,IsOptional} from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class PatientDto {
-    @IsOptional ()
+    @IsOptional()
     @IsNumber()
     id: number;
+    honorific: string;
     name: string;
     landmark: string;
     country: string;
