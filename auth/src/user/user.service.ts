@@ -163,37 +163,36 @@ export class UserService {
     async patientRegistration(patientDto: PatientDto): Promise<any> {
         try {
             const pat = await this.findByPhone(patientDto.phone);
-            if(pat){
-                if(pat.createdBy == CONSTANT_MSG.ROLES.DOCTOR  && pat.password == null){
+            if (pat) {
+                if (pat.createdBy == CONSTANT_MSG.ROLES.DOCTOR && pat.password == null) {
                     const update = await this.patientRegistrationUpdate(patientDto);
                     return {
                         update: "updated password",
-                        patientId:pat.patient_id
+                        patientId: pat.patient_id
                     }
-                } else{
+                } else {
                     return {
                         statusCode: HttpStatus.BAD_REQUEST,
                         message: CONSTANT_MSG.ALREADY_PRESENT
                     }
                 }
             }
-            
+
             const user = await this.patientRepository.patientRegistration(patientDto);
-            const update = await this.patientForgotPassword(patientDto);
+            // const update = await this.patientForgotPassword(patientDto);
             const jwtUserInfo: JwtPatientLoad = {
                 phone: user.phone,
                 patientId: user.patient_id,
                 permission: 'CUSTOMER',
-                role:CONSTANT_MSG.ROLES.PATIENT
+                role: CONSTANT_MSG.ROLES.PATIENT
             };
             console.log("=======jwtUserInfo", jwtUserInfo)
             const accessToken = this.jwtService.sign(jwtUserInfo);
             user.accessToken = accessToken;
             user.permission = 'CUSTOMER';
-            user.password = update.password;
             return user;
         } catch (e) {
-	        console.log(e);
+            console.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
