@@ -14,7 +14,7 @@ export const queries = {
     getPastAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "status"=$5 AND "is_cancel"=false order by appointment_date desc , appointment."startTime" asc limit $4 offset $3',
     getUpcomingAppointmentsWithPagination: 'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND ("status"= $5 OR "status" = $6) AND "is_cancel"=false order by appointment_date desc , appointment."startTime" asc limit $4 offset $3',
     getAppointmentForDoctor: 'SELECT * FROM appointment WHERE "appointment_date" = $1 AND "doctorId" = $2 AND "is_cancel"=false',
-    getAppointmentForDoctorAlongWithPatient: 'SELECT a."id" as "appointmentId",a."startTime",a."endTime",pd."patient_id" as "patientId",pd."firstName",pd."lastName",pd."photo",pd."live_status" as "patientLiveStatus", a."payment_status",a."paymentoption",a."consultationmode",a."status" FROM appointment a  join patient_details pd on pd."patient_id"=a."patient_id" WHERE a."appointment_date" = $1 AND a."doctorId" = $2 AND (a."status"= $3 OR a."status"= $4) AND a."consultationmode"= $5 AND a."is_cancel"=false',
+    getAppointmentForDoctorAlongWithPatient: 'SELECT a."id" as "appointmentId",a."startTime",a."endTime",pd."patient_id" as "patientId",pd."honorific",pd."firstName",pd."lastName",pd."photo",pd."live_status" as "patientLiveStatus", a."payment_status",a."paymentoption",a."consultationmode",a."status" FROM appointment a  join patient_details pd on pd."patient_id"=a."patient_id" WHERE a."appointment_date" = $1 AND a."doctorId" = $2 AND (a."status"= $3 OR a."status"= $4) AND a."consultationmode"= $5 AND a."is_cancel"=false',
     getPossibleListAppointmentDatesFor7Days: 'select appointment_date from appointment  where "doctorId" = $1 and appointment_date >=  $2 group by appointment_date limit 7',
     getListOfAppointmentFromDates: 'select * from appointment where "doctorId" = $1 and  appointment_date in $2 order by appointment_date',
     getPatientList: 'SELECT patient."firstName", patient."lastName", patient."email", patient."dateOfBirth", patient."phone" , app.* from appointment app left join patient_details patient on app."patient_id" = patient."patient_id" where app."doctorId" = $1 order by appointment_date',
@@ -53,7 +53,7 @@ export const queries = {
     getScheduleIntervalDays: 'select "docConfigScheduleDayId" from doc_config_schedule_interval  where doctorkey  =  $1 group by "docConfigScheduleDayId"',
     // getAppointByDocId: 'select * from appointment where "doctorId" = $1 and appointment_date >= $2  order by appointment_date limit 7 ',
     //getAppointByDocId:'SELECT app.* , patient."id" as patientId, patient."name" as patientName, payment."id" as paymentId, payment."is_paid" as isPaid, payment."refund" FROM appointment app left join patient_details patient on patient."id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and app."appointment_date" >= $2  order by appointment_date limit 7 ',
-    getAppointByDocId: 'SELECT app.* , patient."id" as patientId, patient."firstName" as "patientFirstName", patient."lastName" as "patientLastName", payment."id" as paymentId, payment."payment_status" as "fullyPaid" FROM appointment app left join patient_details patient on patient."patient_id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and appointment_date >= $2 and app."is_cancel"=false  order by appointment_date ',
+    getAppointByDocId: 'SELECT app.* , patient."id" as patientId, patient."honorific", patient."firstName" as "patientFirstName", patient."lastName" as "patientLastName", payment."id" as paymentId, payment."payment_status" as "fullyPaid" FROM appointment app left join patient_details patient on patient."patient_id" = app."patient_id" left join payment_details payment on payment."appointment_id" = app."id" WHERE app."doctorId"= $1 and appointment_date >= $2 and app."is_cancel"=false  order by appointment_date ',
     getSlots: 'SELECT schIntr."startTime", schIntr."endTime" from doc_config_schedule_day schDay left  join doc_config_schedule_interval schIntr on schIntr."docConfigScheduleDayId" = schDay."id" where schDay."dayOfWeek" = $1 and schDay."doctor_key" = $2',
     getPatient: 'SELECT * FROM patient_details WHERE phone LIKE $1',
     getPatientDetails: 'SELECT "patient_id", "firstName","lastName","email","dateOfBirth","email", "phone" from patient_details where patient_id = $1',
@@ -92,7 +92,8 @@ export const queries = {
 
     // Doctor report common fields 
     getDoctorReportField: `Select DISTINCT  appointment."appointment_date", appointment."patient_id" ,appointment."createdTime", 
-                            patient."name" as "patientName" , patient."phone" , payment."amount" , appointment."slotTiming" ,
+                            patient."honorific" , patient."name" as "patientName" , patient."phone" ,
+                            payment."amount" , appointment."slotTiming" ,
                             doctor."doctor_name" as "doctorName" `,
     getDoctorReportFromField: ` from doctor `,
     getDoctorReportWhereForDoctor: ` where doctor."doctor_key" = $1 `,
