@@ -1594,18 +1594,18 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {"razorpay_order_id": "order_FV6u13eob2vaLE","razorpay_payment_id": "pay_FV6uMsxQHGLJwC","razorpay_signature": "d4adf91d6277a9ef0350638e6370b148ab372be11da2c002d101b56814688cb3"}'
     })
-    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Payment')
-    @ApiBody({type: AccountDto})
+    @ApiBody({ type: AccountDto })
     paymentVerification(@Request() req, @Body() accountDto: AccountDto) {
         this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
 
-        if(!req.email) {
+        if (!req.body.email) {
             const updateEmail = async () => {
                 const pymntRecipt = await this.calendarService.paymentReciptDetails(req.body.razorpay_payment_id)
-                if(!!pymntRecipt?.email) {
+                if (!!pymntRecipt?.email) {
                     this.calendarService.patientDetailsEdit({
                         patientId: req.body?.patientId,
                         email: pymntRecipt?.email
