@@ -370,6 +370,10 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public patientReport(reports: any) : Observable <any> {
         return this.redisClient.send({ cmd : 'patient_report'},reports);
     }
+    @UseFilters(AllClientServiceException)
+    public deleteReport(id: any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'patient_delete_report'},id);
+    }
 
     @UseFilters(AllClientServiceException)
     public reportList(data: any) : Observable <any> {

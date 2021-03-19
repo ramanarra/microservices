@@ -3202,3 +3202,5 @@ text-align: left; color: #000000;">Hi, {user_name}</h1>
     </body>
 </html>'::character varying WHERE
 id = 6;
+ALTER TABLE public.patient_details ADD honorific varchar(10) NULL;
+ALTER TABLE public.patient_report ADD isActive boolean;

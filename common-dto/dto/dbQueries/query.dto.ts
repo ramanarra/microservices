@@ -38,15 +38,15 @@ export const queries = {
     getAppList:'SELECT * from appointment WHERE "doctorId" = $1 order by appointment_date',
 
     
-    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , "report_url" as "attachment",comments FROM patient_report  WHERE patient_id = $1 Order by id DESC offset $2 limit $3',
-    getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 Order by id DESC',
-    getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
-    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
-    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments FROM patient_report  WHERE appointment_id = $1  Order by id DESC offset $2 limit $3',
+    getReport: 'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , "report_url" as "attachment",comments,id FROM patient_report  WHERE patient_id = $1 AND active=$4  Order by id DESC offset $2 limit $3',
+    getReportWithoutLimit: 'SELECT * FROM patient_report  WHERE patient_id = $1 AND active=$2  Order by id DESC',
+    getReportWithoutLimitSearch: 'SELECT * FROM patient_report  WHERE patient_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) AND active=$3  Order by id DESC',
+    getSearchReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment",comments,id FROM patient_report  WHERE appointment_id = $1   AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) AND active=$5  Order by id DESC offset $2 limit $3',
+    getReportByAppointmentId:'SELECT "file_name" as "fileName", "report_date" as "reportDate", "report_url" as "attachment" , comments,id FROM patient_report  WHERE appointment_id = $1 AND active=$4  Order by id DESC offset $2 limit $3',
 
-    getReportWithoutLimitAppointmentIdSearch:'SELECT * FROM patient_report  WHERE appointment_id = $1 AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) Order by id DESC',
-    getReportWithAppointmentId: 'SELECT * FROM patient_report  WHERE appointment_id = $1 Order by id DESC',
-    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate","report_url" as "attachment", comments FROM patient_report  WHERE patient_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) Order by id DESC offset $2 limit $3',
+    getReportWithoutLimitAppointmentIdSearch:'SELECT * FROM patient_report  WHERE appointment_id = $1  AND (LOWER(comments) LIKE $2 OR LOWER(file_name) LIKE $2) AND active=$3  Order by id DESC',
+    getReportWithAppointmentId: 'SELECT * FROM patient_report  WHERE appointment_id = $1 AND active=$2  Order by id DESC',
+    getSearchReport: 'SELECT "file_name" as "fileName", "report_url" as "attachment" , "report_date" as "reportDate","report_url" as "attachment", comments,id FROM patient_report  WHERE patient_id = $1 AND (LOWER(comments) LIKE $4 OR LOWER(file_name) LIKE $4) AND active=$5 Order by id DESC offset $2 limit $3',
 
     getAppListForPatient:'SELECT * from appointment WHERE "patient_id" = $1 AND current_date <= "appointment_date" order by appointment_date',
     getPaginationAppList:'SELECT * from appointment WHERE "doctorId" = $1 AND  "appointment_date" >= $2  AND "appointment_date" <= $3 order by appointment_date',
@@ -64,6 +64,8 @@ export const queries = {
     getDocListForPatient: 'SELECT * from  appointment a join doctor d on a."doctorId"= d."doctorId" join doc_config dc on dc."doctor_key"=d."doctor_key" join account_details ad on ad."account_key" = d."account_key" where a."patient_id" = $1',
     getPastAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2 AND "is_cancel"=false AND "status"= $3',
     getUpcomingAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2  AND "status"= $3 OR "status"=$4 AND "is_cancel"=false',
+    getUpcomingAppointmentsCounts:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND ("status"= $3 OR "status" = $4) AND "is_cancel"=false', 
+    getDeleteReport:'update patient_report set active=false where id= $1',
     getExistAppointment:'SELECT * FROM appointment WHERE "doctorId"=$1 AND "patient_id"=$2 AND "appointment_date"=$3 AND "is_cancel"=false',
     getUpcomingAppointmentsForPatient: 'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate",a."startTime", a."endTime", a."doctorId", a."patient_id" as "patientId", adc."is_preconsultation_allowed",adc."pre_consultation_hours",adc."pre_consultation_mins", d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName" FROM appointment a join appointment_doc_config adc ON a."id" = adc."appointment_id" join doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key" WHERE a."patient_id" = $1 AND a."doctorId" = $4 AND a."appointment_date" >= $2 AND a."is_cancel"=false AND (a.status= $5 OR a.status=$6) order by appointment_date limit 10 offset $3',
     getAppDoctorList:'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate",a."startTime", a."endTime", a."doctorId", a."patient_id" as "patientId", adc."is_preconsultation_allowed",adc."pre_consultation_hours",adc."pre_consultation_mins", d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName"  FROM appointment a join appointment_doc_config adc ON a."id" = adc."appointment_id" join doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key"  WHERE a."doctorId" = $1 AND a."patient_id" = $2 AND a.appointment_date >= $3 AND a."is_cancel"=false AND (a.status= $4 OR a.status = $5) order by appointment_date',

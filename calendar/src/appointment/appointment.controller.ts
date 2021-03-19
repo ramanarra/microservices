@@ -1314,6 +1314,11 @@ export class AppointmentController {
         const patient = await this.appointmentService.patientFileUpload(reports);
         return patient;  
     }
+    @MessagePattern({cmd: 'patient_delete_report'})
+    async Report(id: any): Promise<any> {
+        const patient = await this.appointmentService.deletereport(id);
+        return patient;  
+    }
    
     @MessagePattern({cmd: 'report_list'})
     async report(data: any): Promise<any> {
