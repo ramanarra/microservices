@@ -40,7 +40,7 @@ import {
     DoctorDto,
     DocConfigDto,
     PrescriptionDto,
-    WorkScheduleDto,
+    WorkScheduleDto,ReportdeleteDto,
     PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
@@ -1800,6 +1800,21 @@ export class CalendarController {
 
       return await this.calendarService.patientReport(reports);
     }
+  }
+  @Put('patient/reportDelete')
+  @ApiBody({ type: ReportdeleteDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+    @ApiOkResponse({
+          description:
+            'requestBody example :  {\n' +
+             '"id":18\n'+
+             '}'
+        })
+  async deleteReport( @Body() id :ReportdeleteDto ){
+    const patient = await this.calendarService.deleteReport(id)
+    return patient
   }
 
    //patient report list
