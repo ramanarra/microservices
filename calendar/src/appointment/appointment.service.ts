@@ -945,7 +945,8 @@ export class AppointmentService {
                     id: "DESC"
                 },
                 where: {
-                    appointmentId: id
+                    appointmentId: id,
+                    active:true
                 }
             });
 
@@ -1274,7 +1275,7 @@ export class AppointmentService {
                 }
             }
 
-            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointments, [user.patientId, date, 'notCompleted', 'paused']);
+            const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointmentsCounts, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
                 var appList: any = [];
@@ -1478,6 +1479,8 @@ export class AppointmentService {
             reschMins = config.rescheduleMinutes;
         }
         var res = {
+            appointmentId: details.appointmentId,
+            doctorKey: details.doctorKey,
             reportDetail: app.reportDetails,
             email: doctor.email,
             doctorPhoto:doctor.photo,
@@ -12053,36 +12056,54 @@ export class AppointmentService {
 
       
    }
+   async deletereport(id: any): Promise<any> {
 
+    var account = await this.patientReportRepository.find({ id: id.id })
+    console.log(account)
+        if(account.length)
+    {
+        const app = await this.patientReportRepository.updateReportInsertion(id)
+        return app
+    }
+    else
+    {
+        return {
+            statusCode:HttpStatus.BAD_REQUEST,
+            message:CONSTANT_MSG.NOREPORT,
+        }
+    }
+            
+   }
+   
    //report Data
    async report(data : any): Promise<any> {
     const patientId = data.patientId;
     const offset = data.paginationStart;
     const endset = data.paginationLimit;
     const searchText = data.searchText;
-    const appointmentId = data.appointmentId;
+     const appointmentId = data.appointmentId;
+    const active=true;
     let response = {};
     let app = [], reportList = [];
     
     if(searchText){
-
         if(appointmentId) {
-            app = await this.patientReportRepository.query(queries.getSearchReportByAppointmentId, [appointmentId,offset,endset, '%'+searchText+'%']); 
-            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitAppointmentIdSearch, [appointmentId, '%'+searchText+'%']);
+            app = await this.patientReportRepository.query(queries.getSearchReportByAppointmentId, [appointmentId,offset,endset, '%'+searchText+'%',active]); 
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitAppointmentIdSearch, [appointmentId, '%'+searchText+'%',active]);
                
         } else {
-            app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%']);
-            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%']);
+            app = await this.patientReportRepository.query(queries.getSearchReport, [patientId,offset,endset,'%'+searchText+'%',active]);
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimitSearch, [patientId, '%'+searchText+'%',active]);
         }
 
     } else {
         if(appointmentId) {
-            app = await this.patientReportRepository.query(queries.getReportByAppointmentId, [appointmentId,offset,endset]);
-            reportList = await this.patientReportRepository.query(queries.getReportWithAppointmentId, [appointmentId]);
+            app = await this.patientReportRepository.query(queries.getReportByAppointmentId, [appointmentId,offset,endset,active]);
+            reportList = await this.patientReportRepository.query(queries.getReportWithAppointmentId, [appointmentId,active]);
 
         } else {
-            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId]);
-            app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset]);
+            reportList = await this.patientReportRepository.query(queries.getReportWithoutLimit, [patientId,active]);
+            app = await this.patientReportRepository.query(queries.getReport, [patientId,offset,endset,active]);
         }
         
          

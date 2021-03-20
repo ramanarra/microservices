@@ -44,7 +44,10 @@ export class PatientReport extends BaseEntity{
     })
      comments : string;
 
-    
+     @Column({
+        name : 'active'
+    })
+    active : boolean;
 
 
 }

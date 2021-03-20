@@ -398,7 +398,7 @@ export class AppointmentController {
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
     const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
-    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR || CONSTANT_MSG.ROLES.DOC_ASSISTANT){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
     }else{
         const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
@@ -518,37 +518,37 @@ export class AppointmentController {
         return appointment;
     }
 
-    @MessagePattern({cmd: 'doctor_list_patients'})
+    @MessagePattern({ cmd: 'doctor_list_patients' })
     async doctorListForPatients(user: any): Promise<any> {
         const doctor = await this.appointmentService.doctor_List(user);
         return doctor;
     }
 
-    @MessagePattern({cmd: 'patient_details_insertion'})
+    @MessagePattern({ cmd: 'patient_details_insertion' })
     async patientInsertion(patientDto: PatientDto): Promise<any> {
         const patient = await this.appointmentService.patientRegistration(patientDto);
         return patient;
     }
 
-    @MessagePattern({cmd: 'find_doctor_by_codeOrName'})
+    @MessagePattern({ cmd: 'find_doctor_by_codeOrName' })
     async findDoctorByCodeOrName(user: any): Promise<any> {
         const doctor = await this.appointmentService.findDoctorByCodeOrName(user.codeOrName.codeOrName);
         return doctor;
     }
 
-    @MessagePattern({cmd: 'patient_details_edit'})
+    @MessagePattern({ cmd: 'patient_details_edit' })
     async patientDetailsEdit(patientDto: any): Promise<any> {
         const patient = await this.appointmentService.patientDetailsEdit(patientDto);
         return patient;
     }
 
-    @MessagePattern({cmd: 'payment_recipt_details'})
-    async paymentReciptDetails(pymntId: String) : Promise<any> {
-        // const recipt = await this.paymentService.paymentReciptDetails(pymntId)
-        // return recipt?.data
+    @MessagePattern({ cmd: 'payment_recipt_details' })
+    async paymentReciptDetails(pymntId: String): Promise<any> {
+        const recipt = await this.paymentService.paymentReciptDetails(pymntId)
+        return recipt?.data
     }
 
-    @MessagePattern({cmd: 'patient_book_appointment'})
+    @MessagePattern({ cmd: 'patient_book_appointment' })
     async patientBookAppointment(patientDto: any): Promise<any> {
         const docId = await this.appointmentService.doctorDetails(patientDto.doctorKey);
         patientDto.doctorId = docId.doctorId;
@@ -1312,6 +1312,11 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_report'})
     async addPatientRecord(reports: any): Promise<any> {
         const patient = await this.appointmentService.patientFileUpload(reports);
+        return patient;  
+    }
+    @MessagePattern({cmd: 'patient_delete_report'})
+    async Report(id: any): Promise<any> {
+        const patient = await this.appointmentService.deletereport(id);
         return patient;  
     }
    

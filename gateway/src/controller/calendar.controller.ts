@@ -40,7 +40,7 @@ import {
     DoctorDto,
     DocConfigDto,
     PrescriptionDto,
-    WorkScheduleDto,
+    WorkScheduleDto,ReportdeleteDto,
     PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
@@ -1594,18 +1594,18 @@ export class CalendarController {
     @ApiOkResponse({
         description: 'requestBody example :   {"razorpay_order_id": "order_FV6u13eob2vaLE","razorpay_payment_id": "pay_FV6uMsxQHGLJwC","razorpay_signature": "d4adf91d6277a9ef0350638e6370b148ab372be11da2c002d101b56814688cb3"}'
     })
-    @ApiUnauthorizedResponse({description: 'Invalid credentials'})
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Payment')
-    @ApiBody({type: AccountDto})
+    @ApiBody({ type: AccountDto })
     paymentVerification(@Request() req, @Body() accountDto: AccountDto) {
         this.logger.log(`getting paymentOrder  Api -> Request data ${JSON.stringify(accountDto, req.user)}`);
 
-        if(!req.email) {
+        if (!req.body.email) {
             const updateEmail = async () => {
                 const pymntRecipt = await this.calendarService.paymentReciptDetails(req.body.razorpay_payment_id)
-                if(!!pymntRecipt?.email) {
+                if (!!pymntRecipt?.email) {
                     this.calendarService.patientDetailsEdit({
                         patientId: req.body?.patientId,
                         email: pymntRecipt?.email
@@ -1800,6 +1800,21 @@ export class CalendarController {
 
       return await this.calendarService.patientReport(reports);
     }
+  }
+  @Put('patient/reportDelete')
+  @ApiBody({ type: ReportdeleteDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+    @ApiOkResponse({
+          description:
+            'requestBody example :  {\n' +
+             '"id":18\n'+
+             '}'
+        })
+  async deleteReport( @Body() id :ReportdeleteDto ){
+    const patient = await this.calendarService.deleteReport(id)
+    return patient
   }
 
    //patient report list
@@ -2034,18 +2049,15 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiQuery({ name: 'appointmentId', required: true })
-    async getAppointmentReports(@Request() req, @selfAppointmentRead() check:boolean, @accountUsersAppointmentRead() check2:boolean, @Query('appointmentId') appointmentId : Number) {
+    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : Number) {
         // check doctor & admin permission
-        if (!check && !check2 && 
-            (req.user.role == CONSTANT_MSG.ROLES.DOCTOR || req.user.role == CONSTANT_MSG.ROLES.ADMIN ||
-            req.user.role == CONSTANT_MSG.ROLES.DOC_ASSISTANT)) {
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        }
 
-        if(!appointmentId) return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: "Please send appointment id for which you want the reports"
-        }
+        if(!appointmentId) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Please send appointment id for which you want the reports"
+            }
+        } 
 
         return await this.calendarService.getAppointmentReports(appointmentId)
     }

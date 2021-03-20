@@ -13,3 +13,8 @@ export class  patientReportDto {
     reportDate : Date;
     comments : string;
 }
+export class  ReportdeleteDto {
+    @IsNumber()
+    id: number;
+}
+

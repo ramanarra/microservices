@@ -1,6 +1,8 @@
 export const CONSTANT_MSG = {
     AUTH  : "Auth",
     CALENDER :  'Calender',
+    REPORTDELETE:'Report deleted Sucessfully',
+    NOREPORT:'No report id exist',
     CHAT : 'Chat',
     SERVICE_INACTIVE_MSG : 'service is offline. Please check once',
     SERVICE_ACTIVE_MSG : 'service is online',
