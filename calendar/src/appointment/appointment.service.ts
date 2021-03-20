@@ -1479,6 +1479,8 @@ export class AppointmentService {
             reschMins = config.rescheduleMinutes;
         }
         var res = {
+            appointmentId: details.appointmentId,
+            doctorKey: details.doctorKey,
             reportDetail: app.reportDetails,
             email: doctor.email,
             doctorPhoto:doctor.photo,
