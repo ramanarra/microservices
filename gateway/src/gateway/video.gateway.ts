@@ -66,7 +66,7 @@ export class VideoGateway {
     console.log("response >>" + JSON.stringify(response));
     let patientSocketList : Socket[] = this.socketStateService.get("CUSTOMER_"+response.patient);
     patientSocketList.forEach( (val : Socket) => {
-      val.emit("videoTokenRemoved", response);
+      val.emit("videoTokenRemoved", {...response, callEndStatus: data.status, appointmentId: data.appointmentId});
     });
     const responseDoc : any = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
     client.emit("getDoctorAppointments", responseDoc);
@@ -189,6 +189,23 @@ export class VideoGateway {
         const res: any = await this.videoService.getPrescriptionDetails(data.appointmentId)
         i.emit('getPrescriptionDetails', res)
       })
+    }
+  }
+
+  @SubscribeMessage('emitPauseStatus')
+  async emitPauseStatus(client: AuthenticatedSocket, data: {appointmentId: Number}) {
+    this.logger.log(
+      `Socket request emit video call pause status for paitent from appointmentId => ${data.appointmentId}`
+    )
+
+    const appointmentDet = await this.calendarService.getAppointmentDetails(data.appointmentId)
+    const appoinmentId = appointmentDet?.[0]?.patientid
+    if(appoinmentId) {
+      const getPrescriptionDetailsSocket: Socket [] = this.socketStateService.get(`CUSTOMER_${appointmentDet[0].patientid}`)
+      // getPrescriptionDetailsSocket.forEach(async(i: Socket) => {
+      //   i.emit('emitPauseStatus', { appoinmentId, status: 'CALL_PAUSED_BY_DOCTOR' })
+      // })
+      getPrescriptionDetailsSocket?.[0].emit('emitPauseStatus', { appoinmentId: data.appointmentId, status: 'CALL_PAUSED_BY_DOCTOR' })
     }
   }
 
