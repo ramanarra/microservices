@@ -28,6 +28,7 @@
     "@nestjs/typeorm": "^7.0.0",
     "async": "^3.2.0",
     "aws-sdk": "^2.813.0",
+    "axios": "^0.21.1",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "common-dto": "file:../common-dto",

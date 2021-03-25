@@ -815,6 +815,37 @@ CREATE TABLE public.patient_details (
 
 ALTER TABLE public.patient_details OWNER TO postgres;
 
+-- updated patient_details table
+
+CREATE TABLE public.patient_details
+(
+    id integer NOT NULL DEFAULT nextval('patient_details_patient_details_id_seq'::regclass),
+    name character varying(100) COLLATE pg_catalog."default",
+    landmark character varying(100) COLLATE pg_catalog."default",
+    country character varying(100) COLLATE pg_catalog."default",
+    registration_number character varying(200) COLLATE pg_catalog."default",
+    address character varying(400) COLLATE pg_catalog."default",
+    state character varying(100) COLLATE pg_catalog."default",
+    pincode character varying(100) COLLATE pg_catalog."default",
+    email character varying(100) COLLATE pg_catalog."default",
+    photo character varying(600) COLLATE pg_catalog."default",
+    phone character varying(100) COLLATE pg_catalog."default",
+    patient_id bigint,
+    "firstName" character varying(100) COLLATE pg_catalog."default",
+    "lastName" character varying(100) COLLATE pg_catalog."default",
+    "dateOfBirth" character varying(100) COLLATE pg_catalog."default",
+    "alternateContact" character varying(100) COLLATE pg_catalog."default",
+    age bigint,
+    live_status live_statuses DEFAULT 'online'::live_statuses,
+    last_active timestamp without time zone,
+    city character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT patient_details_id PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.patient_details
+    OWNER to postgres;
 --
 -- TOC entry 224 (class 1259 OID 24689)
 -- Name: patient_details_patient_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -2699,3 +2730,475 @@ ALTER TABLE public.appointment
 
 COMMENT ON COLUMN public.appointment."hasConsultation"
     IS 'true means consultation started';
+
+ALTER TABLE public.patient_details
+ADD COLUMN city character varying(100);
+
+---Email template
+ALTER TABLE public.message_template
+    ALTER COLUMN body TYPE  character varying(500000);
+
+INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'3'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Created'::character varying, ' <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">New Appointment Created</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user created appointment through VIRUJH. Please find the appointment details Below</div></div>
+             <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Created By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  '::character varying)
+ returning id;
+ 
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'3'::integer, 'APPOINTMENT_CREATED'::character varying, 'Appointment Created'::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'3'::integer, '3'::bigint, '1'::bigint, '3'::bigint)
+ returning id;
+
+INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'4'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Reschedule'::character varying, '<div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Rescheduled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user rescheduled appointment through VIRUJH. Please find the appointment details Below</div></div>
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Old Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Date</div><div style="display: inline-block;">: {rescheduledAppointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled Appointment Start time</div><div style="display: inline-block;">: {rescheduledStartTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Resheduled Appointment End time</div><div style="display: inline-block;">: {rescheduledEndTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Rescheduled On</div><div style="display: inline-block;">: {rescheduledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div>  '::character varying)
+ returning id;
+
+
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'4'::integer, 'APPOINTMENT_RESCHEDULE'::character varying, 'Appointment Reschedule'::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'4'::integer, '4'::bigint, '1'::bigint, '4'::bigint)
+ returning id;
+
+
+ INSERT INTO public.message_template (
+id, sender, subject, body) VALUES (
+'5'::integer, 'notifiaction@virujh.com'::character varying, 'Appointment Cancel'::character varying, ' <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>
+      <div style="height: 7px; background-color: #535353;"></div><div style="background-color:#E8E8E8; margin:0px; padding:20px 20px 40px 20px; font-family:Open Sans, Helvetica, sans-serif; font-size:12px; color:#535353;"><div style="text-align:center; font-size:24px; font-weight:bold; color:#535353;">Appointment Cancelled</div><div style="text-align:center; font-size:18px; font-weight:bold; color:#535353; padding: inherit">One user cancelled appointment through VIRUJH. Please find the appointment details Below</div></div>
+         <div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Cancelled By</div><div style="display: inline-block;">: {role}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Id</div><div style="display: inline-block;">: {appointmentId}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Doctor Name</div><div style="display: inline-block;">: {doctorFirstName} {doctorLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Patient Name</div><div style="display: inline-block;">: {patientFirstName} {patientLastName}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Date</div><div style="display: inline-block;">: {appointmentDate}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment Start time</div><div style="display: inline-block;">: {startTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Appointment End time</div><div style="display: inline-block;">: {endTime}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div class="reset_titles" style="display: inline-block;">Cancelled On</div><div style="display: inline-block;">: {cancelledOn}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+<div  class="reset_titles" style="display: inline-block;">Hospital</div><div style="display: inline-block;">: {hospital}</div></div><br>Thank you</div></div> 
+       '::character varying)
+ returning id;
+
+
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'5'::integer, 'APPOINTMENT_CANCEL'::character varying, 'Appointment Cancel '::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'5'::integer, '5'::bigint, '1'::bigint, '5'::bigint)
+ returning id;
+
+ INSERT INTO public.message_template (
+body, subject, sender, id) VALUES (
+'<div><p>Hello {user_name},</p></div>
+        <div><p>Your patient registration request has been process successfully.
+      </p>
+        </div>
+        <div class="reset_titles" style="display: inline-block;">Email</div><div style="display: inline-block;">: {email}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+          <div class="reset_titles" style="display: inline-block;">Phone</div><div style="display: inline-block;">: {phone}</div></div><div class="reset_info" style="text-align: left;color: #5a5a5a;">
+            <div class="reset_titles" style="display: inline-block;">Password</div>: <span style=" text-align: left; color: #0bb5ff; "><em><b> {password}</b></em></span>
+        <br><br>
+        <div><em>Thank You</em><div>
+        <p><span>VIRUJH</span></p>'::character varying, 'Patient Registration'::character varying, 'notifiaction@virujh.com'::character varying, '6'::integer)
+ returning id;
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'6'::integer, 'PATIENT_REGISTRATION'::character varying, 'Patient Registration'::character varying)
+ returning id;
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'6'::integer, '6'::bigint, '1'::bigint, '6'::bigint)
+ returning id;
+
+
+  INSERT INTO public.message_template (
+body, subject, sender, id) VALUES (
+'<div><p>Hello {user_name},</p></div>
+        <div><p>Your registration has been process successfully.</p>
+        </div>
+        <br><br>
+        <div><em>Thank You</em><div>
+        <p><span>VIRUJH</span></p>'::character varying, 'Registration For Doctor'::character varying, 'notifiaction@virujh.com'::character varying, '2'::integer)
+ returning id;
+
+
+ INSERT INTO public.message_type (
+id, name, description) VALUES (
+'2'::integer, 'REGISTRATION_FOR_DOCTOR'::character varying, 'Registration For Doctor'::character varying)
+ returning id;
+
+
+ INSERT INTO public.message_metadata (
+message_type_id, communication_type_id, message_template_id, id) VALUES (
+'2'::bigint, '1'::bigint, '2'::bigint, '2'::integer)
+ returning id;
+ 
+ --- Advertisement table
+
+ CREATE TABLE public.advertisement (
+     id integer NOT NULL,
+     name character varying(100) COLLATE pg_catalog."default",
+     content character varying(5000) COLLATE pg_catalog."default",
+     code character varying(1000)  COLLATE pg_catalog."default",
+     "createdTime" timestamp without time zone,
+     is_active boolean,
+     CONSTRAINT advertisement_pkey PRIMARY KEY (id)
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.advertisement 
+    OWNER to postgres;
+	
+INSERT INTO public.advertisement values(1,'Medicine', 'Save 50% offer for acetaminophen medicine up to 24 hours', 'NB8ws6');
+
+---Added description for message table
+ALTER TABLE public.message_type
+    ADD COLUMN description character varying;
+
+--Updated email template body length and email template
+ALTER TABLE public.message_template
+    ALTER COLUMN body TYPE  character varying(500000);
+    UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body >
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width: 100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{virujh-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="padding: 20px;">
+                    <h1 style="font-style: normal;font-weight: bold;font-size: 30px; text-align: center;color: #545454;margin: 0px;">Password Reset</h1>
+                    <h1 style=" font-style: normal;font-weight: 600; font-size: 25px;line-height: 37px;
+text-align: left; color: #000000;">Hi, {user_name}</h1>
+                   <div  style="font-style: normal; font-weight: 500; font-size: 18px; color: #878787; text-align: left;"><p>Your reset password request has been process successfully. Your password is <span style="color: #0bb5ff;"><em><b>{password}</b></em></span></p>
+        </div>
+                    <h2 style="font-style: normal; font-weight: 500; font-size: 18px; color: #878787; text-align: left;">If you did not forget your password you safely ignore this email.</h2>
+                </div>
+                
+            </div>
+        </div>
+           </div>
+        </div>
+    </body>
+</html>
+'::character varying WHERE
+id = 1;
+    UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body>
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width: 100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{virujh-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="padding: 20px;">
+                    <h1 style="font-style: normal;font-weight: bold;font-size: 30px; text-align: center;color: #545454;margin: 0px;">Doctor Registration</h1>
+                    <h1 style=" font-style: normal;font-weight: 600; font-size: 25px;line-height: 37px;
+text-align: left; color: #000000;">Hi, {user_name}</h1>
+                   <h2 style="font-style: normal; font-weight: 500; font-size: 18px; color: #878787; text-align: left;">Your registration has been process successfully.</h2>
+                </div>
+                <h1 class="app-thank" style=" font-style: normal;font-weight: bold; font-size: 24px; text-align: center; color: #545454;">Thank You!</h1>
+                
+            </div>
+        </div>
+          </div>
+        </div>
+    </body>
+</html>
+'::character varying WHERE
+id = 2;
+UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body >
+    <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex; justify-content: center;">
+            <div id="center-box" style="position: relative; width: 100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{viruj-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <h1 class="header-1" style="font-family: Poppins;font-style: normal;font-weight: bold;font-size: 25px;text-align: center; color: #545454;">New Appointment Created</h1>
+                    <h2 class="content-1" style="text-align: center; color: #878787; font-size: 20px; font-style: normal;font-weight: 500;">One user created appointment through VIRUJH<br>Please find the appointment detail below</h2>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <h3 class="app-id" style="text-align: center;"><span class="app-id-name" style="font-style: normal;font-weight: 500;font-size: 25px;line-height: 37px;text-align: center;color: #4D4D4D;">Appointment id: </span><span class="app-id-number" style="font-style: normal;font-weight: 500;font-size: 25px; text-align: center;color: #0BB5FF;"> {appointmentId}</span></h3>
+                </div>
+                <div class="content-box text-center" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2); text-align: center;">
+                    <h4 class="app-date-name" style="font-style: normal; font-weight: 500;font-size: 20px;color: #4D4D4D;">Appointment Date:</h4>
+                    <h5 class="app-date-value" style="font-style: normal; font-weight: 600; font-size: 20px; color: #0BB5FF;">{appointmentDate}</h5>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Appointment Start Time</h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{startTime}</h1>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Appointment End Time </h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{endTime}</h1>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <table class="app-table" style="width: 100%;">
+                        <tr class="app-row">
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Doctor Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{doctorFirstName} {doctorLastName}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Hospital</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{hospital}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Email:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{email}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Patient Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{patientFirstName} {patientLastName}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h1 class="app-thank" style="font-style: normal;font-weight: bold;font-size: 75px;text-align: center;color: #545454;">Thank You!</h1>
+                    <div>  
+                        <img src="{plus}" class="svg-bottom-design" style="position: absolute;bottom: 0; width: 115px;height: 113px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    </body>
+</html>'::character varying WHERE
+id = 3;
+    UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body>
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width: 100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{viruj-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <h1 class="header-1" style="font-family: Poppins;font-style: normal;font-weight: bold;font-size: 25px;text-align: center; color: #545454;">Appointment has been  Rescheduled</h1>
+                    <h2 class="content-1" style="text-align: center; color: #878787; font-size: 20px; font-style: normal;font-weight: 500;">One user rescheduled appointment through VIRUJH<br>Please find the appointment detail below</h2>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                
+                    <h3 class="app-id" style="text-align: center;"><span class="app-id-name" style="font-style: normal;font-weight: 500;font-size: 25px;line-height: 37px;text-align: center;color: #4D4D4D;">Rescheduled By: </span><span class="app-id-number" style="font-style: normal;font-weight: 500;font-size: 25px; text-align: center;color: #0BB5FF;"> {role}</span></h3>
+                    <h3 class="app-id" style="text-align: center;"><span class="app-id-name" style="font-style: normal;font-weight: 500;font-size: 25px;line-height: 37px;text-align: center;color: #4D4D4D;">Appointment id: </span><span class="app-id-number" style="font-style: normal;font-weight: 500;font-size: 25px; text-align: center;color: #0BB5FF;"> {appointmentId}</span></h3>
+                </div>
+                <div class="content-box text-center" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2); text-align: center;">
+                    <h4 class="app-date-name" style="font-style: normal; font-weight: 500;font-size: 20px;color: #4D4D4D;">Rescheduled Appointment Date:</h4>
+                    <h5 class="app-date-value" style="font-style: normal; font-weight: 600; font-size: 20px; color: #0BB5FF;">{rescheduledAppointmentDate}</h5>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Rescheduled Appointment Start Time</h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{rescheduledStartTime}</h1>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Rescheduled Appointment End Time </h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{rescheduledEndTime}</h1>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <table class="app-table" style="width: 100%;">
+                        <tr class="app-row">
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Doctor Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{doctorFirstName} {doctorLastName}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Hospital</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{hospital}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Email:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{email}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Patient Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{patientFirstName} {patientLastName}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h1 class="app-thank" style="font-style: normal;font-weight: bold;font-size: 75px;text-align: center;color: #545454;">Thank You!</h1>
+                    <div>  
+                        <img src="{plus}" class="svg-bottom-design" style="position: absolute;bottom: 0; width: 115px;height: 113px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+         </div>
+        </div>
+    </body>
+</html>'::character varying WHERE
+id = 4;
+    UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body >
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width: 100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{viruj-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <h1 class="header-1" style="font-family: Poppins;font-style: normal;font-weight: bold;font-size: 25px;text-align: center; color: #545454;">Appointment has been Cancelled</h1>
+                    <h2 class="content-1" style="text-align: center; color: #878787; font-size: 20px; font-style: normal;font-weight: 500;">One user cancelled appointment through VIRUJH. Please find the appointment details Below</h2>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                
+                    <h3 class="app-id" style="text-align: center;"><span class="app-id-name" style="font-style: normal;font-weight: 500;font-size: 25px;line-height: 37px;text-align: center;color: #4D4D4D;">Cancelled By: </span><span class="app-id-number" style="font-style: normal;font-weight: 500;font-size: 25px; text-align: center;color: #0BB5FF;"> {role}</span></h3>
+                    <h3 class="app-id" style="text-align: center;"><span class="app-id-name" style="font-style: normal;font-weight: 500;font-size: 25px;line-height: 37px;text-align: center;color: #4D4D4D;">Appointment id: </span><span class="app-id-number" style="font-style: normal;font-weight: 500;font-size: 25px; text-align: center;color: #0BB5FF;"> {appointmentId}</span></h3>
+                </div>
+                <div class="content-box text-center" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2); text-align: center;">
+                    <h4 class="app-date-name" style="font-style: normal; font-weight: 500;font-size: 20px;color: #4D4D4D;">Appointment Date:</h4>
+                    <h5 class="app-date-value" style="font-style: normal; font-weight: 600; font-size: 20px; color: #0BB5FF;">{appointmentDate}</h5>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Appointment Start Time</h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{startTime}</h1>
+                    <h3 class="app-start-time" style="font-style: normal; font-weight: 500;font-size: 25px; color: #4D4D4D;">Appointment End Time </h3>
+                    <h1 class="app-time" style="font-style: normal;font-weight: 500;font-size: 45px;color: #0BB5FF;">{endTime}</h1>
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                    <table class="app-table" style="width: 100%;">
+                        <tr class="app-row">
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Doctor Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{doctorFirstName} {doctorLastName}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Hospital</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{hospital}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Email:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{email}</td>
+                        </tr>
+                            <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Cancelled On:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{cancelledOn}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Patient Name:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{patientFirstName} {patientLastName}</td>
+                        </tr>
+                     
+                    </table>
+                </div>
+                <div>
+                    <h1 class="app-thank" style="font-style: normal;font-weight: bold;font-size: 75px;text-align: center;color: #545454;">Thank You!</h1>
+                    <div>  
+                        <img src="{plus}" class="svg-bottom-design" style="position: absolute;bottom: 0; width: 115px;height: 113px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    </body>
+</html>'::character varying WHERE
+id = 5;
+    UPDATE public.message_template SET
+body = '<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body >
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width:100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{viruj-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                 <h1 style="font-style: normal;font-weight: bold;font-size: 30px; text-align: center;color: #545454;margin: 0px;">Patient Registration</h1>
+                 <h1 style=" font-style: normal;font-weight: 600; font-size: 25px;line-height: 37px;
+text-align: left; color: #000000;">Hi, {user_name}</h1>
+                    <table class="app-table" style="width: 100%;">
+                        <tr class="app-row">
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Phone:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{phone}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Email:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{email}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Password:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;"><span style="color: #0bb5ff; "><em><b> {password}</b></em></span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h1 class="app-thank" style="font-style: normal;font-weight: bold;font-size: 24px;text-align: center;color: #545454;">Thank You!</h1>
+            
+                </div>
+            </div>
+        </div>
+         </div>
+        </div>
+    </body>
+</html>'::character varying WHERE
+id = 6;

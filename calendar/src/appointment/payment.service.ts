@@ -5,6 +5,7 @@ import  * as RazorPay from 'razorpay';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
 import { json } from 'express';
+import Axios from 'axios'
 const shortid = require('shortid');
 const crypto = require('crypto');
 var instance = new RazorPay({
@@ -40,6 +41,23 @@ export class PaymentService {
        response.amount = res;
        response.amount_due = res;
        return response;
+    }
+
+    async paymentReciptDetails(pymntId: String) : Promise<any> {
+        //username & password for basic auth of razorpay
+        const username = 'rzp_test_7aIsTw8qZyCQOy'
+        const password = 'Oec8MS34qSS2BVhGMND0ym3L'
+
+        try {
+            return await Axios.get(`https://api.razorpay.com/v1/payments/${pymntId}`, {
+                auth: { username, password }
+            })
+        }
+        catch (e) {
+            console.log(e)
+            return null
+        }
+ 
     }
 
     async paymentVerification(req): Promise<any> {

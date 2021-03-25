@@ -80,16 +80,16 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public appointmentReschedule(appointmentDto: any,user:any): Observable<any> {
+    public appointmentReschedule(appointmentDto: any,user:any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'appointment_reschedule'},appointmentDto);
+        return this.redisClient.send({cmd: 'appointment_reschedule'},appointmentDto).toPromise();
     }
 
     
     @UseFilters(AllClientServiceException)
-    public appointmentCancel(appointmentDto: any,user:any): Observable<any> {
+    public appointmentCancel(appointmentDto: any,user:any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'appointment_cancel'},appointmentDto);
+        return this.redisClient.send({cmd: 'appointment_cancel'},appointmentDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -127,8 +127,8 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientBookAppointment(patientDto : AppointmentDto) : Observable <any> {
-        return this.redisClient.send({ cmd : 'patient_book_appointment'}, patientDto);
+    public patientBookAppointment(patientDto : AppointmentDto) : Promise <any> {
+        return this.redisClient.send({ cmd : 'patient_book_appointment'}, patientDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -231,9 +231,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientAppointmentCancel(appointmentDto: any,user:any): Observable<any> {
+    public patientAppointmentCancel(appointmentDto: any,user:any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'patient_appointment_cancel'},appointmentDto);
+        return this.redisClient.send({cmd: 'patient_appointment_cancel'},appointmentDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -293,9 +293,9 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     }
 
     @UseFilters(AllClientServiceException)
-    public patientAppointmentReschedule(appointmentDto: any,user:any): Observable<any> {
+    public patientAppointmentReschedule(appointmentDto: any,user:any): Promise<any> {
         appointmentDto.user = user;
-        return this.redisClient.send({cmd: 'patient_appointment_reschedule'},appointmentDto);
+        return this.redisClient.send({cmd: 'patient_appointment_reschedule'},appointmentDto).toPromise();
     }
 
     @UseFilters(AllClientServiceException)
@@ -325,6 +325,11 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public paymentVerification(accountDto:any, user:any) : Promise <any> {
         user.accountDto = accountDto;
         return this.redisClient.send({ cmd : 'get_payment_verification'},user).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public paymentReciptDetails(pymntId: String) : Promise<any> {
+        return this.redisClient.send({ cmd: 'payment_recipt_details' }, pymntId).toPromise()
     }
 
     @UseFilters(AllClientServiceException)
@@ -370,6 +375,67 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
     public reportList(data: any) : Observable <any> {
         return this.redisClient.send({ cmd : 'report_list'},data);
     }
-    
 
+    @UseFilters(AllClientServiceException)
+    public uploadFile(files: any) : Observable <any> {
+        return this.redisClient.send({ cmd : 'upload_file'},files);
+    }
+    
+    @UseFilters(AllClientServiceException)
+    public getDoctorDetails(doctorKey:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_doctor_details'},doctorKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public getHospitalDetails(accountKey:any) : Promise <any> {
+        return this.redisClient.send({ cmd : 'get_hospital_details'},accountKey).toPromise();
+    }
+
+    @UseFilters(AllClientServiceException)
+    public addDoctorSinature(reports: any) : Observable <any> {
+        return  this.redisClient.send({ cmd : 'doctor_signature'},reports);
+    }
+
+    //Getting patient report in patient detail page
+    @UseFilters(AllClientServiceException)
+    public patientDetailLabReport(user:any, patientId:any, doctorKey:any) : Observable <any> {
+        user.patientId = patientId;
+        user.doctorKey = doctorKey;
+        return this.redisClient.send({ cmd : 'patient_detail_labreport'},user);
+    }
+
+    @UseFilters(AllClientServiceException)
+    public getMessageTemplate(data: any) : Promise<any> {
+        return this.redisClient.send({ cmd : 'get_message_template'}, data).toPromise();
+    }
+    
+    @UseFilters(AllClientServiceException)
+    public sendConfirmationMailOrSMS(data: any): Promise<any> {
+        return this.redisClient.send({ cmd: 'send_confirmation_email_or_sms'}, data).toPromise();
+    }
+
+   //Getting appointment list report 
+   @UseFilters(AllClientServiceException)
+   public appoinmentListReport(user:any) : Observable <any> {
+   return this.redisClient.send({ cmd : 'appointment_list_report'},user);
+   }
+   
+   //Getting amount list report 
+   @UseFilters(AllClientServiceException)
+   public amountListReport(user:any) : Observable <any> {
+   return this.redisClient.send({ cmd : 'amount_list_report'},user);
+   }
+
+   //Send mail appointmnet response
+   @UseFilters(AllClientServiceException)
+   public sendMailAppointment(sendMail: any, user: any): Promise<any> {
+    sendMail.user = user;
+    return this.redisClient.send({cmd: 'send_mail_res'}, sendMail).toPromise();
+   }
+
+    //Getting advertisment list
+    @UseFilters(AllClientServiceException)
+    public advertisementList(data: any): Promise<any> {
+        return this.redisClient.send({ cmd: 'advertisement_list' }, data).toPromise();
+    }
 }
