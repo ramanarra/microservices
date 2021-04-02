@@ -1053,14 +1053,11 @@ export class CalendarController {
     @ApiBearerAuth('JWT')
     @UseGuards(AuthGuard())
     @ApiTags('Patient')
+    @ApiQuery({ name: 'doctorKey', required: false })
     @ApiUnauthorizedResponse({description: 'Invalid credentials'})
     async doctorDetails( @Request() req,@patient() check: boolean, @Query('doctorKey') doctorKey: String, @Query('appointmentId') appointmentId: number) {
         if (!check)
             return {statusCode:HttpStatus.BAD_REQUEST ,message: CONSTANT_MSG.NO_PERMISSION}
-        if(!doctorKey){
-            console.log("Provide doctorKey");
-            return {statusCode:HttpStatus.BAD_REQUEST ,message: "Provide doctorKey"}
-        }
         if(req.user.role == CONSTANT_MSG.ROLES.PATIENT){
             await this.calendarService.updatePatLastActive(req.user.patientId);
         }

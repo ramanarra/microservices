@@ -160,6 +160,11 @@ export class UserController {
         return await this.userService.accountRegistration(user.doctorDto);
     };
 
+    @MessagePattern({cmd: 'doctor_id'})
+    async doctorid(doctorKey: string): Promise<any> {
+        return await this.userService.doctorid(doctorKey);
+    };
+
     @MessagePattern({cmd: 'auth_doctor_forgotpassword'})
     async doctorForgotPassword(user: any): Promise<any> {
         const doctor = await this.userService.doctorForgotPassword(user.email);

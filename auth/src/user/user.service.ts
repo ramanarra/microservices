@@ -349,6 +349,14 @@ export class UserService {
         return accreg;
     }
 
+    async doctorid(doctorKey: string): Promise<any> {
+        const docId = await this.userRepository.query(queries.getDoctorID, [doctorKey])
+       return {
+           docId
+       }
+   }
+
+
     async genPassword(length: number): Promise<any> {
         try {
             var password = generator.generate({
