@@ -137,6 +137,8 @@ export const queries = {
                             from medicine med 
                             left join prescription pres on med.prescription_id = pres.id 
                         where pres.appointment_id = $1`,
+              
+    getDoctorID:`select * from users where doctor_key =$1`,                    
     getAppointmentDetails: `select a.id as appointmentId, a.patient_id as patientId, a."doctorId"  as doctorId, a.status as status 
                                 from appointment a 
                             where a.id = $1`,
