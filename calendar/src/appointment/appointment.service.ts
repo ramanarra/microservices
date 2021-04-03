@@ -252,8 +252,13 @@ export class AppointmentService {
                     lastName: list.last_name,
                     registrationNumber: list.registration_number,
                     fee: list.consultation_cost,
-                    location: list.city,
-                    hospitalName: list.hospital_name
+                    street: list.street1,
+                    city: list.city,
+                    state:list.state,
+                    pincode:list.pincode,
+                    country:list.country,
+                    hospitalName: list.hospital_name,
+                    experience:list.experience
                 }
                 res.push(doc);
             }
@@ -1488,7 +1493,11 @@ export class AppointmentService {
             consultationTimeSlot: app.appointmentDetails.slotTiming,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
-            location: account.city,
+            street:account.street1,
+            city: account.city,
+            state:account.state,
+            pincode:account.pincode,
+            country:account.country,
             appointmentDate: app.appointmentDetails.appointmentDate,
             startTime: app.appointmentDetails.startTime,
             endTime: app.appointmentDetails.endTime,
@@ -1605,8 +1614,13 @@ export class AppointmentService {
                 lastName: a.last_name,
                 registrationNumber: a.registration_number,
                 fee: a.consultation_cost,
-                location: a.city,
-                hospitalName: a.hospital_name
+                street: a.street1,
+                city:a.city,
+                state:a.state,
+                pincode:a.pincode,
+                country:a.country,
+                hospitalName: a.hospital_name,
+                experience:a.experience
             }
             res.push(b);
         });
@@ -1647,7 +1661,11 @@ export class AppointmentService {
             speciality: doctor.speciality,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
-            location: account.city,
+            street:account.street1,
+            city: account.city,
+            pincode:account.pincode,
+            state:account.state,
+            country:account.country,
             fee: config.consultationCost,
             preConsultationHours: preHours,
             preConsulationMinutes: preMins,
@@ -12299,7 +12317,7 @@ export class AppointmentService {
     //Getting patient report in patient detail page
     async patientDetailLabReport(patientId: any): Promise<any> {
         try {
-            const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
+            const patientReport = await this.patientDetailsRepository.query(queries.getDoctorPatientDetailLabReport, [patientId]);
             let patientDetailReport = patientReport;
             if (patientDetailReport.length) {
                 return {
