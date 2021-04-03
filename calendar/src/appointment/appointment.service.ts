@@ -936,9 +936,10 @@ export class AppointmentService {
     }
     async appointmentDetails(id: any): Promise<any> {
         try {
-            const appointmentDetails = await this.appointmentRepository.findOne({id: id});
-            const pat = await this.patientDetailsRepository.findOne({patientId: appointmentDetails.patientId});
-            const pay = await this.paymentDetailsRepository.findOne({appointmentId: id});
+            const appointmentDetails = await this.appointmentRepository.findOne({ id: id });
+            const pat = await this.patientDetailsRepository.findOne({ patientId: appointmentDetails.patientId });
+            const docId = await this.doctorRepository.findOne({ doctorId: appointmentDetails.doctorId }) 
+            const pay = await this.paymentDetailsRepository.findOne({ appointmentId: id });
             // get patient report
             const report = await this.patientReportRepository.find({
                 order: {
@@ -957,11 +958,25 @@ export class AppointmentService {
                 phone: pat.phone,
                 email: pat.email
             }
+            let doctorId = {
+                doctorKey: docId.doctorKey,
+                accountKey: docId.accountKey,
+                email: docId.email,
+                doctorLiveStatus: docId.liveStatus,
+                firstName: docId.firstName,
+                lastName: docId.lastName,
+                photo: docId.photo,
+                speciality: docId.speciality,
+                doctorId: docId.doctorId,
+
+            }
             let res = {
                 appointmentDetails: appointmentDetails,
                 patientDetails: patient,
                 paymentDetails: pay,
-                reportDetails: report
+                reportDetails: report,
+                DoctorDetails: doctorId,
+
             }
             return res;
         } catch (e) {
@@ -1449,9 +1464,11 @@ export class AppointmentService {
     }
 
     async viewDoctorDetails(details: any): Promise<any> {
-        const doctor = await this.doctorDetails(details.doctorKey);
-        const account = await this.accountDetails(doctor.accountKey);
+
         const app = await this.appointmentDetails(details.appointmentId);
+        const doctor = app.DoctorDetails;
+        const d1 = await this.doctorDetails(doctor.doctorKey);
+        const account = await this.accountDetails(doctor.accountKey);
         const config = await this.getAppDoctorConfigDetails(details.appointmentId);
         const patient = await this.getPatientDetails(app.appointmentDetails.patientId);
         const prescriptionUrl = await this.getprescriptionUrl(details.appointmentId);

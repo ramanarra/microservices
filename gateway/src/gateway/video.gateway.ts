@@ -179,18 +179,23 @@ export class VideoGateway {
   @SubscribeMessage('getPrescriptionDetails')
   async getPrescriptionDetails(client: AuthenticatedSocket, data: {appointmentId: Number}) {
     this.logger.log(
-      `Socket request get prescription details for paitent from appointmentId => ${data.appointmentId}`
+      `Socket request get prescription details for paitent from appointmentId => ${data.appointmentId}${client.auth.data.doctor_key} `
     )
-
+    const response : any = await this.userService.getDoctorId(client.auth.data.doctor_key);    
     const appointmentDet = await this.calendarService.getAppointmentDetails(data.appointmentId)
-    if(appointmentDet?.length && appointmentDet[0].patientid) {
+      if(appointmentDet?.length && appointmentDet[0].patientid ) {
       const getPrescriptionDetailsSocket: Socket [] = this.socketStateService.get(`CUSTOMER_${appointmentDet[0].patientid}`)
+       let doctorsocket : Socket[] = this.socketStateService.get(`DOCTOR_${response.docId[0].id}`);
+        doctorsocket.forEach(async(i: Socket) => {
+        const res: any = await this.videoService.getPrescriptionDetails(data.appointmentId)
+        i.emit('getPrescriptionDetails', res)
+      })
       getPrescriptionDetailsSocket.forEach(async(i: Socket) => {
         const res: any = await this.videoService.getPrescriptionDetails(data.appointmentId)
         i.emit('getPrescriptionDetails', res)
       })
-    }
   }
+}
 
   @SubscribeMessage('emitPauseStatus')
   async emitPauseStatus(client: AuthenticatedSocket, data: {appointmentId: Number}) {
