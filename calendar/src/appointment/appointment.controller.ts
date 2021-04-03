@@ -401,8 +401,9 @@ export class AppointmentController {
     if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
     }else{
-        const docId = await this.appointmentService.doctorDetails(appointmentDto.doctorKey);
-        appointmentDto.doctorId = docId.doctorId;
+        const docIds = app.DoctorDetails;
+        const docId = await this.appointmentService.doctorDetails(docIds.doctorKey);
+        appointmentDto.doctorId = docIds.doctorId;
     }
     const doctor = await this.appointmentService.doctor_Details(appointmentDto.doctorId);
     if(!doctor){
