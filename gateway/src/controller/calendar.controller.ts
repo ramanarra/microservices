@@ -1703,6 +1703,9 @@ export class CalendarController {
         if(req.user.role == CONSTANT_MSG.ROLES.DOCTOR){
             await this.calendarService.updateDocLastActive(req.user.doctor_key);
         }
+        else if(req.user.role==CONSTANT_MSG.ROLES.DOC_ASSISTANT){
+            return await this.calendarService.accountPatientsList(req.user, accountKey);
+        }
         this.logger.log(`account patientsList Api -> Request data }`);
         return await this.calendarService.accountPatientsList(req.user, accountKey);
     }
