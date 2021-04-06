@@ -11,5 +11,5 @@ database :
   synchronize : false
   
 openVidu:
-  urlOpenViduServer : "https://devideo.virujh.com/dashboard"
-  secret : "Virujh#123"
+  urlOpenViduServer : "https://dev.virujh.com/dashboard"
+  secret : "Virujh123"
