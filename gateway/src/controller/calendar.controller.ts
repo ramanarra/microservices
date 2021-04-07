@@ -2067,12 +2067,15 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiQuery({ name: 'appointmentId', required: true })
-    async getAppointmentReports(@Request() req,  @Query('appointmentId') appointmentId : Number) {
-  
-        if(!appointmentId) return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: "Please send appointment id for which you want the reports"
-        }
+    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : Number) {
+        // check doctor & admin permission
+
+        if(!appointmentId) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Please send appointment id for which you want the reports"
+            }
+        } 
 
         return await this.calendarService.getAppointmentReports(appointmentId)
     }
