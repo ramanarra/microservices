@@ -1817,6 +1817,24 @@ export class CalendarController {
     return patient
   }
 
+  @Put('patient/reportId')
+  @ApiBody({ type: AppointmentsDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+    @ApiOkResponse({
+          description:
+            'requestBody example :  {\n' +
+             '"appointmentId":660\n,'+
+             '"deleteId":25\n,'+
+             '"insertId":20\n'+
+             '}'
+        })
+  async updateReports( @Body() data :AppointmentsDto ){
+    const patient = await this.calendarService.updateReport(data)
+    return patient
+  }
+
    //patient report list
    @Get('patient/report/list')
    @ApiOkResponse({description: 'reportList API'})

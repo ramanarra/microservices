@@ -61,6 +61,35 @@ export class AppointmentRepository extends Repository<Appointment> {
         }
     }
 
-
-
+    async updateReportId(data): Promise<any>{
+       
+        const newdata = await this.query(queries.getReportId,[data.id,data.appointmentId] ) 
+        try {
+            return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.Report,
+            
+            }
+         } 
+         catch (error) {
+         this.logger.error(`Unexpected patientReport save error` + error.message);
+         throw new InternalServerErrorException();
+     }
+    }
+    async deleteReportid(data): Promise<any>{
+       
+        const newdata = await this.query(queries.getReportId,[data.id,data.appointmentId] ) 
+        try {
+            return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.  REPORTDELETE,
+           
+            }
+         } 
+         catch (error) {
+         this.logger.error(`Unexpected patientReport save error` + error.message);
+         throw new InternalServerErrorException();
+     }
+    }
+    
 }

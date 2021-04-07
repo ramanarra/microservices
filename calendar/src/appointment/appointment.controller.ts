@@ -1321,6 +1321,12 @@ export class AppointmentController {
         return patient;  
     }
    
+    @MessagePattern({cmd: 'patient_update_report'})
+    async updateReport(data: any): Promise<any> {
+        const patient = await this.appointmentService.updatereport(data);
+        return patient;  
+    }
+   
     @MessagePattern({cmd: 'report_list'})
     async report(data: any): Promise<any> {
         const report = await this.appointmentService.report(data);
