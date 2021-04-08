@@ -9,7 +9,7 @@ services:
       - redis-net
     ports:
       - "6378:6379"
-    restart: always 
+    restart: on-failure 
   
   calendar:
     build: calendar
@@ -17,6 +17,7 @@ services:
     environment:
        - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
+    restart: on-failure  
     networks:
        - redis-net
     depends_on:
@@ -26,6 +27,7 @@ services:
   auth:
     build: auth
     container_name: auth_service
+    restart: on-failure  
     environment:
        - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
@@ -38,6 +40,7 @@ services:
   gateway:
     build: gateway
     container_name: gateway_service
+    restart: on-failure 
     environment:
        - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
@@ -52,4 +55,5 @@ services:
     command: "npm run start:dev"
 
 networks:
-  redis-net: null
+   redis-net:
+    external: true

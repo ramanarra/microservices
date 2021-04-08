@@ -9,7 +9,7 @@ services:
       - redis-net
     ports:
       - "6378:6379"
-    restart: always 
+    restart: on-failure 
   
   calendar:
     build: calendar
@@ -20,7 +20,7 @@ services:
        - NODE_ENV=default
     networks:
        - redis-net
-    restart: always
+    restart: on-failure
     depends_on:
        - redis-loc-server
        - db_calendar
@@ -35,7 +35,7 @@ services:
        - NODE_ENV=default
     networks:
        - redis-net
-    restart: always
+    restart: on-failure
     depends_on:
        - redis-loc-server
        - db_auth
@@ -44,6 +44,7 @@ services:
   gateway:
     build: gateway
     container_name: gateway_service
+    restart: on-failure
     environment:
        - REDIS_HOST=redis-loc-server
        - NODE_ENV=default
@@ -80,8 +81,8 @@ services:
     restart: always
 
 networks:
-  redis-net: null
-
+   redis-net:
+    external: true
 volumes:
   postgre-data-auth:
        driver : local
