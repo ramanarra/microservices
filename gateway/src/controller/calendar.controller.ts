@@ -41,7 +41,8 @@ import {
     DocConfigDto,
     PrescriptionDto,
     WorkScheduleDto,ReportdeleteDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto,
+    AppointmentsDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';

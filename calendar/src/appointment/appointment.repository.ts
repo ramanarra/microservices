@@ -1,9 +1,10 @@
 import { Repository, EntityRepository } from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
+import {HttpStatus} from '@nestjs/common';
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Appointment } from "./appointment.entity";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
-import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG} from  "common-dto";
+import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG,queries} from  "common-dto";
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import { AppointmentDocConfig } from "./appointmentDocConfig/appointmentDocConfig.entity";

@@ -946,16 +946,28 @@ export class AppointmentService {
             const docId = await this.doctorRepository.findOne({ doctorId: appointmentDetails.doctorId }) 
             const pay = await this.paymentDetailsRepository.findOne({ appointmentId: id });
             // get patient report
-            const report = await this.patientReportRepository.find({
-                order: {
-                    id: "DESC"
-                },
-                where: {
-                    appointmentId: id,
-                    active:true
-                }
-            });
 
+
+            
+            const reports=[];
+             if(appointmentDetails.reportid){   
+                const reportIds=appointmentDetails.reportid.split(',');
+            reportIds.map(async id=>{
+                const report = await this.patientReportRepository.findOne({
+                    
+                    where: {
+                        id: parseInt(id),
+                        active:true
+                    }
+                    });
+                    if(report)
+                        reports.push(report);
+
+            })
+            
+        }
+            
+            
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
@@ -979,7 +991,7 @@ export class AppointmentService {
                 appointmentDetails: appointmentDetails,
                 patientDetails: patient,
                 paymentDetails: pay,
-                reportDetails: report,
+                reportDetails: reports,
                 DoctorDetails: doctorId,
 
             }
@@ -12334,7 +12346,7 @@ export class AppointmentService {
     //Getting patient report in patient detail page
     async patientDetailLabReport(patientId: any): Promise<any> {
         try {
-            const patientReport = await this.patientDetailsRepository.query(queries.getDoctorPatientDetailLabReport, [patientId]);
+            const patientReport = await this.patientDetailsRepository.query(queries.getPatientDetailLabReport, [patientId]);
             let patientDetailReport = patientReport;
             if (patientDetailReport.length) {
                 return {
@@ -12558,5 +12570,49 @@ export class AppointmentService {
             appoinmentId,
             reports
         }
+    }
+
+    async updatereport(data: any): Promise<any> {
+
+        if(data.insertId){
+        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
+        var arr = JSON.parse("[" + account[0].reportid + "]");
+        data.id=data.insertId;
+        data.id = account[0].reportid ? account[0].reportid + ',' + data.id : data.id;
+        
+        if(account.length){
+            const app = await this.appointmentRepository.updateReportId(data)
+            return app
+        }
+       
+        else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.NOREPORT,
+            }
+        }
+        
+        
+    }
+    
+    if(data.deleteId){
+        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
+        var arr = JSON.parse("[" + account[0].reportid + "]");
+        data.id=data.deleteId
+        const tempArr = arr.filter(val => (val != data.id) );
+        const newid=tempArr.toString()
+        data.id =  newid ;
+        if(account.length){
+        const app = await this.appointmentRepository.deleteReportid(data)
+        return app
+        }
+        else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.NOREPORT,
+            }
+        }
+    }
+
     }
 }
