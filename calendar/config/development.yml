@@ -12,5 +12,5 @@ database :
 
 openVidu:
   urlOpenViduServer: "https://devideo.virujh.com/dashboard"
-  secret: "Virujh#123"
+  secret : "Virujh#123"
   

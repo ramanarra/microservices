@@ -11,5 +11,5 @@ JWT :
   defaultStrategy : 'jwt'
 
 redis : 
-  host: 'dev-redis-gateway-001.ysl6gq.0001.aps1.cache.amazonaws.com'
+  host: 'localhost'
   port: 6379
