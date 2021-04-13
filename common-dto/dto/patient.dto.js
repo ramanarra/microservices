@@ -9,37 +9,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppointmentDto = void 0;
+exports.PatientDto = void 0;
 const class_validator_1 = require("class-validator");
-class AppointmentDto {
+class PatientDto {
 }
 __decorate([
     class_validator_1.IsOptional(),
     class_validator_1.IsNumber(),
     __metadata("design:type", Number)
-], AppointmentDto.prototype, "id", void 0);
+], PatientDto.prototype, "id", void 0);
 __decorate([
     class_validator_1.IsOptional(),
-    class_validator_1.IsNumber(),
-    __metadata("design:type", Number)
-], AppointmentDto.prototype, "doctorId", void 0);
-__decorate([
-    class_validator_1.IsOptional(),
-    class_validator_1.IsNumber(),
-    __metadata("design:type", Number)
-], AppointmentDto.prototype, "patientId", void 0);
-__decorate([
-    class_validator_1.IsOptional(),
-    __metadata("design:type", Date)
-], AppointmentDto.prototype, "appointmentDate", void 0);
-__decorate([
-    class_validator_1.IsOptional(),
-    class_validator_1.IsMilitaryTime(),
     __metadata("design:type", String)
-], AppointmentDto.prototype, "startTime", void 0);
+], PatientDto.prototype, "pincode", void 0);
+__decorate([
+    class_validator_1.IsOptional(),
+    __metadata("design:type", String)
+], PatientDto.prototype, "email", void 0);
+__decorate([
+    class_validator_1.IsOptional(),
+    __metadata("design:type", String)
+], PatientDto.prototype, "phone", void 0);
 __decorate([
     class_validator_1.IsOptional(),
     class_validator_1.IsNumber(),
     __metadata("design:type", Number)
-], AppointmentDto.prototype, "appointmentId", void 0);
-exports.AppointmentDto = AppointmentDto;
+], PatientDto.prototype, "patientId", void 0);
+exports.PatientDto = PatientDto;

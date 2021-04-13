@@ -1,6 +1,6 @@
 server :
  # URL : 'redis://virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com:6379'
-   URL : 'redis://redis-prod-server:6379'
+   URL : 'redis://redis-staging-server:6379'
 database :
   type : 'postgres'
   username : 'postgres'
@@ -14,7 +14,3 @@ JWT :
   expiresIn : 36000000
   secret : 'topSecret51'
   defaultStrategy : 'jwt'
-
-textLocal :
-  APIKey : 'ZykcD17gN0A-7D7kZfoBD4Xf9RZFG5v3shNk28WVDw'
-  sender: 'TXTLCL'

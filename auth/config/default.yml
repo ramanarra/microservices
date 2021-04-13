@@ -1,5 +1,6 @@
 server :
-  URL : 'redis://localhost:6379'
+  #URL : 'redis://localhost:6379'
+   URL : 'redis://redis-loc-server:6379'
 
 database :
   type : 'postgres'
