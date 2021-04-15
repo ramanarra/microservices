@@ -1,8 +1,8 @@
 server:
   port : 3000
 openVidu:
-  urlOpenViduServer : "https://devideo.virujh.com/dashboard"
-  secret : "Virujh#123"
+  urlOpenViduServer : "https://dev.virujh.com/dashboard"
+  secret : "Virujh123"
 
 JWT :
   expiresIn : 36000000
@@ -10,6 +10,6 @@ JWT :
   defaultStrategy : 'jwt'
 
 redis : 
-  host: 'redis-dev-server'
+  host: 'localhost'
  #host: 'dev-redis-gateway-001.ysl6gq.0001.aps1.cache.amazonaws.com'
-  port: 6379
+  port: 6378

@@ -11,6 +11,6 @@ JWT :
   defaultStrategy : 'jwt'
 
 redis : 
- #host: 'virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com'
-  host: 'redis-prod-server'
+  host: 'virujhliveredis-001.ysl6gq.0001.aps1.cache.amazonaws.com'
+  # host: 'redis-prod-server'
   port: 6379

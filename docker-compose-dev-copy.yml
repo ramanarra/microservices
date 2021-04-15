@@ -1,0 +1,50 @@
+version: '3.0'
+
+services:
+
+  redis-dev-server:
+    build : redis
+    container_name: rediscache
+    restart: on-failure
+    network_mode: host
+    restart: always 
+  
+  calendar:
+    build: calendar
+    container_name: calendar_service
+    environment:
+      # - REDIS_HOST=redis-dev-server
+       - NODE_ENV=development
+    restart: on-failure  
+    network_mode: host
+    depends_on:
+       - redis-dev-server
+    command: "npm run start:dev"
+
+  auth:
+    build: auth
+    container_name: auth_service
+    restart: on-failure  
+    environment:
+      # - REDIS_HOST=redis-dev-server
+       - NODE_ENV=development
+    network_mode: host
+    depends_on:
+      - redis-dev-server
+    command: "npm run start:dev"
+
+  gateway:
+    build: gateway
+    container_name: gateway_service
+    restart: on-failure 
+    environment:
+      # - REDIS_HOST=redis-dev-server
+       - NODE_ENV=development
+    expose:
+       - '3000'
+    network_mode: host
+    depends_on:
+       - auth
+       - calendar
+       - redis-dev-server
+    command: "npm run start:dev"
