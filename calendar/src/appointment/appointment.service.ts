@@ -1961,31 +1961,38 @@ export class AppointmentService {
         const pat = await this.patientDetailsRepository.findOne({ patientId: details.patientId });
         const doc = await this.doctorRepository.findOne({ doctorId: details.doctorId });
         const hosp = await this.accountDetailsRepository.findOne({ accountKey: doc.accountKey });
-
+        const hospitaladdress=hosp.street1+", "+hosp.landmark+", "+hosp.city+", "+hosp.state+", "+hosp.pincode   
         let result = [];
         if (doc.doctorKey == user.doctor_key) {
 
             let prescriptionMedicineDetail = [];
             for (let i = 0; i < user.prescriptionDto.prescriptionList.length ; i++) {
-                
                 prescriptionMedicineDetail = [];
-                
                 // Add prescription
                 const prescriptionDetails = {
+                    currentDate: moment(new Date()).format("DD/MM/YYYY hh:mm:ss A"),
                     appointmentId: details.id,
                     appointmentDate: details.appointmentDate,
-                    hospitalLogo: null,
+                    hospitalLogo: hosp.hospitalPhoto,
                     hospitalName: hosp.hospitalName,
-                    doctorName: doc.firstName + " " + doc.lastName,
+                    doctorName: "Dr."+" "+ doc.firstName + " " + doc.lastName,
                     doctorSignature: doc.signature,
-                    patientName: pat.firstName + " " + pat.lastName
+                    patientName: pat.firstName + " " + pat.lastName,
+                    doctorId:doc.doctorId,
+                    remarks:user.prescriptionDto.remarks,
+                    patientAge:pat.age,
+                    Gender:pat.gender,
+                    patientGender:pat.honorific,
+                    DoctorKey:doc.doctorKey,
+                    hospitalAddress:hospitaladdress,
+                    qualification:doc.qualification,
+                    doctorRegistrationNumber:doc.registrationNumber,
+                
                 }
                 const prescriptionDetail = await this.prescriptionRepository.prescriptionInsertion(prescriptionDetails);
-
                 prescriptionMedicineDetail.push(prescriptionDetail.appointmentdetails);
                 prescriptionMedicineDetail[0].medicineList = [];
                 // Add medicine for prescription
-
                 for (let j = 0; j< user.prescriptionDto.prescriptionList[i].medicineList.length; j++) {
                     const medicineData = {
                         prescriptionId: prescriptionDetail.appointmentdetails.id,
@@ -2001,8 +2008,19 @@ export class AppointmentService {
                 }
 
                 // Generate pdf to store in cloud
-                let generatePdfPrescription = await this.htmlToPdf(prescriptionMedicineDetail,
-                     prescriptionDetails.patientName, prescriptionMedicineDetail[0].id);
+                let generatePdfPrescription = await this.htmlToPdf(prescriptionMedicineDetail, 
+                    prescriptionDetails.patientName,
+                    prescriptionDetails.remarks,
+                    prescriptionMedicineDetail[0].id,
+                    prescriptionDetails.patientAge,
+                    prescriptionDetails.currentDate,
+                    prescriptionDetails.Gender,
+                    prescriptionDetails.DoctorKey,
+                    prescriptionDetails.hospitalLogo,
+                    prescriptionDetails.qualification, 
+                    prescriptionDetails.doctorRegistrationNumber,
+                    prescriptionDetails.hospitalAddress,
+                    );
 
                 if (i === user.prescriptionDto.prescriptionList.length - 1) {
                     result.push(prescriptionDetail);
@@ -2296,7 +2314,8 @@ export class AppointmentService {
         }
     }
 
-    async htmlToPdf(prescription, patientName, prescriptionId) {
+    async htmlToPdf(prescription, patientName,remarks, prescriptionId,patientAge,currentDate,Gender,
+        DoctorKey, hospitalLogo,qualification,doctorRegistrationNumber,hospitalAddress) {
         const params: any = {};
         const AWS = require('aws-sdk');
         let htmlPdf : any = '';
