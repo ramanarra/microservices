@@ -263,6 +263,11 @@ export class AppointmentService {
                 res.push(doc);
             }
             if (doctorList.length) {
+                res.sort((a, b)=>{
+                    if(a.firstName < b.firstName) { return -1; }
+                    if(a.firstName > b.firstName) { return 1; }
+                    return 0;
+                })
                 return res;
             } else {
                 return [];
@@ -1104,6 +1109,12 @@ export class AppointmentService {
             let codeOrNameTime = codeOrName ? codeOrName.trim() : codeOrName;
             const name = await this.doctorRepository.query(queries.getDoctorByName, ['%'+codeOrNameTime+'%'])
             const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
+
+            name.sort((a, b)=>{
+                if(a.firstName < b.firstName) { return -1; }
+                if(a.firstName > b.firstName) { return 1; }
+                return 0;
+            })
             return {
                 doctors: name,
                 hospitals: hospital
