@@ -11,5 +11,5 @@ JWT :
   defaultStrategy : 'jwt'
 
 redis : 
-  host: 'localhost'
+  host: 'redis-loc-server'
   port: 6379

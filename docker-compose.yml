@@ -59,7 +59,9 @@ services:
     command: "npm run start"
 
   db_auth:
-    build: auth-db
+    build:
+      context: ./auth/auth-db
+      dockerfile: Dockerfile-auth
     container_name: auth_db
     ports:
        - "5432:5432"
@@ -70,7 +72,9 @@ services:
     restart: always
 
   db_calendar:
-    build: calendar-db
+    build: 
+      context: ./calendar/calendar-db
+      dockerfile: Dockerfile-calendar
     container_name: calendar_db
     ports:
        - "5433:5432"
