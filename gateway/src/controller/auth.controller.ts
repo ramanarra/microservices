@@ -109,6 +109,7 @@ export class AuthController {
           patient.firstName = details.firstName;
           patient.lastName = details.lastName;
           patient.photo = details.photo;
+          patient.honorific=details.honorific;
         }
         const status = await this.calendarService.updatePatOnline(patient.patientId);
       }     
