@@ -34,6 +34,7 @@ export class PatientDetailsRepository extends Repository<PatientDetails> {
         patient.dateOfBirth = patientDto.dateOfBirth;
         patient.alternateContact = patientDto.alternateContact;
         patient.age = patientDto.age;
+        patient.gender=patientDto.gender;
 
 
         try {
