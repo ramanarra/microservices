@@ -153,5 +153,6 @@ export const queries = {
     // get report uploaded by patient for the appointment
     getAppointmentReports: `select pr.patient_id as PatientId, pr.file_name as fileName, pr.report_url as attachment, pr.file_type as fileType, pr."comments", pr.report_date as reportDate 
                                 from patient_report pr 
-                             where appointment_id  = $1`
+                             where appointment_id  = $1`,
+    getRemarks:`select * from prescription where appointment_id=$1`,  
 }
