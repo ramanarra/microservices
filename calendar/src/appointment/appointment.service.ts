@@ -252,12 +252,22 @@ export class AppointmentService {
                     lastName: list.last_name,
                     registrationNumber: list.registration_number,
                     fee: list.consultation_cost,
-                    location: list.city,
-                    hospitalName: list.hospital_name
+                    street: list.street1,
+                    city: list.city,
+                    state:list.state,
+                    pincode:list.pincode,
+                    country:list.country,
+                    hospitalName: list.hospital_name,
+                    experience:list.experience
                 }
                 res.push(doc);
             }
             if (doctorList.length) {
+                res.sort((a, b)=>{
+                    if(a.firstName < b.firstName) { return -1; }
+                    if(a.firstName > b.firstName) { return 1; }
+                    return 0;
+                })
                 return res;
             } else {
                 return [];
@@ -551,6 +561,10 @@ export class AppointmentService {
             let page: number = user.paginationNumber;
             //var date = moment().format('YYYY-MM-DD');
             var date: any = new Date();
+                
+                date.setHours(date.getHours() + 5); 
+                date.setMinutes(date.getMinutes() + 30);
+                date.setHours(0,0,0,0);
             var startDate: any = date;
             //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
             let possibleNextAppointments = await this.appointmentRepository.query(queries.getAppointByDocId, [docId, startDate])
@@ -941,16 +955,28 @@ export class AppointmentService {
             const docId = await this.doctorRepository.findOne({ doctorId: appointmentDetails.doctorId }) 
             const pay = await this.paymentDetailsRepository.findOne({ appointmentId: id });
             // get patient report
-            const report = await this.patientReportRepository.find({
-                order: {
-                    id: "DESC"
-                },
-                where: {
-                    appointmentId: id,
-                    active:true
-                }
-            });
 
+
+            
+            const reports=[];
+             if(appointmentDetails.reportid){   
+                const reportIds=appointmentDetails.reportid.split(',');
+            reportIds.map(async id=>{
+                const report = await this.patientReportRepository.findOne({
+                    
+                    where: {
+                        id: parseInt(id),
+                        active:true
+                    }
+                    });
+                    if(report)
+                        reports.push(report);
+
+            })
+            
+        }
+            
+            
             let patient = {
                 id: pat.id,
                 firstName: pat.firstName,
@@ -974,7 +1000,7 @@ export class AppointmentService {
                 appointmentDetails: appointmentDetails,
                 patientDetails: patient,
                 paymentDetails: pay,
-                reportDetails: report,
+                reportDetails: reports,
                 DoctorDetails: doctorId,
 
             }
@@ -1083,6 +1109,12 @@ export class AppointmentService {
             let codeOrNameTime = codeOrName ? codeOrName.trim() : codeOrName;
             const name = await this.doctorRepository.query(queries.getDoctorByName, ['%'+codeOrNameTime+'%'])
             const hospital = await this.accountDetailsRepository.query(queries.getHospitalByName, [codeOrName])
+
+            name.sort((a, b)=>{
+                if(a.firstName < b.firstName) { return -1; }
+                if(a.firstName > b.firstName) { return 1; }
+                return 0;
+            })
             return {
                 doctors: name,
                 hospitals: hospital
@@ -1496,6 +1528,8 @@ export class AppointmentService {
             reschMins = config.rescheduleMinutes;
         }
         var res = {
+            appointmentId: details.appointmentId,
+            doctorKey: details.doctorKey,
             reportDetail: app.reportDetails,
             email: doctor.email,
             doctorPhoto:doctor.photo,
@@ -1503,7 +1537,11 @@ export class AppointmentService {
             consultationTimeSlot: app.appointmentDetails.slotTiming,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
-            location: account.city,
+            street:account.street1,
+            city: account.city,
+            state:account.state,
+            pincode:account.pincode,
+            country:account.country,
             appointmentDate: app.appointmentDetails.appointmentDate,
             startTime: app.appointmentDetails.startTime,
             endTime: app.appointmentDetails.endTime,
@@ -1620,8 +1658,13 @@ export class AppointmentService {
                 lastName: a.last_name,
                 registrationNumber: a.registration_number,
                 fee: a.consultation_cost,
-                location: a.city,
-                hospitalName: a.hospital_name
+                street: a.street1,
+                city:a.city,
+                state:a.state,
+                pincode:a.pincode,
+                country:a.country,
+                hospitalName: a.hospital_name,
+                experience:a.experience
             }
             res.push(b);
         });
@@ -1662,7 +1705,11 @@ export class AppointmentService {
             speciality: doctor.speciality,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
-            location: account.city,
+            street:account.street1,
+            city: account.city,
+            pincode:account.pincode,
+            state:account.state,
+            country:account.country,
             fee: config.consultationCost,
             preConsultationHours: preHours,
             preConsulationMinutes: preMins,
@@ -2737,54 +2784,6 @@ export class AppointmentService {
 
     }
 
-
-
-    async updatereport(data: any): Promise<any> {
-
-        if(data.insertId){
-        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
-        var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.insertId;
-        data.id = account[0].reportid ? account[0].reportid + ',' + data.id : data.id;
-        
-        if(account.length){
-            console.log('Hi')
-            const app = await this.appointmentRepository.updateReportId(data)
-            return app
-        }
-       
-        else{
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.NOREPORT,
-            }
-        }
-        
-        
-    }
-    
-    if(data.deleteId){
-        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
-        var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.deleteId
-        const tempArr = arr.filter(val => (val != data.id) );
-        const newid=tempArr.toString()
-        console.log(newid)
-        data.id =  newid ;
-        console.log(data.id)
-        if(account.length){
-        const app = await this.appointmentRepository.deleteReportid(data)
-        return app
-        }
-        else{
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.NOREPORT,
-            }
-        }
-    }
-
-    }
     
     //report Data
     async report(data: any): Promise<any> {
@@ -3236,5 +3235,49 @@ export class AppointmentService {
             appoinmentId,
             reports
         }
+    }
+
+    async updatereport(data: any): Promise<any> {
+
+        if(data.insertId){
+        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
+        var arr = JSON.parse("[" + account[0].reportid + "]");
+        data.id=data.insertId;
+        data.id = account[0].reportid ? account[0].reportid + ',' + data.id : data.id;
+        
+        if(account.length){
+            const app = await this.appointmentRepository.updateReportId(data)
+            return app
+        }
+       
+        else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.NOREPORT,
+            }
+        }
+        
+        
+    }
+    
+    if(data.deleteId){
+        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
+        var arr = JSON.parse("[" + account[0].reportid + "]");
+        data.id=data.deleteId
+        const tempArr = arr.filter(val => (val != data.id) );
+        const newid=tempArr.toString()
+        data.id =  newid ;
+        if(account.length){
+        const app = await this.appointmentRepository.deleteReportid(data)
+        return app
+        }
+        else{
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: CONSTANT_MSG.NOREPORT,
+            }
+        }
+    }
+
     }
 }
