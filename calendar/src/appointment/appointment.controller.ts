@@ -398,7 +398,7 @@ export class AppointmentController {
     async appointmentReschedule(appointmentDto: any): Promise<any> {
     const app = await this.appointmentService.appointmentDetails(appointmentDto.appointmentId)
     const payment = await this.paymentDetailsRepository.findOne({appointmentId:appointmentDto.appointmentId})
-    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR){
+    if(appointmentDto.user.role == CONSTANT_MSG.ROLES.DOCTOR || CONSTANT_MSG.ROLES.DOC_ASSISTANT){
         appointmentDto.doctorId = app.appointmentDetails.doctorId;
     }else{
         const docIds = app.DoctorDetails;
@@ -1318,6 +1318,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_delete_report'})
     async Report(id: any): Promise<any> {
         const patient = await this.appointmentService.deletereport(id);
+        return patient;  
+    }
+   
+    @MessagePattern({cmd: 'patient_update_report'})
+    async updateReport(data: any): Promise<any> {
+        const patient = await this.appointmentService.updatereport(data);
         return patient;  
     }
    

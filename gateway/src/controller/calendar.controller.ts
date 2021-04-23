@@ -41,7 +41,8 @@ import {
     DocConfigDto,
     PrescriptionDto,
     WorkScheduleDto,ReportdeleteDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto,
+    AppointmentsDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -1817,6 +1818,24 @@ export class CalendarController {
     return patient
   }
 
+  @Put('patient/reportId')
+  @ApiBody({ type: AppointmentsDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+    @ApiOkResponse({
+          description:
+            'requestBody example :  {\n' +
+             '"appointmentId":660\n,'+
+             '"deleteId":25\n,'+
+             '"insertId":20\n'+
+             '}'
+        })
+  async updateReports( @Body() data :AppointmentsDto ){
+    const patient = await this.calendarService.updateReport(data)
+    return patient
+  }
+
    //patient report list
    @Get('patient/report/list')
    @ApiOkResponse({description: 'reportList API'})
@@ -2049,12 +2068,15 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiQuery({ name: 'appointmentId', required: true })
-    async getAppointmentReports(@Request() req,  @Query('appointmentId') appointmentId : Number) {
-  
-        if(!appointmentId) return {
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: "Please send appointment id for which you want the reports"
-        }
+    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : Number) {
+        // check doctor & admin permission
+
+        if(!appointmentId) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Please send appointment id for which you want the reports"
+            }
+        } 
 
         return await this.calendarService.getAppointmentReports(appointmentId)
     }
