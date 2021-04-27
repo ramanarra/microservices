@@ -1,9 +1,10 @@
 import { Repository, EntityRepository } from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
+import {HttpStatus} from '@nestjs/common';
 import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Appointment } from "./appointment.entity";
 import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
-import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG} from  "common-dto";
+import { AppointmentDto , DoctorConfigPreConsultationDto,CONSTANT_MSG,queries} from  "common-dto";
 import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
 import { AppointmentCancelRescheduleRepository } from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import { AppointmentDocConfig } from "./appointmentDocConfig/appointmentDocConfig.entity";
@@ -61,6 +62,35 @@ export class AppointmentRepository extends Repository<Appointment> {
         }
     }
 
-
-
+    async updateReportId(data): Promise<any>{
+       
+        const newdata = await this.query(queries.getReportId,[data.id,data.appointmentId] ) 
+        try {
+            return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.Report,
+            
+            }
+         } 
+         catch (error) {
+         this.logger.error(`Unexpected patientReport save error` + error.message);
+         throw new InternalServerErrorException();
+     }
+    }
+    async deleteReportid(data): Promise<any>{
+       
+        const newdata = await this.query(queries.getReportId,[data.id,data.appointmentId] ) 
+        try {
+            return{
+            statusCode: HttpStatus.OK,
+            message: CONSTANT_MSG.  REPORTDELETE,
+           
+            }
+         } 
+         catch (error) {
+         this.logger.error(`Unexpected patientReport save error` + error.message);
+         throw new InternalServerErrorException();
+     }
+    }
+    
 }

@@ -809,10 +809,12 @@ export class AppointmentController {
         if(doc.doctorId==app.appointmentDetails.doctorId){
             const res=await this.videoService.removePatientToken(doc, pat.patientId, docPatientDetail.appointmentId, docPatientDetail.status);
             const patient=pat.patientId;
+            const status=docPatientDetail.status;
             let result={
                 response: res,
                 patient:patient,
-                isRemoved:true
+                isRemoved:true,
+                Videostatus:status
             }
             return result;
         }else {
@@ -1318,6 +1320,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_delete_report'})
     async Report(id: any): Promise<any> {
         const patient = await this.appointmentService.deletereport(id);
+        return patient;  
+    }
+   
+    @MessagePattern({cmd: 'patient_update_report'})
+    async updateReport(data: any): Promise<any> {
+        const patient = await this.appointmentService.updatereport(data);
         return patient;  
     }
    

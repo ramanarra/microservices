@@ -132,6 +132,7 @@ export class AuthController {
           '"alternateContact":"alternateContact", \n' +
           '"age":21, \n' +
           '"photo":"https://homepages.cae.wisc.edu/~ece533/images/airplane.png" \n' +
+          '"gender":"Male", \n' +
           '}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     @ApiBody({ type: PatientDto })

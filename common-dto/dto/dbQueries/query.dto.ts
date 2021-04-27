@@ -68,6 +68,7 @@ export const queries = {
     getUpcomingAppointments:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" <= $2  AND "status"= $3 OR "status"=$4 AND "is_cancel"=false',
     getUpcomingAppointmentsCounts:'SELECT * FROM appointment WHERE "patient_id" = $1 AND "appointment_date" >= $2 AND ("status"= $3 OR "status" = $4) AND "is_cancel"=false', 
     getDeleteReport:'update patient_report set active=false where id= $1',
+    getReportId:'update appointment set reportid= $1 where id=$2',
     getExistAppointment:'SELECT * FROM appointment WHERE "doctorId"=$1 AND "patient_id"=$2 AND "appointment_date"=$3 AND "is_cancel"=false',
     getUpcomingAppointmentsForPatient: 'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate",a."startTime", a."endTime", a."doctorId", a."patient_id" as "patientId", adc."is_preconsultation_allowed",adc."pre_consultation_hours",adc."pre_consultation_mins", d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName" FROM appointment a join appointment_doc_config adc ON a."id" = adc."appointment_id" join doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key" WHERE a."patient_id" = $1 AND a."doctorId" = $4 AND a."appointment_date" >= $2 AND a."is_cancel"=false AND (a.status= $5 OR a.status=$6) order by appointment_date limit 10 offset $3',
     getAppDoctorList: 'SELECT a."id" as "appointmentId", a."appointment_date" as "appointmentDate",a."startTime", a."endTime", a."doctorId", a."patient_id" as "patientId", adc."is_preconsultation_allowed",adc."pre_consultation_hours",adc."pre_consultation_mins", d."first_name" as "doctorFirstName",d."last_name" as "doctorLastName", ac."hospital_name" as "hospitalName"  FROM appointment a join appointment_doc_config adc ON a."id" = adc."appointment_id" join doctor d ON a."doctorId" = d."doctorId" join account_details ac ON d."account_key" = ac."account_key"  WHERE a."doctorId" = $1 AND a."patient_id" = $2 AND a.appointment_date >= $3 AND a."is_cancel"=false AND (a.status= $4 OR a.status = $5) order by appointment_date',
@@ -152,5 +153,6 @@ export const queries = {
     // get report uploaded by patient for the appointment
     getAppointmentReports: `select pr.patient_id as PatientId, pr.file_name as fileName, pr.report_url as attachment, pr.file_type as fileType, pr."comments", pr.report_date as reportDate 
                                 from patient_report pr 
-                             where appointment_id  = $1`
+                             where appointment_id  = $1`,
+    getRemarks:`select * from prescription where appointment_id=$1`,  
 }

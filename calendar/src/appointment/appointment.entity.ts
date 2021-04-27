@@ -96,4 +96,9 @@ export class Appointment extends BaseEntity{
         name: 'hasConsultation'
     })
     hasConsultation: boolean
+
+    @Column({
+        name:'reportid'
+        })
+        reportid:string;
 }

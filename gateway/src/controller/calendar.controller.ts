@@ -41,7 +41,8 @@ import {
     DocConfigDto,
     PrescriptionDto,
     WorkScheduleDto,ReportdeleteDto,
-    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto
+    PatientDto,CONSTANT_MSG,HospitalDto, AccountDto, patientReportDto,
+    AppointmentsDto
 } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {Strategy, ExtractJwt} from 'passport-jwt';
@@ -1745,7 +1746,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiBody({ type: PrescriptionDto })
-    @ApiOkResponse({ description: 'request body example:    {"appointmentId": "251", "prescriptionList" : [{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"},{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]},{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]}]}' })
+    @ApiOkResponse({ description: 'request body example:    {"appointmentId": "251", "remarks":"take medicine","prescriptionList" : [{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"},{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]},{"medicineList": [{"nameOfMedicine":"syrup", "countOfDays":"30", "doseOfMedicine":"10 ml"}]}]}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async prescriptionInsertion(@selfUserSettingWrite() check: boolean, @accountUsersSettingsWrite() check2: boolean, @Request() req, @Body() prescriptionDto: any) {
         // N number of prescription allowed for an appointment
@@ -1814,6 +1815,24 @@ export class CalendarController {
         })
   async deleteReport( @Body() id :ReportdeleteDto ){
     const patient = await this.calendarService.deleteReport(id)
+    return patient
+  }
+
+  @Put('patient/reportId')
+  @ApiBody({ type: AppointmentsDto })
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard())
+  @ApiTags('Patient')
+    @ApiOkResponse({
+          description:
+            'requestBody example :  {\n' +
+             '"appointmentId":660\n,'+
+             '"deleteId":25\n,'+
+             '"insertId":20\n'+
+             '}'
+        })
+  async updateReports( @Body() data :AppointmentsDto ){
+    const patient = await this.calendarService.updateReport(data)
     return patient
   }
 
