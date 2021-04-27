@@ -43,4 +43,5 @@ export class PatientDto {
     oldPassword:string;
     newPassword:string;
     confirmNewPassword:string;
+    gender:string;
 }
