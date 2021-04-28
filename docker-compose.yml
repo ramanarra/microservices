@@ -10,16 +10,22 @@ services:
    restart: on-failure 
   
   calendar:
-   build: calendar
+   build:
+     context: .
+     dockerfile: ./calendar/.
    container_name: calendar_service
    restart: on-failure
 
   auth:
-   build: auth
+   build: .
+     context: .
+     dockerfile: ./auth/.  
    container_name: auth_service
    restart: on-failure
 
   gateway:
-   build: gateway
+   build:
+     context: .
+     dockerfile: ./gateway/.
    container_name: gateway_service
    restart: on-failure
