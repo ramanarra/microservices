@@ -2,93 +2,24 @@ version: '3.0'
 
 services:
 
-  redis-loc-server:
-    image: "redis:alpine"
-    container_name: rediscache
-    networks:
-      - redis-net
-    ports:
-      - "6378:6379"
-    restart: on-failure 
+  redis-server:
+   build :
+     context: .
+     dockerfile: ./redis/.
+   container_name: redis-service
+   restart: on-failure 
   
   calendar:
-    build: calendar
-    container_name: calendar_service
-    environment:
-       - REDIS_HOST=redis-loc-server
-       - POSTGRES_HOST=db_calendar
-       - NODE_ENV=default
-    networks:
-       - redis-net
-    restart: on-failure
-    depends_on:
-       - redis-loc-server
-       - db_calendar
-    command: "npm run start"
+   build: calendar
+   container_name: calendar_service
+   restart: on-failure
 
   auth:
-    build: auth
-    container_name: auth_service
-    environment:
-       - REDIS_HOST=redis-loc-server
-       - POSTGRES_HOST=db_auth
-       - NODE_ENV=default
-    networks:
-       - redis-net
-    restart: on-failure
-    depends_on:
-       - redis-loc-server
-       - db_auth
-    command: "npm run start"
+   build: auth
+   container_name: auth_service
+   restart: on-failure
 
   gateway:
-    build: gateway
-    container_name: gateway_service
-    restart: on-failure
-    environment:
-       - REDIS_HOST=redis-loc-server
-       - NODE_ENV=default
-    ports:
-       - "3000:3000"
-    networks:
-       - redis-net
-    depends_on:
-       - redis-loc-server
-       - auth
-       - calendar
-    command: "npm run start"
-
-  db_auth:
-    build:
-      context: ./auth/auth-db
-      dockerfile: Dockerfile-auth
-    container_name: auth_db
-    ports:
-       - "5432:5432"
-    networks:
-       - redis-net
-    volumes: 
-       - postgre-data-auth:/var/lib/postgresql/data
-    restart: always
-
-  db_calendar:
-    build: 
-      context: ./calendar/calendar-db
-      dockerfile: Dockerfile-calendar
-    container_name: calendar_db
-    ports:
-       - "5433:5432"
-    networks:
-       - redis-net
-    volumes: 
-       - postgre-data-calendar:/var/lib/postgresql/data
-    restart: always
-
-networks:
-   redis-net:
-    external: true
-volumes:
-  postgre-data-auth:
-       driver : local
-  postgre-data-calendar:
-       driver : local  
+   build: gateway
+   container_name: gateway_service
+   restart: on-failure

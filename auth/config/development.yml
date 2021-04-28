@@ -1,7 +1,7 @@
 server :
   #URL : 'redis://dev-redis-gateway-001.ysl6gq.0001.aps1.cache.amazonaws.com:6379'
   # URL : 'redis://redis-dev-server:6378'
-  URL : 'redis://localhost:6379'
+  URL : 'redis://localhost:6378'
 
 
 database :
