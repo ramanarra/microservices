@@ -561,10 +561,6 @@ export class AppointmentService {
             let page: number = user.paginationNumber;
             //var date = moment().format('YYYY-MM-DD');
             var date: any = new Date();
-                
-                date.setHours(date.getHours() + 5); 
-                date.setMinutes(date.getMinutes() + 30);
-                date.setHours(0,0,0,0);
             var startDate: any = date;
             //  var startDate = new Date(Date.now() + (page * 7 * 24 * 60 * 60 * 1000));
             let possibleNextAppointments = await this.appointmentRepository.query(queries.getAppointByDocId, [docId, startDate])
@@ -1559,7 +1555,7 @@ export class AppointmentService {
             doctorLastName: doctor.lastName,
             patientFirstName: patient.firstName,
             patientLastName: patient.lastName,
-            doctorLiveStatus: doctor.liveStatus,
+            doctorLiveStatus: doctor.doctorLiveStatus,
             prescriptionUrl: prescriptionUrl,
         }
         return res;
