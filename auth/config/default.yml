@@ -1,12 +1,12 @@
 server :
-  #URL : 'redis://localhost:6379'
-   URL : 'redis://redis-loc-server:6379'
+  URL : 'redis://localhost:6379'
+  #URL : 'redis://redis-loc-server:6379'
 
 database :
   type : 'postgres'
-  username : 'postgres'
-  password : 'postgres'
-  host: 'virujh-dev-new.cjxvyzcwczxh.ap-south-1.rds.amazonaws.com'
+  username : 'postgres' 
+  password : 'root'
+  host: 'localhost'
   database : 'auth'
   port : 5432
   synchronize : false
