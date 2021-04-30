@@ -2,8 +2,8 @@ server:
   port : 3000
 
 openVidu:
-  urlOpenViduServer : "https://devideo.virujh.com/dashboard"
-  secret : "Virujh#123"
+  urlOpenViduServer : "https://dev.virujh.com/dashboard"
+  secret : "Virujh123"
 
 JWT :
   expiresIn : 36000000

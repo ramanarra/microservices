@@ -109,5 +109,10 @@ export class PatientDetails extends BaseEntity {
         name: 'last_active'
     })
     lastActive: Date;
+    @Column({
+        name: 'gender'
+    })
+    gender: string;
+
 
 }

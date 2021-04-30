@@ -31,3 +31,9 @@ export class AppointmentDto {
   confirmation:boolean;
   hasConsultation: boolean;
 }
+export class AppointmentsDto {
+  id : string;
+  appointmentId:number;
+  insertid:string;
+  deleteid:string;
+}

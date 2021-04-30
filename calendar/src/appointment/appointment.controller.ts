@@ -757,8 +757,10 @@ export class AppointmentController {
     @MessagePattern({cmd: 'video_doctor_session_create'})
     async videoDoctorSessionCreate(doctorKey: string): Promise<any> {
         const doc = await this.appointmentService.doctorDetails(doctorKey);
+        this.logger.log("videoDoctorSessionCreate doc:"+doc);
         if(doc){
             let tokenResponseDetails = await this.videoService.createDoctorSession(doc);
+            this.logger.log("tokenResponseDetails:"+tokenResponseDetails);
             return tokenResponseDetails;
         }else {
             return {
@@ -809,10 +811,12 @@ export class AppointmentController {
         if(doc.doctorId==app.appointmentDetails.doctorId){
             const res=await this.videoService.removePatientToken(doc, pat.patientId, docPatientDetail.appointmentId, docPatientDetail.status);
             const patient=pat.patientId;
+            const status=docPatientDetail.status;
             let result={
                 response: res,
                 patient:patient,
-                isRemoved:true
+                isRemoved:true,
+                Videostatus:status
             }
             return result;
         }else {
@@ -858,15 +862,19 @@ export class AppointmentController {
             var hour = date.getHours();
             var time = hour+":"+minutes;
             var timeMilli = Helper.getTimeInMilliSeconds(time);
-            var appointment = await this.appointmentService.todayAppointmentsForDoctor(doc.doctorId,date)
+            var appointment = await this.appointmentService.todayAppointmentsForDoctor(doc.doctorId,date);
+            this.logger.debug(timeMilli+",docId:"+doc.doctorId+", date:"+date+",todayAppointmentsForDoctor:"+JSON.stringify(appointment));
             let i:any;
             for(i of appointment){
                 let end =Helper.getTimeInMilliSeconds(i.endTime);
-                if(timeMilli<end){
+                this.logger.debug(timeMilli+"::"+end);
+                //TODO: this is wrong logic
+                //if(timeMilli<end){
                     app.push(i);
-                }
+                //}
             }
             let app1=[];
+            //TODO: Just to reduce the size of the array, we don't need this loop, we need to use other methods provided
             if(app1.length>=29){
                 for(i=0;i<30;i++){
                     app1.push(app[i]);
@@ -874,6 +882,7 @@ export class AppointmentController {
             }else{
                 app1=app;
             }
+            this.logger.debug("app1 result:"+app1);
             return app1;
         } else {
             return {
@@ -1318,6 +1327,12 @@ export class AppointmentController {
     @MessagePattern({cmd: 'patient_delete_report'})
     async Report(id: any): Promise<any> {
         const patient = await this.appointmentService.deletereport(id);
+        return patient;  
+    }
+   
+    @MessagePattern({cmd: 'patient_update_report'})
+    async updateReport(data: any): Promise<any> {
+        const patient = await this.appointmentService.updatereport(data);
         return patient;  
     }
    
