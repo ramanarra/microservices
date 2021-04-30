@@ -2,58 +2,38 @@ version: '3.0'
 
 services:
 
-  redis-dev-server:
-    image: "redis:alpine"
-    container_name: rediscache
-    networks:
-      - redis-net
-    ports:
-      - "6378:6379"
+  redis-server:
+   build :
+      context: .
+      dockerfile: ./redis/.
+    container_name: redis-service
     restart: on-failure 
+   network_mode: host
   
   calendar:
-    build: calendar
-    container_name: calendar_service
     environment:
-       - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
-    restart: on-failure  
-    networks:
-       - redis-net
+    network_mode: host
     depends_on:
-       - redis-dev-server
+       - redis-server
     command: "npm run start:dev"
 
-  auth:
-    build: auth
-    container_name: auth_service
-    restart: on-failure  
+  auth: 
     environment:
-       - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
-    networks:
-       - redis-net
+    network_mode: host
     depends_on:
-       - redis-dev-server
+      - redis-server
     command: "npm run start:dev"
 
   gateway:
-    build: gateway
-    container_name: gateway_service
-    restart: on-failure 
     environment:
-       - REDIS_HOST=redis-dev-server
        - NODE_ENV=development
-    ports:
-       - "3000:3000"
-    networks:
-       - redis-net
+    expose:
+       - '3000'
+    network_mode: host
     depends_on:
-       - redis-dev-server
        - auth
        - calendar
+       - redis-server
     command: "npm run start:dev"
-
-networks:
-   redis-net:
-    external: true
