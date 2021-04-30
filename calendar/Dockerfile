@@ -30,16 +30,16 @@ COPY ./calendar/tsconfig.build.json /usr/src/app/calendar
 COPY ./calendar/tsconfig.json /usr/src/app/calendar
 
 #install and run common dto
-#RUN mkdir -p /usr/src/app/common-dto
-WORKDIR /usr/src/app
+RUN mkdir -p /usr/src/app/common-dto
+WORKDIR /usr/src/app/common-dto
 
 #copying common-dto project file to dest. folder
-#COPY common-dto/. /usr/src/app/common-dto
+COPY common-dto/. .
 
 # Clone the conf files into the docker container
 #RUN git clone git@bitbucket.org:virujh/common-dto.git
 
-COPY common-dto .
+#COPY common-dto .
 
 WORKDIR /usr/src/app/common-dto
 
