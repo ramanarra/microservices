@@ -118,5 +118,8 @@ export const CONSTANT_MSG = {
         key_id:'rzp_test_yaoAQ9nmvuUZx4',
         key_secret:'tttY7AYPndi9cCEj549QkovH',
         AndroidVersion:'2.5',
-    }
+    },
+    EMAIL_ALREADY_PRESENT:'Email already exists please signup using the existing credentials',
+    REGISTRATION_SUCCESS: 'Successfully registered',
+    REGISTRATION_FAILED: 'Failed to register the doctor'
 }
