@@ -6,16 +6,12 @@ services:
     environment:
        - NODE_ENV=production 
     network_mode: host
-    depends_on:
-       - redis-server
     command: "npm run start"
 
   auth: 
     environment:
        - NODE_ENV=production
     network_mode: host
-    depends_on:
-      - redis-server
     command: "npm run start"
 
   gateway:
@@ -27,5 +23,4 @@ services:
     depends_on:
        - auth
        - calendar
-       - redis-server
     command: "npm run start"
