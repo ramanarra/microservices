@@ -5,20 +5,20 @@ services:
   calendar:
    build:
      context: .
-     dockerfile: ./calendar/.
+     dockerfile: ./calendar/Dockerfile
    container_name: calendar_service
    restart: on-failure
 
   auth:
    build:
      context: .
-     dockerfile: ./auth/.  
+     dockerfile: ./auth/Dockerfile 
    container_name: auth_service
    restart: on-failure
 
   gateway:
    build:
      context: .
-     dockerfile: ./gateway/.
+     dockerfile: ./gateway/Dockerfile
    container_name: gateway_service
    restart: on-failure
