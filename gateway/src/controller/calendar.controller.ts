@@ -2068,7 +2068,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiQuery({ name: 'appointmentId', required: true })
-    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : Number) {
+    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : any) {
         // check doctor & admin permission
 
         if(!appointmentId) {

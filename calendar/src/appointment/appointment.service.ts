@@ -3215,8 +3215,29 @@ export class AppointmentService {
         return await this.appointmentRepository.query(queries.getAppointmentDetails, [appointmentId])
     }
 
-    async getAppointmentReports(appoinmentId: Number): Promise<any> {
-        const reports = await this.appointmentRepository.query(queries.getAppointmentReports, [appoinmentId])
+    async getAppointmentReports(appoinmentId: any): Promise<any> {
+
+        const appointmentDetails = await this.appointmentRepository.findOne({ id: appoinmentId });
+
+        
+        const reports=[];
+         if(appointmentDetails.reportid){   
+            const reportIds = appointmentDetails.reportid.split(',');
+            for(const id of reportIds) {
+                const report = await this.patientReportRepository.findOne({
+
+                    where: {
+                        id: parseInt(id),
+                        active:true
+                    }
+                    });
+                    if(report)
+                        reports.push(report);
+    
+            }
+            
+        
+    }
 
         return {
             statusCode: HttpStatus.OK,
