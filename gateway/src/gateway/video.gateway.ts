@@ -119,7 +119,7 @@ export class VideoGateway {
         }
 
       });
-
+ 
     }else {
       this.logger.log(`Socket request update live status for ${CONSTANT_MSG.ROLES.DOCTOR} => ${userInfo.doctor_key} and status => ${data.status}`);
       this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.DOCTOR, userInfo.doctor_key, data.status);
