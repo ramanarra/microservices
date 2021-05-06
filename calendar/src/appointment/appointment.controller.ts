@@ -1,18 +1,15 @@
-import {Controller, HttpStatus, Logger, UnauthorizedException} from '@nestjs/common';
-import {AppointmentService} from './appointment.service';
-import {MessagePattern} from '@nestjs/microservices';
-import {CONSTANT_MSG, queries, DoctorDto, DocConfigDto, Sms} from 'common-dto';
-import {PatientDto} from 'common-dto';
-import {Helper} from "../utility/helper";
-import { of } from 'rxjs';
+import { Controller, HttpStatus, Logger } from '@nestjs/common';
+import { AppointmentService } from './appointment.service';
+import { MessagePattern } from '@nestjs/microservices';
+import {CONSTANT_MSG, DoctorDto, PatientDto, queries} from 'common-dto';
+import { Helper } from '../utility/helper';
 import { VideoService } from './video.service';
 import { PatientDetailsRepository } from './patientDetails/patientDetails.repository';
-import * as Razorpay from 'razorpay';
 import { PaymentService } from './payment.service';
-import * as config from 'config';
-import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
-import { PaymentDetails } from "./paymentDetails/paymentDetails.entity";
+import { PaymentDetailsRepository } from './paymentDetails/paymentDetails.repository';
+import { PaymentDetails } from './paymentDetails/paymentDetails.entity';
 import { HelperService } from 'src/utility/helper.service';
+import {DoctorRepository} from "./doctor/doctor.repository";
 //import * as moment from 'moment';
 
 //import {DoctorService} from './doctor/doctor.service';
@@ -28,6 +25,7 @@ export class AppointmentController {
         private readonly paymentService : PaymentService,
         private patientDetailsRepository : PatientDetailsRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
+        private doctorRepository: DoctorRepository,
         private helperService: HelperService) {
         //    this.textLocal = config.get('textLocal');
     }
@@ -1440,5 +1438,25 @@ export class AppointmentController {
     @MessagePattern({ cmd: 'get_appointment_reports' })
     async getAppointmentReports(appoinmentId: Number): Promise<any> {
         return await this.appointmentService.getAppointmentReports(appoinmentId)
+    }
+
+    @MessagePattern({cmd: 'patient_details_patientId'})
+    async patientDetailsByPatientId(patientId: number): Promise<any> {
+        return await this.appointmentService.patientDetailsByPatientId(patientId);
+    }
+
+    @MessagePattern({cmd: 'create_doctor_detail'})
+    async createDoctorDetail(doctorDto: DoctorDto): Promise<any> {
+        const maxRegKey: any = await this.doctorRepository.query(queries.getRegKey);
+        let regKey = 'RegD_';
+        if (maxRegKey.length) {
+            let m = maxRegKey[0];
+            regKey = regKey + (Number(m.maxreg) + 1);
+        } else {
+            regKey = 'RegD_1';
+        }
+        doctorDto.registrationNumber = regKey;
+        const account = await this.appointmentService.registerDoctorDetail(doctorDto);
+        return account;
     }
 }
