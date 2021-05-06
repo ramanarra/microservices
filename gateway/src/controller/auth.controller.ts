@@ -440,6 +440,34 @@ export class AuthController {
       }
       this.logger.log(`Patient Forgot Password Api -> Request data ${JSON.stringify(patientDto)}`);
       const patient = await this.userService.patientForgotPassword(patientDto);
+      if (patient) {
+        const patientDetail = await this.calendarService.patientDetailsByPatientId(patient.patientId);
+        if(patient.statusCode === HttpStatus.OK && patientDetail) {
+            const template = await this.calendarService.getMessageTemplate({messageType: 'FORGOT_PASSWORD', communicationType: 'Email'});
+
+            if(template && template.data){
+                let data = {
+                    email: patientDetail.email,
+                    password: patient.password,
+                    template: template.data.body,
+                    subject: template.data.subject,
+                    type: CONSTANT_MSG.MAIL.FORGOT_PASSWORD,
+                    sender: template.data.sender,
+                    user_name: patientDetail.firstName + patientDetail.lastName
+                };
+
+                const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+                if(sendMail && sendMail.statusCode === HttpStatus.OK){
+                    delete patient.password;
+                    return patient;
+                } else {
+                    return sendMail;
+                }
+
+            }
+        }
+      }
       return patient;
     }
 
@@ -539,6 +567,32 @@ export class AuthController {
       adminDto.role = CONSTANT_MSG.ROLES.ADMIN;
       this.logger.log(`Admin Forgot Password Api -> Request data ${JSON.stringify(adminDto)}`);
       const admin = await this.userService.doctorsForgotPassword(adminDto);
+      if(admin.statusCode === HttpStatus.OK){
+        const template = await this.calendarService.getMessageTemplate({messageType: 'FORGOT_PASSWORD', communicationType: 'Email'});
+
+        if(template && template.data){
+          let data = {
+            email: adminDto.email,
+            password: admin.password,
+            template: template.data.body,
+            subject: template.data.subject,
+            type: CONSTANT_MSG.MAIL.FORGOT_PASSWORD,
+            sender: template.data.sender,
+            user_name: admin.name
+          };
+
+          const sendMail = await this.userService.sendEmailWithTemplate(data);
+
+          if(sendMail && sendMail.statusCode === HttpStatus.OK){
+            delete admin.password;
+            delete admin.name;
+            return admin;
+          } else {
+            return sendMail;
+          }
+
+        }
+      }
       return admin;
     }
 
@@ -580,6 +634,81 @@ export class AuthController {
       this.logger.log(`Patient OTP Verification Api -> Request data ${JSON.stringify(patientDto)}`);
       const patient = await this.userService.OTPVerification(patientDto);
       return patient;
+    }
+
+
+    @Post('doctor/registration')
+    @ApiTags('Doctors')
+    @ApiBody({type: DoctorDto})
+    @ApiOkResponse({ description: 'requestBody example :{"email":"dharani@gmail.com","firstName":"Dharani",' +
+            '"lastName":"Antharvedi","accountKey":5, "specialization": "Child", ' +
+            '"qualification": "MBBS", "experience": "5", "consultationCost" : "100", "password": "123456", ' +
+            '"number":"7845127845", "description":"SAHA WORKING WITH CUTE"}' })
+    @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+    async doctorRegistrationNew(@Body() doctorDto : DoctorDto) {
+        if (!doctorDto.email) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Provide email"
+            }
+        } else {
+            doctorDto.email = doctorDto.email.toLowerCase();
+            const doctorDetail = await this.userService.findDoctorByEmail(doctorDto.email);
+            if (doctorDetail) {
+                return {
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: CONSTANT_MSG.EMAIL_ALREADY_PRESENT
+                }
+            } else {
+                const doctorResponse = await this.userService.doctorRegistrationNew(doctorDto);
+                if (doctorResponse) {
+                  const doctorDetail = await this.calendarService.createDoctorDetail(doctorResponse);
+                  if (doctorDetail) {
+                      //Send mail functionality
+                      const template = await this.calendarService.getMessageTemplate({messageType: 'REGISTRATION_FOR_DOCTOR', communicationType: 'Email'});
+                      if(template && template.data) {
+                          let data = {
+                              email: doctorDto.email,
+                              password: doctorDto.password,
+                              template: template.data.body,
+                              subject: template.data.subject,
+                              type: CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR,
+                              sender: template.data.sender,
+                              user_name: doctorDto['name'] || doctorDto.firstName + doctorDto.lastName
+                          };
+                          const sendMail = await this.userService.sendEmailWithTemplate(data);
+                          if(sendMail && sendMail.statusCode === HttpStatus.OK){
+                              delete doctorDto.password;
+                              delete doctorDto.firstName;
+                              delete doctorDto.lastName;
+                            return {
+                              statusCode: HttpStatus.OK,
+                              message: CONSTANT_MSG.REGISTRATION_SUCCESS,
+                              data: doctorDto
+                            }
+                          } else {
+                            return {
+                              statusCode: HttpStatus.OK,
+                              message: CONSTANT_MSG.REGISTRATION_SUCCESS,
+                              data: {sendMail, doctorDto}
+                            }
+                          }
+                      }
+                  } else {
+                      return {
+                          statusCode: HttpStatus.NOT_MODIFIED,
+                          message: CONSTANT_MSG.REGISTRATION_FAILED
+                      }
+                  }
+                  return doctorDetail;
+                } else {
+                    return {
+                        statusCode: HttpStatus.NOT_MODIFIED,
+                        message: CONSTANT_MSG.REGISTRATION_FAILED
+                    }
+                }
+            }
+        }
     }
     
 }
