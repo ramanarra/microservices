@@ -394,7 +394,8 @@ export class UserService {
                         return {
                             statusCode: HttpStatus.OK,
                             message: CONSTANT_MSG.PASSWORD_UPDATION_SUCCESS,
-                            password: password
+                            password: password,
+                            patientId: patient.patient_id
                         }
                     // }
                 } 

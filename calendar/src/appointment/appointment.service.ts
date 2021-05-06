@@ -1,16 +1,7 @@
 import {HttpStatus, Injectable} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
-import {
-    AppointmentDto,
-    UserDto,
-    DoctorConfigPreConsultationDto,
-    DoctorConfigCanReschDto,
-    DocConfigDto,
-    WorkScheduleDto,
-    PatientDto, CONSTANT_MSG, queries, DoctorDto, HospitalDto, Email,Sms
-} from 'common-dto';
-import {Appointment} from './appointment.entity';
+import {CONSTANT_MSG, DocConfigDto, DoctorDto, Email, HospitalDto, PatientDto, queries, Sms} from 'common-dto';
 import {Doctor} from './doctor/doctor.entity';
 import {DoctorRepository} from './doctor/doctor.repository';
 import {AccountDetailsRepository} from './account/account.repository';
@@ -18,29 +9,20 @@ import {PrescriptionRepository} from './prescription.repository';
 import {PatientReportRepository} from './patientReport.repository'
 import {AccountDetails} from './account/account_details.entity';
 import {DoctorConfigPreConsultationRepository} from './doctorConfigPreConsultancy/doctor_config_preconsultation.repository';
-import {DoctorConfigPreConsultation} from './doctorConfigPreConsultancy/doctor_config_preconsultation.entity';
 import {DoctorConfigCanReschRepository} from './docConfigReschedule/doc_config_can_resch.repository';
-import {DoctorConfigCanResch} from './docConfigReschedule/doc_config_can_resch.entity';
 import {docConfigRepository} from "./doc_config/docConfig.repository";
-import {docConfig} from "./doc_config/docConfig.entity";
 //import {queries} from "../config/query";
 import {DocConfigScheduleDayRepository} from "./docConfigScheduleDay/docConfigScheduleDay.repository";
 import {DocConfigScheduleIntervalRepository} from "./docConfigScheduleInterval/docConfigScheduleInterval.repository";
 import {WorkScheduleDayRepository} from "./workSchedule/workScheduleDay.repository";
 import {WorkScheduleIntervalRepository} from "./workSchedule/workScheduleInterval.repository";
-import {getRepository, Any} from "typeorm";
-import {DocConfigScheduleDay} from "./docConfigScheduleDay/docConfigScheduleDay.entity";
 import {PatientDetailsRepository} from "./patientDetails/patientDetails.repository";
-import {PatientDetails} from './patientDetails/patientDetails.entity';
 import {PaymentDetailsRepository} from "./paymentDetails/paymentDetails.repository";
 import {AppointmentCancelRescheduleRepository} from "./appointmentCancelReschedule/appointmentCancelReschedule.repository";
 import {Helper} from "../utility/helper";
-import { AnimationFrameScheduler } from 'rxjs/internal/scheduler/AnimationFrameScheduler';
-import { AppointmentDocConfigRepository } from "./appointmentDocConfig/appointmentDocConfig.repository";
-import * as config from 'config';
-import { identity } from 'rxjs';
-import { MedicineRepository } from './medicine.repository';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {AppointmentDocConfigRepository} from "./appointmentDocConfig/appointmentDocConfig.repository";
+import {MedicineRepository} from './medicine.repository';
+
 var async = require('async');
 var moment = require('moment');
 var fs = require('fs');
@@ -69,7 +51,7 @@ export class AppointmentService {
         private medicineRepository: MedicineRepository,
         private paymentDetailsRepository: PaymentDetailsRepository,
         private appointmentCancelRescheduleRepository: AppointmentCancelRescheduleRepository,
-        private appointmentDocConfigRepository: AppointmentDocConfigRepository,
+        private appointmentDocConfigRepository: AppointmentDocConfigRepository
     ) {
         this.email = new Email();
         this.sms = new Sms();
@@ -1632,6 +1614,11 @@ export class AppointmentService {
             appointments: app
         }
         return res;
+    }
+
+    async patientDetailsByPatientId(patientId: number): Promise<any> {
+        const patient = await this.patientDetailsRepository.query(queries.getPatientDetails, [patientId]);
+        return patient[0];
     }
 
     async reports(accountKey: any, paginationNumber: any): Promise<any> {
@@ -3277,5 +3264,55 @@ export class AppointmentService {
         }
     }
 
+    }
+
+    async  registerDoctorDetail(doctorDto: DoctorDto): Promise<any> {
+        if (doctorDto['isAccountKey']) {
+            const accountDetail = await this.createAccountDetail(doctorDto);
+            const doctor = await this.createDoctorDetail(doctorDto);
+            return doctor;
+          } else {
+            return await this.createDoctorDetail(doctorDto);
+          }
+    }
+
+    async createDoctorDetail(doctorDto: any) : Promise<any> {
+        try {
+            const doctor = new Doctor();
+            doctor.doctorName = doctorDto.firstName + doctorDto.lastName || null;
+            doctor.accountKey = doctorDto.accountKey;
+            doctor.doctorKey = doctorDto['doctor_key'];
+            doctor.experience = Number(doctorDto['experience']) || 0;
+            doctor.speciality = doctorDto['specialization'] || null;
+            doctor.qualification = doctorDto.qualification || null;
+            doctor.number = doctorDto.number || null;
+            doctor.firstName = doctorDto.firstName || null;
+            doctor.lastName = doctorDto.lastName || null;
+            doctor.email = doctorDto.email || null;
+            doctor.liveStatus = "online";
+            doctor.registrationNumber = doctorDto.registrationNumber;
+            const docDetail = await this.doctorRepository.query(queries.insertDoctorInCalender,
+                [doctor.doctorName, doctor.accountKey, doctor.doctorKey, doctor.experience, doctor.speciality, doctor.qualification,
+                doctor.number, doctor.firstName, doctor.lastName, doctor.registrationNumber, doctor.email, doctor.liveStatus]);
+            if (docDetail) return doctorDto; 
+            else return null;
+            } catch (err) {
+                return err;
+            }
+    }
+
+    async createAccountDetail(doctorDto: any) : Promise<any> {
+        try {
+            const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
+            if (account && account.length) {
+                const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
+                    [doctorDto.accountKey, doctorDto['hospitalName'], '600000', doctorDto.number, account[0].account_details_id + 1]);
+                    return doctorDto;
+            } else {
+                return null;
+            }
+        } catch (err) {
+            return err;
+        }
     }
 }

@@ -2,10 +2,11 @@ import {Controller, UseFilters, Body, Logger,HttpStatus, Inject} from '@nestjs/c
 import {MessagePattern} from '@nestjs/microservices';
 import {UserService} from './user.service';
 import {AccountRepository} from './account.repository';
-import {UserDto,PatientDto,DoctorDto,CONSTANT_MSG} from 'common-dto';
+import { UserDto, PatientDto, DoctorDto, CONSTANT_MSG, queries } from 'common-dto';
 import {AllExceptionsFilter} from 'src/common/filter/all-exceptions.filter';
 import {ClientProxy} from "@nestjs/microservices";
 import {async} from 'rxjs/internal/scheduler/async';
+import { UserRepository } from './user.repository';
 
 @Controller('user')
 @UseFilters(AllExceptionsFilter)
@@ -14,7 +15,9 @@ export class UserController {
     private logger = new Logger('UserController');
 
 
-    constructor(private readonly userService: UserService,private accountRepository:AccountRepository) {
+    constructor(private readonly userService: UserService,
+                private accountRepository:AccountRepository,
+                private userRepository: UserRepository) {
 
     }
 
@@ -233,4 +236,44 @@ export class UserController {
         const template = await this.userService.sendEmailWithTemplate(data);
         return template;
     }
+
+    @MessagePattern({ cmd: 'auth_doctor_registration_new' })
+    async doctorRegistrationNew(doctorDto: any): Promise<any> {
+        const maxDocKey: any = await this.accountRepository.query(queries.getDoctorKey);
+        let docKey = 'Doc_';
+        if (maxDocKey.length) {
+            let m = maxDocKey[0];
+            docKey = docKey + (Number(m.maxdoc) + 1);
+        } else {
+            docKey = 'Doc_1';
+        }
+        doctorDto.doctor_key = docKey;
+        if (!doctorDto.accountKey) {
+            doctorDto.isAccountKey = true;
+            const maxAccKey: any = await this.accountRepository.query(queries.getAccountKey);
+            let accKey = 'Acc_';
+            if (maxAccKey.length) {
+                let m = maxAccKey[0];
+                accKey = accKey + (Number(m.maxacc) + 1);
+            } else {
+                accKey = 'Acc_1';
+            }
+            let account: any = {};
+            doctorDto.accountKey = accKey;
+            doctorDto.hospitalName = 'Kauvery Hospital';
+            account = await this.accountRepository.createAccountDetail(doctorDto);
+            doctorDto.accountId = account.account_id;
+            return doctorDto;
+        } else {
+            const account = await this.accountRepository.query(queries.getAccountDetail,  [doctorDto.accountKey]);
+            if (account && account.length) {
+                doctorDto.isAccountKey = false;
+                doctorDto.account_id = account[0].account_id;
+                await this.accountRepository.createUserDetail(doctorDto);
+                return doctorDto;
+            } else {
+                return null;
+            }
+        }
+    };
 }
