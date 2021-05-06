@@ -1,29 +1,21 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Pre-requisites
+* Docker - [Installation](https://docs.docker.com/docker-for-windows/install/) .  
+* Wsl 2 - [Download page](https://docs.microsoft.com/en-us/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package).
 
-### What is this repository for? ###
+### Installation Steps
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+## Backend 
+```
+1)git clone https://virujh@bitbucket.org/virujh/nest-microservice.git
+2)git checkout -b dockerSetup origin/dockerSetup
+3)SSH setup in cmd:
+  ssh-keygen
+  navigate to C:\Users\your_username\.ssh.
+  Copy id_rsa and replace it with id_rsa in project folder
+4)Navigate to backend-project folder in command prompt and give docker run commands:
+  local       - docker-compose -f docker-compose.yml up
+  Development - docker-compose -f docker-compose-dev.yml up
+  Production  - docker-compose -f docker-compose-prod.yml up
+```

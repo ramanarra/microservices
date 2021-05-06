@@ -1,8 +1,6 @@
 "use strict";
-exports.__esModule = true;
-var UserDto = /** @class */ (function () {
-    function UserDto() {
-    }
-    return UserDto;
-}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserDto = void 0;
+class UserDto {
+}
 exports.UserDto = UserDto;

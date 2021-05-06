@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, Logger } from '@nestjs/common';
 import { OpenViduSessionTokenRepository } from './openviduSession/openviduSessionToken.repository';
 import { OpenViduSessionRepository } from './openviduSession/openviduSession.repository';
 import { OpenViduService } from './open-vidu.service';
@@ -15,6 +15,8 @@ var moment = require('moment');
 @Injectable()
 export class VideoService {
 
+    private logger = new Logger('VideoService');
+
     constructor(private openViduSessionTokenRepository : OpenViduSessionTokenRepository, 
         private openViduSessionRepo : OpenViduSessionRepository, private openViduService : OpenViduService,
         private appointmentRepository:AppointmentRepository){
@@ -24,34 +26,37 @@ export class VideoService {
 
     async createDoctorSession(doc : Doctor) : Promise<any>{
         try {
-            console.log("Create FDoc " + doc.doctorName);
+            this.logger.log("Create FDoc " + doc.doctorName);
 
             // check existing session
             let removeSession = await this.removeSessionAndTokenByDoctor(doc, 0);
+            this.logger.log("createDoctorSession1" );
 
             let session : Session = await this.openViduService.createSession();
-    
+            this.logger.log("createDoctorSession2" );
             const token = await this.openViduService.createTokenForDoctor(session);
+            this.logger.log("createDoctorSession3" );
             const sessionId = session.getSessionId();
+            this.logger.log("sessionId " + sessionId);
             let OVSessionData = {
                 sessionId : session.getSessionId(),
                 sessionName : doc.doctorName + '_'+ new Date().getTime(),
                 //sessionName : doc.doctorName + '_'+ moment().valueOf(),
                 doctorKey : doc.doctorKey
             }
-            console.log("OVSessionData => " + JSON.stringify(OVSessionData));
+            this.logger.log("OVSessionData => " + JSON.stringify(OVSessionData));
             const openViduSessionId = await this.openViduSessionRepo.createSession(OVSessionData);
             let OVsessionTokenDate = {
                 openviduSessionId : openViduSessionId, 
                 token : token,
                 doctorId : doc.doctorId
             }
-            console.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
+            this.logger.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
             await this.openViduSessionTokenRepository.createTokenForDoctorAndPatient(OVsessionTokenDate, 'DOCTOR');
-            console.log("Token => " + token);
+            this.logger.log("Token => " + token);
             return {isToken : true, token : token, isDoctor : true, isPatient : false, sessionId : sessionId, doctorName : doc.doctorName };
         } catch (e) {
-            console.log(e);
+            this.logger.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
@@ -74,9 +79,9 @@ export class VideoService {
                     patientId : patient.patientId,
                     doctorId : doc.doctorId
                 }
-                console.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
+                this.logger.log("OVsessionTokenDate => " + JSON.stringify(OVsessionTokenDate));
                 await this.openViduSessionTokenRepository.createTokenForDoctorAndPatient(OVsessionTokenDate, CONSTANT_MSG.ROLES.PATIENT);
-                console.log("Token => " + token);
+                this.logger.log("Token => " + token);
                 return { isToken : true, token : token, isDoctor : false, isPatient : true, sessionId : sessionId, patient : patient.patientId, appointmentId : appointmentId};
             } else {
                 return {
@@ -85,7 +90,7 @@ export class VideoService {
                 }
             }
         } catch (e) {
-            console.log(e);
+            this.logger.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR
@@ -105,7 +110,7 @@ export class VideoService {
                 return { isToken : false, message : "Still Token not created for patient" };
             }
         } catch (e) {
-            console.log(e);
+            this.logger.log(e);
             return {
                 statusCode: HttpStatus.NO_CONTENT,
                 message: CONSTANT_MSG.DB_ERROR

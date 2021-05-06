@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OpenVidu, Session, TokenOptions, OpenViduRole, Connection } from 'openvidu-node-client';
 import * as config from 'config';
 
 @Injectable()
 export class OpenViduService {
-
+    private logger = new Logger('OpenViduService');
     openVidu: OpenVidu;
     session: Session;
     currentSessionList : Session[];
@@ -27,7 +27,10 @@ export class OpenViduService {
     public async createSession() {
         this.updateSessionList();
         var properties = {};
-        return await this.openVidu.createSession();
+        this.logger.log("creating session");
+        const session = await this.openVidu.createSession();
+        this.logger.log("completed session:"+session);
+        return session;
     }
 
     public async createTokenForDoctor(session : Session) {

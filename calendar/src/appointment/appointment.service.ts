@@ -1,4 +1,4 @@
-import {HttpStatus, Injectable} from '@nestjs/common';
+import {HttpStatus, Injectable,Logger} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CONSTANT_MSG, DocConfigDto, DoctorDto, Email, HospitalDto, PatientDto, queries, Sms} from 'common-dto';
@@ -35,6 +35,7 @@ export class AppointmentService {
     parameter:any
     email : Email;
     sms: Sms;
+    private logger = new Logger('AppointmentService');
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -1285,21 +1286,24 @@ export class AppointmentService {
             //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
 
-            let app;
+            let app;        
+            this.logger.log("patientUpcomingAppointments Query >>> " + date + ", offset:"+offset);
 
             if (user.limit) {
+                this.logger.log("patientUpcomingAppointments Query 1 >>> " + queries.getUpcomingAppointmentsWithPagination);
 
                 app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
                 if (!app.length) {
                     return [];
                 }
             } else {
+                this.logger.log("patientUpcomingAppointments Query 2 >>> " + queries.getTodayAppointments);
                 app = await this.appointmentRepository.query(queries.getTodayAppointments, [user.patientId, date, 'notCompleted', 'paused']);
                 if (!app.length) {
                     return [];
                 }
             }
-
+            this.logger.log("patientUpcomingAppointments Query 3 >>> " + queries.getUpcomingAppointmentsCounts);
             const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointmentsCounts, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
