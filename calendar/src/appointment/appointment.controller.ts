@@ -1436,7 +1436,7 @@ export class AppointmentController {
     }
 
     @MessagePattern({ cmd: 'get_appointment_reports' })
-    async getAppointmentReports(appoinmentId: Number): Promise<any> {
+    async getAppointmentReports(appoinmentId: any): Promise<any> {
         return await this.appointmentService.getAppointmentReports(appoinmentId)
     }
 
