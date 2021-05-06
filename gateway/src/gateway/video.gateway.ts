@@ -54,8 +54,14 @@ export class VideoGateway {
 
   @SubscribeMessage('getPatientTokenForDoctor')
   async getPatientToken(client: AuthenticatedSocket, appointmentId : string) {
-    this.logger.log(`Socket request get patient token for Doctor from  PatientId => ${client.auth.data.patientId} and doc-key => ${appointmentId}`);
-    const response : any = await this.videoService.getPatientTokenForDoctor(appointmentId, client.auth.data.patientId);
+    this.logger.log(`Socket request get patient token for Doctor from  PatientId => ${client.auth.data.patientId} 
+    and appointmentId => ${appointmentId}`);
+    let response : any = [];
+    if (appointmentId) {
+
+      response = await this.videoService.getPatientTokenForDoctor(appointmentId, client.auth.data.patientId);
+      this.logger.log("videoTokenForPatient response >>" + JSON.stringify(response));
+    }
     client.emit("videoTokenForPatient", response);
   }
 
@@ -86,7 +92,12 @@ export class VideoGateway {
   @SubscribeMessage('getAppointmentListForDoctor')
   async getDoctorAppointments(client: AuthenticatedSocket) {
     this.logger.log(`Socket request get appointments for Doctor from doctorKey => ${client.auth.data.doctor_key}`);
-    const response : any = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
+    let response: any = [];
+
+    if (client.auth.data.doctor_key) {
+      response = await this.videoService.getDoctorAppointments(client.auth.data.doctor_key);
+    }
+    
     client.emit("getDoctorAppointments", response);
   }
 
@@ -98,23 +109,26 @@ export class VideoGateway {
       this.userService.updateDoctorAndPatient(CONSTANT_MSG.ROLES.PATIENT, userInfo.patientId, data.status);
 
       //patient related doc list - today's appoinmnet without doctor duplication
-      const patientTodayApp : any = await this.videoService.patientUpcomingAppointments(userInfo.patientId, 0, 0);
+      const patientTodayAppRes : any = await this.videoService.patientUpcomingAppointments(userInfo.patientId, 0, 0);
       let doctorArr = [0];
 
-      console.log('patientTodayApp = > ', patientTodayApp);
+      let patientTodayApp = patientTodayAppRes && (patientTodayAppRes.length || patientTodayAppRes.length === 0) ?
+          patientTodayAppRes : patientTodayAppRes.appointments ;
 
-      patientTodayApp.forEach(element => {
-      console.log(element);
-        console.log('doctor = >', element.doctorId);
-        if (element.doctorId && (doctorArr.length && !doctorArr.includes(element.doctodId))) {
+      patientTodayApp.forEach(async (element) => {
+      this.logger.log(element);
+        this.logger.log('doctor = >', element.doctorId);
+        if (element.doctorId && (doctorArr.length && !doctorArr.includes(element.doctorId))) {
           doctorArr.push(element.doctorId);
+
+          let userDetail = await this.userService.findUserByEmail(element.email).toPromise();
           // docList -> DOCTOR
-          let patientDocSocketList : Socket[] = this.socketStateService.get("DOCTOR_"+ element.doctorId);
+          let patientDocSocketList : Socket[] = this.socketStateService.get("DOCTOR_"+ userDetail.id);
 
           // emiting response
           patientDocSocketList.forEach( async(val : Socket) => {
             const response : any = await this.videoService.getDoctorAppointments(element.doctorKey);
-            client.emit("getDoctorAppointments", response);
+            val.emit("getDoctorAppointments", response);
             });
         }
 
@@ -168,7 +182,7 @@ export class VideoGateway {
       `Socket request get appointments for Doctor from patientKey => ${client.auth.data.doctor_key}${data.patientId, data.appointmentId}`,
     );
    
-    let doctorRepSocketList : Socket[] = this.socketStateService.get("Doctor_"+ client.auth.data.doctor_key);
+    let doctorRepSocketList : Socket[] = this.socketStateService.get("DOCTOR_"+ client.auth.data.doctor_key);
        doctorRepSocketList.forEach(async(val : Socket) => { 
       const response: any =  this.videoService.getReport( client.auth.data.doctor_key, data.patientId, data.appointmentId );
       val.emit('getReport', response);

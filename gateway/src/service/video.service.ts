@@ -65,13 +65,13 @@ export class VideoService {
     // }
 
     @UseFilters(AllClientServiceException)
-    public patientUpcomingAppointments(patientId:any,paginationNumber,limit:any) : Observable <any> {
+    public patientUpcomingAppointments(patientId:any,paginationNumber,limit:any) : Promise <any> {
         let user = {
             patientId:patientId,
             paginationNumber:0,
             limit:0
         }
-        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user);
+        return this.redisClient.send({ cmd : 'patient_upcoming_appointments'},user).toPromise();
     }
 
     @UseFilters(AllClientServiceException)

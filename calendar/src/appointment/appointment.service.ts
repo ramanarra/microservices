@@ -1299,7 +1299,7 @@ export class AppointmentService {
     async patientUpcomingAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
-            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();  // getting only today's date, so next day ipcoming data failed to result
             //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
 
@@ -1347,7 +1347,8 @@ export class AppointmentService {
                                 preConsultationMins: preConsultationMins,
                                 doctorId: appointmentList.doctorId,
                                 doctorKey: doctor.doctorKey,
-                                liveStatus : doctor.liveStatus
+                                liveStatus : doctor.liveStatus,
+                                email: doctor.email,
                             }
                             appList.push(res);
                         }
@@ -1374,7 +1375,8 @@ export class AppointmentService {
                             preConsultationMins: preConsultationMins,
                             doctorId: appointmentList.doctorId,
                             doctorKey: doctor.doctorKey,
-                            liveStatus : doctor.liveStatus
+                            liveStatus : doctor.liveStatus,
+                            email: doctor.email,
                         }
                         appList.push(res);
                     }
