@@ -3291,11 +3291,12 @@ export class AppointmentService {
             doctor.email = doctorDto.email || null;
             doctor.liveStatus = "online";
             doctor.registrationNumber = doctorDto.registrationNumber;
-            const docDetail = await this.doctorRepository.query(queries.insertDoctorInCalender,
-                [doctor.doctorName, doctor.accountKey, doctor.doctorKey, doctor.experience, doctor.speciality, doctor.qualification,
-                doctor.number, doctor.firstName, doctor.lastName, doctor.registrationNumber, doctor.email, doctor.liveStatus]);
-            if (docDetail) return doctorDto; 
-            else return null;
+            // const docDetail = await this.doctorRepository.query(queries.insertDoctorInCalender,
+            //     [doctor.doctorName, doctor.accountKey, doctor.doctorKey, doctor.experience, doctor.speciality, doctor.qualification,
+            //     doctor.number, doctor.firstName, doctor.lastName, doctor.registrationNumber, doctor.email, doctor.liveStatus]);
+            // if (docDetail) return doctorDto; 
+            // else
+             return null;
             } catch (err) {
                 return err;
             }
@@ -3303,14 +3304,14 @@ export class AppointmentService {
 
     async createAccountDetail(doctorDto: any) : Promise<any> {
         try {
-            const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
-            if (account && account.length) {
-                const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
-                    [doctorDto.accountKey, doctorDto['hospitalName'], '600000', doctorDto.number, account[0].account_details_id + 1]);
-                    return doctorDto;
-            } else {
+            // const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
+            // if (account && account.length) {
+                // const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
+                //     [doctorDto.accountKey, doctorDto['hospitalName'], '600000', doctorDto.number, account[0].account_details_id + 1]);
+            //         return doctorDto;
+            // } else {
                 return null;
-            }
+            // }
         } catch (err) {
             return err;
         }

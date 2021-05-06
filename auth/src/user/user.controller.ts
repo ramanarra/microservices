@@ -265,15 +265,15 @@ export class UserController {
             doctorDto.accountId = account.account_id;
             return doctorDto;
         } else {
-            const account = await this.accountRepository.query(queries.getAccountDetail,  [doctorDto.accountKey]);
-            if (account && account.length) {
-                doctorDto.isAccountKey = false;
-                doctorDto.account_id = account[0].account_id;
-                await this.accountRepository.createUserDetail(doctorDto);
-                return doctorDto;
-            } else {
+            // const account = await this.accountRepository.query(queries.getAccountDetail,  [doctorDto.accountKey]);
+            // if (account && account.length) {
+            //     doctorDto.isAccountKey = false;
+            //     doctorDto.account_id = account[0].account_id;
+            //     await this.accountRepository.createUserDetail(doctorDto);
+            //     return doctorDto;
+            // } else {
                 return null;
-            }
+            // }
         }
     };
 }
