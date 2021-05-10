@@ -19,6 +19,9 @@ export class PrescriptionRepository extends Repository<Prescription> {
         prescription.doctorSignature = accountDto.doctorSignature ? accountDto.doctorSignature : null;
         prescription.patientName = accountDto.patientName ? accountDto.patientName : null;
         prescription.prescriptionUrl =accountDto.prescriptionUrl? accountDto.prescriptionUrl : null;
+        prescription.remarks = accountDto.remarks ? accountDto.remarks : null;
+        prescription.hospitalAddress = accountDto.hospitalAddress ? accountDto.hospitalAddress : null;
+        
         try {
             const acc = await prescription.save();
             return {

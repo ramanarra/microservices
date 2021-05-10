@@ -194,7 +194,7 @@ export class VideoGateway {
   @SubscribeMessage('getPrescriptionDetails')
   async getPrescriptionDetails(client: AuthenticatedSocket, data: {appointmentId: Number}) {
     this.logger.log(
-      `Socket request get prescription details for paitent from appointmentId => ${data.appointmentId}${client.auth.data.doctor_key} `
+      `Socket request get prescription details for paitent from appointmentId => ${data.appointmentId} & doc_key => ${client.auth.data.doctor_key} `
     )
     const response : any = await this.userService.getDoctorId(client.auth.data.doctor_key);    
     const appointmentDet = await this.calendarService.getAppointmentDetails(data.appointmentId)

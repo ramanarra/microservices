@@ -3203,8 +3203,9 @@ export class AppointmentService {
         const prescription = await this.medicineRepository.query(queries.getPrescriptionDetails, [appointmentId])
         //pres remark
         const remarks=await this.prescriptionRepository.query(queries.getRemarks,[appointmentId])
-        console.log(remarks);
-        const prescriptionRemarks=remarks?.[0].remarks;
+
+        const prescriptionRemarks = remarks && remarks.length ? remarks[remarks.length-1].remarks : null;
+
         return {
             appointmentId,
             prescription,
