@@ -3250,10 +3250,9 @@ export class AppointmentService {
 
     async updatereport(data: any): Promise<any> {
 
-        if(data.insertId){
         var account = await this.appointmentRepository.find({ id : data.appointmentId })  
         var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.insertId;
+        data.id = data.insertId;
         data.id = data.insertId;
         
         if(account.length){
@@ -3268,27 +3267,7 @@ export class AppointmentService {
             }
         }
         
-        
-    }
     
-    if(data.deleteId){
-        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
-        var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.deleteId
-        const tempArr = arr.filter(val => (val != data.id) );
-        const newid=tempArr.toString()
-        data.id =  newid ;
-        if(account.length){
-        const app = await this.appointmentRepository.deleteReportid(data)
-        return app
-        }
-        else{
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.NOREPORT,
-            }
-        }
-    }
 
     }
 
