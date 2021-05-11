@@ -3254,7 +3254,7 @@ export class AppointmentService {
         var account = await this.appointmentRepository.find({ id : data.appointmentId })  
         var arr = JSON.parse("[" + account[0].reportid + "]");
         data.id=data.insertId;
-        data.id = account[0].reportid ? account[0].reportid + ',' + data.id : data.id;
+        data.id = data.insertId;
         
         if(account.length){
             const app = await this.appointmentRepository.updateReportId(data)
