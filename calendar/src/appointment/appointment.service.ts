@@ -832,6 +832,8 @@ export class AppointmentService {
         try {
 
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
+            const currentAppointment = await this.appointmentRepository.findOne(appointmentDto.appointmentId)
+
             if (app.length) {
                 // // validate with previous data
                 let isOverLapping = await this.findTimeOverlapingForAppointments(app, appointmentDto);
@@ -884,6 +886,7 @@ export class AppointmentService {
             if (isCancel.statusCode != HttpStatus.OK) {
                 return isCancel;
             } else {
+                appointmentDto = {...appointmentDto, reportid: currentAppointment?.reportid || null}
                 const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
                 if (!appoint.message) {
                     const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
@@ -1692,6 +1695,7 @@ export class AppointmentService {
             firstName: doctor.firstName,
             lastName: doctor.lastName,
             speciality: doctor.speciality,
+            experience: doctor?.experience,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
             street:account.street1,
@@ -2779,7 +2783,7 @@ export class AppointmentService {
         const patientId = data.patientId;
         const offset = data.paginationStart;
         const endset = data.paginationLimit;
-        const searchText = data.searchText;
+        const searchText = data.searchText?.toLowerCase();
         const appointmentId = data.appointmentId;
         const active = true;
         let response = {};
