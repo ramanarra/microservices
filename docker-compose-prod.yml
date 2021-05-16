@@ -1,60 +1,26 @@
 version: '3.0'
 
 services:
-
-  redis-prod-server:
-    image: "redis:alpine"
-    container_name: rediscache
-    restart: on-failure
-    networks:
-      - redis-net
-    ports:
-      - "6379:6379"
-    restart: always 
   
   calendar:
-    build: calendar
-    container_name: calendar_service
-    restart: on-failure
     environment:
-       - REDIS_HOST=redis-prod-server
-       - NODE_ENV=production
-    networks:
-       - redis-net
-    depends_on:
-       - redis-prod-server
-    command: "npm run start:prod"
+       - NODE_ENV=production 
+    network_mode: host
+    command: "npm run start"
 
-  auth:
-    build: auth
-    container_name: auth_service
-    restart: on-failure
+  auth: 
     environment:
-       - REDIS_HOST=redis-prod-server
        - NODE_ENV=production
-    networks:
-       - redis-net
-    depends_on:
-       - redis-prod-server
-    command: "npm run start:prod"
+    network_mode: host
+    command: "npm run start"
 
   gateway:
-    build: gateway
-    container_name: gateway_service
-    restart: on-failure
     environment:
-       - REDIS_HOST=redis-prod-server
        - NODE_ENV=production
-    ports:
-       - "3000:3000"
-    networks:
-       - redis-net
+    expose:
+       - '3000'
+    network_mode: host
     depends_on:
-       - redis-prod-server
        - auth
        - calendar
-    command: "npm run start:prod"
-
-networks:
-   redis-net:
-    external: true
+    command: "npm run start"
