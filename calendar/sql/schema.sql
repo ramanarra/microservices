@@ -3243,7 +3243,7 @@ body, subject, sender, id) VALUES (
                 <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
                  <h1 style="font-style: normal;font-weight: bold;font-size: 30px; text-align: center;color: #545454;margin: 0px;">Forgot Password</h1>
                  <h1 style=" font-style: normal;font-weight: 600; font-size: 25px;line-height: 37px;
-text-align: left; color: #000000;">Hi, {user_name}</h1>
+text-align: left; color: #000000;">Hi {user_name},</h1>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Your password has been reset successfully. Please find the below updated password.
       </p>
                     <table class="app-table" style="width: 100%;">
