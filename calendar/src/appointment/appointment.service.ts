@@ -2695,12 +2695,10 @@ export class AppointmentService {
     async patientFileUpload(reports: any): Promise<any> {
 
         const AWS = require('aws-sdk');
-        let htmlPdf: any = '';
         const ID = 'AKIAISEHN3PDMNBWK2UA';
         const SECRET = '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';
         const BUCKET_NAME = 'virujh-cloud';
         const date = new Date();
-        const ReportDate = moment().format('YYYY-MM-DD');
 
         // s3 bucket creation
         const s3 = new AWS.S3({

@@ -538,6 +538,7 @@ export class UserService {
         var templateBody = template;
         if(type === CONSTANT_MSG.MAIL.FORGOT_PASSWORD  || type === CONSTANT_MSG.MAIL.REGISTRATION_FOR_DOCTOR){
             templateBody = templateBody.replace('{password}', password);
+            templateBody = templateBody.replace('{email}', email);
             templateBody = templateBody.replace('{user_name}', user_name ? user_name : '');
             templateBody = templateBody.replace('{viruj-logo}', logo);
             templateBody = templateBody.replace('{corner-plus}', corner);
