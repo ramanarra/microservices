@@ -695,7 +695,7 @@ export class CalendarController {
         }
         if(req.body.firstName){
             // patientDto.lastName = "";
-            patientDto.name =  req.body.firstName+ " " + patientDto.lastName;
+            patientDto.name =  req.body.firstName + " " + (patientDto.lastName ? patientDto.lastName : '');
         }
         if(req.body.firstName){
                 patientDto.firstName =  req.body.firstName;
