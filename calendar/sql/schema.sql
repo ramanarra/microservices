@@ -2567,9 +2567,19 @@ WITH (
     OIDS = FALSE
 );
 
+
 ALTER TABLE public.communication_type
     OWNER to postgres;
 
+INSERT INTO public.communication_type (
+id, name) VALUES (
+'1'::integer, 'Email'::character varying)
+ returning id;
+
+ INSERT INTO public.communication_type (
+id, name) VALUES (
+'2'::integer, 'sms'::character varying)
+ returning id;
 
 CREATE TABLE public.message_template_placeholders
 (
@@ -3204,3 +3214,63 @@ text-align: left; color: #000000;">Hi, {user_name}</h1>
 id = 6;
 ALTER TABLE public.patient_details ADD honorific varchar(10) NULL;
 ALTER TABLE public.patient_report ADD isActive boolean;
+
+
+
+
+
+INSERT INTO public.message_type (
+id, name, description) VALUES (
+'7'::integer, 'FORGOT_PASSWORD'::character varying, 'Forgot Password'::character varying)
+ returning id;
+
+  INSERT INTO public.message_template (
+body, subject, sender, id) VALUES (
+'<html>
+    <header>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+             
+    </header>
+    <body >
+     <div style="padding-top:5px; width:720px; margin:10px auto">
+    <div style="padding: 10px 20px 10px ; border:1px solid #ddd;">
+        <div id="content-main" style="display: flex;justify-content: center;">
+            <div id="center-box" style="position: relative; width:100%;background: #ffffff;">
+                <div class="app-logo" style="border-bottom: 3px solid #0BB5FF;text-align: center;padding: 6px;">
+                    <img src="{viruj-logo}" class="logo-design" style="width: 117px; height: 89px;" />     
+                    <img src="{corner-plus}" class="svg-top-right-design" style="position: absolute;right: 0;width: 76px;height: 91px;top: 0;z-index: 0;" />
+                </div>
+                <div class="content-box" style="border-bottom: 1px solid rgba(109, 109, 109, 0.2);">
+                 <h1 style="font-style: normal;font-weight: bold;font-size: 30px; text-align: center;color: #545454;margin: 0px;">Forgot Password</h1>
+                 <h1 style=" font-style: normal;font-weight: 600; font-size: 25px;line-height: 37px;
+text-align: left; color: #000000;">Hi, {user_name}</h1>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Your password has been reset successfully. Please find the below updated password.
+      </p>
+                    <table class="app-table" style="width: 100%;">
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Email:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;">{email}</td>
+                        </tr>
+                        <tr>
+                            <td class="app-td-name" style="font-style: normal;font-weight: 500;font-size: 18px; color: #4D4D4D; padding-left: 5vh;">Password:</td>
+                            <td class="app-td-value" style="font-style: normal;font-weight: 500; font-size: 18px; line-height: 27px; text-align: left; color: #0BB5FF;"><span style="color: #0bb5ff; "><em><b> {password}</b></em></span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h1 class="app-thank" style="font-style: normal;font-weight: bold;font-size: 24px;text-align: center;color: #545454;">Thank You!</h1>
+            
+                </div>
+            </div>
+        </div>
+         </div>
+        </div>
+    </body>
+</html>'::character varying, 'Forgot Password'::character varying, 'notifiaction@virujh.com'::character varying, '7'::integer)
+ returning id;
+
+
+INSERT INTO public.message_metadata (
+id, message_type_id, communication_type_id, message_template_id) VALUES (
+'7'::integer, '7'::bigint, '1'::bigint, '7'::bigint)
+ returning id;
