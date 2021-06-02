@@ -5,9 +5,9 @@ server :
 database :
   type : 'postgres'
   username : 'postgres'
-  password : 'root'
-  host: 'localhost'
-  database : 'calendar'
+  password : 'postgres'
+  host: 'db_calendar'
+  database : 'livecalendar'
   port : 5432
   synchronize : false
 

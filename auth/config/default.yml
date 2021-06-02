@@ -5,9 +5,9 @@ server :
 database :
   type : 'postgres'
   username : 'postgres' 
-  password : 'root'
-  host: 'localhost'
-  database : 'auth'
+  password : 'postgres'
+  host: 'db_auth'
+  database : 'liveauth'
   port : 5432
   synchronize : false
 
