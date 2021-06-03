@@ -19,3 +19,18 @@
   Development - docker-compose -f docker-compose-dev.yml up
   Production  - docker-compose -f docker-compose-prod.yml up
 ```
+To stop the containers
+```
+  local       - docker-compose -f docker-compose.yml up
+  Development - docker-compose -f docker-compose-dev.yml up
+  Production  - docker-compose -f docker-compose-prod.yml up
+
+```
+Useful Docker Commands
+```
+kill all running containers with docker kill $(docker ps -q)
+delete all stopped containers with docker rm $(docker ps -a -q)
+delete all images with docker rmi $(docker images -q)
+```
+
+
