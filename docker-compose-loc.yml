@@ -23,7 +23,12 @@ services:
     depends_on:
        - redis-server
        - db_calendar
-    command: "npm run start"
+    volumes:
+      - ./calendar:/usr/src/app/calendar
+      - /usr/src/app/calendar/node_modules
+      - ./common-dto:/usr/src/app/common-dto
+      - /usr/src/app/common-dto/node_modules
+    command: "npm run start:dev"
 
   auth:
     environment:
@@ -35,7 +40,12 @@ services:
     depends_on:
        - redis-server
        - db_auth
-    command: "npm run start"
+    volumes:
+      - ./auth:/usr/src/app/auth
+      - /usr/src/app/auth/node_modules
+      - ./common-dto:/usr/src/app/common-dto
+      - /usr/src/app/common-dto/node_modules
+    command: "npm run start:dev"
 
   gateway:
     environment:
@@ -49,7 +59,12 @@ services:
        - redis-server
        - auth
        - calendar
-    command: "npm run start"
+    volumes:
+      - ./gateway:/usr/src/app/gateway
+      - /usr/src/app/gateway/node_modules
+      - ./common-dto:/usr/src/app/common-dto
+      - /usr/src/app/common-dto/node_modules
+    command: "npm run start:dev"
 
   db_auth:
     build:
