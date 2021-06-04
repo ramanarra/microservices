@@ -248,32 +248,20 @@ export class UserController {
             docKey = 'Doc_1';
         }
         doctorDto.doctor_key = docKey;
-        if (!doctorDto.accountKey) {
-            doctorDto.isAccountKey = true;
-            const maxAccKey: any = await this.accountRepository.query(queries.getAccountKey);
-            let accKey = 'Acc_';
-            if (maxAccKey.length) {
-                let m = maxAccKey[0];
-                accKey = accKey + (Number(m.maxacc) + 1);
-            } else {
-                accKey = 'Acc_1';
-            }
-            let account: any = {};
-            doctorDto.accountKey = accKey;
-            doctorDto.hospitalName = 'Kauvery Hospital';
-            account = await this.accountRepository.createAccountDetail(doctorDto);
-            doctorDto.accountId = account.account_id;
-            return doctorDto;
+        doctorDto.isAccountKey = true;
+        const maxAccKey: any = await this.accountRepository.query(queries.getAccountKey);
+        let accKey = 'Acc_';
+        if (maxAccKey.length) {
+            let m = maxAccKey[0];
+            accKey = accKey + (Number(m.maxacc) + 1);
         } else {
-            const account = await this.accountRepository.query(queries.getAccountDetail,  [doctorDto.accountKey]);
-            if (account && account.length) {
-                doctorDto.isAccountKey = false;
-                doctorDto.account_id = account[0].account_id;
-                await this.accountRepository.createUserDetail(doctorDto);
-                return doctorDto;
-            } else {
-                return null;
-            }
+            accKey = 'Acc_1';
         }
+        let account: any = {};
+        doctorDto.accountKey = accKey;
+        // doctorDto.hospitalName = 'Kauvery Hospital';
+        account = await this.accountRepository.createAccountDetail(doctorDto);
+        doctorDto.accountId = account.account_id;
+        return doctorDto;
     };
 }

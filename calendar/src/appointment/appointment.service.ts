@@ -3267,11 +3267,11 @@ export class AppointmentService {
     async  registerDoctorDetail(doctorDto: DoctorDto): Promise<any> {
         if (doctorDto['isAccountKey']) {
             const accountDetail = await this.createAccountDetail(doctorDto);
-            const doctor = await this.createDoctorDetail(doctorDto);
-            return doctor;
-          } else {
-            return await this.createDoctorDetail(doctorDto);
-          }
+        }
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        doctorDto.registrationNumber = doctor.registrationNumber;
+        const config = await this.doctorConfigRepository.doctorConfigSetup(doctor, doctorDto);
+        return doctorDto;
     }
 
     async createDoctorDetail(doctorDto: any) : Promise<any> {
@@ -3304,7 +3304,7 @@ export class AppointmentService {
             const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
             if (account && account.length) {
                 const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
-                    [doctorDto.accountKey, doctorDto['hospitalName'], '600000', doctorDto.number, account[0].account_details_id + 1]);
+                    [doctorDto.accountKey, doctorDto['hospitalName'] || null, '600000', doctorDto.number, account[0].account_details_id + 1]);
                     return doctorDto;
             } else {
                 return null;
