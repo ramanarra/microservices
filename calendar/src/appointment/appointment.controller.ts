@@ -562,9 +562,12 @@ export class AppointmentController {
         const pat = await this.appointmentService.getPatientDetails(patientDto.patientId); 
         const account = await this.appointmentService.accountDetails(docId.accountKey); 
         if(app){
-            const pay = await this.paymentDetailsRepository.findOne( { where : {id : patientDto.paymentId}});
-            pay.appointmentId = app.appointment.appointmentdetails.id;
-            const payment = await this.paymentDetailsRepository.save(pay);
+            if(patientDto.paymentId) {
+                const pay = await this.paymentDetailsRepository.findOne( { where : {id : patientDto.paymentId}});
+                pay.appointmentId = app.appointment.appointmentdetails.id;
+                const payment = await this.paymentDetailsRepository.save(pay);
+            }
+            
             let data={
                 email:doctor.email,
                 appointmentId:app.appointment.appointmentdetails.id,

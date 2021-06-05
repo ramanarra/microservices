@@ -2020,6 +2020,7 @@ export class AppointmentService {
                     patientName: pat.firstName + " " + pat.lastName,
                     doctorId:doc.doctorId,
                     remarks:user.prescriptionDto.remarks,
+                    diagnosis:user.prescriptionDto.diagnosis,
                     patientAge:pat.age,
                     Gender:pat.gender,
                     patientGender:pat.honorific,
@@ -2051,6 +2052,7 @@ export class AppointmentService {
                 let generatePdfPrescription = await this.htmlToPdf(prescriptionMedicineDetail, 
                     prescriptionDetails.patientName,
                     prescriptionDetails.remarks,
+                    prescriptionDetails.diagnosis,
                     prescriptionMedicineDetail[0].id,
                     prescriptionDetails.patientAge,
                     prescriptionDetails.currentDate,
@@ -2354,7 +2356,7 @@ export class AppointmentService {
         }
     }
 
-    async htmlToPdf(prescription, patientName,remarks, prescriptionId,patientAge,currentDate,Gender,
+    async htmlToPdf(prescription, patientName,remarks, diagnosis, prescriptionId,patientAge,currentDate,Gender,
         DoctorKey, hospitalLogo,qualification,doctorRegistrationNumber,hospitalAddress) {
         const params: any = {};
         const AWS = require('aws-sdk');
@@ -2377,266 +2379,378 @@ export class AppointmentService {
         
         <head>
             <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Viruj</title>
-           
-            <style>
-                body {
-                    width: 100%;
-                    background-color: #f3f6f9;
-                    color: #303030;
-                    margin: 0;
-                    font-family: Arial, sans-serif, 'Open Sans'
-                }
-        
-                .app-main {
-                    width: 100%;
-                    position: relative;
-                }
-        
-                .logo-wrapper img {
-                    width: 100%;
-
-                }
-        
-                .banner-sec {
-                    display: inline-block;
-                    width: 140px;
-                   
-                    min-height:1120px;
-                    background-color: #17a5e3;
-                    padding: 0;
-                    position: relative;
-                    float: left;
-                }
-        
-                .content-wrapper {
-                    display: inline-block;
-                    padding: 0;
-                    border: 1px solid #f3f6f9;
-                    background-color: #fff;
-                    width: 85%;
-                    min-height: 1120px;
-                    position: absolute;
-                    float: left;
-                    background-image: url(https://virujh-cloud.s3.amazonaws.com/virujh/report/logo%20%281%29.png);
-                    background-size: 40%;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                   
-                   
-                }
-        
-                .top-wrapper {
-                    
-                    padding: 20px;
-                    border-bottom: 1px solid #edeff2;
-                    text-align: center
-                }
-        
-                .details-wrap label.lbl-name {
-                    font-size: 14px;
-                    margin: 0 0 5px 0;
-                    display: block;
-                }
-        
-                .details-wrap .li-row {
-                    margin-bottom: 20px;
-                }
-        
-                .details-wrap .lbl-txt {
-                    color: white;
-                    font-size: 14px;
-                    margin: 0;
-                }
-        
-                .details-wrap .doctor-details {
-                    padding: 30px 15px;
-                    border-bottom: 1px solid #39b6ec;
-                    margin-bottom: 10px;
-                }
-        
-                .details-wrap .personal-details {
-                    padding: 10px 15px;
-                    margin-top: 50px;
-                }
-        
-                .tbl-header {
-                    display: flex;
-                    justify-content: center;
-                    padding: 20px;
-                    text-align: center;
-                }
-        
-                .table {
-                    width: 100%;
-                    position: relative;
-                    margin: 0;
-                    font-size: 13px;
-                    font-weight: normal;
-                    border-spacing: 0;
-                }
-        
-                .detail-tbl {
-                    width: 100%;
-                    text-align: center;
-                    font-weight: normal !important;  
-                }
-        
-                .thead {
-                    background-color: #e4f7fe;
-                    margin: 0;
-                    text-align: center;
-                }
-        
-                .tbody {
-                    color: #818182;
-                }
-
-               
-        
-                .table th,
-                .table td {
-                    padding: 15px;
-                    font-weight: normal;
-                }
-        
-                .tbody tr td {
-                    border-bottom: 1px solid #edeff2;
-                }
-        
-                .doc-signanture {
-                    color: #17a5e3;
-                    font-size: 16px;
-                    margin: 0;
-                }
-        
-                .doctor-sign {
-                    position: absolute;
-                    bottom: 100px;
-                    left: 20px;
-                }
-            </style>
+            <title>Document</title>
         </head>
+        <style>
+            .frm-tp{
+            margin-top: 50px;
+        }
         
+        .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+            position: relative;
+            min-height: 1px;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        
+        .doc_details{
+           margin-top: 50px;
+           color:#0bb5ff;
+           font-weight: 600;
+           margin-bottom: 20px; 
+           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        .presc_cus{
+            margin-top: 15px;
+            background: #f3fbff;
+            padding: 10px;
+            border-top: 1px solid #0BB5FF;
+            border-bottom: 1px solid #0BB5FF;
+            margin-bottom: 30px;
+        }
+        .head-style{
+            margin-top: 10px;
+            background: #f3fbff;
+            padding: 25px;
+            color: #5F626E;
+            border-top: 1px solid #0BB5FF;
+            border-bottom: 1px solid #0BB5FF;
+            margin: auto;
+        }
+        
+        .doc_sgn{
+            text-align: right; 
+            color: #0BB5FF;
+            font-weight: 600;
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            
+        }
+        .table_cus h4{
+            color: #5F626E;
+            font-weight: 600;
+        }
+        .head_title{
+            font-weight: 600;
+            font-size: 30px;
+            color: #5F626E;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .mid_sec{
+            left: 45px;
+        }
+        .mid_sec2{
+            left: 35px;
+        }
+        
+        @media (min-width:980px){
+        
+            .txt-style{
+                margin: 25px 87px;
+                font-size: 16px;
+                text-align: justify;
+            }      
+        .vlogo{
+            position: relative;
+            top: -30px;
+        }
+        .frm-date{
+            position: relative;
+            left: 70px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .frm-grd{
+            display: grid;
+            grid-template-columns: 18% 82%;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.4em;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .frm-grd2{
+            display: grid;
+            grid-template-columns: 20% 80%;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.4em;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        .def_txt{
+            color: #9C9C9C;
+            font-size: 17px;
+        }
+        .b_txt{
+            color: #5F626E;
+            font-size: 16px;
+        }
+        .pt_table{
+            margin: 15px 60px !important;
+        }
+        .vir_lg{
+            position: absolute;
+            left: 35%;
+            bottom: -30%;
+        }
+        }
+        
+        .b_line{
+            border-bottom: 1px solid #E0E0E0;
+        }
+        @media (min-width: 992px){
+            .col-md-4{
+                float: left;
+            }}
+        @media (min-width: 992px){
+        .col-md-4 {
+            width: 33.33333333%;
+        }}
+        .row {
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        @media (min-width: 1200px){
+        .container {
+            width: 1170px;
+        }}
+        @media (min-width: 992px){
+        .container {
+            width: 970px;
+        }}
+        @media (min-width: 768px){
+        .container {
+            width: 750px;
+        }}
+        .container {
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        
+        @media (min-width: 1200px){
+        .container {
+            width: 1170px;
+        }}
+        
+        .row:before {
+            display: table;
+            content: " ";
+        }
+        
+        .row:after {
+            clear: both;
+        }
+        
+        .row:after {
+            display: table;
+            content: " ";
+        }
+        
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        .container:before{
+            display: table;
+            content: " ";
+        }
+        .h4, .h5, .h6, h4, h5, h6 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+            font-family: inherit;
+            font-weight: 500;
+            line-height: 1.1;
+            color: inherit;
+        }
+        
+        p {
+            margin: 0 0 10px;
+        }
+        html {
+            font-size: 10px;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+        html {
+            font-family: sans-serif;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+        .h4, h4 {
+            font-size: 18px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #9c9c9c;
+            background-color: #fff;
+        }
+        @media (max-width: 1102px){
+            .col-md-4{
+                float: left;
+                width: 33.33333333%;
+            }
+            .frm-grd{
+            display: grid;
+            grid-template-columns: 30% 70%;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.4em;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .frm-grd2{
+            display: grid;
+            grid-template-columns: 35% 65%;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.4em;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+            
+            }
+        @media(max-width:980px){
+            .vir_lg{
+            position: absolute;
+            left: 25%;
+            bottom: -25%;
+        }}
+        
+        
+        
+        
+        
+        </style>
         <body>
-            <section class="app-main">
-                <div class="banner-sec">
-                    <div class="logo-container" style="padding: 20px 15px;">
-                        <div class="logo-wrapper">
-                            <img src={hospitalLogo}
-                                alt="" />
-                        </div>
-                       
-                    </div>
-                    <div class="details-wrap">
-                        <div class="doctor-details">
-                            <div class="header-wrap" style="margin-bottom: 20px;">
-                                <h6 style="color:white;font-size: 16px;margin: 0;">Doctor Details</h6>
-                            </div>
-                            <div class="li-row">
-                                <label class="lbl-name">Name of Doctor</label>
-                                <label class="lbl-txt">{doctor_name}</label>
-                            </div>
-                           
-                            <div class="li-row">
-                                <label class="lbl-name">Doctor Code </label>
-                                <label class="lbl-txt">{DoctorKey}</label>
-                            </div>
-                            <div class="li-row">
-                            <label class="lbl-name">Qualification</label>
-                            <label class="lbl-txt">{qualification}</label>
-                            </div>
-                            <div class="li-row">
-                            <label class="lbl-name">Registration Number</label>
-                            <label class="lbl-txt">{doctorRegistrationNumber}</label>
-                            </div>
-                            <div class="li-row">
-                            <label class="lbl-name">Doctor Address</label>
-                            <label class="lbl-txt">{hospitalAddress}</label>
-                        </div>
-                        </div>
-                        <div class="personal-details">
-                            <div class="header-wrap" style="margin-bottom: 20px;">
-                                <h6 style="color:white;font-size: 16px;margin: 0;line-height: 22px;">Personal Details</h6>
-                            </div>
-                            <div class="li-row">
-                                <label class="lbl-name">Name of Patient </label>
-                                <label class="lbl-txt">{patient_name}</label>
-                            </div>
-                            <div class="li-row">
-                                <label class="lbl-name">Age </label>
-                                <label class="lbl-txt">{patientAge}</label>
-                            </div>
-                            <div class="li-row">
-                            <label class="lbl-name">Gender</label>
-                            <label class="lbl-txt">{Gender}</label>
-                        </div>
+                <div class="container frm-tp">
+                    <div class="row">
+                        <div class="col-md-4"> <img src="virujh-svg.svg" width="120" class="vlogo"> </div>
+                        <div class="col-md-4">
+                            <h4 class="head_title">Prescription</h4> </div>
+                        <div class="col-md-4 frm-date">
+                            <br>
+                            <p class="def_txt">Date : {currentDate}
+                                <br> Time : {currentTime} </p>
                         </div>
                     </div>
-                </div>
-                <div class="content-wrapper">
-                    <div class="top-wrapper">
-                        <h5 style="margin: 0 0px 10px 0;font-size: 25px;font-weight: 500;color: #121212;"> Prescription
-                        </h5>
-                        <h6 style="margin: 0;font-size: 13px;font-weight: normal;">{currentDate}</h6>
-                    </div>
-                    <div class="detail-tbl">
-                        <table class="table tbl-wrap">
-                            <thead class="thead">
-                                <tr>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                    <th>Comments</th>
-                                </tr>
-                            </thead>
-                            <tbody class="tbody">
-                            {tabledata}
-                                
-                            </tbody>
-                        </table>
-                        <div style="font-size: 16px;color: #121212; text-align: left;">
-                        <h5 style="margin-bottom: 10px;font-weight: normal;text-align: center;" >Remarks
-                        </h5>
-                        <p style="text-align:left;font-size: 13px;border: solid 1px;width: 640px;height: 85px;border-color: #edeff2;
-                        margin: 2px;">
-                        {remarks}</p>
+                    <h4 class="doc_details">Doctor’s Details </h4>
+                    <div class="row">
+                        <div class="col-md-4 frm-grd">
+                            <div><b class="b_txt">Name :</b></div>
+                            <div class="def_txt">
+                                <p>{doctor_name}
+                                    <br> {hospitalAddress} </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mid_sec">
+                            <p class="def_txt"> <b class="b_txt">Code : </b> {DoctorKey} </p>
+                        </div>
+                        <div class="col-md-4 frm-grd2">
+                            <div><b class="b_txt">Address: </b></div>
+                            <p class="def_txt"> {hospitalAddress} </p>
                         </div>
                     </div>
-                    <div class="doctor-sign">
-                        <img src="{doctor_signature}" style="display: block;height: 50px;margin-bottom: 15px;" alt="" />
-                        <label class="doc-signanture">Doctor signature</label>
+                
+                    <h4 class="doc_details">Patient's Details </h4>
+                    <div class="row">
+                        <div class="col-md-4 frm-grd">
+                            <div><b class="b_txt">Name :</b></div>
+                            <div class="d_name def_txt">
+                            <p> {patient_name} </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mid_sec">
+                            <p class="def_txt"> <b class="b_txt" style="margin-left:10px">  Age : </b> {patientAge} </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p  class="def_txt"> <b class="b_txt">Gender : </b>{Gender} </p>
+                        </div>
+                    </div>
+                    <div style="padding:10px;"> </div>
+        
+                    <div class="row presc_cus">
+                        <div class="pt_table">
+                        <div class="col-md-4 table_cus"><h4>Description</h4></div>
+                        <div class="col-md-4 table_cus"><h4>Quantity</h4></div>
+                        <div class="col-md-4 table_cus"><h4>Comments</h4></div>
+                      </div>
+                    </div>
+                    
+                    {tabledata}
+                   
+                    <div class="row ">
+                        <div class="presc_cus">
+                        <div class="pt_table table_cus"><h4>Diagnosis</h4></div>
+                        </div>
+                        <p class="txt-style def_txt"> {diagnosis} </p>
+                        <div class="b_line"></div>
+                    </div>
+                  
+                    <div class="row">
+                        <div class="presc_cus">
+                        <div class="pt_table table_cus"><h4>Remarks</h4></div>
+                        </div>
+                        <p class="txt-style def_txt"> {remarks}</p>
+                        <div class="b_line"></div>	
+                    </div>
+                    <div class="vir_lg">
+                        <img src="virujh-bac.svg" width="380">
+                    </div>
+                    <div style="padding: 200px;">
+                        <div class="row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4">
+                                <p class = "doc_sgn"> <img style="width: 130px;" src="{doctor_signature}"> <br> Doctor Signature </p>
+                            </div>
+                          </div>
                     </div>
                 </div>
-            </section>
         </body>
         
-        </html>  `;
+        </html> `;
 
         prescription[0].medicineList.forEach(element => {
-            tabledata +=  ' <tr><td>' + (element.nameOfMedicine ? element.nameOfMedicine : '-') +
-            //  '</td>' + '<td>' + (element.typeOfMedicine ? element.typeOfMedicine : '-') + '</td>' +
-            // '<td>' + (element.frequencyOfEachDose ? element.frequencyOfEachDose : '-') + '</td>' +
-             '<td>' + (element.countOfDays ? element.countOfDays : '-') + '</td>' +
-              '<td>' + (element.doseOfMedicine ? element.doseOfMedicine : '-') + '</td></tr>'
+
+            tabledata += `<div class="row pt_table" style="margin: 15px 0px;">
+                <div class="col-md-4 def_txt " > ` + (element.nameOfMedicine ? element.nameOfMedicine : '-') + `</div>
+                <div class="col-md-4 mid_sec2 def_txt">`  + (element.countOfDays ? element.countOfDays : '-') + `</div>
+                <div class="col-md-4 def_txt"> ` + (element.doseOfMedicine ? element.doseOfMedicine : '-') +  ` </div>
+            </div>
+            <div class="b_line"></div>`;
         });
+
+
+        currentDate= new Date(currentDate);
 
         params.htmlTemplate = params.htmlTemplate.replace('{doctor_name}', prescription[0].doctorName);
         params.htmlTemplate = params.htmlTemplate.replace('{patient_name}', prescription[0].patientName);
         params.htmlTemplate = params.htmlTemplate.replace('{doctor_signature}', prescription[0].doctorSignature);
         params.htmlTemplate = params.htmlTemplate.replace('{tabledata}', tabledata);
         params.htmlTemplate = params.htmlTemplate.replace('{remarks}', remarks);
+        params.htmlTemplate = params.htmlTemplate.replace('{diagnosis}', diagnosis);
         params.htmlTemplate = params.htmlTemplate.replace('{patientAge}', patientAge);
-        params.htmlTemplate = params.htmlTemplate.replace('{currentDate}', currentDate);
-        params.htmlTemplate = params.htmlTemplate.replace('{Gender}', Gender);
+        params.htmlTemplate = params.htmlTemplate.replace('{currentDate}', currentDate.toLocaleDateString());
+        params.htmlTemplate = params.htmlTemplate.replace('{currentTime}', currentDate.toLocaleTimeString());
+        params.htmlTemplate = params.htmlTemplate.replace('{Gender}', Gender ? Gender : '');
         params.htmlTemplate = params.htmlTemplate.replace('{DoctorKey}', DoctorKey);
         params.htmlTemplate = params.htmlTemplate.replace('{hospitalLogo}', hospitalLogo);
         params.htmlTemplate = params.htmlTemplate.replace('{qualification}',qualification );
         params.htmlTemplate = params.htmlTemplate.replace('{doctorRegistrationNumber}',doctorRegistrationNumber );
         params.htmlTemplate = params.htmlTemplate.replace('{hospitalAddress}', hospitalAddress);
+        params.htmlTemplate = params.htmlTemplate.replace('{hospitalAddress}', hospitalAddress);
 
         var options = { 
-            // format: 'Letter',
+            format: 'Letter',
             orientation: "portrait", // portrait or landscape
                 "border": {
                   "top": "0",// default is 0, units: mm, cm, in, px
@@ -3208,10 +3322,13 @@ export class AppointmentService {
 
         const prescriptionRemarks = remarks && remarks.length ? remarks[remarks.length-1].remarks : null;
 
+        const prescriptionDiagnosis = remarks && remarks.length ? remarks[remarks.length-1].diagnosis : null;
+
         return {
             appointmentId,
             prescription,
-            prescriptionRemarks
+            prescriptionRemarks,
+            prescriptionDiagnosis,
         }
     }
     async getAppointmentDetails(appointmentId: Number): Promise<any> {
