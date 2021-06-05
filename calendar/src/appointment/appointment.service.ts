@@ -1,4 +1,4 @@
-import {HttpStatus, Injectable} from '@nestjs/common';
+import {HttpStatus, Injectable,Logger} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CONSTANT_MSG, DocConfigDto, DoctorDto, Email, HospitalDto, PatientDto, queries, Sms} from 'common-dto';
@@ -35,6 +35,7 @@ export class AppointmentService {
     parameter:any
     email : Email;
     sms: Sms;
+    private logger = new Logger('AppointmentService');
     constructor(
         @InjectRepository(AppointmentRepository) private appointmentRepository: AppointmentRepository,
         private accountDetailsRepository: AccountDetailsRepository, private doctorRepository: DoctorRepository,
@@ -831,6 +832,8 @@ export class AppointmentService {
         try {
 
             const app = await this.appointmentRepository.query(queries.getAppointmentForDoctor, [appointmentDto.appointmentDate, appointmentDto.doctorId]);
+            const currentAppointment = await this.appointmentRepository.findOne(appointmentDto.appointmentId)
+
             if (app.length) {
                 // // validate with previous data
                 let isOverLapping = await this.findTimeOverlapingForAppointments(app, appointmentDto);
@@ -883,6 +886,7 @@ export class AppointmentService {
             if (isCancel.statusCode != HttpStatus.OK) {
                 return isCancel;
             } else {
+                appointmentDto = {...appointmentDto, reportid: currentAppointment?.reportid || null}
                 const appoint = await this.appointmentRepository.createAppointment(appointmentDto);
                 if (!appoint.message) {
                     const appDocConfig = await this.appointmentDocConfigRepository.createAppDocConfig(appointmentDto);
@@ -1281,25 +1285,28 @@ export class AppointmentService {
     async patientUpcomingAppointments(user: any): Promise<any> {
         try {
             let d = new Date();
-            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();  // getting only today's date, so next day ipcoming data failed to result
             //var date = moment().format('YYYY-MM-DD');
             let offset = (user.paginationNumber) * (user.limit);
 
-            let app;
+            let app;        
+            this.logger.log("patientUpcomingAppointments Query >>> " + date + ", offset:"+offset);
 
             if (user.limit) {
+                this.logger.log("patientUpcomingAppointments Query 1 >>> " + queries.getUpcomingAppointmentsWithPagination);
 
                 app = await this.appointmentRepository.query(queries.getUpcomingAppointmentsWithPagination, [user.patientId, date, offset, user.limit, 'notCompleted', 'paused']);
                 if (!app.length) {
                     return [];
                 }
             } else {
+                this.logger.log("patientUpcomingAppointments Query 2 >>> " + queries.getTodayAppointments);
                 app = await this.appointmentRepository.query(queries.getTodayAppointments, [user.patientId, date, 'notCompleted', 'paused']);
                 if (!app.length) {
                     return [];
                 }
             }
-
+            this.logger.log("patientUpcomingAppointments Query 3 >>> " + queries.getUpcomingAppointmentsCounts);
             const appNum = await this.appointmentRepository.query(queries.getUpcomingAppointmentsCounts, [user.patientId, date, 'notCompleted', 'paused']);
             let appNumber = appNum.length;
             if (app.length) {
@@ -1329,7 +1336,8 @@ export class AppointmentService {
                                 preConsultationMins: preConsultationMins,
                                 doctorId: appointmentList.doctorId,
                                 doctorKey: doctor.doctorKey,
-                                liveStatus : doctor.liveStatus
+                                liveStatus : doctor.liveStatus,
+                                email: doctor.email,
                             }
                             appList.push(res);
                         }
@@ -1356,7 +1364,8 @@ export class AppointmentService {
                             preConsultationMins: preConsultationMins,
                             doctorId: appointmentList.doctorId,
                             doctorKey: doctor.doctorKey,
-                            liveStatus : doctor.liveStatus
+                            liveStatus : doctor.liveStatus,
+                            email: doctor.email,
                         }
                         appList.push(res);
                     }
@@ -1686,6 +1695,7 @@ export class AppointmentService {
             firstName: doctor.firstName,
             lastName: doctor.lastName,
             speciality: doctor.speciality,
+            experience: doctor?.experience,
             mobileNo: doctor.number,
             hospitalName: account.hospitalName,
             street:account.street1,
@@ -2689,12 +2699,10 @@ export class AppointmentService {
     async patientFileUpload(reports: any): Promise<any> {
 
         const AWS = require('aws-sdk');
-        let htmlPdf: any = '';
         const ID = 'AKIAISEHN3PDMNBWK2UA';
         const SECRET = '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';
         const BUCKET_NAME = 'virujh-cloud';
         const date = new Date();
-        const ReportDate = moment().format('YYYY-MM-DD');
 
         // s3 bucket creation
         const s3 = new AWS.S3({
@@ -2773,7 +2781,7 @@ export class AppointmentService {
         const patientId = data.patientId;
         const offset = data.paginationStart;
         const endset = data.paginationLimit;
-        const searchText = data.searchText;
+        const searchText = data.searchText?.toLowerCase();
         const appointmentId = data.appointmentId;
         const active = true;
         let response = {};
@@ -3197,8 +3205,9 @@ export class AppointmentService {
         const prescription = await this.medicineRepository.query(queries.getPrescriptionDetails, [appointmentId])
         //pres remark
         const remarks=await this.prescriptionRepository.query(queries.getRemarks,[appointmentId])
-        console.log(remarks);
-        const prescriptionRemarks=remarks?.[0].remarks;
+
+        const prescriptionRemarks = remarks && remarks.length ? remarks[remarks.length-1].remarks : null;
+
         return {
             appointmentId,
             prescription,
@@ -3209,8 +3218,29 @@ export class AppointmentService {
         return await this.appointmentRepository.query(queries.getAppointmentDetails, [appointmentId])
     }
 
-    async getAppointmentReports(appoinmentId: Number): Promise<any> {
-        const reports = await this.appointmentRepository.query(queries.getAppointmentReports, [appoinmentId])
+    async getAppointmentReports(appoinmentId: any): Promise<any> {
+
+        const appointmentDetails = await this.appointmentRepository.findOne({ id: appoinmentId });
+
+        
+        const reports=[];
+         if(appointmentDetails.reportid){   
+            const reportIds = appointmentDetails.reportid.split(',');
+            for(const id of reportIds) {
+                const report = await this.patientReportRepository.findOne({
+
+                    where: {
+                        id: parseInt(id),
+                        active:true
+                    }
+                    });
+                    if(report)
+                        reports.push(report);
+    
+            }
+            
+        
+    }
 
         return {
             statusCode: HttpStatus.OK,
@@ -3222,11 +3252,10 @@ export class AppointmentService {
 
     async updatereport(data: any): Promise<any> {
 
-        if(data.insertId){
         var account = await this.appointmentRepository.find({ id : data.appointmentId })  
         var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.insertId;
-        data.id = account[0].reportid ? account[0].reportid + ',' + data.id : data.id;
+        data.id = data.insertId;
+        data.id = data.insertId;
         
         if(account.length){
             const app = await this.appointmentRepository.updateReportId(data)
@@ -3240,27 +3269,7 @@ export class AppointmentService {
             }
         }
         
-        
-    }
     
-    if(data.deleteId){
-        var account = await this.appointmentRepository.find({ id : data.appointmentId })  
-        var arr = JSON.parse("[" + account[0].reportid + "]");
-        data.id=data.deleteId
-        const tempArr = arr.filter(val => (val != data.id) );
-        const newid=tempArr.toString()
-        data.id =  newid ;
-        if(account.length){
-        const app = await this.appointmentRepository.deleteReportid(data)
-        return app
-        }
-        else{
-            return {
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: CONSTANT_MSG.NOREPORT,
-            }
-        }
-    }
 
     }
 
@@ -3289,11 +3298,12 @@ export class AppointmentService {
             doctor.email = doctorDto.email || null;
             doctor.liveStatus = "online";
             doctor.registrationNumber = doctorDto.registrationNumber;
-            const docDetail = await this.doctorRepository.query(queries.insertDoctorInCalender,
-                [doctor.doctorName, doctor.accountKey, doctor.doctorKey, doctor.experience, doctor.speciality, doctor.qualification,
-                doctor.number, doctor.firstName, doctor.lastName, doctor.registrationNumber, doctor.email, doctor.liveStatus]);
-            if (docDetail) return doctorDto; 
-            else return null;
+            // const docDetail = await this.doctorRepository.query(queries.insertDoctorInCalender,
+            //     [doctor.doctorName, doctor.accountKey, doctor.doctorKey, doctor.experience, doctor.speciality, doctor.qualification,
+            //     doctor.number, doctor.firstName, doctor.lastName, doctor.registrationNumber, doctor.email, doctor.liveStatus]);
+            // if (docDetail) return doctorDto; 
+            // else
+             return null;
             } catch (err) {
                 return err;
             }

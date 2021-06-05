@@ -695,7 +695,7 @@ export class CalendarController {
         }
         if(req.body.firstName){
             // patientDto.lastName = "";
-            patientDto.name =  req.body.firstName+ " " + patientDto.lastName;
+            patientDto.name =  req.body.firstName + " " + (patientDto.lastName ? patientDto.lastName : '');
         }
         if(req.body.firstName){
                 patientDto.firstName =  req.body.firstName;
@@ -2068,7 +2068,7 @@ export class CalendarController {
     @UseGuards(AuthGuard())
     @ApiTags('Doctors')
     @ApiQuery({ name: 'appointmentId', required: true })
-    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : Number) {
+    async getAppointmentReports(@Request() req, @Query('appointmentId') appointmentId : any) {
         // check doctor & admin permission
 
         if(!appointmentId) {

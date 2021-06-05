@@ -44,6 +44,9 @@ export class AppointmentRepository extends Repository<Appointment> {
         }else{
             appointment.createdBy = CONSTANT_MSG.ROLES.PATIENT;
             appointment.createdId = appointmentDto.patientId;
+        }
+        if(appointmentDto?.reportid){
+            appointment.reportid = appointmentDto.reportid
         }               
 
         try {

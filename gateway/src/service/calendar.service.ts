@@ -456,7 +456,7 @@ export class CalendarService implements OnModuleInit, OnModuleDestroy {
 
     //get appoinment reports using appointment id
     @UseFilters(AllClientServiceException)
-    public getAppointmentReports(appoinmnetId: Number) : Promise<any> {
+    public getAppointmentReports(appoinmnetId: any) : Promise<any> {
         return this.redisClient.send({ cmd: 'get_appointment_reports' }, appoinmnetId).toPromise()
     }
 

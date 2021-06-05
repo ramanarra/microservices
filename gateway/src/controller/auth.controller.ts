@@ -394,7 +394,7 @@ export class AuthController {
       }
       userDto.role = CONSTANT_MSG.ROLES.DOCTOR;
 
-      this.logger.log(`Doctor Login  Api -> Request data ${JSON.stringify(userDto)}`);
+      this.logger.log(`Doctor forgotPassword  Api -> Request data ${JSON.stringify(userDto)}`);
       const doc:any = await this.userService.doctorsForgotPassword(userDto);
       if(doc.statusCode === HttpStatus.OK){
         const template = await this.calendarService.getMessageTemplate({messageType: 'FORGOT_PASSWORD', communicationType: 'Email'});
@@ -442,7 +442,7 @@ export class AuthController {
       const patient = await this.userService.patientForgotPassword(patientDto);
       if (patient) {
         const patientDetail = await this.calendarService.patientDetailsByPatientId(patient.patientId);
-        if(patient.statusCode === HttpStatus.OK && patientDetail) {
+        if(patient.statusCode === HttpStatus.OK && patientDetail && patientDetail.email) {
             const template = await this.calendarService.getMessageTemplate({messageType: 'FORGOT_PASSWORD', communicationType: 'Email'});
 
             if(template && template.data){
