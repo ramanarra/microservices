@@ -21,7 +21,8 @@ export class docConfigRepository extends Repository<docConfig> {
         const Saturday = await this.query(queries.saturday, [doctor.doctorId, doctor.doctorKey, 'Saturday'])
 
         const config = new docConfig();
-        config.doctorKey = doctorDto.doctorKey;
+        console.log(doctorDto['doctor_key'])
+        config.doctorKey = doctorDto['doctor_key'];
         config.consultationCost = doctorDto['consultationCost'] ? doctorDto['consultationCost'] : 100;
         config.consultationSessionTimings = doctorDto['consultationSessionTimings'] ? doctorDto['consultationSessionTimings'] : 15;
         config.isPatientRescheduleAllowed = false;

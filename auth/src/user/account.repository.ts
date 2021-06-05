@@ -72,7 +72,7 @@ export class AccountRepository extends Repository<Account> {
         account.account_name = doctorDto.hospitalName;
         account.updated_time = new Date();
         account.updated_user = doctorDto.updated_user ? doctorDto.updated_user : null;
-        account.is_active = true;
+        account.is_active = false;
         try {
             const accRes = await account.save();
             const user = new Users();
@@ -100,6 +100,7 @@ export class AccountRepository extends Repository<Account> {
             await userRole.save();
             return user;
         } catch (error) {
+            console.log(error)
             this.logger.error(`Unexpected Sign up process save error` + error);
             throw new InternalServerErrorException();
         }
