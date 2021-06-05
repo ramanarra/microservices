@@ -131,7 +131,7 @@ export const queries = {
     getAmountListReportWithLimit: `  and appointment."appointment_date" =$4 order by appointment."appointment_date" DESC offset $2 limit $3`,
     getAmountListReportWithSearch: `  where doctor."doctor_key" =  $1   AND  (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  and appointment."appointment_date" =$5 order by appointment."appointment_date" DESC offset $2 limit $3`,
     getAmountListReportWithoutLimitSearch: `    AND  (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2))  and appointment."appointment_date" = $3 order by appointment."appointment_date" DESC`,
-    getAmountListReportWithFilterSearch: `  and appointment."appointment_date" BETWEEN $5 and $6 AND  (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  order by appointment."appointment_date" DESC offset $2 limit $3`,
+    getAmountListReportWithFilterSearch: `  where doctor."doctor_key" =  $1  and appointment."appointment_date" BETWEEN $5 and $6 AND  (LOWER(name) LIKE LOWER($4) OR LOWER(doctor_name) LIKE LOWER($4) OR (phone) LIKE ($4) OR (amount) LIKE ($4) OR  CAST (appointment_date AS TEXT ) LIKE ($4) OR CAST ("createdTime" AS TEXT ) LIKE ($4)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($4) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($4))  order by appointment."appointment_date" DESC offset $2 limit $3`,
     getAmountListReportWithoutLimitFilterSearch: `   and appointment."appointment_date" BETWEEN $3 and $4 AND (LOWER(name) LIKE LOWER($2) OR LOWER(doctor_name) LIKE LOWER($2) OR (phone) LIKE ($2) OR (amount) LIKE ($2) OR  CAST (appointment_date AS TEXT ) LIKE ($2) OR CAST ("createdTime" AS TEXT ) LIKE ($2)  OR  CAST ("slotTiming" AS TEXT ) LIKE ($2) OR  CAST (appointment.patient_id AS TEXT ) LIKE ($2)) order by appointment."appointment_date" DESC`,
     getAmountListReportWithFilter: `  and appointment."appointment_date" BETWEEN $4 and $5  order by appointment."appointment_date" DESC offset $2 limit $3`,
     getAmountListReportWithoutLimitFilter: `  and appointment."appointment_date" BETWEEN $2 and $3 order by appointment."appointment_date" DESC`,
@@ -154,5 +154,9 @@ export const queries = {
     getAppointmentReports: `select pr.patient_id as PatientId, pr.file_name as fileName, pr.report_url as attachment, pr.file_type as fileType, pr."comments", pr.report_date as reportDate 
                                 from patient_report pr 
                              where appointment_id  = $1`,
-    getRemarks:`select * from prescription where appointment_id=$1`,  
+    getRemarks:`select * from prescription where appointment_id=$1`,
+    getAccountDetail: 'select account_id from account where account_key=$1',
+    insertDoctorInCalender: 'INSERT INTO public.doctor(doctor_name, account_key, doctor_key, experience, speciality, qualification, number, last_name, first_name, registration_number, email, live_status)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);',
+    insertAccountDetail: 'INSERT INTO public.account_details(account_key, hospital_name, pincode, phone, account_details_id) VALUES ($1, $2, $3, $4, $5);',
+    getAccountDetailCalendar: 'select account_details_id from account_details Order by account_details_id DESC limit 1'
 }

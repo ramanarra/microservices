@@ -562,9 +562,12 @@ export class AppointmentController {
         const pat = await this.appointmentService.getPatientDetails(patientDto.patientId); 
         const account = await this.appointmentService.accountDetails(docId.accountKey); 
         if(app){
-            const pay = await this.paymentDetailsRepository.findOne( { where : {id : patientDto.paymentId}});
-            pay.appointmentId = app.appointment.appointmentdetails.id;
-            const payment = await this.paymentDetailsRepository.save(pay);
+            if(patientDto.paymentId) {
+                const pay = await this.paymentDetailsRepository.findOne( { where : {id : patientDto.paymentId}});
+                pay.appointmentId = app.appointment.appointmentdetails.id;
+                const payment = await this.paymentDetailsRepository.save(pay);
+            }
+            
             let data={
                 email:doctor.email,
                 appointmentId:app.appointment.appointmentdetails.id,
@@ -1447,15 +1450,6 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'create_doctor_detail'})
     async createDoctorDetail(doctorDto: DoctorDto): Promise<any> {
-        const maxRegKey: any = await this.doctorRepository.query(queries.getRegKey);
-        let regKey = 'RegD_';
-        if (maxRegKey.length) {
-            let m = maxRegKey[0];
-            regKey = regKey + (Number(m.maxreg) + 1);
-        } else {
-            regKey = 'RegD_1';
-        }
-        doctorDto.registrationNumber = regKey;
         const account = await this.appointmentService.registerDoctorDetail(doctorDto);
         return account;
     }
