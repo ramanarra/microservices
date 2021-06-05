@@ -20,6 +20,7 @@ export class PrescriptionRepository extends Repository<Prescription> {
         prescription.patientName = accountDto.patientName ? accountDto.patientName : null;
         prescription.prescriptionUrl =accountDto.prescriptionUrl? accountDto.prescriptionUrl : null;
         prescription.remarks = accountDto.remarks ? accountDto.remarks : null;
+        prescription.diagnosis = accountDto.diagnosis ? accountDto.diagnosis : null;
         prescription.hospitalAddress = accountDto.hospitalAddress ? accountDto.hospitalAddress : null;
         
         try {

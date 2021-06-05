@@ -52,6 +52,11 @@ export class Prescription extends BaseEntity{
         name : 'remarks'
     })
     remarks : string;
+
+    @Column({
+        name : 'diagnosis'
+    })
+    diagnosis : string;
     
     @Column({
         name : 'hospitalAddress'
