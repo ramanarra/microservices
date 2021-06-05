@@ -1,4 +1,4 @@
-import {HttpStatus, Injectable,Logger} from '@nestjs/common';
+import {HttpStatus, Injectable, Logger, InternalServerErrorException} from '@nestjs/common';
 import {AppointmentRepository} from './appointment.repository';
 import {InjectRepository} from '@nestjs/typeorm';
 import {CONSTANT_MSG, DocConfigDto, DoctorDto, Email, HospitalDto, PatientDto, queries, Sms} from 'common-dto';
@@ -193,16 +193,10 @@ export class AppointmentService {
             if (doctorList.length) {
                 return res;
             } else {
-                return {
-                    statusCode: HttpStatus.NO_CONTENT,
-                    message: CONSTANT_MSG.INVALID_REQUEST
-                }
+                return []
             }
         } catch (e) {
-            return {
-                statusCode: HttpStatus.NO_CONTENT,
-                message: CONSTANT_MSG.DB_ERROR
-            }
+            return []
         }
     }
 
@@ -3274,13 +3268,11 @@ export class AppointmentService {
     }
 
     async  registerDoctorDetail(doctorDto: DoctorDto): Promise<any> {
-        if (doctorDto['isAccountKey']) {
-            const accountDetail = await this.createAccountDetail(doctorDto);
-            const doctor = await this.createDoctorDetail(doctorDto);
-            return doctor;
-          } else {
-            return await this.createDoctorDetail(doctorDto);
-          }
+        const accountDetail = await this.createAccountDetail(doctorDto);
+        const doctor = await this.doctorRepository.doctorRegistration(doctorDto);
+        doctorDto.registrationNumber = doctor.registrationNumber;
+        const config = await this.doctorConfigRepository.doctorConfigSetup(doctor, doctorDto);
+        return doctorDto;
     }
 
     async createDoctorDetail(doctorDto: any) : Promise<any> {
@@ -3311,14 +3303,29 @@ export class AppointmentService {
 
     async createAccountDetail(doctorDto: any) : Promise<any> {
         try {
-            // const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
-            // if (account && account.length) {
-                // const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
-                //     [doctorDto.accountKey, doctorDto['hospitalName'], '600000', doctorDto.number, account[0].account_details_id + 1]);
-            //         return doctorDto;
-            // } else {
-                return null;
-            // }
+            const account = await this.accountDetailsRepository.query(queries.getAccountDetailCalendar);
+            if (account && account.length) {
+                try {
+                const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
+                    [doctorDto.accountKey, doctorDto['hospitalName'] || null, '600000', doctorDto.number, account[0].account_details_id + 1]);
+                    return doctorDto;
+                } catch (error) {
+                    this.logger.error(`Unexpected Appointment save error` + error.message);
+                    throw new InternalServerErrorException();
+                }
+            } else {
+                try {
+                    console.log(doctorDto)
+                    const accountDetail = await this.accountDetailsRepository.query(queries.insertAccountDetail,
+                        [doctorDto.accountKey, doctorDto['hospitalName'] || null, '600000', doctorDto.number, 1]);
+                        console.log(accountDetail)
+                        return doctorDto;
+                } catch (error) {
+                    this.logger.error(`Unexpected Appointment save error` + error.message);
+                    throw new InternalServerErrorException();
+                }
+               
+            }
         } catch (err) {
             return err;
         }

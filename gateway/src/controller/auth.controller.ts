@@ -641,8 +641,8 @@ export class AuthController {
     @ApiTags('Doctors')
     @ApiBody({type: DoctorDto})
     @ApiOkResponse({ description: 'requestBody example :{"email":"dharani@gmail.com","firstName":"Dharani",' +
-            '"lastName":"Antharvedi","accountKey":5, "specialization": "Child", ' +
-            '"qualification": "MBBS", "experience": "5", "consultationCost" : "100", "password": "123456", ' +
+            '"lastName":"Antharvedi", "registrationNumber": "RegD_1", "hospitalName": "Kauvery Hospital", "specialization": "Child", ' +
+            '"qualification": "MBBS", "experience": "5", "password": "123456", ' +
             '"number":"7845127845", "description":"SAHA WORKING WITH CUTE"}' })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
     async doctorRegistrationNew(@Body() doctorDto : DoctorDto) {
@@ -650,6 +650,11 @@ export class AuthController {
             return {
                 statusCode: HttpStatus.BAD_REQUEST,
                 message: "Provide email"
+            }
+        } else if(!doctorDto.registrationNumber) {
+            return {
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: "Provide registrationNumber"
             }
         } else {
             doctorDto.email = doctorDto.email.toLowerCase();

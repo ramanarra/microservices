@@ -1447,15 +1447,6 @@ export class AppointmentController {
 
     @MessagePattern({cmd: 'create_doctor_detail'})
     async createDoctorDetail(doctorDto: DoctorDto): Promise<any> {
-        const maxRegKey: any = await this.doctorRepository.query(queries.getRegKey);
-        let regKey = 'RegD_';
-        if (maxRegKey.length) {
-            let m = maxRegKey[0];
-            regKey = regKey + (Number(m.maxreg) + 1);
-        } else {
-            regKey = 'RegD_1';
-        }
-        doctorDto.registrationNumber = regKey;
         const account = await this.appointmentService.registerDoctorDetail(doctorDto);
         return account;
     }

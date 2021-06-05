@@ -23,7 +23,7 @@ export class DoctorRepository extends Repository<Doctor> {
 
         const doctor = new Doctor();
         doctor.accountKey = doctorDto.accountKey;
-        doctor.doctorKey = doctorDto.doctorKey;
+        doctor.doctorKey = doctorDto['doctor_key'];
         doctor.email = doctorDto.email;
         doctor.firstName = doctorDto['firstName'];
         doctor.lastName = doctorDto['lastName'];
@@ -34,11 +34,12 @@ export class DoctorRepository extends Repository<Doctor> {
         doctor.photo = doctorDto.photo ? doctorDto.photo : null;
         doctor.number = doctorDto.number ? doctorDto.number : null;
         doctor.signature = doctorDto.signature ? doctorDto.signature : null;
-        doctor.registrationNumber = doctorDto.registrationNumber ? doctorDto.registrationNumber : null;
+        doctor.registrationNumber = doctorDto.registrationNumber ? doctorDto.registrationNumber : null
 
         try {
             return await doctor.save();
         } catch (error) {
+            console.log(error)
             this.logger.error(`Unexpected Appointment save error` + error.message);
             throw new InternalServerErrorException();
         }

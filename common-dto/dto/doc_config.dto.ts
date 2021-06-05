@@ -7,7 +7,7 @@ export class DocConfigDto {
     doctorKey: string;
     @IsOptional()
     @IsNumber()
-    @Min(1)
+    @Min(0)
     @Max(9999)
     consultationCost: string;
     isPreconsultationAllowed: boolean;
