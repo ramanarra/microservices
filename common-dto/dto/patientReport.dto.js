@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReportdeleteDto = exports.patientReportDto = void 0;
+exports.patientReportDto = void 0;
 const class_validator_1 = require("class-validator");
 class patientReportDto {
 }
@@ -27,10 +27,3 @@ __decorate([
     __metadata("design:type", Number)
 ], patientReportDto.prototype, "appointmentId", void 0);
 exports.patientReportDto = patientReportDto;
-class ReportdeleteDto {
-}
-__decorate([
-    class_validator_1.IsNumber(),
-    __metadata("design:type", Number)
-], ReportdeleteDto.prototype, "id", void 0);
-exports.ReportdeleteDto = ReportdeleteDto;

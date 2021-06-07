@@ -21,7 +21,7 @@ __decorate([
 __decorate([
     class_validator_1.IsOptional(),
     class_validator_1.IsNumber(),
-    class_validator_1.Min(0),
+    class_validator_1.Min(1),
     class_validator_1.Max(9999),
     __metadata("design:type", String)
 ], DocConfigDto.prototype, "consultationCost", void 0);
