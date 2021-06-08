@@ -20,13 +20,13 @@ Unix OS
   Development - docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d
   Production  - docker-compose -f docker-compose.yml -f docker-compose-prod.yml up -d
 ```
-### Commands to stop and remove container:
+## Commands to stop and remove container:
 ```
   Local       - docker-compose -f docker-compose.yml -f docker-compose-loc.yml down
   Development - docker-compose -f docker-compose.yml -f docker-compose-dev.yml down
   Production  - docker-compose -f docker-compose.yml -f docker-compose-prod.yml down
 ```
-### Commands to view and remove images:
+## Commands to view and remove images:
 ```
 To list images   - docker images
 To remove images - docker rmi <image-name>
