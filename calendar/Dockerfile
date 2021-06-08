@@ -18,11 +18,7 @@ FROM node:10.23.1
 # Add bitbuckets key
 #RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts    
 
-RUN unlink /etc/timezone
-RUN ln -s /usr/share/zoneinfo/Asia/Kolkata /etc/timezone
-
-RUN unlink /etc/localtime
-RUN ln -s /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+ RUN ls /usr/share/zoneinfo && cp /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && echo "Asia/Kolkata" >  /etc/timezone
 
 # create and set app directory
 RUN mkdir -p /usr/src/app
